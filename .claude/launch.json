@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "fleetmanage-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:node"],
+      "port": 5173
+    }
+  ]
+}

@@ -24,24 +24,41 @@ world (per-tenant currency, units, and timezone).
 
 ## Local development
 
-Prereqs: Node 20+, [Supabase CLI](https://supabase.com/docs/guides/cli), Docker (for local Supabase).
+Prereqs: Node 20+. Two backend options:
+
+**Option A — hosted Supabase (no Docker):** create a free project at
+[database.new](https://database.new), then apply the schema and configure env:
 
 ```bash
 npm install
+npx supabase login
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase db push                       # applies supabase/migrations
+cp .env.example .env                       # set VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
+cp .dev.vars.example .dev.vars             # set SUPABASE_URL + ANON + SERVICE_ROLE keys
+```
 
-# 1. Start local Supabase (applies supabase/migrations automatically)
-supabase start
+**Option B — local Supabase (needs Docker):** `npx supabase start`, then copy the
+printed keys into `.env` / `.dev.vars` the same way.
 
-# 2. Configure env — copy the keys `supabase start` prints
-cp .env.example .env            # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
-cp .dev.vars.example .dev.vars  # SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+Run the app:
 
-# 3. Generate worker types + run the app (SPA + Worker API together)
+```bash
 npm run cf-typegen -- --include-runtime=false
-npm run dev
+npm run dev          # SPA + Worker API inside workerd (Cloudflare's runtime)
+```
+
+If workerd cannot start on your machine (a known issue on some Windows hosts —
+symptom: `Error: write EOF`), use the workerd-free mode in two terminals:
+
+```bash
+npm run dev:api      # the same Hono API hosted on Node at :8788
+npm run dev:node     # Vite SPA at :5173, /api proxied to :8788
 ```
 
 Open http://localhost:5173, create an organization on `/signup`, and you're in.
+Optionally seed a demo tenant: `node scripts/seed-demo.mjs`.
+Run unit tests with `npm test`.
 
 ## Deployment
 

@@ -26,9 +26,15 @@ units (km/mi, L/gal), timezone.
 - [x] Phase 4 — Core CRUD: vehicles (list/detail/form/assignment), drivers (license expiry badges)
 - [x] Phase 5 — Ops modules: maintenance (reminders + work orders), WO detail w/ line items, fuel (efficiency), inspections (+new w/ checklist → auto-issues), issues (→ WO conversion), renewals — 17 review findings fixed
 - [x] Phase 6 — Dashboard (KPIs, 6-mo spend chart, status donut, due-soon lists), reports (cost/vehicle + fuel efficiency + CSV export), settings (org/members/invitations) — 7 review findings fixed (incl. invitations tenant_id default)
-- [ ] Phase 7 — Polish: code-split heavy pages, final consistency pass
-- [ ] Phase 8 — Deployment: wrangler config finalized, env docs, README with Supabase+Cloudflare deploy steps, seed demo tenant, typecheck+build+tests green
-- [ ] Phase 9 — Final E2E verify in browser against local dev, fix gaps, stop loop
+- [x] Phase 7 — Polish: code-split heavy pages (recharts lazy chunk)
+- [x] Phase 8 — Deployment: wrangler config, README (deploy + no-docker dev path), seed script, unit tests (16 passing), build green
+- [~] Phase 9 — Verification (as far as possible without a Supabase backend):
+  - [x] Build + typecheck green; 16 unit tests pass (unit conversions, money, efficiency)
+  - [x] Browser smoke test: auth redirect, login + signup render, global onboarding selects populated, TZ auto-detect
+  - [x] /api/health OK (Node host direct + vite proxy); client→API error path surfaces cleanly
+  - [x] workerd broken on this machine (exit 53) → added workerd-free dev mode (dev:node + dev:api via @hono/node-server)
+  - [ ] BLOCKED on credentials: full data E2E + production deploy need a hosted Supabase project (user account) + `wrangler login`
+    Docker path abandoned per user instruction (Docker Desktop also crashed on stale AF_UNIX sockets + factory reset removed WSL distro).
 
 ## Conventions
 - Money stored as numeric cents-free `numeric(12,2)` + tenant currency code; distances stored in km, volumes in liters (canonical), converted for display by tenant units.
