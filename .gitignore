@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env
+.env.local
+*.local
+worker-configuration.d.ts
+supabase/.temp/
+supabase/.branches/
+.DS_Store
