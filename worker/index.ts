@@ -1,4 +1,7 @@
 import { Hono } from "hono";
+import { onboarding } from "./onboarding";
+import { invitations } from "./invitations";
+import { members } from "./members";
 
 export type Bindings = {
   SUPABASE_URL: string;
@@ -9,6 +12,10 @@ export type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>().basePath("/api");
 
 app.get("/health", (c) => c.json({ ok: true, service: "fleetmanage-api" }));
+
+app.route("/onboarding", onboarding);
+app.route("/invitations", invitations);
+app.route("/members", members);
 
 app.notFound((c) => c.json({ error: "Not found" }, 404));
 
