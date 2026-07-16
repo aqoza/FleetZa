@@ -24,9 +24,9 @@ units (km/mi, L/gal), timezone.
 - [x] Phase 2 — Supabase: config, full schema migration, RLS + helper fns, indexes (seed deferred to Phase 8)
 - [x] Phase 3 — Auth + onboarding: worker API (signup/invite/members), auth context, login/signup/accept-invite pages, protected routes + app shell
 - [x] Phase 4 — Core CRUD: vehicles (list/detail/form/assignment), drivers (license expiry badges)
-- [ ] Phase 5 — Ops modules (IN PROGRESS via workflow wf_64750a62-912): maintenance page (reminders + work orders), WO detail w/ line items, fuel (efficiency), inspections (+new w/ checklist → auto-issues), issues (→ WO conversion), renewals
-- [ ] Phase 6 — Dashboard (KPIs, charts, upcoming reminders/renewals), reports (cost per vehicle, fuel efficiency), renewals & alert surfacing
-- [ ] Phase 7 — Settings: tenant profile (currency/units/timezone), members & roles UI, invitations UI; role-based UI gating; polish (empty states, loading, errors, responsive)
+- [x] Phase 5 — Ops modules: maintenance (reminders + work orders), WO detail w/ line items, fuel (efficiency), inspections (+new w/ checklist → auto-issues), issues (→ WO conversion), renewals — 17 review findings fixed
+- [x] Phase 6 — Dashboard (KPIs, 6-mo spend chart, status donut, due-soon lists), reports (cost/vehicle + fuel efficiency + CSV export), settings (org/members/invitations) — 7 review findings fixed (incl. invitations tenant_id default)
+- [ ] Phase 7 — Polish: code-split heavy pages, final consistency pass
 - [ ] Phase 8 — Deployment: wrangler config finalized, env docs, README with Supabase+Cloudflare deploy steps, seed demo tenant, typecheck+build+tests green
 - [ ] Phase 9 — Final E2E verify in browser against local dev, fix gaps, stop loop
 

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -6,7 +7,6 @@ import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import AcceptInvitePage from "./pages/auth/AcceptInvitePage";
 import { LoadingState } from "./components/ui";
-import DashboardPage from "./pages/DashboardPage";
 import VehiclesPage from "./pages/vehicles/VehiclesPage";
 import VehicleDetailPage from "./pages/vehicles/VehicleDetailPage";
 import DriversPage from "./pages/drivers/DriversPage";
@@ -17,8 +17,11 @@ import InspectionsPage from "./pages/inspections/InspectionsPage";
 import NewInspectionPage from "./pages/inspections/NewInspectionPage";
 import IssuesPage from "./pages/issues/IssuesPage";
 import RenewalsPage from "./pages/renewals/RenewalsPage";
-import ReportsPage from "./pages/reports/ReportsPage";
 import SettingsPage from "./pages/settings/SettingsPage";
+
+// recharts is heavy — split the chart pages into their own chunks
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
+const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,7 +58,14 @@ export default function App() {
 
             <Route element={<Protected />}>
               <Route element={<AppLayout />}>
-                <Route path="/" element={<DashboardPage />} />
+                <Route
+                  path="/"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <DashboardPage />
+                    </Suspense>
+                  }
+                />
                 <Route path="/vehicles" element={<VehiclesPage />} />
                 <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
                 <Route path="/drivers" element={<DriversPage />} />
@@ -66,7 +76,14 @@ export default function App() {
                 <Route path="/inspections/new" element={<NewInspectionPage />} />
                 <Route path="/issues" element={<IssuesPage />} />
                 <Route path="/renewals" element={<RenewalsPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
+                <Route
+                  path="/reports"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ReportsPage />
+                    </Suspense>
+                  }
+                />
                 <Route path="/settings/*" element={<SettingsPage />} />
               </Route>
             </Route>
