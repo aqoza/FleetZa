@@ -83,7 +83,7 @@ create index profiles_tenant_idx on public.profiles (tenant_id);
 
 create table public.invitations (
   id         uuid primary key default gen_random_uuid(),
-  tenant_id  uuid not null references public.tenants (id) on delete cascade,
+  tenant_id  uuid not null default app.tenant_id() references public.tenants (id) on delete cascade,
   email      text not null,
   role       text not null default 'viewer' check (role in ('admin', 'manager', 'viewer')),
   token      uuid not null unique default gen_random_uuid(),

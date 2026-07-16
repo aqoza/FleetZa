@@ -20,11 +20,11 @@ units (km/mi, L/gal), timezone.
 
 ## Phases
 - [x] Phase 0 — Research + this plan
-- [ ] Phase 1 — Scaffold: npm project, Vite + React + Tailwind + Cloudflare plugin, Hono worker, tsconfig, wrangler.jsonc, builds green
-- [ ] Phase 2 — Supabase: config, full schema migration (tenants, profiles, invitations, vehicles, drivers, assignments, service_reminders, work_orders, fuel_logs, inspections + templates, issues, renewals, comments/attachments meta), RLS + helper fns, indexes, seed script
-- [ ] Phase 3 — Auth + onboarding: signup→create tenant (Worker), login, invite flow (create/accept), auth context, protected routes, org switcher not needed (1 tenant/user v1)
-- [ ] Phase 4 — Core CRUD: vehicles (list/detail/form, status, odometer), drivers (license expiry), assignments
-- [ ] Phase 5 — Ops modules: service reminders, work orders (+line items), fuel logs (efficiency calc), inspections (template + submit), issues
+- [x] Phase 1 — Scaffold: npm project, Vite + React + Tailwind + Cloudflare plugin, Hono worker, tsconfig, wrangler.jsonc, builds green
+- [x] Phase 2 — Supabase: config, full schema migration, RLS + helper fns, indexes (seed deferred to Phase 8)
+- [x] Phase 3 — Auth + onboarding: worker API (signup/invite/members), auth context, login/signup/accept-invite pages, protected routes + app shell
+- [x] Phase 4 — Core CRUD: vehicles (list/detail/form/assignment), drivers (license expiry badges)
+- [ ] Phase 5 — Ops modules (IN PROGRESS via workflow wf_64750a62-912): maintenance page (reminders + work orders), WO detail w/ line items, fuel (efficiency), inspections (+new w/ checklist → auto-issues), issues (→ WO conversion), renewals
 - [ ] Phase 6 — Dashboard (KPIs, charts, upcoming reminders/renewals), reports (cost per vehicle, fuel efficiency), renewals & alert surfacing
 - [ ] Phase 7 — Settings: tenant profile (currency/units/timezone), members & roles UI, invitations UI; role-based UI gating; polish (empty states, loading, errors, responsive)
 - [ ] Phase 8 — Deployment: wrangler config finalized, env docs, README with Supabase+Cloudflare deploy steps, seed demo tenant, typecheck+build+tests green
