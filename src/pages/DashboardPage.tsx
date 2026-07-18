@@ -1,6 +1,15 @@
 import { useMemo, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { format, subMonths } from "date-fns";
+import {
+  Activity,
+  AlertTriangle,
+  BellRing,
+  Building2,
+  Truck,
+  Wrench,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -14,8 +23,15 @@ import {
   YAxis,
 } from "recharts";
 import { listRows } from "../lib/db";
-import { daysUntil, formatCompact, formatDate, formatDistance, formatMoney } from "../lib/format";
-import { renewalTypes, vehicleStatus } from "../lib/labels";
+import {
+  daysUntil,
+  formatCompact,
+  formatDate,
+  formatDateTime,
+  formatDistance,
+  formatMoney,
+} from "../lib/format";
+import { renewalTypes, vehicleStatus, workOrderStatus } from "../lib/labels";
 import type {
   FuelLog,
   Issue,
@@ -26,10 +42,17 @@ import type {
   VehicleStatus,
   WorkOrder,
 } from "../lib/types";
-import { useTenant } from "../context/AuthContext";
+import { useAuth, useTenant } from "../context/AuthContext";
 import { useModules } from "../context/ModulesContext";
-import { Badge, Card, ErrorState, LoadingState, PageHeader } from "../components/ui";
-import { useT } from "../i18n";
+import {
+  Badge,
+  Card,
+  ErrorState,
+  LoadingState,
+  PageHeader,
+  StatCard,
+} from "../components/ui";
+import { useT, type MessageKey } from "../i18n";
 
 type ReminderRow = ServiceReminder & { vehicles: { name: string; odometer: number } };
 type RenewalRow = Renewal & { vehicles: { name: string } | null };
@@ -37,16 +60,53 @@ type WorkOrderRow = WorkOrder & {
   work_order_lines: { quantity: number; unit_cost: number }[];
 };
 type CertificateRow = SpeedLimiterCertificate & { vehicles: { name: string } | null };
-
-const STATUS_COLORS: Record<VehicleStatus, string> = {
-  active: "#10b981",
-  in_shop: "#f59e0b",
-  out_of_service: "#ef4444",
-  retired: "#94a3b8",
+type AuditRow = {
+  id: number;
+  table_name: string;
+  action: "insert" | "update" | "delete";
+  at: string;
+  diff: Record<string, unknown> | null;
 };
 
+/** Status palette (reserved for state; validated — docs/DESIGN_SYSTEM.md). */
+const STATUS_COLORS: Record<VehicleStatus, string> = {
+  active: "#059669",
+  in_shop: "#d97706",
+  out_of_service: "#dc2626",
+  retired: "#64748b",
+};
+
+/** CVD-validated series pair (docs/DESIGN_SYSTEM.md — never same-hue pairs). */
 const FUEL_COLOR = "#1d67f1";
-const MAINTENANCE_COLOR = "#59aaff";
+const MAINTENANCE_COLOR = "#0d9488";
+
+const GRID_STROKE = "#e6e9f0";
+const TICK_STYLE = { fill: "#94a3b8", fontSize: 12 };
+
+/** Audited tables → entity label keys (mirror of the audit trigger list). */
+const AUDIT_ENTITY_KEYS: Record<string, MessageKey> = {
+  vehicles: "dashboard.entity.vehicles",
+  customers: "dashboard.entity.customers",
+  contacts: "dashboard.entity.contacts",
+  drivers: "dashboard.entity.drivers",
+  sl_devices: "dashboard.entity.sl_devices",
+  sl_technicians: "dashboard.entity.sl_technicians",
+  sl_jobs: "dashboard.entity.sl_jobs",
+  speed_limiter_installations: "dashboard.entity.speed_limiter_installations",
+  speed_limiter_certificates: "dashboard.entity.speed_limiter_certificates",
+  work_orders: "dashboard.entity.work_orders",
+  renewals: "dashboard.entity.renewals",
+};
+
+/** Best human identifier available in an audit row's diff payload. */
+function auditName(diff: Record<string, unknown> | null): string | null {
+  if (!diff) return null;
+  for (const key of ["name", "certificate_number", "serial", "title", "task", "first_name"]) {
+    const v = diff[key];
+    if (typeof v === "string" && v) return v;
+  }
+  return null;
+}
 
 /** Overdue / due-soon state for a reminder, plus a sort key (lower = more urgent). */
 function reminderDue(r: ReminderRow) {
@@ -62,35 +122,25 @@ function reminderDue(r: ReminderRow) {
   return { overdue, dueSoon, urgency };
 }
 
-function KpiCard({
-  label,
-  value,
-  sub,
-  alert,
+function ListCard({
+  title,
+  viewAll,
+  children,
 }: {
-  label: string;
-  value: number;
-  sub?: string;
-  alert?: boolean;
+  title: string;
+  viewAll?: string;
+  children: ReactNode;
 }) {
-  return (
-    <Card className="p-5">
-      <div className="text-sm font-medium text-slate-500">{label}</div>
-      <div
-        className={`mt-1 text-2xl font-semibold ${alert ? "text-red-600" : "text-slate-900"}`}
-      >
-        {value}
-      </div>
-      {sub && <div className="mt-1 text-xs text-slate-500">{sub}</div>}
-    </Card>
-  );
-}
-
-function ListCard({ title, children }: { title: string; children: ReactNode }) {
+  const t = useT();
   return (
     <Card>
-      <div className="border-b border-slate-200 px-5 py-3.5">
-        <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+      <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+        <h2 className="text-sm font-semibold text-ink">{title}</h2>
+        {viewAll && (
+          <Link to={viewAll} className="text-xs font-medium text-brand-700 hover:underline">
+            {t("dashboard.viewAll")}
+          </Link>
+        )}
       </div>
       {children}
     </Card>
@@ -100,9 +150,7 @@ function ListCard({ title, children }: { title: string; children: ReactNode }) {
 function NothingDue() {
   const t = useT();
   return (
-    <div className="px-5 py-10 text-center text-sm text-slate-500">
-      {t("dashboard.nothingDue")}
-    </div>
+    <div className="px-5 py-10 text-center text-sm text-ink-3">{t("dashboard.nothingDue")}</div>
   );
 }
 
@@ -110,6 +158,7 @@ export default function DashboardPage() {
   const tenant = useTenant();
   const t = useT();
   const { isEnabled } = useModules();
+  const { isAdmin } = useAuth();
 
   const customersOn = isEnabled("customers");
   const issuesOn = isEnabled("issues");
@@ -137,7 +186,8 @@ export default function DashboardPage() {
       listRows<WorkOrderRow>("work_orders", (q) =>
         q
           .select("*, work_order_lines(quantity, unit_cost)")
-          .in("status", ["open", "in_progress"]),
+          .in("status", ["open", "in_progress"])
+          .order("created_at", { ascending: false }),
       ),
     enabled: maintenanceOn,
   });
@@ -188,6 +238,16 @@ export default function DashboardPage() {
         q.select("*, vehicles(name)").order("expires_at").limit(20),
       ),
     enabled: slCertsOn,
+  });
+
+  // RLS restricts audit_events to admins; the gate just avoids a wasted query.
+  const activityQ = useQuery({
+    queryKey: ["audit_events", "dashboard"],
+    queryFn: () =>
+      listRows<AuditRow>("audit_events", (q) =>
+        q.order("at", { ascending: false }).limit(8),
+      ),
+    enabled: isAdmin,
   });
 
   const vehicles = vehiclesQ.data ?? [];
@@ -264,6 +324,9 @@ export default function DashboardPage() {
     (slCertsOn ? dueCertificates.filter((c) => c.days <= 30).length : 0);
   const attentionOn = preventiveOn || renewalsOn || slCertsOn;
 
+  const openWorkOrders = workOrdersQ.data ?? [];
+  const activity = activityQ.data ?? [];
+
   const queries = [
     vehiclesQ,
     issuesQ,
@@ -277,69 +340,91 @@ export default function DashboardPage() {
   const isLoading = queries.some((q) => q.isLoading);
   const firstError = queries.map((q) => q.error).find(Boolean);
 
+  const actionTone: Record<AuditRow["action"], "green" | "blue" | "red"> = {
+    insert: "green",
+    update: "blue",
+    delete: "red",
+  };
+
   return (
     <>
-      <PageHeader
-        title={t("nav.dashboard")}
-        description={t("dashboard.subtitle")}
-      />
+      <PageHeader title={t("nav.dashboard")} description={t("dashboard.subtitle")} />
 
       {isLoading && <LoadingState />}
       {!isLoading && firstError && <ErrorState message={firstError.message} />}
 
       {!isLoading && !firstError && (
-        <div className="space-y-6">
+        <div className="space-y-5">
+          {/* KPI cards */}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {customersOn ? (
               <>
-                <KpiCard
+                <StatCard
+                  icon={<Truck className="h-5 w-5" />}
+                  tone="blue"
                   label={t("dashboard.companyVehicles")}
                   value={fleetVehicles.length}
                   sub={t("dashboard.nActive", {
                     count: fleetVehicles.filter((v) => v.status === "active").length,
                   })}
+                  subTone="good"
                 />
-                <KpiCard
+                <StatCard
+                  icon={<Building2 className="h-5 w-5" />}
+                  tone="green"
                   label={t("dashboard.customerVehicles")}
                   value={vehicles.filter((v) => v.ownership === "customer").length}
                 />
               </>
             ) : (
-              <KpiCard
+              <StatCard
+                icon={<Truck className="h-5 w-5" />}
+                tone="blue"
                 label={t("dashboard.totalVehicles")}
                 value={vehicles.length}
                 sub={t("dashboard.nActive", {
                   count: vehicles.filter((v) => v.status === "active").length,
                 })}
+                subTone="good"
               />
             )}
             {issuesOn && (
-              <KpiCard label={t("dashboard.openIssues")} value={issuesQ.data?.length ?? 0} />
+              <StatCard
+                icon={<AlertTriangle className="h-5 w-5" />}
+                tone="amber"
+                label={t("dashboard.openIssues")}
+                value={issuesQ.data?.length ?? 0}
+              />
             )}
             {maintenanceOn && (
-              <KpiCard
+              <StatCard
+                icon={<Wrench className="h-5 w-5" />}
+                tone="violet"
                 label={t("dashboard.openWorkOrders")}
-                value={workOrdersQ.data?.length ?? 0}
+                value={openWorkOrders.length}
               />
             )}
             {attentionOn && (
-              <KpiCard
+              <StatCard
+                icon={<BellRing className="h-5 w-5" />}
+                tone="red"
                 label={t("dashboard.attentionNeeded")}
                 value={attentionCount}
                 sub={t("dashboard.attentionSub")}
-                alert={attentionCount > 0}
+                subTone={attentionCount > 0 ? "serious" : "muted"}
               />
             )}
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          {/* Spend + fleet status */}
+          <div className="grid gap-4 xl:grid-cols-3">
             {(fuelOn || maintenanceOn) && (
-              <Card className="p-5">
+              <Card className="p-5 xl:col-span-2">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-sm font-semibold text-slate-900">
+                  <h2 className="text-sm font-semibold text-ink">
                     {t("dashboard.monthlySpend")}
                   </h2>
-                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                  <div className="flex items-center gap-4 text-xs text-ink-2">
                     {fuelOn && (
                       <span className="flex items-center gap-1.5">
                         <span
@@ -362,23 +447,23 @@ export default function DashboardPage() {
                 </div>
                 <div dir="ltr">
                   <ResponsiveContainer width="100%" height={260}>
-                    <BarChart data={monthly}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <BarChart data={monthly} barCategoryGap="28%">
+                      <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} vertical={false} />
                       <XAxis
                         dataKey="month"
-                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tick={TICK_STYLE}
                         tickLine={false}
                         axisLine={false}
                       />
                       <YAxis
-                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tick={TICK_STYLE}
                         tickLine={false}
                         axisLine={false}
                         width={44}
                         tickFormatter={(v) => formatCompact(Number(v))}
                       />
                       <Tooltip
-                        cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
+                        cursor={{ fill: "rgba(148, 163, 184, 0.08)" }}
                         formatter={(value) => formatMoney(Number(value), tenant.currency)}
                       />
                       {fuelOn && (
@@ -406,54 +491,62 @@ export default function DashboardPage() {
             )}
 
             <Card className="p-5">
-              <h2 className="text-sm font-semibold text-slate-900">{t("dashboard.fleetStatus")}</h2>
-              <div className="mt-2 flex items-center gap-6">
-                <div className="relative h-[260px] min-w-0 flex-1">
-                  <div dir="ltr" className="h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={statusData}
-                          dataKey="value"
-                          nameKey="name"
-                          innerRadius={60}
-                          outerRadius={92}
-                          paddingAngle={2}
-                        >
-                          {statusData.map((s) => (
-                            <Cell key={s.key} fill={s.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-semibold text-slate-900">
-                      {fleetVehicles.length}
-                    </span>
-                    <span className="text-xs text-slate-500">{t("dashboard.vehiclesLabel")}</span>
-                  </div>
+              <h2 className="text-sm font-semibold text-ink">{t("dashboard.fleetStatus")}</h2>
+              <div className="relative mx-auto mt-2 h-[190px] max-w-[220px]">
+                <div dir="ltr" className="h-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={statusData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={62}
+                        outerRadius={88}
+                        paddingAngle={2}
+                        stroke="#ffffff"
+                        strokeWidth={2}
+                      >
+                        {statusData.map((s) => (
+                          <Cell key={s.key} fill={s.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
-                <ul className="w-40 space-y-2.5">
-                  {statusData.map((s) => (
-                    <li key={s.key} className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-[26px] font-bold leading-none tracking-tight text-ink tabular-nums">
+                    {fleetVehicles.length}
+                  </span>
+                  <span className="mt-1 text-xs text-ink-3">{t("dashboard.vehiclesLabel")}</span>
+                </div>
+              </div>
+              <ul className="mt-4 space-y-2.5">
+                {statusData.map((s) => {
+                  const pct =
+                    fleetVehicles.length > 0
+                      ? Math.round((s.value / fleetVehicles.length) * 1000) / 10
+                      : 0;
+                  return (
+                    <li key={s.key} className="flex items-center gap-2 text-sm text-ink-2">
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
                         style={{ backgroundColor: s.color }}
                       />
                       <span className="truncate">{s.name}</span>
-                      <span className="ms-auto font-medium text-slate-900">{s.value}</span>
+                      <span className="ms-auto font-semibold text-ink tabular-nums">{s.value}</span>
+                      <span className="w-12 text-end text-xs text-ink-3 tabular-nums">{pct}%</span>
                     </li>
-                  ))}
-                </ul>
-              </div>
+                  );
+                })}
+              </ul>
             </Card>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          {/* Due-soon boards */}
+          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {preventiveOn && (
-              <ListCard title={t("dashboard.dueSoonService")}>
+              <ListCard title={t("dashboard.dueSoonService")} viewAll="/maintenance">
                 {dueReminders.length === 0 ? (
                   <NothingDue />
                 ) : (
@@ -461,10 +554,8 @@ export default function DashboardPage() {
                     {dueReminders.slice(0, 6).map(({ reminder: r, overdue }) => (
                       <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-800">
-                            {r.task}
-                          </div>
-                          <div className="truncate text-xs text-slate-500">
+                          <div className="truncate text-sm font-medium text-ink">{r.task}</div>
+                          <div className="truncate text-xs text-ink-3">
                             {r.vehicles.name}
                             {" · "}
                             {[
@@ -488,7 +579,7 @@ export default function DashboardPage() {
             )}
 
             {renewalsOn && (
-              <ListCard title={t("dashboard.dueSoonRenewals")}>
+              <ListCard title={t("dashboard.dueSoonRenewals")} viewAll="/renewals">
                 {dueRenewals.length === 0 ? (
                   <NothingDue />
                 ) : (
@@ -496,11 +587,11 @@ export default function DashboardPage() {
                     {dueRenewals.slice(0, 6).map(({ renewal: r, days }) => (
                       <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-800">
+                          <div className="truncate text-sm font-medium text-ink">
                             {t(renewalTypes[r.renewal_type])}
                             {r.name ? ` — ${r.name}` : ""}
                           </div>
-                          <div className="truncate text-xs text-slate-500">
+                          <div className="truncate text-xs text-ink-3">
                             {r.vehicles?.name ?? t("common.dash")} · {formatDate(r.due_date)}
                           </div>
                         </div>
@@ -519,7 +610,7 @@ export default function DashboardPage() {
             )}
 
             {slCertsOn && (
-              <ListCard title={t("dashboard.slCertsTitle")}>
+              <ListCard title={t("dashboard.slCertsTitle")} viewAll="/speed-limiters/certificates">
                 {dueCertificates.length === 0 ? (
                   <NothingDue />
                 ) : (
@@ -527,10 +618,10 @@ export default function DashboardPage() {
                     {dueCertificates.slice(0, 6).map(({ certificate: c, days }) => (
                       <li key={c.id} className="flex items-center justify-between gap-3 px-5 py-3">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-800">
+                          <div className="truncate text-sm font-medium text-ink">
                             {c.certificate_number}
                           </div>
-                          <div className="truncate text-xs text-slate-500">
+                          <div className="truncate text-xs text-ink-3">
                             {c.vehicles?.name ?? t("common.dash")} · {formatDate(c.expires_at)}
                           </div>
                         </div>
@@ -543,6 +634,86 @@ export default function DashboardPage() {
                         </Badge>
                       </li>
                     ))}
+                  </ul>
+                )}
+              </ListCard>
+            )}
+          </div>
+
+          {/* Recent work + activity */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {maintenanceOn && (
+              <ListCard title={t("dashboard.recentWorkOrders")} viewAll="/maintenance">
+                {openWorkOrders.length === 0 ? (
+                  <NothingDue />
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {openWorkOrders.slice(0, 6).map((w) => {
+                      const meta = workOrderStatus[w.status];
+                      return (
+                        <li
+                          key={w.id}
+                          className="flex items-center justify-between gap-3 px-5 py-3"
+                        >
+                          <div className="min-w-0">
+                            <Link
+                              to={`/maintenance/work-orders/${w.id}`}
+                              className="block truncate text-sm font-medium text-brand-700 hover:underline"
+                            >
+                              #{w.number} {w.title}
+                            </Link>
+                            <div className="truncate text-xs text-ink-3">
+                              {formatDate(w.scheduled_date ?? w.created_at)}
+                            </div>
+                          </div>
+                          <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </ListCard>
+            )}
+
+            {isAdmin && (
+              <ListCard title={t("dashboard.recentActivity")}>
+                {activityQ.isLoading ? (
+                  <div className="px-5 py-10 text-center text-sm text-ink-3">
+                    {t("common.loading")}
+                  </div>
+                ) : activityQ.error ? (
+                  <div className="px-5 py-4">
+                    <ErrorState message={(activityQ.error as Error).message} />
+                  </div>
+                ) : activity.length === 0 ? (
+                  <div className="px-5 py-10 text-center text-sm text-ink-3">
+                    {t("dashboard.noActivity")}
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {activity.map((a) => {
+                      const entityKey = AUDIT_ENTITY_KEYS[a.table_name];
+                      const name = auditName(a.diff);
+                      return (
+                        <li key={a.id} className="flex items-center gap-3 px-5 py-3">
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-canvas text-ink-3">
+                            <Activity className="h-4 w-4" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-medium text-ink">
+                              {entityKey ? t(entityKey) : a.table_name}
+                              {name ? ` · ${name}` : ""}
+                            </div>
+                            <div className="truncate text-xs text-ink-3">
+                              {formatDateTime(a.at)}
+                            </div>
+                          </div>
+                          <Badge tone={actionTone[a.action]}>
+                            {t(`dashboard.activity.${a.action}`)}
+                          </Badge>
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
               </ListCard>

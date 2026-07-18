@@ -20,6 +20,17 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "nav.reports": "التقارير",
   "nav.settings": "الإعدادات",
 
+  "nav.section.overview": "نظرة عامة",
+  "nav.section.fleet_ops": "عمليات الأسطول",
+  "nav.section.maintenance": "الصيانة",
+  "nav.section.compliance": "الامتثال",
+  "nav.section.customer": "العملاء والشركاء",
+  "nav.section.analytics": "التحليلات",
+  "nav.section.admin": "الإدارة",
+
+  "search.placeholder": "ابحث عن مركبات أو عملاء أو شهادات…",
+  "search.noResults": "لا توجد نتائج مطابقة",
+
   "action.save": "حفظ",
   "action.saveChanges": "حفظ التغييرات",
   "action.cancel": "إلغاء",

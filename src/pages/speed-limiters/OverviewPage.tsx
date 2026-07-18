@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Wrench } from "lucide-react";
+import { Award, Building2, Cpu, Wrench } from "lucide-react";
 import { listRows } from "../../lib/db";
 import { daysUntil, formatDate } from "../../lib/format";
 import type {
@@ -13,7 +13,7 @@ import type {
   SpeedLimiterCertificate,
 } from "../../lib/types";
 import { useModules } from "../../context/ModulesContext";
-import { Badge, Card, EmptyState, ErrorState, LoadingState } from "../../components/ui";
+import { Badge, Card, EmptyState, ErrorState, LoadingState, StatCard } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 
@@ -40,16 +40,6 @@ const jobStatusMeta: Record<SlJobStatus, { labelKey: MessageKey; tone: BadgeTone
   closed: { labelKey: "speedLimiters.jobStatus.closed", tone: "slate" },
   canceled: { labelKey: "speedLimiters.jobStatus.canceled", tone: "slate" },
 };
-
-function KpiCard({ label, value, sub }: { label: string; value: number; sub?: string }) {
-  return (
-    <Card className="p-5">
-      <div className="text-sm font-medium text-slate-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold text-slate-900">{value}</div>
-      {sub && <div className="mt-0.5 text-xs text-slate-500">{sub}</div>}
-    </Card>
-  );
-}
 
 type BucketEntry = { cert: CertRow; days: number };
 
@@ -190,15 +180,29 @@ export default function OverviewPage() {
     <div className="space-y-6">
       {/* KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label={t("speedLimiters.overview.kpiCustomers")} value={kpis.customers} />
-        <KpiCard
+        <StatCard
+          icon={<Building2 className="h-5 w-5" />}
+          tone="green"
+          label={t("speedLimiters.overview.kpiCustomers")}
+          value={kpis.customers}
+        />
+        <StatCard
+          icon={<Cpu className="h-5 w-5" />}
+          tone="blue"
           label={t("speedLimiters.overview.kpiDevicesInstalled")}
           value={kpis.devicesInstalled}
           sub={t("speedLimiters.overview.kpiInStock", { count: kpis.devicesInStock })}
         />
-        <KpiCard label={t("speedLimiters.overview.kpiOpenJobs")} value={kpis.openJobs} />
+        <StatCard
+          icon={<Wrench className="h-5 w-5" />}
+          tone="violet"
+          label={t("speedLimiters.overview.kpiOpenJobs")}
+          value={kpis.openJobs}
+        />
         {certificatesEnabled && (
-          <KpiCard
+          <StatCard
+            icon={<Award className="h-5 w-5" />}
+            tone="amber"
             label={t("speedLimiters.overview.kpiValidCertificates")}
             value={kpis.validCertificates}
           />

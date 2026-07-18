@@ -18,6 +18,19 @@ export const enCommon = {
   "nav.reports": "Reports",
   "nav.settings": "Settings",
 
+  // Sidebar sections (module-registry categories + platform core)
+  "nav.section.overview": "Overview",
+  "nav.section.fleet_ops": "Fleet operations",
+  "nav.section.maintenance": "Maintenance",
+  "nav.section.compliance": "Compliance",
+  "nav.section.customer": "Customers & partners",
+  "nav.section.analytics": "Analytics",
+  "nav.section.admin": "Administration",
+
+  // Global search
+  "search.placeholder": "Search vehicles, customers, certificates…",
+  "search.noResults": "No matches",
+
   // Generic actions
   "action.save": "Save",
   "action.saveChanges": "Save changes",

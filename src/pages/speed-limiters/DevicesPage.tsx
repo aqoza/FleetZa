@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Cpu, History, Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Archive, Cpu, History, PackageOpen, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteRow, insertRow, listPage, listRows, updateRow, wrapDbError, sanitizeSearch } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
@@ -10,8 +10,8 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import type { BadgeTone } from "../../components/ui";
 import {
-  Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Pagination, Select, Table, Textarea,
+  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
+  Pagination, Select, StatCard, Table, Textarea,
 } from "../../components/ui";
 
 type DeviceRow = SlDevice & { vehicles: Pick<Vehicle, "name"> | null };
@@ -68,15 +68,6 @@ function warrantyCell(d: SlDevice, t: Translate) {
     );
   }
   return <span className="text-slate-600">{formatDate(d.warranty_until)}</span>;
-}
-
-function KpiCard({ label, value }: { label: string; value: number }) {
-  return (
-    <Card className="p-4">
-      <div className="text-sm font-medium text-slate-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold text-slate-900">{value}</div>
-    </Card>
-  );
 }
 
 function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void }) {
@@ -368,10 +359,10 @@ export default function DevicesPage() {
       />
 
       <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <KpiCard label={t(deviceStatus.in_stock.labelKey)} value={kpis.in_stock} />
-        <KpiCard label={t(deviceStatus.installed.labelKey)} value={kpis.installed} />
-        <KpiCard label={t(deviceStatus.faulty.labelKey)} value={kpis.faulty} />
-        <KpiCard label={t(deviceStatus.retired.labelKey)} value={kpis.retired} />
+        <StatCard icon={<PackageOpen className="h-5 w-5" />} tone="blue" label={t(deviceStatus.in_stock.labelKey)} value={kpis.in_stock} />
+        <StatCard icon={<Cpu className="h-5 w-5" />} tone="green" label={t(deviceStatus.installed.labelKey)} value={kpis.installed} />
+        <StatCard icon={<AlertTriangle className="h-5 w-5" />} tone="red" label={t(deviceStatus.faulty.labelKey)} value={kpis.faulty} />
+        <StatCard icon={<Archive className="h-5 w-5" />} tone="slate" label={t(deviceStatus.retired.labelKey)} value={kpis.retired} />
       </div>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">

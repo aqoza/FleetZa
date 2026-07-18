@@ -21,9 +21,9 @@ const buttonStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-300 shadow-sm",
   secondary:
-    "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 disabled:text-slate-400",
-  danger: "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300 shadow-sm",
-  ghost: "text-slate-600 hover:bg-slate-100 disabled:text-slate-400",
+    "bg-surface text-ink-2 border border-line hover:bg-canvas disabled:text-ink-3",
+  danger: "bg-serious text-white hover:bg-red-700 disabled:bg-red-300 shadow-sm",
+  ghost: "text-ink-2 hover:bg-canvas disabled:text-ink-3",
 };
 
 export function Button({
@@ -134,9 +134,74 @@ export function Badge({ tone = "slate", children }: { tone?: BadgeTone; children
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={cx("rounded-xl border border-slate-200 bg-white shadow-sm", className)}>
+    <div className={cx("rounded-2xl border border-line bg-surface shadow-card", className)}>
       {children}
     </div>
+  );
+}
+
+// --- Icon chip + stat card (the KPI language — docs/DESIGN_SYSTEM.md) ---
+
+export type ChipTone = "blue" | "green" | "amber" | "violet" | "red" | "slate";
+
+const chipStyles: Record<ChipTone, string> = {
+  blue: "bg-brand-50 text-brand-600",
+  green: "bg-emerald-50 text-emerald-600",
+  amber: "bg-amber-50 text-amber-600",
+  violet: "bg-violet-50 text-violet-600",
+  red: "bg-red-50 text-red-600",
+  slate: "bg-slate-100 text-slate-500",
+};
+
+/** Tinted square icon holder used on stat cards, panels, and activity rows. */
+export function IconChip({ tone = "blue", children }: { tone?: ChipTone; children: ReactNode }) {
+  return (
+    <span
+      className={cx(
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+        chipStyles[tone],
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** KPI card: icon chip, muted label, large tabular value, optional sub line. */
+export function StatCard({
+  icon,
+  tone,
+  label,
+  value,
+  sub,
+  subTone = "muted",
+}: {
+  icon: ReactNode;
+  tone?: ChipTone;
+  label: string;
+  value: ReactNode;
+  sub?: string;
+  subTone?: "muted" | "good" | "warn" | "serious";
+}) {
+  const subColor = {
+    muted: "text-ink-3",
+    good: "text-good",
+    warn: "text-warn",
+    serious: "text-serious",
+  }[subTone];
+  return (
+    <Card className="p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-sm font-medium text-ink-2">{label}</div>
+          <div className="mt-1.5 text-[28px] font-bold leading-none tracking-tight text-ink tabular-nums">
+            {value}
+          </div>
+          {sub && <div className={cx("mt-2 truncate text-xs font-medium", subColor)}>{sub}</div>}
+        </div>
+        <IconChip tone={tone}>{icon}</IconChip>
+      </div>
+    </Card>
   );
 }
 
@@ -154,8 +219,8 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+        {description && <p className="mt-1 text-sm text-ink-2">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -177,21 +242,23 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
 }) {
+  const t = useT();
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 pt-[8vh]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-sidebar/50 p-4 pt-[8vh] backdrop-blur-[2px]">
       <div
-        className={cx("w-full rounded-xl bg-white shadow-xl", wide ? "max-w-2xl" : "max-w-md")}
+        className={cx("w-full rounded-2xl bg-surface shadow-pop", wide ? "max-w-2xl" : "max-w-md")}
         role="dialog"
         aria-modal="true"
         aria-label={title}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5">
-          <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <h2 className="text-base font-semibold text-ink">{title}</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            aria-label="Close"
+            className="rounded-md p-1 text-ink-3 hover:bg-canvas hover:text-ink-2"
+            aria-label={t("action.close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -206,14 +273,14 @@ export function Modal({
 
 export function Table({ headers, children }: { headers: ReactNode[]; children: ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
-        <thead className="bg-slate-50">
+    <div className="overflow-x-auto rounded-2xl border border-line bg-surface shadow-card">
+      <table className="min-w-full divide-y divide-line text-sm">
+        <thead className="bg-canvas/60">
           <tr>
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="px-4 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-slate-500"
+                className="px-4 py-2.5 text-start text-[11px] font-semibold uppercase tracking-wider text-ink-3 rtl:tracking-normal"
               >
                 {h}
               </th>
@@ -240,7 +307,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line bg-surface px-6 py-14 text-center">
       {icon && <div className="mb-3 text-slate-300">{icon}</div>}
       <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
       {description && <p className="mt-1 max-w-sm text-sm text-slate-500">{description}</p>}
