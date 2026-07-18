@@ -4,9 +4,13 @@ export type VolumeUnit = "L" | "gal";
 export type Language = "en" | "ar";
 export type DriverStatus = "active" | "inactive";
 
+export type TenantArchetype = "fleet_operator" | "service_provider";
+
 export interface Tenant {
   id: string;
   name: string;
+  /** Business type: drives the home dashboard and onboarding module set. */
+  archetype: TenantArchetype;
   country: string;
   currency: string;
   distance_unit: DistanceUnit;

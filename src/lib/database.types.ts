@@ -1353,6 +1353,7 @@ export type Database = {
       }
       tenants: {
         Row: {
+          archetype: string
           country: string
           created_at: string
           currency: string
@@ -1365,6 +1366,7 @@ export type Database = {
           volume_unit: string
         }
         Insert: {
+          archetype?: string
           country?: string
           created_at?: string
           currency?: string
@@ -1377,6 +1379,7 @@ export type Database = {
           volume_unit?: string
         }
         Update: {
+          archetype?: string
           country?: string
           created_at?: string
           currency?: string

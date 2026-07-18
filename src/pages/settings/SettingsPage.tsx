@@ -26,6 +26,7 @@ import type {
   Profile,
   Role,
   Tenant,
+  TenantArchetype,
   VolumeUnit,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
@@ -89,6 +90,7 @@ function OrganizationTab() {
 
   const [form, setForm] = useState({
     name: tenant.name,
+    archetype: tenant.archetype,
     country: tenant.country,
     currency: tenant.currency,
     timezone: tenant.timezone,
@@ -108,6 +110,7 @@ function OrganizationTab() {
     mutationFn: async () => {
       await updateRow<Tenant>("tenants", tenant.id, {
         name: form.name.trim(),
+        archetype: form.archetype,
         country: form.country,
         currency: form.currency,
         timezone: form.timezone,
@@ -130,6 +133,12 @@ function OrganizationTab() {
   if (!isAdmin) {
     const rows: Array<[string, string]> = [
       [t("field.name"), tenant.name],
+      [
+        t("settings.archetype"),
+        tenant.archetype === "service_provider"
+          ? t("settings.archetypeProvider")
+          : t("settings.archetypeOperator"),
+      ],
       [t("settings.country"), countryName(tenant.country)],
       [t("settings.currency"), tenant.currency],
       [t("settings.timezone"), tenant.timezone],
@@ -165,6 +174,16 @@ function OrganizationTab() {
 
           <Field label={t("settings.orgName")} required>
             <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
+          </Field>
+
+          <Field label={t("settings.archetype")} hint={t("settings.archetypeHint")}>
+            <Select
+              value={form.archetype}
+              onChange={(e) => set("archetype", e.target.value as TenantArchetype)}
+            >
+              <option value="fleet_operator">{t("settings.archetypeOperator")}</option>
+              <option value="service_provider">{t("settings.archetypeProvider")}</option>
+            </Select>
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">

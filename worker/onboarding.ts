@@ -10,6 +10,7 @@ const signupSchema = z.object({
   password: z.string().min(8).max(128),
   fullName: z.string().min(1).max(120),
   companyName: z.string().min(1).max(120),
+  archetype: z.enum(["fleet_operator", "service_provider"]).default("fleet_operator"),
   country: z.string().length(2).default("US"),
   currency: z.string().length(3).optional(),
   timezone: z.string().min(1).max(64).optional(),
@@ -56,6 +57,7 @@ onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
     .from("tenants")
     .insert({
       name: body.companyName,
+      archetype: body.archetype,
       country: body.country.toUpperCase(),
       currency: (body.currency ?? cfg.currency).toUpperCase(),
       timezone: body.timezone ?? cfg.timezone,
@@ -95,16 +97,23 @@ onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
     items: DEFAULT_INSPECTION_ITEMS,
   });
 
-  // Subscribe the new tenant to the default module set.
+  // Subscribe the new tenant to its archetype's module set: service providers
+  // additionally get customers + the speed-limiter suite from day one.
+  const moduleIds =
+    body.archetype === "service_provider"
+      ? [...DEFAULT_MODULES, "customers", "speed_limiters", "sl_certificates"]
+      : DEFAULT_MODULES;
   await admin.from("tenant_modules").insert(
-    DEFAULT_MODULES.map((moduleId) => ({
+    moduleIds.map((moduleId) => ({
       tenant_id: tenant.id,
       module_id: moduleId,
       enabled_by: userId,
     })),
   );
 
-  // Seed speed-limiter settings so certificate numbering starts cleanly.
+  // Seed speed-limiter settings for every tenant: operators that enable the
+  // module later must be able to configure cert prefix/validity BEFORE their
+  // first issuance (the RPC's lazy insert only fires at issuance time).
   await admin.from("sl_settings").insert({ tenant_id: tenant.id });
 
   return c.json({ ok: true, tenantId: tenant.id }, 201);

@@ -16,6 +16,7 @@ import type { Tenant } from "./types";
 const tenant = (over: Partial<Tenant> = {}): Tenant => ({
   id: "t1",
   name: "Test",
+  archetype: "fleet_operator",
   country: "US",
   currency: "USD",
   distance_unit: "km",

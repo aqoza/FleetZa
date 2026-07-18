@@ -2,6 +2,15 @@
 // Shared auth strings (auth.welcomeBack, auth.signIn, field.email, …) live in
 // common.ts and are reused directly — do NOT duplicate them here.
 export const enAuth = {
+  // Signup — business-type (archetype) chooser
+  "auth.archetype": "What does your company do?",
+  "auth.archetypeOperator": "Fleet operator",
+  "auth.archetypeOperatorDesc":
+    "We manage our own vehicles — maintenance, fuel, inspections, renewals.",
+  "auth.archetypeProvider": "Fleet service provider",
+  "auth.archetypeProviderDesc":
+    "We install and certify speed limiters for customer fleets.",
+
   // Signup — country picker groups and tax hint
   "auth.middleEast": "Middle East",
   "auth.otherCountries": "Other countries",

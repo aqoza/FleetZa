@@ -16,6 +16,10 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
 
   // Organization form
   "settings.orgName": "اسم المؤسسة",
+  "settings.archetype": "نوع النشاط التجاري",
+  "settings.archetypeOperator": "مشغّل أسطول",
+  "settings.archetypeProvider": "مزوّد خدمات أساطيل",
+  "settings.archetypeHint": "يغيّر لوحة المعلومات الرئيسية. تبقى الوحدات كما هي مُهيّأة.",
   "settings.country": "الدولة",
   "settings.countryChangeHint":
     "تغيير الدولة يُحدّث التنسيقات وإعدادات الضريبة الافتراضية للمؤسسة بأكملها.",

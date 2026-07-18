@@ -7,6 +7,7 @@ import {
   otherCountries,
 } from "../../../shared/countries";
 import { apiFetch } from "../../lib/api";
+import type { TenantArchetype } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, Select } from "../../components/ui";
 import { useT } from "../../i18n";
@@ -37,6 +38,7 @@ export default function SignupPage() {
   );
 
   const [form, setForm] = useState({
+    archetype: "fleet_operator" as TenantArchetype,
     fullName: "",
     email: "",
     password: "",
@@ -105,6 +107,46 @@ export default function SignupPage() {
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <ErrorState message={error} />}
+
+        <fieldset>
+          <legend className="mb-1 block text-sm font-medium text-ink-2">
+            {t("auth.archetype")}
+          </legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(
+              [
+                ["fleet_operator", "auth.archetypeOperator", "auth.archetypeOperatorDesc"],
+                ["service_provider", "auth.archetypeProvider", "auth.archetypeProviderDesc"],
+              ] as const
+            ).map(([value, titleKey, descKey]) => {
+              const selected = form.archetype === value;
+              return (
+                <label
+                  key={value}
+                  className={
+                    "block cursor-pointer rounded-xl border p-4 text-start transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-500 has-[:focus-visible]:ring-offset-2 " +
+                    (selected
+                      ? "border-brand-500 bg-brand-50 ring-1 ring-brand-500"
+                      : "border-line bg-surface hover:border-brand-300")
+                  }
+                >
+                  <input
+                    type="radio"
+                    name="archetype"
+                    value={value}
+                    checked={selected}
+                    onChange={() => set("archetype", value)}
+                    className="sr-only"
+                  />
+                  <span className="block text-sm font-semibold text-ink">{t(titleKey)}</span>
+                  <span className="mt-1 block text-xs leading-relaxed text-ink-2">
+                    {t(descKey)}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("field.fullName")} required>

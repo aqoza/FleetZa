@@ -10,6 +10,10 @@ export const enSettings = {
 
   // Organization form
   "settings.orgName": "Organization name",
+  "settings.archetype": "Business type",
+  "settings.archetypeOperator": "Fleet operator",
+  "settings.archetypeProvider": "Fleet service provider",
+  "settings.archetypeHint": "Changes the home dashboard. Modules stay as configured.",
   "settings.country": "Country",
   "settings.countryChangeHint":
     "Changing country updates formats and tax defaults for the whole organization.",

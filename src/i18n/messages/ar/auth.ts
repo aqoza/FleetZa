@@ -3,6 +3,14 @@ import { enAuth } from "../en/auth";
 // Arabic (MSA). Keep terminology consistent with the glossary:
 // المؤسسة (organization), دعوة (invitation), الضريبة (tax).
 export const arAuth: Record<keyof typeof enAuth, string> = {
+  "auth.archetype": "ما طبيعة نشاط شركتك؟",
+  "auth.archetypeOperator": "مشغّل أسطول",
+  "auth.archetypeOperatorDesc":
+    "ندير مركباتنا الخاصة — الصيانة والوقود والفحوصات والتجديدات.",
+  "auth.archetypeProvider": "مزوّد خدمات أساطيل",
+  "auth.archetypeProviderDesc":
+    "نقوم بتركيب محددات السرعة وإصدار شهاداتها لأساطيل العملاء.",
+
   "auth.middleEast": "الشرق الأوسط",
   "auth.otherCountries": "دول أخرى",
   "auth.taxHint": "سيتم تطبيق {label} بنسبة {rate}% على تكاليف الصيانة.",

@@ -88,6 +88,20 @@ export async function listPage<T>(
   return { rows: (data ?? []) as T[], total: count ?? 0 };
 }
 
+/** Head-only exact count for KPI tiles — no rows transferred. */
+export async function countRows(
+  table: TableName,
+  build?: (q: AnyFilter) => AnyFilter,
+): Promise<number> {
+  let q = supabase
+    .from(table)
+    .select("*", { count: "exact", head: true }) as unknown as AnyFilter;
+  if (build) q = build(q);
+  const { count, error } = await q;
+  if (error) throw wrapDbError(error);
+  return count ?? 0;
+}
+
 export async function getRow<T>(table: TableName, id: string): Promise<T | null> {
   const { data, error } = await (supabase.from(table).select("*") as unknown as AnyFilter)
     .eq("id", id)
