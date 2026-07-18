@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { insertRow, listRows, updateRow } from "../../lib/db";
 import { displayToKm, kmToDisplay } from "../../lib/format";
 import { fuelTypes, vehicleStatus, vehicleTypes } from "../../lib/labels";
-import type { SlCustomer, Vehicle } from "../../lib/types";
+import type { Customer, Vehicle } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
@@ -20,16 +20,26 @@ export function VehicleForm({
   const tenant = useTenant();
   const qc = useQueryClient();
   const { isEnabled } = useModules();
-  const slEnabled = isEnabled("speed_limiters");
+  const customersEnabled = isEnabled("customers");
 
+  // Picker lists active customers, plus the vehicle's current customer even if
+  // since deactivated — otherwise editing such a vehicle is blocked by the
+  // required select (and switching away would silently detach it).
+  const currentCustomerId = vehicle?.customer_id ?? null;
   const { data: customers } = useQuery({
-    queryKey: ["sl_customers", "active"],
+    queryKey: ["customers", "picker", currentCustomerId],
     queryFn: () =>
-      listRows<SlCustomer>("sl_customers", (q) => q.eq("status", "active").order("name")),
-    enabled: slEnabled,
+      listRows<Customer>("customers", (q) =>
+        (currentCustomerId
+          ? q.or(`status.eq.active,id.eq.${currentCustomerId}`)
+          : q.eq("status", "active")
+        ).order("name"),
+      ),
+    enabled: customersEnabled,
   });
 
   const [form, setForm] = useState({
+    ownership: vehicle?.ownership ?? "company",
     name: vehicle?.name ?? "",
     vehicle_type: vehicle?.vehicle_type ?? "car",
     status: vehicle?.status ?? "active",
@@ -74,9 +84,13 @@ export function VehicleForm({
         fleet_number: form.fleet_number.trim() || null,
         notes: form.notes.trim() || null,
       };
-      // Only touch customer_id when the module (and thus the select) is active,
-      // so a disabled module never silently unlinks a vehicle from a customer.
-      if (slEnabled) values.customer_id = form.customer_id || null;
+      // Only touch ownership when the customers module (and thus the owner
+      // control) is active, so a disabled module never silently unlinks a
+      // vehicle from its customer.
+      if (customersEnabled) {
+        values.ownership = form.ownership;
+        values.customer_id = form.ownership === "customer" ? form.customer_id || null : null;
+      }
       return vehicle
         ? updateRow<Vehicle>("vehicles", vehicle.id, values)
         : insertRow<Vehicle>("vehicles", values);
@@ -146,23 +160,35 @@ export function VehicleForm({
         <Field label={t("field.vin")}>
           <Input value={form.vin} onChange={(e) => set("vin", e.target.value)} />
         </Field>
-        {slEnabled && (
-          <Field label={t("slCustomers.vehicleCustomer")}>
-            <Select value={form.customer_id} onChange={(e) => set("customer_id", e.target.value)}>
-              <option value="">{t("slCustomers.vehicleCustomerOwnFleet")}</option>
+        {customersEnabled && (
+          <Field label={t("vehicles.owner")}>
+            <Select value={form.ownership} onChange={(e) => set("ownership", e.target.value)}>
+              <option value="company">{t("vehicles.ownerCompany")}</option>
+              <option value="customer">{t("vehicles.ownerCustomer")}</option>
+            </Select>
+          </Field>
+        )}
+        {customersEnabled && form.ownership === "customer" && (
+          <Field label={t("vehicles.ownerCustomer")} required>
+            <Select
+              value={form.customer_id}
+              onChange={(e) => set("customer_id", e.target.value)}
+              required
+            >
+              <option value="">{t("vehicles.selectCustomer")}</option>
               {(customers ?? []).map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
           </Field>
         )}
-        <Field label={t("slCustomers.vehicleChassisNumber")}>
+        <Field label={t("vehicles.chassisNumber")}>
           <Input
             value={form.chassis_number}
             onChange={(e) => set("chassis_number", e.target.value)}
           />
         </Field>
-        <Field label={t("slCustomers.vehicleFleetNumber")}>
+        <Field label={t("vehicles.fleetNumber")}>
           <Input
             value={form.fleet_number}
             onChange={(e) => set("fleet_number", e.target.value)}

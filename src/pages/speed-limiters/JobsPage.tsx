@@ -6,7 +6,7 @@ import { insertRow, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import type {
   SlChecklistItem,
-  SlCustomer,
+  Customer,
   SlDevice,
   SlJob,
   SlJobStatus,
@@ -34,7 +34,7 @@ import {
 
 type JobRow = SlJob & {
   vehicles: Pick<Vehicle, "name"> | null;
-  sl_customers: { name: string } | null;
+  customers: { name: string } | null;
   sl_technicians: { name: string } | null;
 };
 
@@ -77,7 +77,7 @@ function NewJobForm({
   vehiclesLoading,
   onDone,
 }: {
-  customers: SlCustomer[];
+  customers: Customer[];
   vehicles: Vehicle[];
   devices: SlDevice[];
   technicians: SlTechnician[];
@@ -442,7 +442,7 @@ export default function JobsPage() {
     queryFn: () =>
       listRows<JobRow>("sl_jobs", (q) =>
         q
-          .select("*, vehicles(name), sl_customers(name), sl_technicians(name)")
+          .select("*, vehicles(name), customers(name), sl_technicians(name)")
           .order("created_at", { ascending: false }),
       ),
   });
@@ -457,8 +457,8 @@ export default function JobsPage() {
   });
 
   const { data: customers, error: customersError } = useQuery({
-    queryKey: ["sl_customers"],
-    queryFn: () => listRows<SlCustomer>("sl_customers", (q) => q.order("name")),
+    queryKey: ["customers"],
+    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
   });
 
   const {
@@ -582,7 +582,7 @@ export default function JobsPage() {
                 </Link>
               </td>
               <td className="px-4 py-3 text-slate-600">{t(jobTypeKeys[j.job_type])}</td>
-              <td className="px-4 py-3 text-slate-600">{j.sl_customers?.name ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-600">{j.customers?.name ?? "—"}</td>
               <td className="px-4 py-3 text-slate-600">{j.vehicles?.name ?? "—"}</td>
               <td className="px-4 py-3 text-slate-600">{j.sl_technicians?.name ?? "—"}</td>
               <td className="px-4 py-3 text-slate-600">{formatDate(j.scheduled_date)}</td>

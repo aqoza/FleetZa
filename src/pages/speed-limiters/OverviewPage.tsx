@@ -5,7 +5,7 @@ import { Wrench } from "lucide-react";
 import { listRows } from "../../lib/db";
 import { daysUntil, formatDate } from "../../lib/format";
 import type {
-  SlCustomer,
+  Customer,
   SlDevice,
   SlJob,
   SlJobStatus,
@@ -20,7 +20,7 @@ import { useT, type MessageKey, type Translate } from "../../i18n";
 type JobRow = SlJob & { vehicles: { name: string } | null };
 type CertRow = SpeedLimiterCertificate & {
   vehicles: { name: string } | null;
-  sl_customers: { name: string } | null;
+  customers: { name: string } | null;
 };
 
 const jobTypeKey: Record<SlJobType, MessageKey> = {
@@ -100,7 +100,7 @@ function BucketCard({
               </div>
               <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-slate-500">
                 <span className="truncate">
-                  {[cert.sl_customers?.name, cert.vehicles?.name].filter(Boolean).join(" · ") || "—"}
+                  {[cert.customers?.name, cert.vehicles?.name].filter(Boolean).join(" · ") || "—"}
                 </span>
                 <span className="shrink-0">{formatDate(cert.expires_at)}</span>
               </div>
@@ -124,8 +124,8 @@ export default function OverviewPage() {
   const certificatesEnabled = isEnabled("sl_certificates");
 
   const customersQ = useQuery({
-    queryKey: ["sl_customers"],
-    queryFn: () => listRows<SlCustomer>("sl_customers", (q) => q.order("name")),
+    queryKey: ["customers"],
+    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
   });
 
   const devicesQ = useQuery({
@@ -145,7 +145,7 @@ export default function OverviewPage() {
     queryKey: ["speed_limiter_certificates", "overview"],
     queryFn: () =>
       listRows<CertRow>("speed_limiter_certificates", (q) =>
-        q.select("*, vehicles(name), sl_customers(name)").order("expires_at"),
+        q.select("*, vehicles(name), customers(name)").order("expires_at"),
       ),
     enabled: certificatesEnabled,
   });

@@ -10,6 +10,7 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "nav.dashboard": "لوحة المعلومات",
   "nav.vehicles": "المركبات",
   "nav.drivers": "السائقون",
+  "nav.customers": "العملاء",
   "nav.maintenance": "الصيانة",
   "nav.fuel": "الوقود",
   "nav.inspections": "الفحوصات",

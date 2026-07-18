@@ -36,6 +36,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   // --- Compliance & certification ---
   "modules.renewals.name": "التجديدات وانتهاء المستندات",
   "modules.renewals.description": "تابع تواريخ انتهاء التسجيل والتأمين والتصاريح مع تذكيرات في الوقت المناسب.",
+  "modules.customers.name": "العملاء",
+  "modules.customers.description": "منشآت العملاء وجهات الاتصال المشتركة، تستخدمها كل الوحدات التي تتعامل مع العملاء.",
   "modules.speed_limiters.name": "توريد وتركيب محددات السرعة",
   "modules.speed_limiters.description": "أدر أجهزة محددات السرعة وعمليات تركيبها وحالتها عبر مركباتك.",
   "modules.sl_certificates.name": "شهادات محددات السرعة",

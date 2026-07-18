@@ -70,7 +70,10 @@ export const MODULES: ModuleDef[] = [
 
   // --- Compliance & certification ---
   m("renewals", "compliance", "available", { requires: ["fleet"], routes: ["/renewals"] }),
-  m("speed_limiters", "compliance", "available", { requires: ["fleet"], routes: ["/speed-limiters"] }),
+  m("speed_limiters", "compliance", "available", {
+    requires: ["fleet", "customers"],
+    routes: ["/speed-limiters"],
+  }),
   m("sl_certificates", "compliance", "available", { requires: ["speed_limiters"] }),
   m("insurance_mgmt", "compliance", "coming_soon", { requires: ["fleet"] }),
   m("incidents", "compliance", "coming_soon", { requires: ["fleet"] }),
@@ -98,7 +101,10 @@ export const MODULES: ModuleDef[] = [
   m("mobile_workforce", "people", "coming_soon"),
 
   // --- Customer & partners ---
-  m("customer_portal", "customer", "coming_soon"),
+  // Global master data: client organizations + their contacts. Consumed by
+  // speed_limiters today and by CRM/sales/billing/portal as they land.
+  m("customers", "customer", "available", { routes: ["/customers"] }),
+  m("customer_portal", "customer", "coming_soon", { requires: ["customers"] }),
   m("vendor_portal", "customer", "coming_soon"),
 
   // --- Analytics ---

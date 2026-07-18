@@ -6,7 +6,7 @@ import { Ban, Check, Copy, Printer, RefreshCw, Settings, ShieldCheck, Trash2 } f
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
-import type { SlCustomer, SlSettings, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
+import type { Customer, SlSettings, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
@@ -15,7 +15,7 @@ import {
 
 type CertRow = SpeedLimiterCertificate & {
   vehicles: Pick<Vehicle, "name" | "license_plate"> | null;
-  sl_customers: Pick<SlCustomer, "name"> | null;
+  customers: Pick<Customer, "name"> | null;
 };
 
 type Bucket = "revoked" | "expired" | "d30" | "d60" | "d90" | "ok";
@@ -146,7 +146,7 @@ function RenewForm({
       <div className="rounded-lg bg-slate-50 p-3 text-sm">
         <div className="flex justify-between gap-4 py-0.5">
           <span className="text-slate-500">{t("slCertificates.customer")}</span>
-          <span className="text-end font-medium text-slate-800">{cert.sl_customers?.name ?? "—"}</span>
+          <span className="text-end font-medium text-slate-800">{cert.customers?.name ?? "—"}</span>
         </div>
         <div className="flex justify-between gap-4 py-0.5">
           <span className="text-slate-500">{t("slCertificates.vehicle")}</span>
@@ -314,7 +314,7 @@ export default function CertificatesPage() {
     queryKey: ["speed_limiter_certificates"],
     queryFn: () =>
       listRows<CertRow>("speed_limiter_certificates", (q) =>
-        q.select("*, vehicles(name, license_plate), sl_customers(name)").order("expires_at"),
+        q.select("*, vehicles(name, license_plate), customers(name)").order("expires_at"),
       ),
   });
 
@@ -350,7 +350,7 @@ export default function CertificatesPage() {
       if (needle) {
         const hay = [
           c.certificate_number,
-          c.sl_customers?.name,
+          c.customers?.name,
           c.vehicles?.name,
           c.vehicles?.license_plate,
         ]
@@ -440,7 +440,7 @@ export default function CertificatesPage() {
                   <div className="text-xs text-slate-500">{c.issuing_authority}</div>
                 )}
               </td>
-              <td className="px-4 py-3 text-slate-600">{c.sl_customers?.name ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-600">{c.customers?.name ?? "—"}</td>
               <td className="px-4 py-3">
                 <div className="text-slate-700">{c.vehicles?.name ?? "—"}</div>
                 {c.vehicles?.license_plate && (

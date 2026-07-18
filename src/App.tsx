@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nProvider, useI18n } from "./i18n";
 import { AuthProvider, useAuth } from "./context/AuthContext";
@@ -28,6 +28,9 @@ const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
 // The speed limiter hub carries its own sub-routes, so it gets its own chunk
 const SpeedLimitersHub = lazy(() => import("./pages/speed-limiters/SpeedLimitersHub"));
+// Customers is global master data with its own module + chunk
+const CustomersPage = lazy(() => import("./pages/customers/CustomersPage"));
+const CustomerDetailPage = lazy(() => import("./pages/customers/CustomerDetailPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +46,13 @@ function Protected() {
   if (!session) return <Navigate to="/login" replace />;
   if (!tenant) return <LoadingState label={t("common.preparingOrg")} />;
   return <Outlet />;
+}
+
+/** Customers moved out of the speed-limiter hub — keep pre-extraction deep
+ *  links (bookmarks, printed docs) alive regardless of module enablement. */
+function LegacyCustomerRedirect() {
+  const { customerId } = useParams();
+  return <Navigate to={`/customers/${customerId}`} replace />;
 }
 
 function PublicOnly() {
@@ -91,6 +101,22 @@ export default function App() {
                   element={<ModuleGate module="drivers"><DriversPage /></ModuleGate>}
                 />
                 <Route
+                  path="/customers"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="customers"><CustomersPage /></ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/customers/:customerId"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="customers"><CustomerDetailPage /></ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
                   path="/maintenance"
                   element={<ModuleGate module="maintenance"><MaintenancePage /></ModuleGate>}
                 />
@@ -117,6 +143,14 @@ export default function App() {
                 <Route
                   path="/renewals"
                   element={<ModuleGate module="renewals"><RenewalsPage /></ModuleGate>}
+                />
+                <Route
+                  path="/speed-limiters/customers"
+                  element={<Navigate to="/customers" replace />}
+                />
+                <Route
+                  path="/speed-limiters/customers/:customerId"
+                  element={<LegacyCustomerRedirect />}
                 />
                 <Route
                   path="/speed-limiters/*"

@@ -111,6 +111,7 @@ export default function DashboardPage() {
   const t = useT();
   const { isEnabled } = useModules();
 
+  const customersOn = isEnabled("customers");
   const issuesOn = isEnabled("issues");
   const maintenanceOn = isEnabled("maintenance");
   const preventiveOn = isEnabled("preventive");
@@ -190,6 +191,11 @@ export default function DashboardPage() {
   });
 
   const vehicles = vehiclesQ.data ?? [];
+  /** Vehicles that make up YOUR fleet: company-owned only when the customers module is on. */
+  const fleetVehicles = useMemo(
+    () => (customersOn ? vehicles.filter((v) => v.ownership === "company") : vehicles),
+    [vehicles, customersOn],
+  );
   const reminders = remindersQ.data ?? [];
   const renewals = renewalsQ.data ?? [];
 
@@ -221,10 +227,10 @@ export default function DashboardPage() {
       (Object.keys(vehicleStatus) as VehicleStatus[]).map((s) => ({
         key: s,
         name: t(vehicleStatus[s].labelKey),
-        value: vehicles.filter((v) => v.status === s).length,
+        value: fleetVehicles.filter((v) => v.status === s).length,
         color: STATUS_COLORS[s],
       })),
-    [vehicles, t],
+    [fleetVehicles, t],
   );
 
   const dueReminders = useMemo(
@@ -284,13 +290,29 @@ export default function DashboardPage() {
       {!isLoading && !firstError && (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <KpiCard
-              label={t("dashboard.totalVehicles")}
-              value={vehicles.length}
-              sub={t("dashboard.nActive", {
-                count: vehicles.filter((v) => v.status === "active").length,
-              })}
-            />
+            {customersOn ? (
+              <>
+                <KpiCard
+                  label={t("dashboard.companyVehicles")}
+                  value={fleetVehicles.length}
+                  sub={t("dashboard.nActive", {
+                    count: fleetVehicles.filter((v) => v.status === "active").length,
+                  })}
+                />
+                <KpiCard
+                  label={t("dashboard.customerVehicles")}
+                  value={vehicles.filter((v) => v.ownership === "customer").length}
+                />
+              </>
+            ) : (
+              <KpiCard
+                label={t("dashboard.totalVehicles")}
+                value={vehicles.length}
+                sub={t("dashboard.nActive", {
+                  count: vehicles.filter((v) => v.status === "active").length,
+                })}
+              />
+            )}
             {issuesOn && (
               <KpiCard label={t("dashboard.openIssues")} value={issuesQ.data?.length ?? 0} />
             )}
@@ -408,7 +430,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-slate-900">
-                      {vehicles.length}
+                      {fleetVehicles.length}
                     </span>
                     <span className="text-xs text-slate-500">{t("dashboard.vehiclesLabel")}</span>
                   </div>

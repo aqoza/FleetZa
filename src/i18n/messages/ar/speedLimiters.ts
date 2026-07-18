@@ -8,9 +8,8 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   // Hub
   "speedLimiters.title": "محددات السرعة",
   "speedLimiters.subtitle":
-    "العملاء والأجهزة والمهام وشهادات المطابقة لخدمة محددات السرعة لديك",
+    "الأجهزة والمهام وشهادات المطابقة لخدمة محددات السرعة لديك",
   "speedLimiters.tab.overview": "نظرة عامة",
-  "speedLimiters.tab.customers": "العملاء",
   "speedLimiters.tab.devices": "الأجهزة",
   "speedLimiters.tab.jobs": "المهام",
   "speedLimiters.tab.certificates": "الشهادات",

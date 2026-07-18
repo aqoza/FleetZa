@@ -50,6 +50,8 @@ export interface Vehicle {
   tenant_id: string;
   name: string;
   vin: string | null;
+  /** 'company' = the tenant's own fleet; 'customer' requires customer_id. */
+  ownership: "company" | "customer";
   customer_id: string | null;
   chassis_number: string | null;
   fleet_number: string | null;
@@ -277,7 +279,7 @@ export interface SpeedLimiterCertificate {
 
 // --- Speed limiter enterprise (service-provider) model ---
 
-export interface SlCustomer {
+export interface Customer {
   id: string;
   tenant_id: string;
   name: string;
@@ -297,7 +299,7 @@ export interface SlCustomer {
   updated_at: string;
 }
 
-export interface SlContact {
+export interface Contact {
   id: string;
   tenant_id: string;
   customer_id: string;

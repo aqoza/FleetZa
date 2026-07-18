@@ -8,6 +8,7 @@ export const enCommon = {
   "nav.dashboard": "Dashboard",
   "nav.vehicles": "Vehicles",
   "nav.drivers": "Drivers",
+  "nav.customers": "Customers",
   "nav.maintenance": "Maintenance",
   "nav.fuel": "Fuel",
   "nav.inspections": "Inspections",

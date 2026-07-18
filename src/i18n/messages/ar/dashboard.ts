@@ -5,6 +5,8 @@ export const arDashboard: Record<keyof typeof enDashboard, string> = {
 
   // KPI cards
   "dashboard.totalVehicles": "إجمالي المركبات",
+  "dashboard.companyVehicles": "مركبات الشركة",
+  "dashboard.customerVehicles": "مركبات العملاء",
   "dashboard.nActive": "{count} نشطة",
   "dashboard.openIssues": "الأعطال المفتوحة",
   "dashboard.openWorkOrders": "أوامر العمل المفتوحة",

@@ -36,6 +36,8 @@ export const enModules = {
   // --- Compliance & certification ---
   "modules.renewals.name": "Renewals & Documents Expiry",
   "modules.renewals.description": "Track registration, insurance, and permit expiry dates with timely reminders.",
+  "modules.customers.name": "Customers",
+  "modules.customers.description": "Shared customer organizations and contacts, used by every module that deals with clients.",
   "modules.speed_limiters.name": "Speed Limiter Supply & Installation",
   "modules.speed_limiters.description": "Manage speed limiter devices, installations, and their status across your vehicles.",
   "modules.sl_certificates.name": "Speed Limiter Certificates",

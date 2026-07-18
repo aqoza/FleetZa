@@ -3,13 +3,24 @@ export const enVehicles = {
   "vehicles.title": "Vehicles",
   "vehicles.countInFleet": "{count} vehicles in your fleet",
   "vehicles.add": "Add vehicle",
+
+  // Ownership (company fleet vs customer-owned)
+  "vehicles.owner": "Owner",
+  "vehicles.ownerCompany": "Company fleet",
+  "vehicles.ownerCustomer": "Customer",
+  "vehicles.selectCustomer": "Select a customer…",
+  "vehicles.allOwners": "All owners",
+  "vehicles.speedLimiterPanel": "Speed limiter",
+  "vehicles.noSpeedLimiter": "No speed limiter installed.",
+  "vehicles.chassisNumber": "Chassis number",
+  "vehicles.fleetNumber": "Fleet number",
   "vehicles.searchPlaceholder": "Search name, plate, VIN…",
   "vehicles.allStatuses": "All statuses",
 
   // Empty states
   "vehicles.noMatch": "No vehicles match your filters",
   "vehicles.empty": "No vehicles yet",
-  "vehicles.noMatchHint": "Try a different search or status filter.",
+  "vehicles.noMatchHint": "Try a different search, status or owner filter.",
   "vehicles.emptyHint": "Add your first vehicle to start tracking maintenance, fuel and costs.",
 
   // Detail

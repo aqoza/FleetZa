@@ -2,9 +2,8 @@ export const enSpeedLimiters = {
   // Hub
   "speedLimiters.title": "Speed limiters",
   "speedLimiters.subtitle":
-    "Customers, devices, jobs and compliance certificates for your speed limiter operation",
+    "Devices, jobs and compliance certificates for your speed limiter operation",
   "speedLimiters.tab.overview": "Overview",
-  "speedLimiters.tab.customers": "Customers",
   "speedLimiters.tab.devices": "Devices",
   "speedLimiters.tab.jobs": "Jobs",
   "speedLimiters.tab.certificates": "Certificates",

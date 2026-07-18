@@ -34,7 +34,7 @@ import {
 
 type JobDetail = SlJob & {
   vehicles: { name: string } | null;
-  sl_customers: { name: string } | null;
+  customers: { name: string } | null;
   sl_technicians: { name: string } | null;
   sl_devices: Pick<SlDevice, "serial" | "manufacturer" | "model"> | null;
 };
@@ -327,7 +327,7 @@ export default function JobDetailPage() {
       const rows = await listRows<JobDetail>("sl_jobs", (q) =>
         q
           .select(
-            "*, vehicles(name), sl_customers(name), sl_technicians(name), sl_devices(serial, manufacturer, model)",
+            "*, vehicles(name), customers(name), sl_technicians(name), sl_devices(serial, manufacturer, model)",
           )
           .eq("id", jobId)
           .limit(1),
@@ -434,12 +434,12 @@ export default function JobDetailPage() {
           <InfoRow
             label={t("slJobs.customer")}
             value={
-              job.sl_customers && job.customer_id ? (
+              job.customers && job.customer_id ? (
                 <Link
-                  to={`/speed-limiters/customers/${job.customer_id}`}
+                  to={`/customers/${job.customer_id}`}
                   className="text-brand-700 hover:underline"
                 >
-                  {job.sl_customers.name}
+                  {job.customers.name}
                 </Link>
               ) : (
                 "—"

@@ -57,8 +57,9 @@ The app adapts automatically to what's enabled:
 - **Settings → Modules** is the admin catalog: browse by category, enable/disable per
   tenant. Dependencies auto-enable; disabling warns when enabled modules depend on it.
 
-11 modules are live today (fleet core, drivers, fuel, maintenance, preventive service,
-inspections, issues, renewals, reports, speed limiters, speed limiter certificates),
+12 modules are live today (fleet core, drivers, customers, fuel, maintenance,
+preventive service, inspections, issues, renewals, reports, speed limiters, speed
+limiter certificates),
 plus a catalog of coming-soon modules (GPS tracking, dispatch, TMS, workshop, finance,
 CRM, …) that become enableable as they're implemented.
 

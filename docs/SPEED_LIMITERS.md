@@ -60,9 +60,9 @@ erDiagram
 
 | Entity | Table | Purpose | Key relationships |
 |---|---|---|---|
-| Customer | `sl_customers` | Client organization: name, CR/tax numbers, billing terms, credit limit, active/inactive status | Parent of contacts, vehicles, jobs, certificates |
-| Contact | `sl_contacts` | Person at a customer (title, department, email/phone/WhatsApp, `is_primary`) | `customer_id` → customer |
-| Vehicle | `vehicles` (extended) | Fleet-core vehicle, extended with `customer_id`, `chassis_number`, `fleet_number` so provider tenants can track customer-owned vehicles | `customer_id` → customer |
+| Customer | `customers` (**global** — owned by the `customers` master-data module, which this module requires) | Client organization: name, CR/tax numbers, billing terms, credit limit, active/inactive status | Parent of contacts, vehicles, jobs, certificates |
+| Contact | `contacts` (**global**, with customers) | Person at a customer (title, department, email/phone/WhatsApp, `is_primary`) | `customer_id` → customer |
+| Vehicle | `vehicles` (extended) | Fleet-core vehicle with a first-class `ownership` (`company` \| `customer`) plus `customer_id`, `chassis_number`, `fleet_number` so provider tenants track customer-owned vehicles distinctly from their own fleet | `customer_id` → customer |
 | Device | `sl_devices` | Physical limiter unit: serial, manufacturer/model, firmware, IMEI, purchase and warranty data; status `in_stock` \| `installed` \| `faulty` \| `retired`; `current_vehicle_id` when installed | Tracked through jobs and installations |
 | Technician | `sl_technicians` | Installer/inspector on staff (name, phone, email, active flag) | Assigned to jobs via `technician_id` |
 | Job | `sl_jobs` | The unit of work — see the state machine below. `number` is assigned by a DB trigger (never sent by the client); carries checklist, signatures, QC fields, timing | `customer_id`, `vehicle_id`, `device_id`, `technician_id` |
@@ -153,7 +153,8 @@ catalog modules** rather than half-built here:
 
 | Concern | Belongs to |
 |---|---|
-| Invoicing, quotes, payments for jobs/certificates | **Finance** module |
+| Customer & contact master data | **Customers** module (extracted 2026-07; this module consumes the global `customers`/`contacts` tables and requires the module) |
+| Invoicing, quotes, payments for jobs/certificates | **Finance** module (will consume the same global customers) |
 | Purchase orders, supplier management, stock replenishment for devices | **Inventory** module |
 | Customer self-service logins (view own vehicles/certificates) | **Customer Portal** module |
 | SMS/WhatsApp reminders for expiring certificates and scheduled jobs | **Notifications** module |
@@ -165,13 +166,15 @@ additive, not a migration.
 
 ## Where things live
 
-- Types: `src/lib/types.ts` (`SlCustomer`, `SlContact`, `SlDevice`, `SlTechnician`,
-  `SlJob`, `SlSettings`, extended `Vehicle`, `SpeedLimiterInstallation`,
-  `SpeedLimiterCertificate`)
-- Pages: `src/pages/speed-limiters/` (hub + Customers, Devices, Jobs, Certificates,
-  detail and print pages); public verify page at `/verify`
+- Types: `src/lib/types.ts` (`Customer`, `Contact` — global master data — plus
+  `SlDevice`, `SlTechnician`, `SlJob`, `SlSettings`, extended `Vehicle`,
+  `SpeedLimiterInstallation`, `SpeedLimiterCertificate`)
+- Pages: `src/pages/speed-limiters/` (hub + Devices, Jobs, Certificates, detail
+  and print pages); customer pages live in the global `src/pages/customers/`
+  (`/customers`, `/customers/:id`); public verify page at `/verify`
 - Worker: public `GET /api/verify/:certUuid`
 - DB: `supabase/migrations` (tables, RLS, job-number trigger,
-  `next_certificate_number()` RPC)
-- i18n namespaces: `speedLimiters` (hub + shared enums), `slCustomers`,
+  `next_certificate_number()` RPC; customers/contacts renamed global in
+  `20260720000001_customers_extraction.sql`)
+- i18n namespaces: `speedLimiters` (hub + shared enums), `customers` (global),
   `slDevices`, `slJobs`, `slCertificates` — English + Arabic, RTL-ready

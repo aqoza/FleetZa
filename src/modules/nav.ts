@@ -4,6 +4,7 @@
 import {
   AlertTriangle,
   BarChart3,
+  Building2,
   ClipboardCheck,
   Fuel,
   Gauge,
@@ -27,6 +28,7 @@ export const NAV_ITEMS: Array<{
   { moduleId: "fleet", to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard, end: true },
   { moduleId: "fleet", to: "/vehicles", labelKey: "nav.vehicles", icon: Truck },
   { moduleId: "drivers", to: "/drivers", labelKey: "nav.drivers", icon: Users },
+  { moduleId: "customers", to: "/customers", labelKey: "nav.customers", icon: Building2 },
   { moduleId: "maintenance", to: "/maintenance", labelKey: "nav.maintenance", icon: Wrench },
   { moduleId: "fuel", to: "/fuel", labelKey: "nav.fuel", icon: Fuel },
   { moduleId: "inspections", to: "/inspections", labelKey: "nav.inspections", icon: ClipboardCheck },

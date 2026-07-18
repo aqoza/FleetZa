@@ -50,8 +50,8 @@ import { enModules } from "./messages/en/modules";
 import { arModules } from "./messages/ar/modules";
 import { enSpeedLimiters } from "./messages/en/speedLimiters";
 import { arSpeedLimiters } from "./messages/ar/speedLimiters";
-import { enSlCustomers } from "./messages/en/slCustomers";
-import { arSlCustomers } from "./messages/ar/slCustomers";
+import { enCustomers } from "./messages/en/customers";
+import { arCustomers } from "./messages/ar/customers";
 import { enSlDevices } from "./messages/en/slDevices";
 import { arSlDevices } from "./messages/ar/slDevices";
 import { enSlJobs } from "./messages/en/slJobs";
@@ -82,7 +82,7 @@ const en = {
   ...enSettings,
   ...enModules,
   ...enSpeedLimiters,
-  ...enSlCustomers,
+  ...enCustomers,
   ...enSlDevices,
   ...enSlJobs,
   ...enSlCertificates,
@@ -103,7 +103,7 @@ const ar: Record<string, string> = {
   ...arSettings,
   ...arModules,
   ...arSpeedLimiters,
-  ...arSlCustomers,
+  ...arCustomers,
   ...arSlDevices,
   ...arSlJobs,
   ...arSlCertificates,

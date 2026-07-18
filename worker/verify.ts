@@ -19,7 +19,7 @@ verify.get("/:id", async (c) => {
   const { data: cert } = await admin
     .from("speed_limiter_certificates")
     .select(
-      "certificate_number, issued_at, expires_at, status, set_speed_kmh, issuing_authority, vehicles(name, license_plate), sl_customers(name), tenants(name)",
+      "certificate_number, issued_at, expires_at, status, set_speed_kmh, issuing_authority, vehicles(name, license_plate), customers(name), tenants(name)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -27,7 +27,7 @@ verify.get("/:id", async (c) => {
   if (!cert) return c.json({ status: "not_found" }, 404);
 
   const vehicle = cert.vehicles as unknown as { name: string; license_plate: string | null } | null;
-  const customer = cert.sl_customers as unknown as { name: string } | null;
+  const customer = cert.customers as unknown as { name: string } | null;
   const tenant = cert.tenants as unknown as { name: string } | null;
 
   const expired = new Date(`${cert.expires_at}T23:59:59`) < new Date();

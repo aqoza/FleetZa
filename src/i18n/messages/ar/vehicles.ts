@@ -8,13 +8,24 @@ export const arVehicles: Record<keyof typeof enVehicles, string> = {
   "vehicles.title": "المركبات",
   "vehicles.countInFleet": "{count} مركبة في أسطولك",
   "vehicles.add": "إضافة مركبة",
+
+  // Ownership
+  "vehicles.owner": "المالك",
+  "vehicles.ownerCompany": "أسطول الشركة",
+  "vehicles.ownerCustomer": "عميل",
+  "vehicles.selectCustomer": "اختر عميلاً…",
+  "vehicles.allOwners": "كل المالكين",
+  "vehicles.speedLimiterPanel": "محدد السرعة",
+  "vehicles.noSpeedLimiter": "لا يوجد محدد سرعة مركّب.",
+  "vehicles.chassisNumber": "رقم الهيكل",
+  "vehicles.fleetNumber": "رقم الأسطول",
   "vehicles.searchPlaceholder": "ابحث بالاسم أو اللوحة أو رقم الهيكل…",
   "vehicles.allStatuses": "جميع الحالات",
 
   // Empty states
   "vehicles.noMatch": "لا توجد مركبات مطابقة لعوامل التصفية",
   "vehicles.empty": "لا توجد مركبات بعد",
-  "vehicles.noMatchHint": "جرّب بحثًا أو عامل تصفية حالة مختلفًا.",
+  "vehicles.noMatchHint": "جرّب بحثًا مختلفًا أو غيّر عامل تصفية الحالة أو المالك.",
   "vehicles.emptyHint": "أضف أول مركبة لبدء تتبّع الصيانة والوقود والتكاليف.",
 
   // Detail

@@ -5,14 +5,14 @@ import QRCode from "qrcode";
 import { ArrowLeft, Printer } from "lucide-react";
 import { listRows } from "../../lib/db";
 import { formatDate } from "../../lib/format";
-import type { SlCustomer, SlDevice, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
+import type { Customer, SlDevice, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import { Button, Card, ErrorState, LoadingState } from "../../components/ui";
 
 type CertPrintRow = SpeedLimiterCertificate & {
   vehicles: Pick<Vehicle, "name" | "license_plate" | "chassis_number"> | null;
-  sl_customers: Pick<SlCustomer, "name"> | null;
+  customers: Pick<Customer, "name"> | null;
   sl_devices: Pick<SlDevice, "serial"> | null;
 };
 
@@ -38,7 +38,7 @@ export default function CertificatePrintPage() {
       const rows = await listRows<CertPrintRow>("speed_limiter_certificates", (q) =>
         q
           .select(
-            "*, vehicles(name, license_plate, chassis_number), sl_customers(name), sl_devices(serial)",
+            "*, vehicles(name, license_plate, chassis_number), customers(name), sl_devices(serial)",
           )
           .eq("id", certId)
           .limit(1),
@@ -129,7 +129,7 @@ export default function CertificatePrintPage() {
         <dl className="mt-8 grid grid-cols-1 gap-x-10 gap-y-4 sm:grid-cols-2">
           <DetailItem
             label={t("slCertificates.fieldCustomer")}
-            value={cert.sl_customers?.name ?? "—"}
+            value={cert.customers?.name ?? "—"}
           />
           <DetailItem label={t("slCertificates.fieldVehicle")} value={cert.vehicles?.name ?? "—"} />
           <DetailItem

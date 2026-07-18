@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { formatMoney } from "../../lib/format";
-import type { SlContact, SlCustomer } from "../../lib/types";
+import type { Contact, Customer } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
@@ -13,18 +13,18 @@ import {
 } from "../../components/ui";
 
 export const customerStatusMeta: Record<
-  SlCustomer["status"],
+  Customer["status"],
   { labelKey: MessageKey; tone: BadgeTone }
 > = {
-  active: { labelKey: "slCustomers.status.active", tone: "green" },
-  inactive: { labelKey: "slCustomers.status.inactive", tone: "slate" },
+  active: { labelKey: "customers.status.active", tone: "green" },
+  inactive: { labelKey: "customers.status.inactive", tone: "slate" },
 };
 
 export function CustomerForm({
   customer,
   onDone,
 }: {
-  customer?: SlCustomer;
+  customer?: Customer;
   onDone: () => void;
 }) {
   const t = useT();
@@ -69,14 +69,14 @@ export function CustomerForm({
         notes: form.notes.trim() || null,
       };
       return customer
-        ? updateRow<SlCustomer>("sl_customers", customer.id, values)
-        : insertRow<SlCustomer>("sl_customers", values);
+        ? updateRow<Customer>("customers", customer.id, values)
+        : insertRow<Customer>("customers", values);
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["sl_customers"] });
+      void qc.invalidateQueries({ queryKey: ["customers"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : t("slCustomers.saveFailed")),
+    onError: (err) => setError(err instanceof Error ? err.message : t("customers.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -89,13 +89,13 @@ export function CustomerForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t("slCustomers.name")} required>
+        <Field label={t("customers.name")} required>
           <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
         </Field>
-        <Field label={t("slCustomers.crNumber")}>
+        <Field label={t("customers.crNumber")}>
           <Input value={form.cr_number} onChange={(e) => set("cr_number", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.taxNumber")}>
+        <Field label={t("customers.taxNumber")}>
           <Input value={form.tax_number} onChange={(e) => set("tax_number", e.target.value)} />
         </Field>
         <Field label={t("field.email")}>
@@ -104,25 +104,25 @@ export function CustomerForm({
         <Field label={t("field.phone")}>
           <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.website")}>
+        <Field label={t("customers.website")}>
           <Input value={form.website} onChange={(e) => set("website", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.address")}>
+        <Field label={t("customers.address")}>
           <Input value={form.address} onChange={(e) => set("address", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.city")}>
+        <Field label={t("customers.city")}>
           <Input value={form.city} onChange={(e) => set("city", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.country")}>
+        <Field label={t("customers.country")}>
           <Input value={form.country} onChange={(e) => set("country", e.target.value)} />
         </Field>
-        <Field label={t("slCustomers.billingTerms")}>
+        <Field label={t("customers.billingTerms")}>
           <Input
             value={form.billing_terms}
             onChange={(e) => set("billing_terms", e.target.value)}
           />
         </Field>
-        <Field label={t("slCustomers.creditLimitUnit", { currency: tenant.currency })}>
+        <Field label={t("customers.creditLimitUnit", { currency: tenant.currency })}>
           <Input
             type="number" min={0} step="0.01"
             value={form.credit_limit}
@@ -160,23 +160,23 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [adding, setAdding] = useState(false);
-  const [editing, setEditing] = useState<SlCustomer | null>(null);
-  const [deleting, setDeleting] = useState<SlCustomer | null>(null);
+  const [editing, setEditing] = useState<Customer | null>(null);
+  const [deleting, setDeleting] = useState<Customer | null>(null);
   const [actionError, setActionError] = useState("");
 
   const { data: customers, isLoading, error } = useQuery({
-    queryKey: ["sl_customers"],
-    queryFn: () => listRows<SlCustomer>("sl_customers", (q) => q.order("name")),
+    queryKey: ["customers"],
+    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
   });
 
   const { data: contacts } = useQuery({
-    queryKey: ["sl_contacts"],
-    queryFn: () => listRows<SlContact>("sl_contacts"),
+    queryKey: ["contacts"],
+    queryFn: () => listRows<Contact>("contacts"),
   });
 
   // Client-side join: preferred contact (primary if one exists) per customer.
   const contactByCustomer = useMemo(() => {
-    const map = new Map<string, SlContact>();
+    const map = new Map<string, Contact>();
     for (const c of contacts ?? []) {
       const existing = map.get(c.customer_id);
       if (!existing || (c.is_primary && !existing.is_primary)) map.set(c.customer_id, c);
@@ -185,17 +185,17 @@ export default function CustomersPage() {
   }, [contacts]);
 
   const remove = useMutation({
-    mutationFn: (id: string) => deleteRow("sl_customers", id),
+    mutationFn: (id: string) => deleteRow("customers", id),
     onSuccess: () => {
       setActionError("");
-      void qc.invalidateQueries({ queryKey: ["sl_customers"] });
-      void qc.invalidateQueries({ queryKey: ["sl_contacts"] });
+      void qc.invalidateQueries({ queryKey: ["customers"] });
+      void qc.invalidateQueries({ queryKey: ["contacts"] });
       // Deleting a customer unlinks its vehicles.
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       setDeleting(null);
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : t("slCustomers.deleteFailed"));
+      setActionError(err instanceof Error ? err.message : t("customers.deleteFailed"));
       setDeleting(null);
     },
   });
@@ -214,12 +214,12 @@ export default function CustomersPage() {
   return (
     <>
       <PageHeader
-        title={t("slCustomers.title")}
-        description={t("slCustomers.subtitle")}
+        title={t("customers.title")}
+        description={t("customers.subtitle")}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>
-              <Plus className="h-4 w-4" /> {t("slCustomers.newCustomer")}
+              <Plus className="h-4 w-4" /> {t("customers.newCustomer")}
             </Button>
           )
         }
@@ -229,7 +229,7 @@ export default function CustomersPage() {
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("slCustomers.searchPlaceholder")}
+          placeholder={t("customers.searchPlaceholder")}
           className="max-w-80"
         />
         <Select
@@ -237,7 +237,7 @@ export default function CustomersPage() {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="max-w-44"
         >
-          <option value="all">{t("slCustomers.allStatuses")}</option>
+          <option value="all">{t("customers.allStatuses")}</option>
           {Object.entries(customerStatusMeta).map(([v, m]) => (
             <option key={v} value={v}>{t(m.labelKey)}</option>
           ))}
@@ -256,15 +256,15 @@ export default function CustomersPage() {
         <EmptyState
           icon={<Building2 className="h-10 w-10" />}
           title={
-            customers?.length ? t("slCustomers.emptyFilteredTitle") : t("slCustomers.emptyTitle")
+            customers?.length ? t("customers.emptyFilteredTitle") : t("customers.emptyTitle")
           }
           description={
-            customers?.length ? t("slCustomers.emptyFilteredDesc") : t("slCustomers.emptyDesc")
+            customers?.length ? t("customers.emptyFilteredDesc") : t("customers.emptyDesc")
           }
           action={
             isManager && !customers?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> {t("slCustomers.newCustomer")}
+                <Plus className="h-4 w-4" /> {t("customers.newCustomer")}
               </Button>
             ) : undefined
           }
@@ -274,11 +274,11 @@ export default function CustomersPage() {
       {!isLoading && !error && filtered.length > 0 && (
         <Table
           headers={[
-            t("slCustomers.company"),
-            t("slCustomers.cityCountry"),
-            t("slCustomers.contact"),
-            t("slCustomers.billingTerms"),
-            t("slCustomers.creditLimit"),
+            t("customers.company"),
+            t("customers.cityCountry"),
+            t("customers.contact"),
+            t("customers.billingTerms"),
+            t("customers.creditLimit"),
             t("common.status"),
             "",
           ]}
@@ -290,7 +290,7 @@ export default function CustomersPage() {
               <tr key={c.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
                   <Link
-                    to={`/speed-limiters/customers/${c.id}`}
+                    to={`/customers/${c.id}`}
                     className="font-medium text-brand-700 hover:underline"
                   >
                     {c.name}
@@ -325,7 +325,7 @@ export default function CustomersPage() {
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                         onClick={() => setEditing(c)}
-                        aria-label={t("slCustomers.editCustomer")}
+                        aria-label={t("customers.editCustomer")}
                         title={t("action.edit")}
                       >
                         <Pencil className="h-4 w-4" />
@@ -333,7 +333,7 @@ export default function CustomersPage() {
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                         onClick={() => setDeleting(c)}
-                        aria-label={t("slCustomers.deleteCustomer")}
+                        aria-label={t("customers.deleteCustomer")}
                         title={t("action.delete")}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -347,12 +347,12 @@ export default function CustomersPage() {
         </Table>
       )}
 
-      <Modal title={t("slCustomers.newCustomer")} open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("customers.newCustomer")} open={adding} onClose={() => setAdding(false)} wide>
         <CustomerForm onDone={() => setAdding(false)} />
       </Modal>
 
       <Modal
-        title={t("slCustomers.editCustomer")}
+        title={t("customers.editCustomer")}
         open={!!editing}
         onClose={() => setEditing(null)}
         wide
@@ -361,14 +361,14 @@ export default function CustomersPage() {
       </Modal>
 
       <Modal
-        title={t("slCustomers.deleteCustomer")}
+        title={t("customers.deleteCustomer")}
         open={!!deleting}
         onClose={() => setDeleting(null)}
       >
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              {t("slCustomers.deleteConfirm", { name: deleting.name })}
+              {t("customers.deleteConfirm", { name: deleting.name })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeleting(null)}>
@@ -379,7 +379,7 @@ export default function CustomersPage() {
                 onClick={() => remove.mutate(deleting.id)}
                 loading={remove.isPending}
               >
-                {t("slCustomers.deleteCustomer")}
+                {t("customers.deleteCustomer")}
               </Button>
             </div>
           </>

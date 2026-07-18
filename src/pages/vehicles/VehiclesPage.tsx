@@ -7,41 +7,55 @@ import { formatDistance } from "../../lib/format";
 import { vehicleStatus, vehicleTypes } from "../../lib/labels";
 import type { Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Input, LoadingState, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
 import { VehicleForm } from "./VehicleForm";
 
+type VehicleRow = Vehicle & { customers?: { name: string } | null };
+
 export default function VehiclesPage() {
   const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
+  const { isEnabled } = useModules();
+  const customersOn = isEnabled("customers");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+  const [owner, setOwner] = useState("company");
   const [adding, setAdding] = useState(false);
 
   const { data: vehicles, isLoading, error } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
+    queryKey: ["vehicles", { withOwner: customersOn }],
+    queryFn: () =>
+      customersOn
+        ? listRows<VehicleRow>("vehicles", (q) => q.select("*, customers(name)").order("name"))
+        : listRows<VehicleRow>("vehicles", (q) => q.order("name")),
   });
+
+  const fleetCount = customersOn
+    ? (vehicles ?? []).filter((v) => v.ownership === "company").length
+    : vehicles?.length ?? 0;
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     return (vehicles ?? []).filter((v) => {
+      if (customersOn && owner !== "all" && v.ownership !== owner) return false;
       if (status !== "all" && v.status !== status) return false;
       if (!term) return true;
       return [v.name, v.make, v.model, v.license_plate, v.vin]
         .filter(Boolean)
         .some((f) => (f as string).toLowerCase().includes(term));
     });
-  }, [vehicles, search, status]);
+  }, [vehicles, search, status, owner, customersOn]);
 
   return (
     <>
       <PageHeader
         title={t("vehicles.title")}
-        description={t("vehicles.countInFleet", { count: vehicles?.length ?? 0 })}
+        description={t("vehicles.countInFleet", { count: fleetCount })}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>
@@ -64,6 +78,13 @@ export default function VehiclesPage() {
             <option key={v} value={v}>{t(s.labelKey)}</option>
           ))}
         </Select>
+        {customersOn && (
+          <Select value={owner} onChange={(e) => setOwner(e.target.value)} className="max-w-44">
+            <option value="company">{t("vehicles.ownerCompany")}</option>
+            <option value="customer">{t("vehicles.ownerCustomer")}</option>
+            <option value="all">{t("vehicles.allOwners")}</option>
+          </Select>
+        )}
       </div>
 
       {isLoading && <LoadingState />}
@@ -91,6 +112,7 @@ export default function VehiclesPage() {
           headers={[
             t("field.vehicle"),
             t("vehicles.type"),
+            ...(customersOn ? [t("vehicles.owner")] : []),
             t("field.licensePlate"),
             t("field.odometer"),
             t("field.status"),
@@ -107,6 +129,20 @@ export default function VehiclesPage() {
                 </div>
               </td>
               <td className="px-4 py-3 text-slate-600">{t(vehicleTypes[v.vehicle_type])}</td>
+              {customersOn && (
+                <td className="px-4 py-3 text-slate-600">
+                  {v.ownership === "customer" && v.customer_id ? (
+                    <Link
+                      to={`/customers/${v.customer_id}`}
+                      className="text-brand-700 hover:underline"
+                    >
+                      {v.customers?.name ?? t("common.dash")}
+                    </Link>
+                  ) : (
+                    t("vehicles.ownerCompany")
+                  )}
+                </td>
+              )}
               <td className="px-4 py-3 text-slate-600">{v.license_plate ?? t("common.dash")}</td>
               <td className="px-4 py-3 text-slate-600">
                 {formatDistance(v.odometer, tenant.distance_unit)}

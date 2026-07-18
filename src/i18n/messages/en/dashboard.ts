@@ -3,6 +3,8 @@ export const enDashboard = {
 
   // KPI cards
   "dashboard.totalVehicles": "Total vehicles",
+  "dashboard.companyVehicles": "Company vehicles",
+  "dashboard.customerVehicles": "Customer vehicles",
   "dashboard.nActive": "{count} active",
   "dashboard.openIssues": "Open issues",
   "dashboard.openWorkOrders": "Open work orders",
