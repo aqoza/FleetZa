@@ -8,19 +8,20 @@ import { daysUntil, formatDate, formatMoney } from "../../lib/format";
 import { renewalTypes } from "../../lib/labels";
 import type { Renewal, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
 
 type RenewalRow = Renewal & { vehicles: Pick<Vehicle, "name"> | null };
 
-function dueDateCell(r: RenewalRow) {
+function dueDateCell(r: RenewalRow, t: Translate) {
   if (r.completed_at) return <span className="text-slate-600">{formatDate(r.due_date)}</span>;
   const days = daysUntil(r.due_date);
   if (days < 0) {
     return (
       <div className="flex items-center gap-2">
-        <Badge tone="red">Overdue</Badge>
+        <Badge tone="red">{t("renewals.overdue")}</Badge>
         <span className="text-xs text-slate-500">{formatDate(r.due_date)}</span>
       </div>
     );
@@ -28,7 +29,7 @@ function dueDateCell(r: RenewalRow) {
   if (days <= 30) {
     return (
       <div className="flex items-center gap-2">
-        <Badge tone="yellow">Due in {days} d</Badge>
+        <Badge tone="yellow">{t("renewals.dueInDays", { count: days })}</Badge>
         <span className="text-xs text-slate-500">{formatDate(r.due_date)}</span>
       </div>
     );
@@ -45,6 +46,7 @@ function RenewalForm({
   vehicles: Vehicle[];
   onDone: () => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -81,7 +83,7 @@ function RenewalForm({
       void qc.invalidateQueries({ queryKey: ["renewals"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("renewals.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -93,28 +95,28 @@ function RenewalForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Vehicle" required>
+        <Field label={t("field.vehicle")} required>
           <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">Select vehicle…</option>
+            <option value="">{t("renewals.selectVehicle")}</option>
             {vehicles.map((v) => (
               <option key={v.id} value={v.id}>{v.name}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Type">
+        <Field label={t("renewals.type")}>
           <Select value={form.renewal_type} onChange={(e) => set("renewal_type", e.target.value)}>
-            {Object.entries(renewalTypes).map(([v, label]) => (
-              <option key={v} value={v}>{label}</option>
+            {Object.entries(renewalTypes).map(([v, labelKey]) => (
+              <option key={v} value={v}>{t(labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Name" hint="Optional custom label, e.g. insurer or permit name">
+        <Field label={t("field.name")} hint={t("renewals.nameHint")}>
           <Input value={form.name} onChange={(e) => set("name", e.target.value)} />
         </Field>
-        <Field label="Due date" required>
+        <Field label={t("field.dueDate")} required>
           <Input type="date" value={form.due_date} onChange={(e) => set("due_date", e.target.value)} required />
         </Field>
-        <Field label={`Amount (${tenant.currency})`}>
+        <Field label={t("renewals.amountLabel", { currency: tenant.currency })}>
           <Input
             type="number"
             min="0"
@@ -123,7 +125,7 @@ function RenewalForm({
             onChange={(e) => set("amount", e.target.value)}
           />
         </Field>
-        <Field label="Recurs every (months)" hint="Leave empty for one-time">
+        <Field label={t("renewals.recurEvery")} hint={t("renewals.recurHint")}>
           <Input
             type="number"
             min="1"
@@ -133,13 +135,13 @@ function RenewalForm({
           />
         </Field>
       </div>
-      <Field label="Notes">
+      <Field label={t("field.notes")}>
         <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
         <Button type="submit" loading={mutation.isPending}>
-          {renewal ? "Save changes" : "Add renewal"}
+          {renewal ? t("action.saveChanges") : t("renewals.addRenewal")}
         </Button>
       </div>
     </form>
@@ -153,6 +155,7 @@ function CountryDefaultsForm({
   vehicles: Vehicle[];
   onDone: () => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const country = getCountry(tenant.country);
@@ -189,7 +192,7 @@ function CountryDefaultsForm({
       if (added > 0) void qc.invalidateQueries({ queryKey: ["renewals"] });
     },
     onError: (err) => {
-      setError(err instanceof Error ? err.message : "Failed to add renewals");
+      setError(err instanceof Error ? err.message : t("renewals.addDefaultsFailed"));
       // Some inserts may have landed before the failure — refresh the list.
       void qc.invalidateQueries({ queryKey: ["renewals"] });
     },
@@ -204,7 +207,7 @@ function CountryDefaultsForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <Field label="Vehicle" required>
+      <Field label={t("field.vehicle")} required>
         <Select
           value={vehicleId}
           onChange={(e) => {
@@ -213,7 +216,7 @@ function CountryDefaultsForm({
           }}
           required
         >
-          <option value="">Select vehicle…</option>
+          <option value="">{t("renewals.selectVehicle")}</option>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
@@ -221,14 +224,14 @@ function CountryDefaultsForm({
       </Field>
       <div>
         <span className="mb-1 block text-sm font-medium text-slate-700">
-          Standard renewals for {country.name}
+          {t("renewals.standardFor", { country: country.name })}
         </span>
         <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-slate-50">
           {catalog.map((entry) => (
             <li key={entry.type} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
               <span className="text-slate-700">{entry.label}</span>
               <span className="whitespace-nowrap text-xs text-slate-500">
-                every {entry.months} months
+                {t("renewals.everyMonthsLong", { count: entry.months })}
               </span>
             </li>
           ))}
@@ -244,19 +247,20 @@ function CountryDefaultsForm({
           }
         >
           {result.added > 0
-            ? `Added ${result.added} renewal${result.added === 1 ? "" : "s"}`
-            : "All standard renewals already exist for this vehicle."}
+            ? t("renewals.addedN", { count: result.added })
+            : t("renewals.allExist")}
         </p>
       )}
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Close</Button>
-        <Button type="submit" loading={mutation.isPending}>Create</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.close")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("action.create")}</Button>
       </div>
     </form>
   );
 }
 
 export default function RenewalsPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -318,7 +322,7 @@ export default function RenewalsPage() {
       void qc.invalidateQueries({ queryKey: ["renewals"] });
     },
     onError: (err) =>
-      setActionError(err instanceof Error ? err.message : "Failed to mark renewal complete"),
+      setActionError(err instanceof Error ? err.message : t("renewals.completeFailed")),
   });
 
   const remove = useMutation({
@@ -329,7 +333,7 @@ export default function RenewalsPage() {
       setDeleting(null);
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to delete renewal");
+      setActionError(err instanceof Error ? err.message : t("renewals.deleteFailed"));
       setDeleting(null);
     },
   });
@@ -348,16 +352,16 @@ export default function RenewalsPage() {
   return (
     <>
       <PageHeader
-        title="Renewals"
-        description="Registrations, insurance, permits and other expiring documents"
+        title={t("renewals.title")}
+        description={t("renewals.description")}
         actions={
           isManager && (
             <>
               <Button variant="secondary" onClick={() => setAddingDefaults(true)}>
-                <ShieldCheck className="h-4 w-4" /> Add country defaults
+                <ShieldCheck className="h-4 w-4" /> {t("renewals.addDefaults")}
               </Button>
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> Add renewal
+                <Plus className="h-4 w-4" /> {t("renewals.addRenewal")}
               </Button>
             </>
           )
@@ -366,12 +370,12 @@ export default function RenewalsPage() {
 
       <div className="mb-4 flex flex-wrap gap-3">
         <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="max-w-44">
-          <option value="pending">Pending</option>
-          <option value="completed">Completed</option>
-          <option value="all">All</option>
+          <option value="pending">{t("renewals.statusPending")}</option>
+          <option value="completed">{t("renewals.statusCompleted")}</option>
+          <option value="all">{t("common.all")}</option>
         </Select>
         <Select value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value)} className="max-w-44">
-          <option value="all">All vehicles</option>
+          <option value="all">{t("renewals.allVehicles")}</option>
           {vehicles?.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
@@ -389,16 +393,16 @@ export default function RenewalsPage() {
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<CalendarClock className="h-10 w-10" />}
-          title={renewals?.length ? "No renewals match your filters" : "No renewals yet"}
+          title={renewals?.length ? t("renewals.emptyFilteredTitle") : t("renewals.emptyTitle")}
           description={
             renewals?.length
-              ? "Try a different status or vehicle filter."
-              : "Track registrations, insurance and permits so nothing expires unnoticed."
+              ? t("renewals.emptyFilteredDesc")
+              : t("renewals.emptyDesc")
           }
           action={
             isManager && !renewals?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> Add renewal
+                <Plus className="h-4 w-4" /> {t("renewals.addRenewal")}
               </Button>
             ) : undefined
           }
@@ -406,31 +410,45 @@ export default function RenewalsPage() {
       )}
 
       {!isLoading && !error && filtered.length > 0 && (
-        <Table headers={["Type", "Vehicle", "Due date", "Amount", "Recurs", "Status", ""]}>
+        <Table
+          headers={[
+            t("renewals.type"),
+            t("field.vehicle"),
+            t("field.dueDate"),
+            t("field.amount"),
+            t("renewals.recurs"),
+            t("common.status"),
+            "",
+          ]}
+        >
           {filtered.map((r) => (
             <tr key={r.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <div className="font-medium text-slate-800">
-                  {r.name ?? renewalTypes[r.renewal_type]}
+                  {r.name ?? t(renewalTypes[r.renewal_type])}
                 </div>
                 {r.name && (
-                  <div className="text-xs text-slate-500">{renewalTypes[r.renewal_type]}</div>
+                  <div className="text-xs text-slate-500">{t(renewalTypes[r.renewal_type])}</div>
                 )}
               </td>
               <td className="px-4 py-3 text-slate-600">{r.vehicles?.name ?? "—"}</td>
-              <td className="px-4 py-3">{dueDateCell(r)}</td>
+              <td className="px-4 py-3">{dueDateCell(r, t)}</td>
               <td className="px-4 py-3 text-slate-600">{formatMoney(r.amount, tenant.currency)}</td>
               <td className="px-4 py-3 text-slate-600">
-                {r.recurrence_months ? `Every ${r.recurrence_months} mo` : "—"}
+                {r.recurrence_months
+                  ? t("renewals.everyMonthsShort", { count: r.recurrence_months })
+                  : "—"}
               </td>
               <td className="px-4 py-3">
                 {r.completed_at ? (
-                  <Badge tone="green">Completed {formatDate(r.completed_at)}</Badge>
+                  <Badge tone="green">
+                    {t("renewals.completedOn", { date: formatDate(r.completed_at) })}
+                  </Badge>
                 ) : (
-                  <Badge tone="blue">Pending</Badge>
+                  <Badge tone="blue">{t("renewals.statusPending")}</Badge>
                 )}
               </td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-3 text-end">
                 {isManager && (
                   <div className="flex justify-end gap-1">
                     {!r.completed_at && (
@@ -438,8 +456,8 @@ export default function RenewalsPage() {
                         className="rounded p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-50"
                         onClick={() => complete.mutate(r)}
                         disabled={complete.isPending}
-                        aria-label="Mark complete"
-                        title="Mark complete"
+                        aria-label={t("action.markComplete")}
+                        title={t("action.markComplete")}
                       >
                         <Check className="h-4 w-4" />
                       </button>
@@ -447,16 +465,16 @@ export default function RenewalsPage() {
                     <button
                       className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                       onClick={() => setEditing(r)}
-                      aria-label="Edit renewal"
-                      title="Edit"
+                      aria-label={t("renewals.editRenewal")}
+                      title={t("action.edit")}
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
                       className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                       onClick={() => setDeleting(r)}
-                      aria-label="Delete renewal"
-                      title="Delete"
+                      aria-label={t("renewals.deleteRenewal")}
+                      title={t("action.delete")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -468,12 +486,12 @@ export default function RenewalsPage() {
         </Table>
       )}
 
-      <Modal title="Add renewal" open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("renewals.addRenewal")} open={adding} onClose={() => setAdding(false)} wide>
         <RenewalForm vehicles={vehicles ?? []} onDone={() => setAdding(false)} />
       </Modal>
 
       <Modal
-        title="Add country defaults"
+        title={t("renewals.addDefaults")}
         open={addingDefaults}
         onClose={() => setAddingDefaults(false)}
       >
@@ -483,27 +501,28 @@ export default function RenewalsPage() {
         />
       </Modal>
 
-      <Modal title="Edit renewal" open={!!editing} onClose={() => setEditing(null)} wide>
+      <Modal title={t("renewals.editRenewal")} open={!!editing} onClose={() => setEditing(null)} wide>
         {editing && (
           <RenewalForm renewal={editing} vehicles={vehicles ?? []} onDone={() => setEditing(null)} />
         )}
       </Modal>
 
-      <Modal title="Delete renewal" open={!!deleting} onClose={() => setDeleting(null)}>
+      <Modal title={t("renewals.deleteRenewal")} open={!!deleting} onClose={() => setDeleting(null)}>
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              Delete the{" "}
+              {t("renewals.deleteLead")}
               <span className="font-semibold">
-                {deleting.name ?? renewalTypes[deleting.renewal_type]}
-              </span>{" "}
-              renewal{deleting.vehicles ? ` for ${deleting.vehicles.name}` : ""}? This cannot be
-              undone.
+                {deleting.name ?? t(renewalTypes[deleting.renewal_type])}
+              </span>
+              {deleting.vehicles
+                ? t("renewals.deleteRestVehicle", { vehicle: deleting.vehicles.name })
+                : t("renewals.deleteRestNoVehicle")}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setDeleting(null)}>{t("action.cancel")}</Button>
               <Button variant="danger" onClick={() => remove.mutate(deleting.id)} loading={remove.isPending}>
-                Delete renewal
+                {t("renewals.deleteRenewal")}
               </Button>
             </div>
           </>

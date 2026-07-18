@@ -16,22 +16,44 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { LANGUAGES, useI18n, type MessageKey } from "../i18n";
 
-const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/vehicles", label: "Vehicles", icon: Truck },
-  { to: "/drivers", label: "Drivers", icon: Users },
-  { to: "/maintenance", label: "Maintenance", icon: Wrench },
-  { to: "/fuel", label: "Fuel", icon: Fuel },
-  { to: "/inspections", label: "Inspections", icon: ClipboardCheck },
-  { to: "/issues", label: "Issues", icon: AlertTriangle },
-  { to: "/renewals", label: "Renewals", icon: ShieldCheck },
-  { to: "/reports", label: "Reports", icon: BarChart3 },
-  { to: "/settings", label: "Settings", icon: Settings },
+const nav: { to: string; labelKey: MessageKey; icon: typeof Truck; end?: boolean }[] = [
+  { to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard, end: true },
+  { to: "/vehicles", labelKey: "nav.vehicles", icon: Truck },
+  { to: "/drivers", labelKey: "nav.drivers", icon: Users },
+  { to: "/maintenance", labelKey: "nav.maintenance", icon: Wrench },
+  { to: "/fuel", labelKey: "nav.fuel", icon: Fuel },
+  { to: "/inspections", labelKey: "nav.inspections", icon: ClipboardCheck },
+  { to: "/issues", labelKey: "nav.issues", icon: AlertTriangle },
+  { to: "/renewals", labelKey: "nav.renewals", icon: ShieldCheck },
+  { to: "/reports", labelKey: "nav.reports", icon: BarChart3 },
+  { to: "/settings", labelKey: "nav.settings", icon: Settings },
 ];
+
+function LanguageSwitcher() {
+  const { language, t } = useI18n();
+  const { setLanguage } = useAuth();
+  return (
+    <div className="mb-3 flex rounded-lg bg-slate-800 p-0.5">
+      {LANGUAGES.map(({ code, labelKey }) => (
+        <button
+          key={code}
+          onClick={() => void setLanguage(code)}
+          className={`flex-1 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
+            language === code ? "bg-slate-600 text-white" : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          {t(labelKey)}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function AppLayout() {
   const { tenant, profile, signOut } = useAuth();
+  const { t } = useI18n();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const sidebar = (
@@ -41,12 +63,12 @@ export default function AppLayout() {
           F
         </div>
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-white">FleetManage</div>
+          <div className="truncate text-sm font-semibold text-white">{t("app.name")}</div>
           <div className="truncate text-xs text-slate-400">{tenant?.name}</div>
         </div>
       </div>
       <nav className="flex-1 space-y-0.5 px-3">
-        {nav.map(({ to, label, icon: Icon, end }) => (
+        {nav.map(({ to, labelKey, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -61,21 +83,25 @@ export default function AppLayout() {
             }
           >
             <Icon className="h-4.5 w-4.5 shrink-0" />
-            {label}
+            {t(labelKey)}
           </NavLink>
         ))}
       </nav>
       <div className="border-t border-slate-800 p-4">
+        <LanguageSwitcher />
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
             <div className="truncate text-sm font-medium text-slate-200">
               {profile?.full_name || profile?.email}
             </div>
-            <div className="truncate text-xs capitalize text-slate-500">{profile?.role}</div>
+            <div className="truncate text-xs text-slate-500">
+              {profile?.role ? t(`role.${profile.role}`) : ""}
+            </div>
           </div>
           <button
             onClick={() => void signOut()}
-            title="Sign out"
+            title={t("action.signOut")}
+            aria-label={t("action.signOut")}
             className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
           >
             <LogOut className="h-4 w-4" />
@@ -87,18 +113,18 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-full">
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — flexbox places it at the inline-start (right in RTL) */}
       <aside className="hidden w-60 shrink-0 bg-slate-900 lg:block">{sidebar}</aside>
 
       {/* Mobile sidebar */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-slate-900/50" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-64 bg-slate-900">
+          <aside className="absolute inset-y-0 start-0 w-64 bg-slate-900">
             <button
-              className="absolute right-3 top-4 rounded-md p-1 text-slate-400 hover:text-white"
+              className="absolute end-3 top-4 rounded-md p-1 text-slate-400 hover:text-white"
               onClick={() => setMobileOpen(false)}
-              aria-label="Close menu"
+              aria-label={t("action.closeMenu")}
             >
               <X className="h-5 w-5" />
             </button>
@@ -113,11 +139,11 @@ export default function AppLayout() {
           <button
             onClick={() => setMobileOpen(true)}
             className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100"
-            aria-label="Open menu"
+            aria-label={t("action.openMenu")}
           >
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-semibold">FleetManage</span>
+          <span className="text-sm font-semibold">{t("app.name")}</span>
         </header>
 
         <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">

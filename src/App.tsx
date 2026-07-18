@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { I18nProvider, useI18n } from "./i18n";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import AppLayout from "./components/AppLayout";
 import LoginPage from "./pages/auth/LoginPage";
@@ -31,9 +32,10 @@ const queryClient = new QueryClient({
 
 function Protected() {
   const { session, tenant, loading } = useAuth();
-  if (loading) return <LoadingState label="Loading your workspace…" />;
+  const { t } = useI18n();
+  if (loading) return <LoadingState label={t("common.loadingWorkspace")} />;
   if (!session) return <Navigate to="/login" replace />;
-  if (!tenant) return <LoadingState label="Preparing your organization…" />;
+  if (!tenant) return <LoadingState label={t("common.preparingOrg")} />;
   return <Outlet />;
 }
 
@@ -46,9 +48,10 @@ function PublicOnly() {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
+    <I18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
           <Routes>
             <Route element={<PublicOnly />}>
               <Route path="/login" element={<LoginPage />} />
@@ -90,8 +93,9 @@ export default function App() {
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    </I18nProvider>
   );
 }

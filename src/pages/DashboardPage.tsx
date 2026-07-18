@@ -27,6 +27,7 @@ import type {
 } from "../lib/types";
 import { useTenant } from "../context/AuthContext";
 import { Badge, Card, ErrorState, LoadingState, PageHeader } from "../components/ui";
+import { useT } from "../i18n";
 
 type ReminderRow = ServiceReminder & { vehicles: { name: string; odometer: number } };
 type RenewalRow = Renewal & { vehicles: { name: string } | null };
@@ -99,15 +100,17 @@ function ListCard({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function NothingDue() {
+  const t = useT();
   return (
     <div className="px-5 py-10 text-center text-sm text-slate-500">
-      Nothing due — nice and healthy fleet.
+      {t("dashboard.nothingDue")}
     </div>
   );
 }
 
 export default function DashboardPage() {
   const tenant = useTenant();
+  const t = useT();
 
   const vehiclesQ = useQuery({
     queryKey: ["vehicles", "dashboard"],
@@ -196,11 +199,11 @@ export default function DashboardPage() {
     () =>
       (Object.keys(vehicleStatus) as VehicleStatus[]).map((s) => ({
         key: s,
-        name: vehicleStatus[s].label,
+        name: t(vehicleStatus[s].labelKey),
         value: vehicles.filter((v) => v.status === s).length,
         color: STATUS_COLORS[s],
       })),
-    [vehicles],
+    [vehicles, t],
   );
 
   const dueReminders = useMemo(
@@ -231,8 +234,8 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title="Dashboard"
-        description="Fleet health, spend and upcoming work at a glance"
+        title={t("nav.dashboard")}
+        description={t("dashboard.subtitle")}
       />
 
       {isLoading && <LoadingState />}
@@ -242,16 +245,18 @@ export default function DashboardPage() {
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <KpiCard
-              label="Total vehicles"
+              label={t("dashboard.totalVehicles")}
               value={vehicles.length}
-              sub={`${vehicles.filter((v) => v.status === "active").length} active`}
+              sub={t("dashboard.nActive", {
+                count: vehicles.filter((v) => v.status === "active").length,
+              })}
             />
-            <KpiCard label="Open issues" value={issuesQ.data?.length ?? 0} />
-            <KpiCard label="Open work orders" value={workOrdersQ.data?.length ?? 0} />
+            <KpiCard label={t("dashboard.openIssues")} value={issuesQ.data?.length ?? 0} />
+            <KpiCard label={t("dashboard.openWorkOrders")} value={workOrdersQ.data?.length ?? 0} />
             <KpiCard
-              label="Attention needed"
+              label={t("dashboard.attentionNeeded")}
               value={attentionCount}
-              sub="Overdue reminders & renewals"
+              sub={t("dashboard.attentionSub")}
               alert={attentionCount > 0}
             />
           </div>
@@ -260,7 +265,7 @@ export default function DashboardPage() {
             <Card className="p-5">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-slate-900">
-                  Monthly spend — last 6 months
+                  {t("dashboard.monthlySpend")}
                 </h2>
                 <div className="flex items-center gap-4 text-xs text-slate-500">
                   <span className="flex items-center gap-1.5">
@@ -268,75 +273,79 @@ export default function DashboardPage() {
                       className="h-2.5 w-2.5 rounded-sm"
                       style={{ backgroundColor: FUEL_COLOR }}
                     />
-                    Fuel
+                    {t("nav.fuel")}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <span
                       className="h-2.5 w-2.5 rounded-sm"
                       style={{ backgroundColor: MAINTENANCE_COLOR }}
                     />
-                    Maintenance
+                    {t("nav.maintenance")}
                   </span>
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={260}>
-                <BarChart data={monthly}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fill: "#64748b", fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tick={{ fill: "#64748b", fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={false}
-                    width={44}
-                    tickFormatter={(v) => compactNumber.format(Number(v))}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
-                    formatter={(value) => formatMoney(Number(value), tenant.currency)}
-                  />
-                  <Bar dataKey="fuel" name="Fuel" stackId="spend" fill={FUEL_COLOR} />
-                  <Bar
-                    dataKey="maintenance"
-                    name="Maintenance"
-                    stackId="spend"
-                    fill={MAINTENANCE_COLOR}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+              <div dir="ltr">
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={monthly}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                      tickLine={false}
+                      axisLine={false}
+                      width={44}
+                      tickFormatter={(v) => compactNumber.format(Number(v))}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
+                      formatter={(value) => formatMoney(Number(value), tenant.currency)}
+                    />
+                    <Bar dataKey="fuel" name={t("nav.fuel")} stackId="spend" fill={FUEL_COLOR} />
+                    <Bar
+                      dataKey="maintenance"
+                      name={t("nav.maintenance")}
+                      stackId="spend"
+                      fill={MAINTENANCE_COLOR}
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </Card>
 
             <Card className="p-5">
-              <h2 className="text-sm font-semibold text-slate-900">Fleet status</h2>
+              <h2 className="text-sm font-semibold text-slate-900">{t("dashboard.fleetStatus")}</h2>
               <div className="mt-2 flex items-center gap-6">
                 <div className="relative h-[260px] min-w-0 flex-1">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={statusData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={60}
-                        outerRadius={92}
-                        paddingAngle={2}
-                      >
-                        {statusData.map((s) => (
-                          <Cell key={s.key} fill={s.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <div dir="ltr" className="h-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={statusData}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={60}
+                          outerRadius={92}
+                          paddingAngle={2}
+                        >
+                          {statusData.map((s) => (
+                            <Cell key={s.key} fill={s.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                   <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-2xl font-semibold text-slate-900">
                       {vehicles.length}
                     </span>
-                    <span className="text-xs text-slate-500">vehicles</span>
+                    <span className="text-xs text-slate-500">{t("dashboard.vehiclesLabel")}</span>
                   </div>
                 </div>
                 <ul className="w-40 space-y-2.5">
@@ -347,7 +356,7 @@ export default function DashboardPage() {
                         style={{ backgroundColor: s.color }}
                       />
                       <span className="truncate">{s.name}</span>
-                      <span className="ml-auto font-medium text-slate-900">{s.value}</span>
+                      <span className="ms-auto font-medium text-slate-900">{s.value}</span>
                     </li>
                   ))}
                 </ul>
@@ -356,7 +365,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <ListCard title="Due soon — service">
+            <ListCard title={t("dashboard.dueSoonService")}>
               {dueReminders.length === 0 ? (
                 <NothingDue />
               ) : (
@@ -379,7 +388,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <Badge tone={overdue ? "red" : "yellow"}>
-                        {overdue ? "Overdue" : "Due soon"}
+                        {overdue ? t("dashboard.overdue") : t("dashboard.dueSoon")}
                       </Badge>
                     </li>
                   ))}
@@ -387,7 +396,7 @@ export default function DashboardPage() {
               )}
             </ListCard>
 
-            <ListCard title="Due soon — renewals">
+            <ListCard title={t("dashboard.dueSoonRenewals")}>
               {dueRenewals.length === 0 ? (
                 <NothingDue />
               ) : (
@@ -396,15 +405,19 @@ export default function DashboardPage() {
                     <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium text-slate-800">
-                          {renewalTypes[r.renewal_type]}
+                          {t(renewalTypes[r.renewal_type])}
                           {r.name ? ` — ${r.name}` : ""}
                         </div>
                         <div className="truncate text-xs text-slate-500">
-                          {r.vehicles?.name ?? "—"} · {formatDate(r.due_date)}
+                          {r.vehicles?.name ?? t("common.dash")} · {formatDate(r.due_date)}
                         </div>
                       </div>
                       <Badge tone={days < 0 ? "red" : days <= 30 ? "yellow" : "slate"}>
-                        {days < 0 ? "Overdue" : days === 0 ? "Due today" : `Due in ${days} d`}
+                        {days < 0
+                          ? t("dashboard.overdue")
+                          : days === 0
+                            ? t("dashboard.dueToday")
+                            : t("dashboard.dueInDays", { count: days })}
                       </Badge>
                     </li>
                   ))}

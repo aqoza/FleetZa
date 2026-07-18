@@ -5,6 +5,7 @@ import { displayToKm, kmToDisplay } from "../../lib/format";
 import { fuelTypes, vehicleStatus, vehicleTypes } from "../../lib/labels";
 import type { Vehicle } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import { Button, ErrorState, Field, Input, Select, Textarea } from "../../components/ui";
 
 export function VehicleForm({
@@ -14,6 +15,7 @@ export function VehicleForm({
   vehicle?: Vehicle;
   onDone: () => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
 
@@ -65,7 +67,7 @@ export function VehicleForm({
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("vehicles.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -78,74 +80,74 @@ export function VehicleForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name / unit number" required>
+        <Field label={t("vehicles.nameLabel")} required>
           <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
         </Field>
-        <Field label="Type">
+        <Field label={t("vehicles.type")}>
           <Select value={form.vehicle_type} onChange={(e) => set("vehicle_type", e.target.value)}>
-            {Object.entries(vehicleTypes).map(([v, label]) => (
-              <option key={v} value={v}>{label}</option>
+            {Object.entries(vehicleTypes).map(([v, labelKey]) => (
+              <option key={v} value={v}>{t(labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Status">
+        <Field label={t("field.status")}>
           <Select value={form.status} onChange={(e) => set("status", e.target.value)}>
             {Object.entries(vehicleStatus).map(([v, s]) => (
-              <option key={v} value={v}>{s.label}</option>
+              <option key={v} value={v}>{t(s.labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Fuel type">
+        <Field label={t("vehicles.fuelType")}>
           <Select value={form.fuel_type} onChange={(e) => set("fuel_type", e.target.value)}>
-            {Object.entries(fuelTypes).map(([v, label]) => (
-              <option key={v} value={v}>{label}</option>
+            {Object.entries(fuelTypes).map(([v, labelKey]) => (
+              <option key={v} value={v}>{t(labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Make">
+        <Field label={t("field.make")}>
           <Input value={form.make} onChange={(e) => set("make", e.target.value)} />
         </Field>
-        <Field label="Model">
+        <Field label={t("field.model")}>
           <Input value={form.model} onChange={(e) => set("model", e.target.value)} />
         </Field>
-        <Field label="Year">
+        <Field label={t("field.year")}>
           <Input
             type="number" min={1900} max={2100}
             value={form.year} onChange={(e) => set("year", e.target.value)}
           />
         </Field>
-        <Field label={`Odometer (${tenant.distance_unit})`}>
+        <Field label={t("vehicles.odometerUnit", { unit: tenant.distance_unit })}>
           <Input
             type="number" min={0} step="1"
             value={form.odometer} onChange={(e) => set("odometer", e.target.value)}
           />
         </Field>
-        <Field label="License plate">
+        <Field label={t("field.licensePlate")}>
           <Input value={form.license_plate} onChange={(e) => set("license_plate", e.target.value)} />
         </Field>
-        <Field label="VIN">
+        <Field label={t("field.vin")}>
           <Input value={form.vin} onChange={(e) => set("vin", e.target.value)} />
         </Field>
-        <Field label="Purchase date">
+        <Field label={t("vehicles.purchaseDate")}>
           <Input
             type="date"
             value={form.purchase_date} onChange={(e) => set("purchase_date", e.target.value)}
           />
         </Field>
-        <Field label={`Purchase price (${tenant.currency})`}>
+        <Field label={t("vehicles.purchasePriceUnit", { currency: tenant.currency })}>
           <Input
             type="number" min={0} step="0.01"
             value={form.purchase_price} onChange={(e) => set("purchase_price", e.target.value)}
           />
         </Field>
       </div>
-      <Field label="Notes">
+      <Field label={t("field.notes")}>
         <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
         <Button type="submit" loading={mutation.isPending}>
-          {vehicle ? "Save changes" : "Add vehicle"}
+          {vehicle ? t("action.saveChanges") : t("vehicles.add")}
         </Button>
       </div>
     </form>

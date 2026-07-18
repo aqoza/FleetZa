@@ -22,6 +22,7 @@ import {
 } from "../../lib/format";
 import type { FuelLog, Vehicle, WorkOrder, WorkOrderLine } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import {
   Button, Card, EmptyState, ErrorState, LoadingState, PageHeader, Select, Table,
 } from "../../components/ui";
@@ -68,11 +69,14 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
 }
 
 export default function ReportsPage() {
+  const t = useT();
   const tenant = useTenant();
   const [period, setPeriod] = useState("90");
   const currencyDecimals = getCountry(tenant.country).currencyDecimals;
-  const maintenanceHeader =
-    getCountry(tenant.country).tax.rate > 0 ? "Maintenance (incl. tax)" : "Maintenance";
+  const hasTax = getCountry(tenant.country).tax.rate > 0;
+  // On-screen header is translated; the CSV keeps English column headers (stable export).
+  const maintenanceHeader = hasTax ? t("reports.maintenanceInclTax") : t("reports.maintenance");
+  const maintenanceCsvHeader = hasTax ? "Maintenance (incl. tax)" : "Maintenance";
 
   const { data: vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useQuery({
     queryKey: ["vehicles", "reports"],
@@ -161,7 +165,7 @@ export default function ReportsPage() {
       }
       rows.push({
         vehicleId,
-        name: vehicleNames.get(vehicleId) ?? "Unknown vehicle",
+        name: vehicleNames.get(vehicleId) ?? t("reports.unknownVehicle"),
         fuel: e.fuel,
         maintenance: e.maintenance,
         total,
@@ -170,7 +174,7 @@ export default function ReportsPage() {
     }
     rows.sort((a, b) => b.total - a.total);
     return rows;
-  }, [periodFuel, periodOrders, vehicleNames, tenant, currencyDecimals]);
+  }, [periodFuel, periodOrders, vehicleNames, tenant, currencyDecimals, t]);
 
   /** Section 2: fill-ups, volume, and average full-tank efficiency per vehicle. */
   const efficiencyRows = useMemo(() => {
@@ -207,7 +211,7 @@ export default function ReportsPage() {
       }
       rows.push({
         vehicleId,
-        name: vehicleNames.get(vehicleId) ?? "Unknown vehicle",
+        name: vehicleNames.get(vehicleId) ?? t("reports.unknownVehicle"),
         fillUps: group.length,
         liters: group.reduce((sum, l) => sum + l.volume, 0),
         avgEfficiency: samples.length
@@ -217,13 +221,13 @@ export default function ReportsPage() {
     }
     rows.sort((a, b) => a.name.localeCompare(b.name));
     return rows;
-  }, [periodFuel, vehicleNames, tenant]);
+  }, [periodFuel, vehicleNames, tenant, t]);
 
   const chartHeight = Math.min(400, 60 + 36 * costRows.length);
 
   function exportCostCsv() {
     downloadCsv("cost-per-vehicle.csv", [
-      ["Vehicle", "Fuel", maintenanceHeader, "Total", `Cost per ${tenant.distance_unit}`],
+      ["Vehicle", "Fuel", maintenanceCsvHeader, "Total", `Cost per ${tenant.distance_unit}`],
       ...costRows.map((r) => [
         r.name,
         r.fuel.toFixed(currencyDecimals),
@@ -254,8 +258,8 @@ export default function ReportsPage() {
   return (
     <>
       <PageHeader
-        title="Reports"
-        description="Cost and fuel efficiency across the fleet"
+        title={t("reports.title")}
+        description={t("reports.subtitle")}
       />
 
       <div className="mb-4">
@@ -264,9 +268,9 @@ export default function ReportsPage() {
           onChange={(e) => setPeriod(e.target.value)}
           className="max-w-xs"
         >
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
-          <option value="365">Last 365 days</option>
+          <option value="30">{t("reports.period30")}</option>
+          <option value="90">{t("reports.period90")}</option>
+          <option value="365">{t("reports.period365")}</option>
         </Select>
       </div>
 
@@ -277,10 +281,10 @@ export default function ReportsPage() {
         <>
           <section>
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-slate-900">Cost per vehicle</h2>
+              <h2 className="text-base font-semibold text-slate-900">{t("reports.costPerVehicle")}</h2>
               {costRows.length > 0 && (
                 <Button variant="secondary" onClick={exportCostCsv}>
-                  <Download className="h-4 w-4" /> Export CSV
+                  <Download className="h-4 w-4" /> {t("action.export")}
                 </Button>
               )}
             </div>
@@ -288,12 +292,13 @@ export default function ReportsPage() {
             {costRows.length === 0 ? (
               <EmptyState
                 icon={<BarChart3 className="h-10 w-10" />}
-                title="No costs in this period"
-                description="Fuel logs and completed work orders in the selected period will appear here."
+                title={t("reports.noCostsTitle")}
+                description={t("reports.noCostsDesc")}
               />
             ) : (
               <>
                 <Card className="mb-4 p-4">
+                  <div dir="ltr">
                   <ResponsiveContainer width="100%" height={chartHeight}>
                     <BarChart
                       data={costRows}
@@ -321,21 +326,22 @@ export default function ReportsPage() {
                       />
                       <Bar
                         dataKey="total"
-                        name="Total cost"
+                        name={t("reports.totalCost")}
                         fill="#1d67f1"
                         radius={[0, 4, 4, 0]}
                       />
                     </BarChart>
                   </ResponsiveContainer>
+                  </div>
                 </Card>
 
                 <Table
                   headers={[
-                    "Vehicle",
-                    "Fuel",
+                    t("field.vehicle"),
+                    t("reports.fuel"),
                     maintenanceHeader,
-                    "Total",
-                    `Cost / ${tenant.distance_unit}`,
+                    t("reports.total"),
+                    t("reports.costPerDistance", { unit: tenant.distance_unit }),
                   ]}
                 >
                   {costRows.map((r) => (
@@ -362,10 +368,10 @@ export default function ReportsPage() {
 
           <section className="mt-8">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-slate-900">Fuel efficiency</h2>
+              <h2 className="text-base font-semibold text-slate-900">{t("reports.fuelEfficiency")}</h2>
               {efficiencyRows.length > 0 && (
                 <Button variant="secondary" onClick={exportEfficiencyCsv}>
-                  <Download className="h-4 w-4" /> Export CSV
+                  <Download className="h-4 w-4" /> {t("action.export")}
                 </Button>
               )}
             </div>
@@ -373,11 +379,18 @@ export default function ReportsPage() {
             {efficiencyRows.length === 0 ? (
               <EmptyState
                 icon={<Fuel className="h-10 w-10" />}
-                title="No fuel logs in this period"
-                description="Log fill-ups to see per-vehicle fuel volume and efficiency."
+                title={t("reports.noFuelTitle")}
+                description={t("reports.noFuelDesc")}
               />
             ) : (
-              <Table headers={["Vehicle", "Fill-ups", "Volume", "Avg efficiency"]}>
+              <Table
+                headers={[
+                  t("field.vehicle"),
+                  t("reports.fillUps"),
+                  t("reports.volume"),
+                  t("reports.avgEfficiency"),
+                ]}
+              >
                 {efficiencyRows.map((r) => (
                   <tr key={r.vehicleId} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>

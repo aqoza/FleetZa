@@ -13,23 +13,24 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import {
   Badge, Button, Card, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
+import { useT, type MessageKey } from "../../i18n";
 
 type WorkOrderWithVehicle = WorkOrder & {
   vehicles: { name: string; odometer: number } | null;
 };
 
-const lineCategories: Record<WorkOrderLine["category"], string> = {
-  labor: "Labor",
-  part: "Part",
-  fee: "Fee",
-  other: "Other",
+const lineCategories: Record<WorkOrderLine["category"], MessageKey> = {
+  labor: "maintenance.lineCategory.labor",
+  part: "maintenance.lineCategory.part",
+  fee: "maintenance.lineCategory.fee",
+  other: "maintenance.lineCategory.other",
 };
 
 function InfoRow({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex justify-between gap-4 py-1.5 text-sm">
       <span className="text-slate-500">{label}</span>
-      <span className="text-right font-medium text-slate-800">{value}</span>
+      <span className="text-end font-medium text-slate-800">{value}</span>
     </div>
   );
 }
@@ -41,6 +42,7 @@ function WorkOrderEditForm({
   workOrder: WorkOrderWithVehicle;
   onDone: () => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -78,7 +80,7 @@ function WorkOrderEditForm({
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("maintenance.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -90,34 +92,36 @@ function WorkOrderEditForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <Field label="Title" required>
+      <Field label={t("maintenance.woTitle")} required>
         <Input value={form.title} onChange={(e) => set("title", e.target.value)} required />
       </Field>
-      <Field label="Description">
+      <Field label={t("maintenance.description")}>
         <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Priority">
+        <Field label={t("field.priority")}>
           <Select value={form.priority} onChange={(e) => set("priority", e.target.value)}>
             {Object.entries(priority).map(([v, p]) => (
-              <option key={v} value={v}>{p.label}</option>
+              <option key={v} value={v}>{t(p.labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Vendor">
+        <Field label={t("field.vendor")}>
           <Input value={form.vendor} onChange={(e) => set("vendor", e.target.value)} />
         </Field>
-        <Field label="Scheduled date">
+        <Field label={t("maintenance.scheduledDate")}>
           <Input
             type="date"
             value={form.scheduled_date} onChange={(e) => set("scheduled_date", e.target.value)}
           />
         </Field>
         <Field
-          label={`Odometer (${tenant.distance_unit})`}
+          label={t("maintenance.odometerUnit", { unit: tenant.distance_unit })}
           hint={
             workOrder.vehicles
-              ? `Vehicle currently at ${formatDistance(workOrder.vehicles.odometer, tenant.distance_unit)}`
+              ? t("maintenance.vehicleCurrentlyAt", {
+                  distance: formatDistance(workOrder.vehicles.odometer, tenant.distance_unit),
+                })
               : undefined
           }
         >
@@ -128,14 +132,15 @@ function WorkOrderEditForm({
         </Field>
       </div>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={mutation.isPending}>Save changes</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("action.saveChanges")}</Button>
       </div>
     </form>
   );
 }
 
 export default function WorkOrderDetailPage() {
+  const t = useT();
   const { id = "" } = useParams();
   const tenant = useTenant();
   const { isManager } = useAuth();
@@ -183,7 +188,7 @@ export default function WorkOrderDetailPage() {
       void qc.invalidateQueries({ queryKey: ["work_orders"] });
     },
     onError: (err) =>
-      setActionError(err instanceof Error ? err.message : "Could not update status"),
+      setActionError(err instanceof Error ? err.message : t("maintenance.statusUpdateFailed")),
   });
 
   const addLine = useMutation({
@@ -201,7 +206,7 @@ export default function WorkOrderDetailPage() {
       setLineForm((f) => ({ ...f, description: "", quantity: "1", unit_cost: "" }));
       setLineError("");
     },
-    onError: (err) => setLineError(err instanceof Error ? err.message : "Could not add line"),
+    onError: (err) => setLineError(err instanceof Error ? err.message : t("maintenance.lineAddFailed")),
   });
 
   const removeLine = useMutation({
@@ -212,7 +217,7 @@ export default function WorkOrderDetailPage() {
       setDeletingLine(null);
     },
     onError: (err) => {
-      setLineError(err instanceof Error ? err.message : "Could not delete line");
+      setLineError(err instanceof Error ? err.message : t("maintenance.lineDeleteFailed"));
       setDeletingLine(null);
     },
   });
@@ -225,7 +230,7 @@ export default function WorkOrderDetailPage() {
       navigate("/maintenance");
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Delete failed");
+      setActionError(err instanceof Error ? err.message : t("maintenance.deleteFailed"));
       setConfirmDelete(false);
     },
   });
@@ -238,7 +243,7 @@ export default function WorkOrderDetailPage() {
 
   if (isLoading) return <LoadingState />;
   if (error) return <ErrorState message={(error as Error).message} />;
-  if (!workOrder) return <ErrorState message="Work order not found." />;
+  if (!workOrder) return <ErrorState message={t("maintenance.workOrderNotFound")} />;
 
   const st = workOrderStatus[workOrder.status];
   const pr = priority[workOrder.priority];
@@ -253,15 +258,15 @@ export default function WorkOrderDetailPage() {
         to="/maintenance"
         className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700"
       >
-        <ArrowLeft className="h-4 w-4" /> Maintenance
+        <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t("nav.maintenance")}
       </Link>
       <PageHeader
-        title={`Work order #${workOrder.number}`}
+        title={t("maintenance.workOrderNumber", { number: workOrder.number })}
         description={workOrder.vehicles?.name}
         actions={
           <>
-            <Badge tone={st.tone}>{st.label}</Badge>
-            <Badge tone={pr.tone}>{pr.label}</Badge>
+            <Badge tone={st.tone}>{t(st.labelKey)}</Badge>
+            <Badge tone={pr.tone}>{t(pr.labelKey)}</Badge>
             {isManager && (
               <>
                 {workOrder.status === "open" && (
@@ -270,14 +275,14 @@ export default function WorkOrderDetailPage() {
                       onClick={() => setStatus.mutate({ status: "in_progress" })}
                       loading={setStatus.isPending}
                     >
-                      <Play className="h-4 w-4" /> Start work
+                      <Play className="h-4 w-4" /> {t("maintenance.startWork")}
                     </Button>
                     <Button
                       variant="secondary"
                       disabled={setStatus.isPending}
                       onClick={() => setStatus.mutate({ status: "canceled" })}
                     >
-                      <Ban className="h-4 w-4" /> Cancel
+                      <Ban className="h-4 w-4" /> {t("action.cancel")}
                     </Button>
                   </>
                 )}
@@ -292,14 +297,14 @@ export default function WorkOrderDetailPage() {
                       }
                       loading={setStatus.isPending}
                     >
-                      <Check className="h-4 w-4" /> Complete
+                      <Check className="h-4 w-4" /> {t("maintenance.complete")}
                     </Button>
                     <Button
                       variant="secondary"
                       disabled={setStatus.isPending}
                       onClick={() => setStatus.mutate({ status: "canceled" })}
                     >
-                      <Ban className="h-4 w-4" /> Cancel
+                      <Ban className="h-4 w-4" /> {t("action.cancel")}
                     </Button>
                   </>
                 )}
@@ -309,14 +314,14 @@ export default function WorkOrderDetailPage() {
                     onClick={() => setStatus.mutate({ status: "open", completed_at: null })}
                     loading={setStatus.isPending}
                   >
-                    <RotateCcw className="h-4 w-4" /> Reopen
+                    <RotateCcw className="h-4 w-4" /> {t("maintenance.reopen")}
                   </Button>
                 )}
                 <Button variant="secondary" onClick={() => setEditing(true)}>
-                  <Pencil className="h-4 w-4" /> Edit
+                  <Pencil className="h-4 w-4" /> {t("action.edit")}
                 </Button>
                 <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-                  <Trash2 className="h-4 w-4" /> Delete
+                  <Trash2 className="h-4 w-4" /> {t("action.delete")}
                 </Button>
               </>
             )}
@@ -332,10 +337,10 @@ export default function WorkOrderDetailPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-900">Details</h3>
-          <InfoRow label="Title" value={workOrder.title} />
+          <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("maintenance.details")}</h3>
+          <InfoRow label={t("maintenance.woTitle")} value={workOrder.title} />
           <InfoRow
-            label="Vehicle"
+            label={t("field.vehicle")}
             value={
               workOrder.vehicles ? (
                 <Link
@@ -349,10 +354,10 @@ export default function WorkOrderDetailPage() {
               )
             }
           />
-          <InfoRow label="Vendor" value={workOrder.vendor ?? "—"} />
-          <InfoRow label="Scheduled" value={formatDate(workOrder.scheduled_date)} />
-          <InfoRow label="Odometer" value={formatDistance(workOrder.odometer, tenant.distance_unit)} />
-          <InfoRow label="Completed" value={formatDateTime(workOrder.completed_at, tenant.timezone)} />
+          <InfoRow label={t("field.vendor")} value={workOrder.vendor ?? "—"} />
+          <InfoRow label={t("maintenance.scheduled")} value={formatDate(workOrder.scheduled_date)} />
+          <InfoRow label={t("field.odometer")} value={formatDistance(workOrder.odometer, tenant.distance_unit)} />
+          <InfoRow label={t("maintenance.completed")} value={formatDateTime(workOrder.completed_at, tenant.timezone)} />
           {workOrder.description && (
             <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
               {workOrder.description}
@@ -361,7 +366,7 @@ export default function WorkOrderDetailPage() {
         </Card>
 
         <Card className="p-5 lg:col-span-2">
-          <h3 className="mb-3 text-sm font-semibold text-slate-900">Line items</h3>
+          <h3 className="mb-3 text-sm font-semibold text-slate-900">{t("maintenance.lineItems")}</h3>
           {lineError && (
             <div className="mb-3">
               <ErrorState message={lineError} />
@@ -372,10 +377,19 @@ export default function WorkOrderDetailPage() {
           ) : linesError ? (
             <ErrorState message={(linesError as Error).message} />
           ) : (
-            <Table headers={["Category", "Description", "Qty", "Unit cost", "Line total", ""]}>
+            <Table
+              headers={[
+                t("maintenance.category"),
+                t("maintenance.description"),
+                t("maintenance.qty"),
+                t("maintenance.unitCost"),
+                t("maintenance.lineTotal"),
+                "",
+              ]}
+            >
               {(lines ?? []).map((l) => (
                 <tr key={l.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 text-slate-600">{lineCategories[l.category]}</td>
+                  <td className="px-4 py-3 text-slate-600">{t(lineCategories[l.category])}</td>
                   <td className="px-4 py-3 font-medium text-slate-800">{l.description}</td>
                   <td className="px-4 py-3 text-slate-600">{l.quantity}</td>
                   <td className="px-4 py-3 text-slate-600">
@@ -384,13 +398,13 @@ export default function WorkOrderDetailPage() {
                   <td className="px-4 py-3 font-medium text-slate-800">
                     {formatMoney(l.quantity * l.unit_cost, tenant.currency)}
                   </td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-end">
                     {isManager && (
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                         onClick={() => setDeletingLine(l)}
                         disabled={removeLine.isPending}
-                        aria-label={`Delete ${l.description}`}
+                        aria-label={t("maintenance.deleteAria", { name: l.description })}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -401,7 +415,7 @@ export default function WorkOrderDetailPage() {
               {(lines ?? []).length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
-                    No line items yet.
+                    {t("maintenance.noLineItems")}
                   </td>
                 </tr>
               )}
@@ -409,8 +423,8 @@ export default function WorkOrderDetailPage() {
                 (workOrder.tax_rate > 0 ? (
                   <>
                     <tr className="bg-slate-50">
-                      <td colSpan={4} className="px-4 py-2 text-right text-slate-600">
-                        Subtotal
+                      <td colSpan={4} className="px-4 py-2 text-end text-slate-600">
+                        {t("maintenance.subtotal")}
                       </td>
                       <td className="px-4 py-2 text-slate-700">
                         {formatMoney(subtotal, tenant.currency)}
@@ -418,8 +432,8 @@ export default function WorkOrderDetailPage() {
                       <td />
                     </tr>
                     <tr className="bg-slate-50">
-                      <td colSpan={4} className="px-4 py-2 text-right text-slate-600">
-                        {taxLabel} ({workOrder.tax_rate}%)
+                      <td colSpan={4} className="px-4 py-2 text-end text-slate-600">
+                        {t("maintenance.taxLine", { label: taxLabel, rate: workOrder.tax_rate })}
                       </td>
                       <td className="px-4 py-2 text-slate-700">
                         {formatMoney(taxAmount, tenant.currency)}
@@ -427,8 +441,8 @@ export default function WorkOrderDetailPage() {
                       <td />
                     </tr>
                     <tr className="bg-slate-50">
-                      <td colSpan={4} className="px-4 py-3 text-right font-semibold text-slate-700">
-                        Total
+                      <td colSpan={4} className="px-4 py-3 text-end font-semibold text-slate-700">
+                        {t("maintenance.total")}
                       </td>
                       <td className="px-4 py-3 font-semibold text-slate-900">
                         {formatMoney(total, tenant.currency)}
@@ -438,8 +452,8 @@ export default function WorkOrderDetailPage() {
                   </>
                 ) : (
                   <tr className="bg-slate-50">
-                    <td colSpan={4} className="px-4 py-3 text-right font-semibold text-slate-700">
-                      Total
+                    <td colSpan={4} className="px-4 py-3 text-end font-semibold text-slate-700">
+                      {t("maintenance.total")}
                     </td>
                     <td className="px-4 py-3 font-semibold text-slate-900">
                       {formatMoney(total, tenant.currency)}
@@ -452,26 +466,26 @@ export default function WorkOrderDetailPage() {
           {isManager && (
             <form onSubmit={onAddLine} className="mt-4 flex flex-wrap items-end gap-2">
               <div className="w-32">
-                <Field label="Category">
+                <Field label={t("maintenance.category")}>
                   <Select value={lineForm.category} onChange={(e) => setLine("category", e.target.value)}>
-                    {Object.entries(lineCategories).map(([v, label]) => (
-                      <option key={v} value={v}>{label}</option>
+                    {Object.entries(lineCategories).map(([v, labelKey]) => (
+                      <option key={v} value={v}>{t(labelKey)}</option>
                     ))}
                   </Select>
                 </Field>
               </div>
               <div className="min-w-40 flex-1">
-                <Field label="Description">
+                <Field label={t("maintenance.description")}>
                   <Input
                     value={lineForm.description}
                     onChange={(e) => setLine("description", e.target.value)}
-                    placeholder="e.g. Brake pads"
+                    placeholder={t("maintenance.linePlaceholder")}
                     required
                   />
                 </Field>
               </div>
               <div className="w-20">
-                <Field label="Qty">
+                <Field label={t("maintenance.qty")}>
                   <Input
                     type="number" min={0} step="0.01" required
                     value={lineForm.quantity}
@@ -480,7 +494,7 @@ export default function WorkOrderDetailPage() {
                 </Field>
               </div>
               <div className="w-32">
-                <Field label={`Unit cost (${tenant.currency})`}>
+                <Field label={t("maintenance.unitCostCurrency", { currency: tenant.currency })}>
                   <Input
                     type="number" min={0} step="0.01" required
                     value={lineForm.unit_cost}
@@ -489,47 +503,45 @@ export default function WorkOrderDetailPage() {
                 </Field>
               </div>
               <Button type="submit" loading={addLine.isPending}>
-                <Plus className="h-4 w-4" /> Add
+                <Plus className="h-4 w-4" /> {t("action.add")}
               </Button>
             </form>
           )}
         </Card>
       </div>
 
-      <Modal title="Edit work order" open={editing} onClose={() => setEditing(false)} wide>
+      <Modal title={t("maintenance.editWorkOrder")} open={editing} onClose={() => setEditing(false)} wide>
         <WorkOrderEditForm workOrder={workOrder} onDone={() => setEditing(false)} />
       </Modal>
 
-      <Modal title="Delete work order" open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+      <Modal title={t("maintenance.deleteWorkOrder")} open={confirmDelete} onClose={() => setConfirmDelete(false)}>
         <p className="text-sm text-slate-600">
-          Delete <span className="font-semibold">work order #{workOrder.number}</span> and all of
-          its line items? This cannot be undone.
+          {t("maintenance.deleteWorkOrderConfirm", { number: workOrder.number })}
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+          <Button variant="secondary" onClick={() => setConfirmDelete(false)}>{t("action.cancel")}</Button>
           <Button variant="danger" onClick={() => remove.mutate()} loading={remove.isPending}>
-            Delete work order
+            {t("maintenance.deleteWorkOrder")}
           </Button>
         </div>
       </Modal>
 
       <Modal
-        title="Delete line item"
+        title={t("maintenance.deleteLineItem")}
         open={deletingLine !== null}
         onClose={() => setDeletingLine(null)}
       >
         <p className="text-sm text-slate-600">
-          Delete <span className="font-semibold">{deletingLine?.description}</span>? This cannot
-          be undone.
+          {t("maintenance.deleteLineConfirm", { description: deletingLine?.description ?? "" })}
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => setDeletingLine(null)}>Cancel</Button>
+          <Button variant="secondary" onClick={() => setDeletingLine(null)}>{t("action.cancel")}</Button>
           <Button
             variant="danger"
             onClick={() => deletingLine && removeLine.mutate(deletingLine.id)}
             loading={removeLine.isPending}
           >
-            Delete line item
+            {t("maintenance.deleteLineItem")}
           </Button>
         </div>
       </Modal>

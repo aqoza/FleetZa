@@ -9,6 +9,7 @@ import type {
   Driver, FuelLog, Issue, Vehicle, VehicleAssignment, WorkOrder,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import {
   Badge, Button, Card, ErrorState, Field, LoadingState, Modal, PageHeader, Select,
 } from "../../components/ui";
@@ -18,12 +19,13 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 py-1.5 text-sm">
       <span className="text-slate-500">{label}</span>
-      <span className="text-right font-medium text-slate-800">{value}</span>
+      <span className="text-end font-medium text-slate-800">{value}</span>
     </div>
   );
 }
 
 export default function VehicleDetailPage() {
+  const t = useT();
   const { id = "" } = useParams();
   const tenant = useTenant();
   const { isManager } = useAuth();
@@ -105,7 +107,7 @@ export default function VehicleDetailPage() {
   });
 
   if (isLoading) return <LoadingState />;
-  if (!vehicle) return <ErrorState message="Vehicle not found." />;
+  if (!vehicle) return <ErrorState message={t("vehicles.notFound")} />;
 
   const st = vehicleStatus[vehicle.status];
   const currentDriver = assignment?.drivers;
@@ -113,7 +115,7 @@ export default function VehicleDetailPage() {
   return (
     <>
       <Link to="/vehicles" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700">
-        <ArrowLeft className="h-4 w-4" /> Vehicles
+        <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t("vehicles.title")}
       </Link>
       <PageHeader
         title={vehicle.name}
@@ -122,10 +124,10 @@ export default function VehicleDetailPage() {
           isManager && (
             <>
               <Button variant="secondary" onClick={() => setEditing(true)}>
-                <Pencil className="h-4 w-4" /> Edit
+                <Pencil className="h-4 w-4" /> {t("action.edit")}
               </Button>
               <Button variant="danger" onClick={() => setConfirmDelete(true)}>
-                <Trash2 className="h-4 w-4" /> Delete
+                <Trash2 className="h-4 w-4" /> {t("action.delete")}
               </Button>
             </>
           )
@@ -134,15 +136,15 @@ export default function VehicleDetailPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-900">Details</h3>
-          <InfoRow label="Status" value={st.label} />
-          <InfoRow label="Type" value={vehicleTypes[vehicle.vehicle_type]} />
-          <InfoRow label="Fuel" value={fuelTypes[vehicle.fuel_type]} />
-          <InfoRow label="Odometer" value={formatDistance(vehicle.odometer, tenant.distance_unit)} />
-          <InfoRow label="License plate" value={vehicle.license_plate ?? "—"} />
-          <InfoRow label="VIN" value={vehicle.vin ?? "—"} />
-          <InfoRow label="Purchased" value={formatDate(vehicle.purchase_date)} />
-          <InfoRow label="Purchase price" value={formatMoney(vehicle.purchase_price, tenant.currency)} />
+          <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("vehicles.details")}</h3>
+          <InfoRow label={t("field.status")} value={t(st.labelKey)} />
+          <InfoRow label={t("vehicles.type")} value={t(vehicleTypes[vehicle.vehicle_type])} />
+          <InfoRow label={t("vehicles.fuel")} value={t(fuelTypes[vehicle.fuel_type])} />
+          <InfoRow label={t("field.odometer")} value={formatDistance(vehicle.odometer, tenant.distance_unit)} />
+          <InfoRow label={t("field.licensePlate")} value={vehicle.license_plate ?? t("common.dash")} />
+          <InfoRow label={t("field.vin")} value={vehicle.vin ?? t("common.dash")} />
+          <InfoRow label={t("vehicles.purchased")} value={formatDate(vehicle.purchase_date)} />
+          <InfoRow label={t("vehicles.purchasePrice")} value={formatMoney(vehicle.purchase_price, tenant.currency)} />
           {vehicle.notes && (
             <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{vehicle.notes}</p>
           )}
@@ -150,10 +152,10 @@ export default function VehicleDetailPage() {
 
         <Card className="p-5">
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900">Assigned driver</h3>
+            <h3 className="text-sm font-semibold text-slate-900">{t("vehicles.assignedDriver")}</h3>
             {isManager && (
               <Button variant="ghost" onClick={() => { setSelectedDriver(assignment?.driver_id ?? ""); setAssigning(true); }}>
-                <UserCheck className="h-4 w-4" /> {assignment ? "Change" : "Assign"}
+                <UserCheck className="h-4 w-4" /> {assignment ? t("vehicles.change") : t("vehicles.assign")}
               </Button>
             )}
           </div>
@@ -163,30 +165,30 @@ export default function VehicleDetailPage() {
                 {currentDriver.first_name} {currentDriver.last_name}
               </div>
               <div className="text-xs text-slate-500">
-                since {formatDate(assignment!.started_at)}
+                {t("vehicles.since", { date: formatDate(assignment!.started_at) })}
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">No driver assigned.</p>
+            <p className="text-sm text-slate-500">{t("vehicles.noDriver")}</p>
           )}
 
-          <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-900">Open issues</h3>
+          <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-900">{t("vehicles.openIssues")}</h3>
           {openIssues?.length ? (
             <ul className="space-y-1.5">
               {openIssues.map((i) => (
                 <li key={i.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="truncate text-slate-700">{i.title}</span>
-                  <Badge tone={issueStatus[i.status].tone}>{issueStatus[i.status].label}</Badge>
+                  <Badge tone={issueStatus[i.status].tone}>{t(issueStatus[i.status].labelKey)}</Badge>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">No open issues.</p>
+            <p className="text-sm text-slate-500">{t("vehicles.noOpenIssues")}</p>
           )}
         </Card>
 
         <Card className="p-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-900">Recent work orders</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("vehicles.recentWorkOrders")}</h3>
           {openWork?.length ? (
             <ul className="space-y-1.5">
               {openWork.map((w) => (
@@ -194,15 +196,15 @@ export default function VehicleDetailPage() {
                   <Link to={`/maintenance/work-orders/${w.id}`} className="truncate text-brand-700 hover:underline">
                     #{w.number} {w.title}
                   </Link>
-                  <Badge tone={workOrderStatus[w.status].tone}>{workOrderStatus[w.status].label}</Badge>
+                  <Badge tone={workOrderStatus[w.status].tone}>{t(workOrderStatus[w.status].labelKey)}</Badge>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">No work orders yet.</p>
+            <p className="text-sm text-slate-500">{t("vehicles.noWorkOrders")}</p>
           )}
 
-          <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-900">Recent fuel</h3>
+          <h3 className="mb-2 mt-6 text-sm font-semibold text-slate-900">{t("vehicles.recentFuel")}</h3>
           {recentFuel?.length ? (
             <ul className="space-y-1.5">
               {recentFuel.map((f) => (
@@ -215,20 +217,20 @@ export default function VehicleDetailPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">No fuel logs yet.</p>
+            <p className="text-sm text-slate-500">{t("vehicles.noFuelLogs")}</p>
           )}
         </Card>
       </div>
 
-      <Modal title="Edit vehicle" open={editing} onClose={() => setEditing(false)} wide>
+      <Modal title={t("vehicles.edit")} open={editing} onClose={() => setEditing(false)} wide>
         <VehicleForm vehicle={vehicle} onDone={() => { setEditing(false); void qc.invalidateQueries({ queryKey: ["vehicles", id] }); }} />
       </Modal>
 
-      <Modal title="Assign driver" open={assigning} onClose={() => setAssigning(false)}>
+      <Modal title={t("vehicles.assignDriver")} open={assigning} onClose={() => setAssigning(false)}>
         <div className="space-y-4">
-          <Field label="Driver" hint="Leave empty to unassign">
+          <Field label={t("field.driver")} hint={t("vehicles.unassignHint")}>
             <Select value={selectedDriver} onChange={(e) => setSelectedDriver(e.target.value)}>
-              <option value="">— Unassigned —</option>
+              <option value="">{t("vehicles.unassigned")}</option>
               {drivers?.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.first_name} {d.last_name}
@@ -237,21 +239,22 @@ export default function VehicleDetailPage() {
             </Select>
           </Field>
           <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setAssigning(false)}>Cancel</Button>
-            <Button onClick={() => assign.mutate()} loading={assign.isPending}>Save</Button>
+            <Button variant="secondary" onClick={() => setAssigning(false)}>{t("action.cancel")}</Button>
+            <Button onClick={() => assign.mutate()} loading={assign.isPending}>{t("action.save")}</Button>
           </div>
         </div>
       </Modal>
 
-      <Modal title="Delete vehicle" open={confirmDelete} onClose={() => setConfirmDelete(false)}>
+      <Modal title={t("vehicles.delete")} open={confirmDelete} onClose={() => setConfirmDelete(false)}>
         <p className="text-sm text-slate-600">
-          Delete <span className="font-semibold">{vehicle.name}</span> and all of its history
-          (fuel, work orders, inspections)? This cannot be undone.
+          {t("vehicles.deleteConfirmPrefix")}{" "}
+          <span className="font-semibold">{vehicle.name}</span>{" "}
+          {t("vehicles.deleteConfirmSuffix")}
         </p>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => setConfirmDelete(false)}>Cancel</Button>
+          <Button variant="secondary" onClick={() => setConfirmDelete(false)}>{t("action.cancel")}</Button>
           <Button variant="danger" onClick={() => remove.mutate()} loading={remove.isPending}>
-            Delete vehicle
+            {t("vehicles.delete")}
           </Button>
         </div>
       </Modal>

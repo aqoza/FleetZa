@@ -15,6 +15,7 @@ import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
+import { useT, type MessageKey } from "../../i18n";
 
 // --- Service reminders ---
 
@@ -22,11 +23,11 @@ type ReminderRow = ServiceReminder & { vehicles: { name: string; odometer: numbe
 
 type ReminderStatusKey = "overdue" | "due_soon" | "ok" | "inactive";
 
-const reminderStatus: Record<ReminderStatusKey, { label: string; tone: BadgeTone }> = {
-  overdue: { label: "Overdue", tone: "red" },
-  due_soon: { label: "Due soon", tone: "yellow" },
-  ok: { label: "OK", tone: "green" },
-  inactive: { label: "Inactive", tone: "slate" },
+const reminderStatus: Record<ReminderStatusKey, { labelKey: MessageKey; tone: BadgeTone }> = {
+  overdue: { labelKey: "maintenance.reminderStatus.overdue", tone: "red" },
+  due_soon: { labelKey: "maintenance.reminderStatus.dueSoon", tone: "yellow" },
+  ok: { labelKey: "maintenance.reminderStatus.ok", tone: "green" },
+  inactive: { labelKey: "maintenance.reminderStatus.inactive", tone: "slate" },
 };
 
 function reminderState(r: ReminderRow): ReminderStatusKey {
@@ -39,6 +40,7 @@ function reminderState(r: ReminderRow): ReminderStatusKey {
 }
 
 function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone: () => void }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const unit = tenant.distance_unit;
@@ -90,7 +92,7 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("maintenance.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -102,23 +104,23 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Vehicle" required>
+        <Field label={t("field.vehicle")} required>
           <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">Select vehicle…</option>
+            <option value="">{t("maintenance.selectVehicle")}</option>
             {vehicles?.map((v) => (
               <option key={v.id} value={v.id}>{v.name}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Task" required>
+        <Field label={t("maintenance.task")} required>
           <Input
             value={form.task}
             onChange={(e) => set("task", e.target.value)}
-            placeholder="e.g. Oil change"
+            placeholder={t("maintenance.taskPlaceholder")}
             required
           />
         </Field>
-        <Field label="Interval (months)" hint="Recurs every N months">
+        <Field label={t("maintenance.intervalMonths")} hint={t("maintenance.intervalMonthsHint")}>
           <Input
             type="number"
             min={1}
@@ -126,7 +128,10 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
             onChange={(e) => set("interval_months", e.target.value)}
           />
         </Field>
-        <Field label={`Interval (${unit})`} hint={`Recurs every N ${unit}`}>
+        <Field
+          label={t("maintenance.intervalDistance", { unit })}
+          hint={t("maintenance.intervalDistanceHint", { unit })}
+        >
           <Input
             type="number"
             min={1}
@@ -134,10 +139,10 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
             onChange={(e) => set("interval_distance", e.target.value)}
           />
         </Field>
-        <Field label="Due date">
+        <Field label={t("field.dueDate")}>
           <Input type="date" value={form.due_date} onChange={(e) => set("due_date", e.target.value)} />
         </Field>
-        <Field label={`Due odometer (${unit})`}>
+        <Field label={t("maintenance.dueOdometer", { unit })}>
           <Input
             type="number"
             min={0}
@@ -146,13 +151,13 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
           />
         </Field>
       </div>
-      <Field label="Notes">
+      <Field label={t("field.notes")}>
         <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
         <Button type="submit" loading={mutation.isPending}>
-          {reminder ? "Save changes" : "Add reminder"}
+          {reminder ? t("action.saveChanges") : t("maintenance.addReminder")}
         </Button>
       </div>
     </form>
@@ -166,6 +171,7 @@ function RemindersTab({
   adding: boolean;
   setAdding: (open: boolean) => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -204,7 +210,7 @@ function RemindersTab({
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Update failed"),
+    onError: (err) => setActionError(err instanceof Error ? err.message : t("maintenance.updateFailed")),
   });
 
   const remove = useMutation({
@@ -214,7 +220,7 @@ function RemindersTab({
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       setDeleting(null);
     },
-    onError: (err) => setActionError(err instanceof Error ? err.message : "Delete failed"),
+    onError: (err) => setActionError(err instanceof Error ? err.message : t("maintenance.deleteFailed")),
   });
 
   const filtered = useMemo(
@@ -226,9 +232,9 @@ function RemindersTab({
     <>
       <div className="mb-4 flex flex-wrap gap-3">
         <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="max-w-44">
-          <option value="all">All reminders</option>
-          <option value="overdue">Overdue</option>
-          <option value="due_soon">Due soon</option>
+          <option value="all">{t("maintenance.allReminders")}</option>
+          <option value="overdue">{t("maintenance.reminderStatus.overdue")}</option>
+          <option value="due_soon">{t("maintenance.reminderStatus.dueSoon")}</option>
         </Select>
       </div>
 
@@ -239,16 +245,16 @@ function RemindersTab({
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<BellRing className="h-10 w-10" />}
-          title={reminders?.length ? "No reminders match your filter" : "No service reminders yet"}
+          title={reminders?.length ? t("maintenance.noRemindersMatch") : t("maintenance.noRemindersYet")}
           description={
             reminders?.length
-              ? "Try a different filter."
-              : "Create reminders to keep vehicles on schedule for routine service."
+              ? t("maintenance.tryDifferentFilter")
+              : t("maintenance.remindersEmptyDesc")
           }
           action={
             isManager && !reminders?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> Add reminder
+                <Plus className="h-4 w-4" /> {t("maintenance.addReminder")}
               </Button>
             ) : undefined
           }
@@ -256,7 +262,16 @@ function RemindersTab({
       )}
 
       {!isLoading && !error && filtered.length > 0 && (
-        <Table headers={["Task", "Vehicle", "Due", "Last done", "Status", ""]}>
+        <Table
+          headers={[
+            t("maintenance.task"),
+            t("field.vehicle"),
+            t("maintenance.due"),
+            t("maintenance.lastDone"),
+            t("common.status"),
+            "",
+          ]}
+        >
           {filtered.map((r) => {
             const state = reminderState(r);
             return (
@@ -295,9 +310,9 @@ function RemindersTab({
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <Badge tone={reminderStatus[state].tone}>{reminderStatus[state].label}</Badge>
+                  <Badge tone={reminderStatus[state].tone}>{t(reminderStatus[state].labelKey)}</Badge>
                 </td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-end">
                   {isManager && (
                     <div className="flex justify-end gap-1">
                       {r.active && (
@@ -305,8 +320,8 @@ function RemindersTab({
                           className="rounded p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
                           onClick={() => markDone.mutate(r)}
                           disabled={markDone.isPending}
-                          title="Mark done"
-                          aria-label={`Mark ${r.task} done`}
+                          title={t("maintenance.markDone")}
+                          aria-label={t("maintenance.markDoneAria", { task: r.task })}
                         >
                           <CheckCircle2 className="h-4 w-4" />
                         </button>
@@ -314,14 +329,14 @@ function RemindersTab({
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                         onClick={() => setEditing(r)}
-                        aria-label={`Edit ${r.task}`}
+                        aria-label={t("maintenance.editAria", { name: r.task })}
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                         onClick={() => setDeleting(r)}
-                        aria-label={`Delete ${r.task}`}
+                        aria-label={t("maintenance.deleteAria", { name: r.task })}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -334,29 +349,31 @@ function RemindersTab({
         </Table>
       )}
 
-      <Modal title="Add reminder" open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("maintenance.addReminder")} open={adding} onClose={() => setAdding(false)} wide>
         <ReminderForm onDone={() => setAdding(false)} />
       </Modal>
 
-      <Modal title="Edit reminder" open={!!editing} onClose={() => setEditing(null)} wide>
+      <Modal title={t("maintenance.editReminder")} open={!!editing} onClose={() => setEditing(null)} wide>
         {editing && <ReminderForm reminder={editing} onDone={() => setEditing(null)} />}
       </Modal>
 
-      <Modal title="Delete reminder" open={!!deleting} onClose={() => setDeleting(null)}>
+      <Modal title={t("maintenance.deleteReminder")} open={!!deleting} onClose={() => setDeleting(null)}>
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              Delete <span className="font-semibold">{deleting.task}</span> for{" "}
-              <span className="font-semibold">{deleting.vehicles.name}</span>? This cannot be undone.
+              {t("maintenance.deleteReminderConfirm", {
+                task: deleting.task,
+                vehicle: deleting.vehicles.name,
+              })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setDeleting(null)}>{t("action.cancel")}</Button>
               <Button
                 variant="danger"
                 onClick={() => remove.mutate(deleting.id)}
                 loading={remove.isPending}
               >
-                Delete reminder
+                {t("maintenance.deleteReminder")}
               </Button>
             </div>
           </>
@@ -374,6 +391,7 @@ type WorkOrderRow = WorkOrder & {
 };
 
 function WorkOrderForm({ onDone }: { onDone: () => void }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const unit = tenant.distance_unit;
@@ -417,7 +435,7 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("maintenance.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -428,41 +446,41 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <Field label="Title" required>
+      <Field label={t("maintenance.woTitle")} required>
         <Input
           value={form.title}
           onChange={(e) => set("title", e.target.value)}
-          placeholder="e.g. Replace front brake pads"
+          placeholder={t("maintenance.woTitlePlaceholder")}
           required
         />
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Vehicle" required>
+        <Field label={t("field.vehicle")} required>
           <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">Select vehicle…</option>
+            <option value="">{t("maintenance.selectVehicle")}</option>
             {vehicles?.map((v) => (
               <option key={v.id} value={v.id}>{v.name}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Priority">
+        <Field label={t("field.priority")}>
           <Select value={form.priority} onChange={(e) => set("priority", e.target.value)}>
             {Object.entries(priority).map(([v, p]) => (
-              <option key={v} value={v}>{p.label}</option>
+              <option key={v} value={v}>{t(p.labelKey)}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Vendor">
+        <Field label={t("field.vendor")}>
           <Input value={form.vendor} onChange={(e) => set("vendor", e.target.value)} />
         </Field>
-        <Field label="Scheduled date">
+        <Field label={t("maintenance.scheduledDate")}>
           <Input
             type="date"
             value={form.scheduled_date}
             onChange={(e) => set("scheduled_date", e.target.value)}
           />
         </Field>
-        <Field label={`Odometer (${unit})`}>
+        <Field label={t("maintenance.odometerUnit", { unit })}>
           <Input
             type="number"
             min={0}
@@ -471,12 +489,12 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
           />
         </Field>
       </div>
-      <Field label="Description">
+      <Field label={t("maintenance.description")}>
         <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={mutation.isPending}>Create work order</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("maintenance.createWorkOrder")}</Button>
       </div>
     </form>
   );
@@ -489,6 +507,7 @@ function WorkOrdersTab({
   adding: boolean;
   setAdding: (open: boolean) => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [status, setStatus] = useState("all");
@@ -514,9 +533,9 @@ function WorkOrdersTab({
     <>
       <div className="mb-4 flex flex-wrap gap-3">
         <Select value={status} onChange={(e) => setStatus(e.target.value)} className="max-w-44">
-          <option value="all">All statuses</option>
+          <option value="all">{t("maintenance.allStatuses")}</option>
           {Object.entries(workOrderStatus).map(([v, s]) => (
-            <option key={v} value={v}>{s.label}</option>
+            <option key={v} value={v}>{t(s.labelKey)}</option>
           ))}
         </Select>
       </div>
@@ -527,16 +546,16 @@ function WorkOrdersTab({
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<Wrench className="h-10 w-10" />}
-          title={workOrders?.length ? "No work orders match your filter" : "No work orders yet"}
+          title={workOrders?.length ? t("maintenance.noWorkOrdersMatch") : t("maintenance.noWorkOrdersYet")}
           description={
             workOrders?.length
-              ? "Try a different status filter."
-              : "Create work orders to track repairs and scheduled maintenance."
+              ? t("maintenance.tryDifferentStatusFilter")
+              : t("maintenance.workOrdersEmptyDesc")
           }
           action={
             isManager && !workOrders?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> New work order
+                <Plus className="h-4 w-4" /> {t("maintenance.newWorkOrder")}
               </Button>
             ) : undefined
           }
@@ -544,7 +563,16 @@ function WorkOrdersTab({
       )}
 
       {!isLoading && !error && filtered.length > 0 && (
-        <Table headers={["#", "Title", "Priority", "Status", "Scheduled", "Total"]}>
+        <Table
+          headers={[
+            "#",
+            t("maintenance.woTitle"),
+            t("field.priority"),
+            t("common.status"),
+            t("maintenance.scheduled"),
+            t("maintenance.total"),
+          ]}
+        >
           {filtered.map((w) => {
             const subtotal = w.work_order_lines.reduce(
               (sum, l) => sum + l.quantity * l.unit_cost,
@@ -564,11 +592,11 @@ function WorkOrdersTab({
                   <div className="text-xs text-slate-500">{w.vehicles.name}</div>
                 </td>
                 <td className="px-4 py-3">
-                  <Badge tone={priority[w.priority].tone}>{priority[w.priority].label}</Badge>
+                  <Badge tone={priority[w.priority].tone}>{t(priority[w.priority].labelKey)}</Badge>
                 </td>
                 <td className="px-4 py-3">
                   <Badge tone={workOrderStatus[w.status].tone}>
-                    {workOrderStatus[w.status].label}
+                    {t(workOrderStatus[w.status].labelKey)}
                   </Badge>
                 </td>
                 <td className="px-4 py-3 text-slate-600">{formatDate(w.scheduled_date)}</td>
@@ -576,7 +604,7 @@ function WorkOrdersTab({
                   {formatMoney(total, tenant.currency)}
                   {w.tax_rate > 0 && (
                     <div className="text-xs font-normal text-slate-500">
-                      incl. {taxLabel} {w.tax_rate}%
+                      {t("maintenance.inclTax", { label: taxLabel, rate: w.tax_rate })}
                     </div>
                   )}
                 </td>
@@ -586,7 +614,7 @@ function WorkOrdersTab({
         </Table>
       )}
 
-      <Modal title="New work order" open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("maintenance.newWorkOrder")} open={adding} onClose={() => setAdding(false)} wide>
         <WorkOrderForm onDone={() => setAdding(false)} />
       </Modal>
     </>
@@ -598,6 +626,7 @@ function WorkOrdersTab({
 type Tab = "reminders" | "work_orders";
 
 export default function MaintenancePage() {
+  const t = useT();
   const { isManager } = useAuth();
   const [tab, setTab] = useState<Tab>("reminders");
   const [addingReminder, setAddingReminder] = useState(false);
@@ -606,17 +635,17 @@ export default function MaintenancePage() {
   return (
     <>
       <PageHeader
-        title="Maintenance"
-        description="Service reminders and work orders for your fleet"
+        title={t("maintenance.title")}
+        description={t("maintenance.subtitle")}
         actions={
           isManager &&
           (tab === "reminders" ? (
             <Button onClick={() => setAddingReminder(true)}>
-              <Plus className="h-4 w-4" /> Add reminder
+              <Plus className="h-4 w-4" /> {t("maintenance.addReminder")}
             </Button>
           ) : (
             <Button onClick={() => setAddingWorkOrder(true)}>
-              <Plus className="h-4 w-4" /> New work order
+              <Plus className="h-4 w-4" /> {t("maintenance.newWorkOrder")}
             </Button>
           ))
         }
@@ -625,8 +654,8 @@ export default function MaintenancePage() {
       <div className="mb-4 flex gap-2">
         {(
           [
-            ["reminders", "Service reminders"],
-            ["work_orders", "Work orders"],
+            ["reminders", t("maintenance.tabReminders")],
+            ["work_orders", t("maintenance.tabWorkOrders")],
           ] as [Tab, string][]
         ).map(([value, label]) => (
           <button

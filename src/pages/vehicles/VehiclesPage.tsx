@@ -7,12 +7,14 @@ import { formatDistance } from "../../lib/format";
 import { vehicleStatus, vehicleTypes } from "../../lib/labels";
 import type { Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Input, LoadingState, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
 import { VehicleForm } from "./VehicleForm";
 
 export default function VehiclesPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [search, setSearch] = useState("");
@@ -38,12 +40,12 @@ export default function VehiclesPage() {
   return (
     <>
       <PageHeader
-        title="Vehicles"
-        description={`${vehicles?.length ?? 0} vehicles in your fleet`}
+        title={t("vehicles.title")}
+        description={t("vehicles.countInFleet", { count: vehicles?.length ?? 0 })}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>
-              <Plus className="h-4 w-4" /> Add vehicle
+              <Plus className="h-4 w-4" /> {t("vehicles.add")}
             </Button>
           )
         }
@@ -51,15 +53,15 @@ export default function VehiclesPage() {
 
       <div className="mb-4 flex flex-wrap gap-3">
         <Input
-          placeholder="Search name, plate, VIN…"
+          placeholder={t("vehicles.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
         <Select value={status} onChange={(e) => setStatus(e.target.value)} className="max-w-44">
-          <option value="all">All statuses</option>
+          <option value="all">{t("vehicles.allStatuses")}</option>
           {Object.entries(vehicleStatus).map(([v, s]) => (
-            <option key={v} value={v}>{s.label}</option>
+            <option key={v} value={v}>{t(s.labelKey)}</option>
           ))}
         </Select>
       </div>
@@ -70,16 +72,14 @@ export default function VehiclesPage() {
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<Truck className="h-10 w-10" />}
-          title={vehicles?.length ? "No vehicles match your filters" : "No vehicles yet"}
+          title={vehicles?.length ? t("vehicles.noMatch") : t("vehicles.empty")}
           description={
-            vehicles?.length
-              ? "Try a different search or status filter."
-              : "Add your first vehicle to start tracking maintenance, fuel and costs."
+            vehicles?.length ? t("vehicles.noMatchHint") : t("vehicles.emptyHint")
           }
           action={
             isManager && !vehicles?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> Add vehicle
+                <Plus className="h-4 w-4" /> {t("vehicles.add")}
               </Button>
             ) : undefined
           }
@@ -87,7 +87,15 @@ export default function VehiclesPage() {
       )}
 
       {!isLoading && !error && filtered.length > 0 && (
-        <Table headers={["Vehicle", "Type", "License plate", "Odometer", "Status"]}>
+        <Table
+          headers={[
+            t("field.vehicle"),
+            t("vehicles.type"),
+            t("field.licensePlate"),
+            t("field.odometer"),
+            t("field.status"),
+          ]}
+        >
           {filtered.map((v) => (
             <tr key={v.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
@@ -95,23 +103,23 @@ export default function VehiclesPage() {
                   {v.name}
                 </Link>
                 <div className="text-xs text-slate-500">
-                  {[v.year, v.make, v.model].filter(Boolean).join(" ") || "—"}
+                  {[v.year, v.make, v.model].filter(Boolean).join(" ") || t("common.dash")}
                 </div>
               </td>
-              <td className="px-4 py-3 text-slate-600">{vehicleTypes[v.vehicle_type]}</td>
-              <td className="px-4 py-3 text-slate-600">{v.license_plate ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-600">{t(vehicleTypes[v.vehicle_type])}</td>
+              <td className="px-4 py-3 text-slate-600">{v.license_plate ?? t("common.dash")}</td>
               <td className="px-4 py-3 text-slate-600">
                 {formatDistance(v.odometer, tenant.distance_unit)}
               </td>
               <td className="px-4 py-3">
-                <Badge tone={vehicleStatus[v.status].tone}>{vehicleStatus[v.status].label}</Badge>
+                <Badge tone={vehicleStatus[v.status].tone}>{t(vehicleStatus[v.status].labelKey)}</Badge>
               </td>
             </tr>
           ))}
         </Table>
       )}
 
-      <Modal title="Add vehicle" open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("vehicles.add")} open={adding} onClose={() => setAdding(false)} wide>
         <VehicleForm onDone={() => setAdding(false)} />
       </Modal>
     </>

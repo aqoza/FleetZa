@@ -1,6 +1,8 @@
 export type Role = "owner" | "admin" | "manager" | "viewer";
 export type DistanceUnit = "km" | "mi";
 export type VolumeUnit = "L" | "gal";
+export type Language = "en" | "ar";
+export type DriverStatus = "active" | "inactive";
 
 export interface Tenant {
   id: string;
@@ -21,6 +23,7 @@ export interface Profile {
   full_name: string;
   phone: string | null;
   role: Role;
+  language: Language;
   created_at: string;
 }
 
@@ -74,7 +77,7 @@ export interface Driver {
   license_class: string | null;
   license_expiry: string | null;
   hire_date: string | null;
-  status: "active" | "inactive";
+  status: DriverStatus;
   notes: string | null;
   created_at: string;
   updated_at: string;

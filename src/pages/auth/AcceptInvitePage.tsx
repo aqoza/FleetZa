@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, LoadingState } from "../../components/ui";
+import { useT, type MessageKey } from "../../i18n";
 import { AuthShell } from "./AuthShell";
 
 interface InviteInfo {
@@ -16,6 +17,7 @@ export default function AcceptInvitePage() {
   const token = params.get("token") ?? "";
   const navigate = useNavigate();
   const { signIn } = useAuth();
+  const t = useT();
 
   const [invite, setInvite] = useState<InviteInfo | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -26,15 +28,15 @@ export default function AcceptInvitePage() {
 
   useEffect(() => {
     if (!token) {
-      setLoadError("This invitation link is missing its token.");
+      setLoadError(t("auth.inviteMissingToken"));
       return;
     }
     apiFetch<InviteInfo>(`/invitations/${token}`)
       .then(setInvite)
       .catch((err) =>
-        setLoadError(err instanceof Error ? err.message : "Invitation not found"),
+        setLoadError(err instanceof Error ? err.message : t("auth.inviteNotFound")),
       );
-  }, [token]);
+  }, [token, t]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -46,7 +48,7 @@ export default function AcceptInvitePage() {
       await signIn(invite.email, password);
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not accept invitation");
+      setError(err instanceof Error ? err.message : t("auth.inviteAcceptFailed"));
     } finally {
       setBusy(false);
     }
@@ -54,12 +56,12 @@ export default function AcceptInvitePage() {
 
   if (loadError) {
     return (
-      <AuthShell title="Invitation problem">
+      <AuthShell title={t("auth.inviteProblem")}>
         <ErrorState message={loadError} />
         <p className="mt-4 text-sm text-slate-500">
-          Ask your administrator to send a new invitation, or{" "}
+          {t("auth.inviteHelp")}{" "}
           <Link to="/login" className="font-medium text-brand-600">
-            sign in
+            {t("auth.signInLink")}
           </Link>
           .
         </p>
@@ -69,7 +71,7 @@ export default function AcceptInvitePage() {
 
   if (!invite) {
     return (
-      <AuthShell title="Checking invitation…">
+      <AuthShell title={t("auth.checkingInvite")}>
         <LoadingState />
       </AuthShell>
     );
@@ -77,15 +79,18 @@ export default function AcceptInvitePage() {
 
   return (
     <AuthShell
-      title={`Join ${invite.organization}`}
-      subtitle={`You've been invited as ${invite.role} (${invite.email}).`}
+      title={t("auth.joinOrg", { org: invite.organization })}
+      subtitle={t("auth.invitedAs", {
+        role: t(`role.${invite.role}` as MessageKey),
+        email: invite.email,
+      })}
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <ErrorState message={error} />}
-        <Field label="Your name" required>
+        <Field label={t("field.fullName")} required>
           <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </Field>
-        <Field label="Choose a password" required hint="At least 8 characters">
+        <Field label={t("auth.choosePassword")} required hint={t("auth.atLeast8")}>
           <Input
             type="password"
             value={password}
@@ -96,7 +101,7 @@ export default function AcceptInvitePage() {
           />
         </Field>
         <Button type="submit" loading={busy} className="w-full">
-          Join organization
+          {t("auth.joinOrganization")}
         </Button>
       </form>
     </AuthShell>

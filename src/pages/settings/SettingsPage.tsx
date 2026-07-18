@@ -21,6 +21,7 @@ import type {
   VolumeUnit,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT, type Translate } from "../../i18n";
 import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
@@ -51,10 +52,6 @@ function countryName(code: string): string {
   }
 }
 
-function capitalize(s: string): string {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
 const roleTone: Record<Role, BadgeTone> = {
   owner: "purple",
   admin: "blue",
@@ -65,6 +62,7 @@ const roleTone: Record<Role, BadgeTone> = {
 // --- Organization tab ---
 
 function OrganizationTab() {
+  const t = useT();
   const tenant = useTenant();
   const { isAdmin, refresh } = useAuth();
 
@@ -111,7 +109,7 @@ function OrganizationTab() {
       await refresh();
     },
     onSuccess: () => setSaved(true),
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("settings.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -122,13 +120,19 @@ function OrganizationTab() {
 
   if (!isAdmin) {
     const rows: Array<[string, string]> = [
-      ["Name", tenant.name],
-      ["Country", countryName(tenant.country)],
-      ["Currency", tenant.currency],
-      ["Timezone", tenant.timezone],
-      ["Distance unit", tenant.distance_unit === "mi" ? "Miles" : "Kilometers"],
-      ["Volume unit", tenant.volume_unit === "gal" ? "Gallons (US)" : "Liters"],
-      ["Created", formatDate(tenant.created_at)],
+      [t("field.name"), tenant.name],
+      [t("settings.country"), countryName(tenant.country)],
+      [t("settings.currency"), tenant.currency],
+      [t("settings.timezone"), tenant.timezone],
+      [
+        t("settings.distanceUnit"),
+        tenant.distance_unit === "mi" ? t("settings.miles") : t("settings.kilometers"),
+      ],
+      [
+        t("settings.volumeUnit"),
+        tenant.volume_unit === "gal" ? t("settings.gallons") : t("settings.liters"),
+      ],
+      [t("settings.created"), formatDate(tenant.created_at)],
     ];
     return (
       <Card className="max-w-2xl">
@@ -150,17 +154,17 @@ function OrganizationTab() {
         <form onSubmit={onSubmit} className="space-y-4">
           {error && <ErrorState message={error} />}
 
-          <Field label="Organization name" required>
+          <Field label={t("settings.orgName")} required>
             <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
-              label="Country"
+              label={t("settings.country")}
               required
               hint={
                 form.country !== tenant.country
-                  ? "Changing country updates formats and tax defaults for the whole organization."
+                  ? t("settings.countryChangeHint")
                   : undefined
               }
             >
@@ -168,14 +172,14 @@ function OrganizationTab() {
                 {!isSupportedCountry(tenant.country) && (
                   <option value={tenant.country}>{countryName(tenant.country)}</option>
                 )}
-                <optgroup label="Middle East">
+                <optgroup label={t("settings.middleEast")}>
                   {MIDDLE_EAST_OPTIONS.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
                     </option>
                   ))}
                 </optgroup>
-                <optgroup label="Other countries">
+                <optgroup label={t("settings.otherCountries")}>
                   {OTHER_OPTIONS.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -184,7 +188,7 @@ function OrganizationTab() {
                 </optgroup>
               </Select>
             </Field>
-            <Field label="Currency" required>
+            <Field label={t("settings.currency")} required>
               <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
                 {currencies.map((c) => (
                   <option key={c} value={c}>
@@ -193,7 +197,7 @@ function OrganizationTab() {
                 ))}
               </Select>
             </Field>
-            <Field label="Timezone" required>
+            <Field label={t("settings.timezone")} required>
               <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
                 {timezones.map((tz) => (
                   <option key={tz} value={tz}>
@@ -203,22 +207,22 @@ function OrganizationTab() {
               </Select>
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Distance">
+              <Field label={t("settings.distance")}>
                 <Select
                   value={form.distance_unit}
                   onChange={(e) => set("distance_unit", e.target.value as DistanceUnit)}
                 >
-                  <option value="km">Kilometers</option>
-                  <option value="mi">Miles</option>
+                  <option value="km">{t("settings.kilometers")}</option>
+                  <option value="mi">{t("settings.miles")}</option>
                 </Select>
               </Field>
-              <Field label="Volume">
+              <Field label={t("settings.volume")}>
                 <Select
                   value={form.volume_unit}
                   onChange={(e) => set("volume_unit", e.target.value as VolumeUnit)}
                 >
-                  <option value="L">Liters</option>
-                  <option value="gal">Gallons (US)</option>
+                  <option value="L">{t("settings.liters")}</option>
+                  <option value="gal">{t("settings.gallons")}</option>
                 </Select>
               </Field>
             </div>
@@ -234,10 +238,10 @@ function OrganizationTab() {
 
           <div className="flex items-center justify-end gap-3">
             {saved && !save.isPending && (
-              <span className="text-sm font-medium text-emerald-600">Saved.</span>
+              <span className="text-sm font-medium text-emerald-600">{t("settings.saved")}</span>
             )}
             <Button type="submit" loading={save.isPending}>
-              Save changes
+              {t("action.saveChanges")}
             </Button>
           </div>
         </form>
@@ -251,6 +255,7 @@ function OrganizationTab() {
 // --- Country profile card (read-only) ---
 
 function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
+  const t = useT();
   const currencySample = useMemo(() => {
     try {
       return new Intl.NumberFormat(cfg.locale, {
@@ -272,34 +277,43 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
 
   return (
     <Card className="p-5 lg:col-span-2">
-      <h2 className="text-sm font-semibold text-slate-900">Country profile</h2>
-      <p className="mt-1 text-xs text-slate-500">Defaults for {cfg.name} applied across the app.</p>
+      <h2 className="text-sm font-semibold text-slate-900">{t("settings.countryProfile")}</h2>
+      <p className="mt-1 text-xs text-slate-500">
+        {t("settings.countryProfileDesc", { name: cfg.name })}
+      </p>
 
       <dl className="mt-4 space-y-4">
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Currency
+            {t("settings.currency")}
           </dt>
           <dd className="mt-1 text-sm text-slate-800">
-            {cfg.currency} <span className="text-slate-500">— e.g. {currencySample}</span>
+            {cfg.currency}{" "}
+            <span className="text-slate-500">
+              {t("settings.egSample", { sample: currencySample })}
+            </span>
           </dd>
         </div>
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Date format
+            {t("settings.dateFormat")}
           </dt>
           <dd className="mt-1 text-sm text-slate-800">{dateSample}</dd>
         </div>
         <div>
-          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tax</dt>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            {t("settings.tax")}
+          </dt>
           <dd className="mt-1 text-sm text-slate-800">
-            {cfg.tax.rate > 0 ? `${cfg.tax.label} ${cfg.tax.rate}%` : `No ${cfg.tax.label}`}
+            {cfg.tax.rate > 0
+              ? `${cfg.tax.label} ${cfg.tax.rate}%`
+              : t("settings.noTax", { label: cfg.tax.label })}
           </dd>
           {cfg.tax.note && <dd className="mt-1 text-xs text-slate-500">{cfg.tax.note}</dd>}
         </div>
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Renewal defaults
+            {t("settings.renewalDefaults")}
           </dt>
           <dd className="mt-1">
             <ul className="space-y-1.5">
@@ -310,7 +324,7 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
                 >
                   <span className="text-slate-700">{r.label}</span>
                   <span className="whitespace-nowrap text-xs text-slate-500">
-                    every {r.months} mo
+                    {t("settings.everyMonths", { count: r.months })}
                   </span>
                 </li>
               ))}
@@ -325,6 +339,7 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
 // --- Members tab ---
 
 function MembersTab() {
+  const t = useT();
   const { profile, isAdmin } = useAuth();
   const qc = useQueryClient();
   const [actionError, setActionError] = useState("");
@@ -343,7 +358,7 @@ function MembersTab() {
       void qc.invalidateQueries({ queryKey: ["profiles"] });
     },
     onError: (err) =>
-      setActionError(err instanceof Error ? err.message : "Role change failed"),
+      setActionError(err instanceof Error ? err.message : t("settings.roleChangeFailed")),
   });
 
   const remove = useMutation({
@@ -355,7 +370,7 @@ function MembersTab() {
     },
     onError: (err) => {
       setRemoving(null);
-      setActionError(err instanceof Error ? err.message : "Remove failed");
+      setActionError(err instanceof Error ? err.message : t("settings.removeFailed"));
     },
   });
 
@@ -375,13 +390,19 @@ function MembersTab() {
       {!isLoading && !error && (members?.length ?? 0) === 0 && (
         <EmptyState
           icon={<Users className="h-10 w-10" />}
-          title="No members yet"
-          description="Invite teammates from the Invitations tab."
+          title={t("settings.noMembers")}
+          description={t("settings.noMembersDesc")}
         />
       )}
 
       {!isLoading && !error && (members?.length ?? 0) > 0 && (
-        <Table headers={isAdmin ? ["Name", "Role", "Joined", ""] : ["Name", "Role", "Joined"]}>
+        <Table
+          headers={
+            isAdmin
+              ? [t("field.name"), t("settings.role"), t("settings.joined"), ""]
+              : [t("field.name"), t("settings.role"), t("settings.joined")]
+          }
+        >
           {(members ?? []).map((m) => (
             <tr key={m.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
@@ -395,26 +416,26 @@ function MembersTab() {
                       value={m.role}
                       onChange={(e) => changeRole.mutate({ id: m.id, role: e.target.value as Role })}
                       disabled={changeRole.isPending}
-                      aria-label={`Role for ${m.full_name}`}
+                      aria-label={t("settings.roleForAria", { name: m.full_name })}
                     >
-                      <option value="admin">Admin</option>
-                      <option value="manager">Manager</option>
-                      <option value="viewer">Viewer</option>
+                      <option value="admin">{t("role.admin")}</option>
+                      <option value="manager">{t("role.manager")}</option>
+                      <option value="viewer">{t("role.viewer")}</option>
                     </Select>
                   </div>
                 ) : (
-                  <Badge tone={roleTone[m.role]}>{capitalize(m.role)}</Badge>
+                  <Badge tone={roleTone[m.role]}>{t(`role.${m.role}`)}</Badge>
                 )}
               </td>
               <td className="px-4 py-3 text-slate-600">{formatDate(m.created_at)}</td>
               {isAdmin && (
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-end">
                   {canManage(m) && (
                     <button
                       className="rounded-md px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                       onClick={() => setRemoving(m)}
                     >
-                      Remove
+                      {t("action.remove")}
                     </button>
                   )}
                 </td>
@@ -424,21 +445,24 @@ function MembersTab() {
         </Table>
       )}
 
-      <Modal title="Remove member" open={!!removing} onClose={() => setRemoving(null)}>
+      <Modal title={t("settings.removeMember")} open={!!removing} onClose={() => setRemoving(null)}>
         {removing && (
           <>
             <p className="text-sm text-slate-600">
-              Remove <span className="font-semibold">{removing.full_name}</span> from the
-              organization? They will lose access immediately.
+              {t("settings.removeMemberConfirmPre")}{" "}
+              <span className="font-semibold">{removing.full_name}</span>{" "}
+              {t("settings.removeMemberConfirmPost")}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setRemoving(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setRemoving(null)}>
+                {t("action.cancel")}
+              </Button>
               <Button
                 variant="danger"
                 onClick={() => remove.mutate(removing.id)}
                 loading={remove.isPending}
               >
-                Remove member
+                {t("settings.removeMember")}
               </Button>
             </div>
           </>
@@ -451,6 +475,7 @@ function MembersTab() {
 // --- Invitations tab ---
 
 function InviteForm({ onDone }: { onDone: () => void }) {
+  const t = useT();
   const tenant = useTenant();
   const { profile } = useAuth();
   const qc = useQueryClient();
@@ -470,7 +495,7 @@ function InviteForm({ onDone }: { onDone: () => void }) {
       void qc.invalidateQueries({ queryKey: ["invitations"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Invite failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("settings.inviteFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -481,7 +506,7 @@ function InviteForm({ onDone }: { onDone: () => void }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <Field label="Email" required>
+      <Field label={t("field.email")} required>
         <Input
           type="email"
           value={email}
@@ -490,29 +515,30 @@ function InviteForm({ onDone }: { onDone: () => void }) {
           autoComplete="off"
         />
       </Field>
-      <Field label="Role">
+      <Field label={t("settings.role")}>
         <Select
           value={role}
           onChange={(e) => setRole(e.target.value as Exclude<Role, "owner">)}
         >
-          <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
-          <option value="viewer">Viewer</option>
+          <option value="admin">{t("role.admin")}</option>
+          <option value="manager">{t("role.manager")}</option>
+          <option value="viewer">{t("role.viewer")}</option>
         </Select>
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={mutation.isPending}>Create invitation</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("settings.createInvitation")}</Button>
       </div>
     </form>
   );
 }
 
-function invitationBadge(inv: Invitation) {
-  if (inv.status === "accepted") return <Badge tone="green">Accepted</Badge>;
-  if (inv.status === "revoked") return <Badge tone="slate">Revoked</Badge>;
-  if (new Date(inv.expires_at).getTime() < Date.now()) return <Badge tone="red">Expired</Badge>;
-  return <Badge tone="yellow">Pending</Badge>;
+function invitationBadge(inv: Invitation, t: Translate) {
+  if (inv.status === "accepted") return <Badge tone="green">{t("settings.statusAccepted")}</Badge>;
+  if (inv.status === "revoked") return <Badge tone="slate">{t("settings.statusRevoked")}</Badge>;
+  if (new Date(inv.expires_at).getTime() < Date.now())
+    return <Badge tone="red">{t("settings.statusExpired")}</Badge>;
+  return <Badge tone="yellow">{t("settings.statusPending")}</Badge>;
 }
 
 function InvitationsTab({
@@ -522,6 +548,7 @@ function InvitationsTab({
   inviting: boolean;
   setInviting: (open: boolean) => void;
 }) {
+  const t = useT();
   const qc = useQueryClient();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [revoking, setRevoking] = useState<Invitation | null>(null);
@@ -543,7 +570,7 @@ function InvitationsTab({
     },
     onError: (err) => {
       setRevoking(null);
-      setActionError(err instanceof Error ? err.message : "Revoke failed");
+      setActionError(err instanceof Error ? err.message : t("settings.revokeFailed"));
     },
   });
 
@@ -571,11 +598,11 @@ function InvitationsTab({
       {!isLoading && !error && (invitations?.length ?? 0) === 0 && (
         <EmptyState
           icon={<Mail className="h-10 w-10" />}
-          title="No invitations yet"
-          description="Invite teammates to give them access to your fleet workspace."
+          title={t("settings.noInvitations")}
+          description={t("settings.noInvitationsDesc")}
           action={
             <Button onClick={() => setInviting(true)}>
-              <Plus className="h-4 w-4" /> Invite member
+              <Plus className="h-4 w-4" /> {t("settings.inviteMember")}
             </Button>
           }
         />
@@ -583,27 +610,35 @@ function InvitationsTab({
 
       {!isLoading && !error && (invitations?.length ?? 0) > 0 && (
         <>
-          <Table headers={["Email", "Role", "Status", "Invited", ""]}>
+          <Table
+            headers={[
+              t("field.email"),
+              t("settings.role"),
+              t("common.status"),
+              t("settings.invited"),
+              "",
+            ]}
+          >
             {(invitations ?? []).map((inv) => (
               <tr key={inv.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 font-medium text-slate-800">{inv.email}</td>
-                <td className="px-4 py-3 text-slate-600">{capitalize(inv.role)}</td>
-                <td className="px-4 py-3">{invitationBadge(inv)}</td>
+                <td className="px-4 py-3 text-slate-600">{t(`role.${inv.role}`)}</td>
+                <td className="px-4 py-3">{invitationBadge(inv, t)}</td>
                 <td className="px-4 py-3 text-slate-600">{formatDate(inv.created_at)}</td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-end">
                   {inv.status === "pending" && (
                     <div className="flex justify-end gap-2">
                       <button
                         className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
                         onClick={() => copyLink(inv)}
                       >
-                        {copiedId === inv.id ? "Copied!" : "Copy link"}
+                        {copiedId === inv.id ? t("action.copied") : t("action.copy")}
                       </button>
                       <button
                         className="rounded-md px-2.5 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                         onClick={() => setRevoking(inv)}
                       >
-                        Revoke
+                        {t("settings.revoke")}
                       </button>
                     </div>
                   )}
@@ -611,32 +646,36 @@ function InvitationsTab({
               </tr>
             ))}
           </Table>
-          <p className="mt-3 text-xs text-slate-500">
-            Send the invite link to your teammate — the app does not email it yet.
-          </p>
+          <p className="mt-3 text-xs text-slate-500">{t("settings.inviteLinkHint")}</p>
         </>
       )}
 
-      <Modal title="Invite member" open={inviting} onClose={() => setInviting(false)}>
+      <Modal title={t("settings.inviteMember")} open={inviting} onClose={() => setInviting(false)}>
         <InviteForm onDone={() => setInviting(false)} />
       </Modal>
 
-      <Modal title="Revoke invitation" open={!!revoking} onClose={() => setRevoking(null)}>
+      <Modal
+        title={t("settings.revokeInvitation")}
+        open={!!revoking}
+        onClose={() => setRevoking(null)}
+      >
         {revoking && (
           <>
             <p className="text-sm text-slate-600">
-              Revoke the invitation for{" "}
-              <span className="font-semibold">{revoking.email}</span>? The invite link will stop
-              working.
+              {t("settings.revokeInvitationConfirmPre")}{" "}
+              <span className="font-semibold">{revoking.email}</span>
+              {t("settings.revokeInvitationConfirmPost")}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setRevoking(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setRevoking(null)}>
+                {t("action.cancel")}
+              </Button>
               <Button
                 variant="danger"
                 onClick={() => revoke.mutate(revoking.id)}
                 loading={revoke.isPending}
               >
-                Revoke invitation
+                {t("settings.revokeInvitation")}
               </Button>
             </div>
           </>
@@ -651,6 +690,7 @@ function InvitationsTab({
 type Tab = "organization" | "members" | "invitations";
 
 export default function SettingsPage() {
+  const t = useT();
   const { isAdmin } = useAuth();
   const [tab, setTab] = useState<Tab>("organization");
   const [inviting, setInviting] = useState(false);
@@ -658,13 +698,13 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader
-        title="Settings"
-        description="Your organization, team members, and invitations"
+        title={t("settings.title")}
+        description={t("settings.subtitle")}
         actions={
           tab === "invitations" &&
           isAdmin && (
             <Button onClick={() => setInviting(true)}>
-              <Plus className="h-4 w-4" /> Invite member
+              <Plus className="h-4 w-4" /> {t("settings.inviteMember")}
             </Button>
           )
         }
@@ -673,11 +713,11 @@ export default function SettingsPage() {
       <div className="mb-4 flex gap-2">
         {(
           [
-            ["organization", "Organization"],
-            ["members", "Members"],
-            ["invitations", "Invitations"],
-          ] as [Tab, string][]
-        ).map(([value, label]) => (
+            ["organization", "settings.tab.organization"],
+            ["members", "settings.tab.members"],
+            ["invitations", "settings.tab.invitations"],
+          ] as const
+        ).map(([value, labelKey]) => (
           <button
             key={value}
             onClick={() => setTab(value)}
@@ -687,7 +727,7 @@ export default function SettingsPage() {
                 : "rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
             }
           >
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>
@@ -699,7 +739,7 @@ export default function SettingsPage() {
           <InvitationsTab inviting={inviting} setInviting={setInviting} />
         ) : (
           <Card className="max-w-2xl px-5 py-4 text-sm text-slate-500">
-            Only admins manage invitations.
+            {t("settings.adminsOnlyInvitations")}
           </Card>
         ))}
     </>

@@ -6,6 +6,7 @@ import type {
   TextareaHTMLAttributes,
 } from "react";
 import { Loader2, X } from "lucide-react";
+import { useT } from "../i18n";
 
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
@@ -211,7 +212,7 @@ export function Table({ headers, children }: { headers: ReactNode[]; children: R
             {headers.map((h, i) => (
               <th
                 key={i}
-                className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                className="px-4 py-2.5 text-start text-xs font-semibold uppercase tracking-wide text-slate-500"
               >
                 {h}
               </th>
@@ -247,11 +248,12 @@ export function EmptyState({
   );
 }
 
-export function LoadingState({ label = "Loading…" }: { label?: string }) {
+export function LoadingState({ label }: { label?: string }) {
+  const t = useT();
   return (
     <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
       <Loader2 className="h-5 w-5 animate-spin" />
-      {label}
+      {label ?? t("common.loading")}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { formatDate } from "../../lib/format";
 import { issueStatus, priority } from "../../lib/labels";
 import type { Issue, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -34,6 +35,7 @@ function RowAction({
 }
 
 function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: () => void }) {
+  const t = useT();
   const qc = useQueryClient();
   const [form, setForm] = useState({
     vehicle_id: "",
@@ -59,7 +61,7 @@ function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: ()
       void qc.invalidateQueries({ queryKey: ["issues"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("issues.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -70,36 +72,37 @@ function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: ()
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <Field label="Vehicle" required>
+      <Field label={t("field.vehicle")} required>
         <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-          <option value="">Select a vehicle…</option>
+          <option value="">{t("issues.selectVehicle")}</option>
           {vehicles.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
         </Select>
       </Field>
-      <Field label="Title" required>
+      <Field label={t("issues.fieldTitle")} required>
         <Input value={form.title} onChange={(e) => set("title", e.target.value)} required />
       </Field>
-      <Field label="Description">
+      <Field label={t("issues.fieldDescription")}>
         <Textarea value={form.description} onChange={(e) => set("description", e.target.value)} />
       </Field>
-      <Field label="Priority">
+      <Field label={t("field.priority")}>
         <Select value={form.priority} onChange={(e) => set("priority", e.target.value)}>
           {Object.entries(priority).map(([v, p]) => (
-            <option key={v} value={v}>{p.label}</option>
+            <option key={v} value={v}>{t(p.labelKey)}</option>
           ))}
         </Select>
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={mutation.isPending}>Report issue</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("issues.report")}</Button>
       </div>
     </form>
   );
 }
 
 export default function IssuesPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -130,7 +133,7 @@ export default function IssuesPage() {
       void qc.invalidateQueries({ queryKey: ["issues"] });
     },
     onError: (err) =>
-      setActionError(err instanceof Error ? err.message : "Updating the issue failed"),
+      setActionError(err instanceof Error ? err.message : t("issues.updateFailed")),
   });
 
   const createWo = useMutation({
@@ -156,7 +159,7 @@ export default function IssuesPage() {
     },
     onSuccess: () => setActionError(""),
     onError: (err) =>
-      setActionError(err instanceof Error ? err.message : "Creating the work order failed"),
+      setActionError(err instanceof Error ? err.message : t("issues.createWoFailed")),
     onSettled: () => {
       void qc.invalidateQueries({ queryKey: ["work_orders"] });
       void qc.invalidateQueries({ queryKey: ["issues"] });
@@ -171,7 +174,7 @@ export default function IssuesPage() {
       setDeleting(null);
     },
     onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Deleting the issue failed");
+      setActionError(err instanceof Error ? err.message : t("issues.deleteFailed"));
       setDeleting(null);
     },
   });
@@ -191,12 +194,12 @@ export default function IssuesPage() {
   return (
     <>
       <PageHeader
-        title="Issues"
-        description={`${issues?.length ?? 0} reported issues`}
+        title={t("issues.title")}
+        description={t("issues.reportedCount", { count: issues?.length ?? 0 })}
         actions={
           isManager && (
             <Button onClick={() => setReporting(true)}>
-              <Plus className="h-4 w-4" /> Report issue
+              <Plus className="h-4 w-4" /> {t("issues.report")}
             </Button>
           )
         }
@@ -204,13 +207,13 @@ export default function IssuesPage() {
 
       <div className="mb-4 flex flex-wrap gap-3">
         <Select value={status} onChange={(e) => setStatus(e.target.value)} className="max-w-44">
-          <option value="all">All</option>
+          <option value="all">{t("common.all")}</option>
           {Object.entries(issueStatus).map(([v, s]) => (
-            <option key={v} value={v}>{s.label}</option>
+            <option key={v} value={v}>{t(s.labelKey)}</option>
           ))}
         </Select>
         <Select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="max-w-52">
-          <option value="all">All vehicles</option>
+          <option value="all">{t("issues.allVehicles")}</option>
           {vehicles?.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
@@ -224,16 +227,14 @@ export default function IssuesPage() {
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<AlertTriangle className="h-10 w-10" />}
-          title={issues?.length ? "No issues match your filters" : "No issues reported"}
+          title={issues?.length ? t("issues.emptyFilteredTitle") : t("issues.emptyTitle")}
           description={
-            issues?.length
-              ? "Try a different status or vehicle filter."
-              : "Report an issue when something needs attention on a vehicle."
+            issues?.length ? t("issues.emptyFilteredDesc") : t("issues.emptyDesc")
           }
           action={
             isManager && !issues?.length ? (
               <Button onClick={() => setReporting(true)}>
-                <Plus className="h-4 w-4" /> Report issue
+                <Plus className="h-4 w-4" /> {t("issues.report")}
               </Button>
             ) : undefined
           }
@@ -241,33 +242,33 @@ export default function IssuesPage() {
       )}
 
       {!isLoading && !error && filtered.length > 0 && (
-        <Table headers={["Issue", "Priority", "Status", "Reported", ""]}>
+        <Table headers={[t("issues.colIssue"), t("field.priority"), t("common.status"), t("issues.colReported"), ""]}>
           {filtered.map((i) => (
             <tr key={i.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium text-slate-800">{i.title}</span>
-                  {i.source === "inspection" && <Badge tone="purple">From inspection</Badge>}
+                  {i.source === "inspection" && <Badge tone="purple">{t("issues.fromInspection")}</Badge>}
                 </div>
                 <div className="text-xs text-slate-500">{i.vehicles?.name ?? "—"}</div>
               </td>
               <td className="px-4 py-3">
-                <Badge tone={priority[i.priority].tone}>{priority[i.priority].label}</Badge>
+                <Badge tone={priority[i.priority].tone}>{t(priority[i.priority].labelKey)}</Badge>
               </td>
               <td className="px-4 py-3">
-                <Badge tone={issueStatus[i.status].tone}>{issueStatus[i.status].label}</Badge>
+                <Badge tone={issueStatus[i.status].tone}>{t(issueStatus[i.status].labelKey)}</Badge>
               </td>
               <td className="px-4 py-3 text-slate-600">
                 {formatDate(i.reported_at, tenant.timezone)}
               </td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-3 text-end">
                 <div className="flex items-center justify-end gap-1">
                   {i.work_order_id && (
                     <Link
                       to={`/maintenance/work-orders/${i.work_order_id}`}
                       className="rounded-md px-2 py-1 text-xs font-medium text-brand-700 hover:underline"
                     >
-                      WO ↗
+                      {t("issues.workOrderLink")}
                     </Link>
                   )}
                   {isManager && (
@@ -279,7 +280,7 @@ export default function IssuesPage() {
                             transition.mutate({ id: i.id, values: { status: "in_progress" } })
                           }
                         >
-                          Start
+                          {t("issues.start")}
                         </RowAction>
                       )}
                       {(i.status === "open" || i.status === "in_progress") && (
@@ -295,7 +296,7 @@ export default function IssuesPage() {
                             })
                           }
                         >
-                          Resolve
+                          {t("issues.resolve")}
                         </RowAction>
                       )}
                       {i.status === "resolved" && (
@@ -305,19 +306,19 @@ export default function IssuesPage() {
                             transition.mutate({ id: i.id, values: { status: "closed" } })
                           }
                         >
-                          Close
+                          {t("action.close")}
                         </RowAction>
                       )}
                       {(i.status === "open" || i.status === "in_progress") &&
                         !i.work_order_id && (
                           <RowAction disabled={busy} onClick={() => createWo.mutate(i)}>
-                            Create WO
+                            {t("issues.createWo")}
                           </RowAction>
                         )}
                       <button
                         className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                         onClick={() => setDeleting(i)}
-                        aria-label={`Delete ${i.title}`}
+                        aria-label={t("issues.deleteAria", { title: i.title })}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -330,24 +331,25 @@ export default function IssuesPage() {
         </Table>
       )}
 
-      <Modal title="Report issue" open={reporting} onClose={() => setReporting(false)} wide>
+      <Modal title={t("issues.report")} open={reporting} onClose={() => setReporting(false)} wide>
         <ReportIssueForm vehicles={vehicles ?? []} onDone={() => setReporting(false)} />
       </Modal>
 
-      <Modal title="Delete issue" open={!!deleting} onClose={() => setDeleting(null)}>
+      <Modal title={t("issues.deleteTitle")} open={!!deleting} onClose={() => setDeleting(null)}>
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              Delete <span className="font-semibold">{deleting.title}</span>? This cannot be undone.
+              {t("issues.deleteConfirm")} <span className="font-semibold">{deleting.title}</span>
+              {t("issues.deleteConfirmUndone")}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setDeleting(null)}>{t("action.cancel")}</Button>
               <Button
                 variant="danger"
                 onClick={() => remove.mutate(deleting.id)}
                 loading={remove.isPending}
               >
-                Delete issue
+                {t("issues.deleteTitle")}
               </Button>
             </div>
           </>

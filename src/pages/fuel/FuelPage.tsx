@@ -15,6 +15,7 @@ import {
 } from "../../lib/format";
 import type { Driver, FuelLog, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT } from "../../i18n";
 import {
   Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -37,6 +38,7 @@ function FuelForm({
   drivers: Driver[];
   onDone: () => void;
 }) {
+  const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -81,7 +83,7 @@ function FuelForm({
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("fuel.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -93,21 +95,21 @@ function FuelForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Vehicle" required>
+        <Field label={t("field.vehicle")} required>
           <Select
             value={form.vehicle_id}
             onChange={(e) => set("vehicle_id", e.target.value)}
             required
           >
-            <option value="">Select a vehicle…</option>
+            <option value="">{t("fuel.selectVehicle")}</option>
             {vehicles.map((v) => (
               <option key={v.id} value={v.id}>{v.name}</option>
             ))}
           </Select>
         </Field>
-        <Field label="Driver">
+        <Field label={t("field.driver")}>
           <Select value={form.driver_id} onChange={(e) => set("driver_id", e.target.value)}>
-            <option value="">— None —</option>
+            <option value="">{t("fuel.noDriver")}</option>
             {drivers.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.first_name} {d.last_name}
@@ -115,7 +117,7 @@ function FuelForm({
             ))}
           </Select>
         </Field>
-        <Field label="Filled at" required>
+        <Field label={t("fuel.filledAt")} required>
           <Input
             type="datetime-local"
             value={form.filled_at}
@@ -123,7 +125,7 @@ function FuelForm({
             required
           />
         </Field>
-        <Field label={`Odometer (${tenant.distance_unit})`}>
+        <Field label={`${t("field.odometer")} (${tenant.distance_unit})`}>
           <Input
             type="number"
             min="0"
@@ -132,7 +134,7 @@ function FuelForm({
             onChange={(e) => set("odometer", e.target.value)}
           />
         </Field>
-        <Field label={`Volume (${tenant.volume_unit})`} required>
+        <Field label={`${t("fuel.volume")} (${tenant.volume_unit})`} required>
           <Input
             type="number"
             min="0"
@@ -142,7 +144,7 @@ function FuelForm({
             required
           />
         </Field>
-        <Field label={`Total cost (${tenant.currency})`} required>
+        <Field label={`${t("fuel.totalCost")} (${tenant.currency})`} required>
           <Input
             type="number"
             min="0"
@@ -152,7 +154,7 @@ function FuelForm({
             required
           />
         </Field>
-        <Field label="Vendor">
+        <Field label={t("field.vendor")}>
           <Input value={form.vendor} onChange={(e) => set("vendor", e.target.value)} />
         </Field>
         <label className="flex items-center gap-2 self-end pb-2 text-sm font-medium text-slate-700">
@@ -162,21 +164,22 @@ function FuelForm({
             onChange={(e) => set("is_full_tank", e.target.checked)}
             className="h-4 w-4 rounded border-slate-300 accent-brand-600"
           />
-          Full tank
+          {t("fuel.fullTank")}
         </label>
       </div>
-      <Field label="Notes">
+      <Field label={t("field.notes")}>
         <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onDone}>Cancel</Button>
-        <Button type="submit" loading={mutation.isPending}>Log fuel</Button>
+        <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
+        <Button type="submit" loading={mutation.isPending}>{t("fuel.logFuel")}</Button>
       </div>
     </form>
   );
 }
 
 export default function FuelPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -210,7 +213,7 @@ export default function FuelPage() {
       setDeleting(null);
     },
     onError: (err) =>
-      setDeleteError(err instanceof Error ? err.message : "Delete failed"),
+      setDeleteError(err instanceof Error ? err.message : t("fuel.deleteFailed")),
   });
 
   /** Efficiency per log id, vs the previous fill-up (next-lower odometer) of the same vehicle. */
@@ -261,25 +264,25 @@ export default function FuelPage() {
 
   function pricePerUnit(log: FuelLogRow): string {
     const displayVolume = litersToDisplay(log.volume, tenant.volume_unit);
-    if (displayVolume <= 0) return "—";
+    if (displayVolume <= 0) return t("common.dash");
     return formatMoney(log.total_cost / displayVolume, tenant.currency);
   }
 
   function efficiencyCell(log: FuelLogRow): string {
     const eff = efficiency.get(log.id);
-    if (eff === null || eff === undefined) return "—";
+    if (eff === null || eff === undefined) return t("common.dash");
     return `${eff.toFixed(1)} ${efficiencyLabel(tenant)}`;
   }
 
   return (
     <>
       <PageHeader
-        title="Fuel"
-        description={`${logs?.length ?? 0} fuel logs`}
+        title={t("fuel.title")}
+        description={t("fuel.logCount", { count: logs?.length ?? 0 })}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>
-              <Plus className="h-4 w-4" /> Log fuel
+              <Plus className="h-4 w-4" /> {t("fuel.logFuel")}
             </Button>
           )
         }
@@ -291,7 +294,7 @@ export default function FuelPage() {
           onChange={(e) => setVehicleFilter(e.target.value)}
           className="max-w-xs"
         >
-          <option value="all">All vehicles</option>
+          <option value="all">{t("fuel.allVehicles")}</option>
           {vehicles?.map((v) => (
             <option key={v.id} value={v.id}>{v.name}</option>
           ))}
@@ -305,7 +308,7 @@ export default function FuelPage() {
         <div className="mb-4 grid gap-4 sm:grid-cols-3">
           <Card className="p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Total spend
+              {t("fuel.totalSpend")}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
               {formatMoney(totals.spend, tenant.currency)}
@@ -313,7 +316,7 @@ export default function FuelPage() {
           </Card>
           <Card className="p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Total volume
+              {t("fuel.totalVolume")}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
               {formatVolume(totals.liters, tenant.volume_unit)}
@@ -321,7 +324,7 @@ export default function FuelPage() {
           </Card>
           <Card className="p-4">
             <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
-              Avg price / {tenant.volume_unit}
+              {t("fuel.avgPrice")} / {tenant.volume_unit}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
               {formatMoney(totals.avgPrice, tenant.currency)}
@@ -333,16 +336,14 @@ export default function FuelPage() {
       {!isLoading && !error && filtered.length === 0 && (
         <EmptyState
           icon={<Fuel className="h-10 w-10" />}
-          title={logs?.length ? "No fuel logs for this vehicle" : "No fuel logs yet"}
+          title={logs?.length ? t("fuel.emptyFilteredTitle") : t("fuel.emptyTitle")}
           description={
-            logs?.length
-              ? "Try a different vehicle filter."
-              : "Log fill-ups to track fuel spend and efficiency per vehicle."
+            logs?.length ? t("fuel.emptyFilteredDesc") : t("fuel.emptyDesc")
           }
           action={
             isManager && !logs?.length ? (
               <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> Log fuel
+                <Plus className="h-4 w-4" /> {t("fuel.logFuel")}
               </Button>
             ) : undefined
           }
@@ -352,14 +353,14 @@ export default function FuelPage() {
       {!isLoading && !error && filtered.length > 0 && (
         <Table
           headers={[
-            "Date",
-            "Vehicle",
-            "Odometer",
-            "Volume",
-            "Total cost",
-            `Price/${tenant.volume_unit}`,
-            "Efficiency",
-            "Vendor",
+            t("field.date"),
+            t("field.vehicle"),
+            t("field.odometer"),
+            t("fuel.volume"),
+            t("fuel.totalCost"),
+            `${t("fuel.price")}/${tenant.volume_unit}`,
+            t("fuel.efficiency"),
+            t("field.vendor"),
             "",
           ]}
         >
@@ -369,7 +370,7 @@ export default function FuelPage() {
                 {formatDate(log.filled_at, tenant.timezone)}
               </td>
               <td className="px-4 py-3 font-medium text-slate-800">
-                {log.vehicles?.name ?? "—"}
+                {log.vehicles?.name ?? t("common.dash")}
               </td>
               <td className="px-4 py-3 text-slate-600">
                 {formatDistance(log.odometer, tenant.distance_unit)}
@@ -382,8 +383,8 @@ export default function FuelPage() {
               </td>
               <td className="px-4 py-3 text-slate-600">{pricePerUnit(log)}</td>
               <td className="px-4 py-3 text-slate-600">{efficiencyCell(log)}</td>
-              <td className="px-4 py-3 text-slate-600">{log.vendor ?? "—"}</td>
-              <td className="px-4 py-3 text-right">
+              <td className="px-4 py-3 text-slate-600">{log.vendor ?? t("common.dash")}</td>
+              <td className="px-4 py-3 text-end">
                 {isManager && (
                   <button
                     className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
@@ -391,7 +392,7 @@ export default function FuelPage() {
                       setDeleteError("");
                       setDeleting(log);
                     }}
-                    aria-label="Delete fuel log"
+                    aria-label={t("fuel.deleteLog")}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -402,7 +403,7 @@ export default function FuelPage() {
         </Table>
       )}
 
-      <Modal title="Log fuel" open={adding} onClose={() => setAdding(false)} wide>
+      <Modal title={t("fuel.logFuel")} open={adding} onClose={() => setAdding(false)} wide>
         {adding && (
           <FuelForm
             vehicles={vehicles ?? []}
@@ -412,7 +413,7 @@ export default function FuelPage() {
         )}
       </Modal>
 
-      <Modal title="Delete fuel log" open={!!deleting} onClose={() => setDeleting(null)}>
+      <Modal title={t("fuel.deleteLog")} open={!!deleting} onClose={() => setDeleting(null)}>
         {deleting && (
           <>
             {deleteError && (
@@ -421,19 +422,21 @@ export default function FuelPage() {
               </div>
             )}
             <p className="text-sm text-slate-600">
-              Delete the {formatDate(deleting.filled_at, tenant.timezone)} fuel log for{" "}
-              <span className="font-semibold">{deleting.vehicles?.name ?? "this vehicle"}</span> (
-              {formatVolume(deleting.volume, tenant.volume_unit)},{" "}
-              {formatMoney(deleting.total_cost, tenant.currency)})? This cannot be undone.
+              {t("fuel.deleteConfirm", {
+                date: formatDate(deleting.filled_at, tenant.timezone),
+                vehicle: deleting.vehicles?.name ?? t("fuel.thisVehicle"),
+                volume: formatVolume(deleting.volume, tenant.volume_unit),
+                cost: formatMoney(deleting.total_cost, tenant.currency),
+              })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
+              <Button variant="secondary" onClick={() => setDeleting(null)}>{t("action.cancel")}</Button>
               <Button
                 variant="danger"
                 onClick={() => remove.mutate(deleting.id)}
                 loading={remove.isPending}
               >
-                Delete log
+                {t("fuel.deleteButton")}
               </Button>
             </div>
           </>

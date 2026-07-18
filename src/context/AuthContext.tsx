@@ -9,9 +9,10 @@ import {
 } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { getCountry } from "../../shared/countries";
+import { useI18n } from "../i18n";
 import { configureFormatting } from "../lib/format";
 import { supabase } from "../lib/supabase";
-import type { Profile, Tenant } from "../lib/types";
+import type { Language, Profile, Tenant } from "../lib/types";
 
 interface AuthState {
   session: Session | null;
@@ -23,11 +24,13 @@ interface AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refresh: () => Promise<void>;
+  setLanguage: (lang: Language) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { setLanguage: applyLanguage } = useI18n();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -82,6 +85,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     configureFormatting({ locale: tenant ? getCountry(tenant.country).locale : undefined });
   }, [tenant]);
 
+  // Apply the signed-in user's saved language once per profile load. Keyed on
+  // the profile id (not language) so it doesn't fight the in-app switcher.
+  const profileId = profile?.id;
+  const profileLanguage = profile?.language;
+  useEffect(() => {
+    if (profileId && profileLanguage) applyLanguage(profileLanguage);
+  }, [profileId, profileLanguage, applyLanguage]);
+
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
@@ -97,6 +108,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadMembership(data.session);
   }, [loadMembership]);
 
+  const setLanguage = useCallback(
+    async (lang: Language) => {
+      applyLanguage(lang);
+      setProfile((p) => (p ? { ...p, language: lang } : p));
+      if (session) {
+        await supabase.from("profiles").update({ language: lang }).eq("id", session.user.id);
+      }
+    },
+    [applyLanguage, session],
+  );
+
   const role = profile?.role;
   const value: AuthState = {
     session,
@@ -108,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signOut,
     refresh,
+    setLanguage,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

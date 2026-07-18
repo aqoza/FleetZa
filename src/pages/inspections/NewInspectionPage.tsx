@@ -8,19 +8,21 @@ import type {
   Driver, Inspection, InspectionItem, InspectionResult, InspectionTemplate, Issue, Vehicle,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT, type MessageKey } from "../../i18n";
 import {
   Button, Card, ErrorState, Field, Input, LoadingState, PageHeader, Select, Textarea,
 } from "../../components/ui";
 
 type ResultValue = InspectionResult["result"];
 
-const resultOptions: Array<{ value: ResultValue; label: string; selected: string }> = [
-  { value: "pass", label: "Pass", selected: "border-emerald-600 bg-emerald-600 text-white" },
-  { value: "fail", label: "Fail", selected: "border-red-600 bg-red-600 text-white" },
-  { value: "na", label: "N/A", selected: "border-slate-500 bg-slate-500 text-white" },
+const resultOptions: Array<{ value: ResultValue; labelKey: MessageKey; selected: string }> = [
+  { value: "pass", labelKey: "inspections.resultPass", selected: "border-emerald-600 bg-emerald-600 text-white" },
+  { value: "fail", labelKey: "inspections.resultFail", selected: "border-red-600 bg-red-600 text-white" },
+  { value: "na", labelKey: "inspections.resultNa", selected: "border-slate-500 bg-slate-500 text-white" },
 ];
 
 export default function NewInspectionPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const navigate = useNavigate();
@@ -60,13 +62,13 @@ export default function NewInspectionPage() {
   const grouped = useMemo(() => {
     const map = new Map<string, InspectionItem[]>();
     for (const item of template?.items ?? []) {
-      const section = item.section ?? "General";
+      const section = item.section ?? t("inspections.generalSection");
       const existing = map.get(section);
       if (existing) existing.push(item);
       else map.set(section, [item]);
     }
     return [...map.entries()];
-  }, [template]);
+  }, [template, t]);
 
   const failCount =
     template?.items.filter((it) => (answers[it.id]?.result ?? "pass") === "fail").length ?? 0;
@@ -96,7 +98,7 @@ export default function NewInspectionPage() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!vehicleId) throw new Error("Select a vehicle.");
+      if (!vehicleId) throw new Error(t("inspections.selectVehicleError"));
       const results: InspectionResult[] = (template?.items ?? []).map((item) => {
         const a = answers[item.id];
         const result = a?.result ?? "pass";
@@ -133,7 +135,7 @@ export default function NewInspectionPage() {
           .map(async (r) => {
             await insertRow<Issue>("issues", {
               vehicle_id: vehicleId,
-              title: `${r.label} — failed inspection`,
+              title: t("inspections.failedInspectionTitle", { item: r.label }),
               description: r.note || null,
               priority: "high",
               source: "inspection",
@@ -151,7 +153,7 @@ export default function NewInspectionPage() {
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       navigate("/inspections");
     },
-    onError: (err) => setError(err instanceof Error ? err.message : "Save failed"),
+    onError: (err) => setError(err instanceof Error ? err.message : t("inspections.saveFailed")),
   });
 
   function onSubmit(e: FormEvent) {
@@ -168,14 +170,14 @@ export default function NewInspectionPage() {
         to="/inspections"
         className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700"
       >
-        <ArrowLeft className="h-4 w-4" /> Inspections
+        <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t("inspections.title")}
       </Link>
       <PageHeader
-        title="New inspection"
-        description="Walk through the checklist and record the vehicle's condition."
+        title={t("inspections.new")}
+        description={t("inspections.newDescription")}
       />
 
-      {!isManager && <ErrorState message="Only managers can record inspections." />}
+      {!isManager && <ErrorState message={t("inspections.onlyManagers")} />}
 
       {isManager && loading && <LoadingState />}
 
@@ -185,19 +187,19 @@ export default function NewInspectionPage() {
 
           <Card className="p-5">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Vehicle" required>
+              <Field label={t("field.vehicle")} required>
                 <Select
                   value={vehicleId}
                   onChange={(e) => onVehicleChange(e.target.value)}
                   required
                 >
-                  <option value="">Select a vehicle…</option>
+                  <option value="">{t("inspections.selectVehicle")}</option>
                   {vehicles?.map((v) => (
                     <option key={v.id} value={v.id}>{v.name}</option>
                   ))}
                 </Select>
               </Field>
-              <Field label="Template">
+              <Field label={t("inspections.template")}>
                 <Select
                   value={effectiveTemplateId}
                   onChange={(e) => onTemplateChange(e.target.value)}
@@ -207,9 +209,9 @@ export default function NewInspectionPage() {
                   ))}
                 </Select>
               </Field>
-              <Field label="Driver">
+              <Field label={t("field.driver")}>
                 <Select value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-                  <option value="">— No driver —</option>
+                  <option value="">{t("inspections.noDriver")}</option>
                   {drivers?.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.first_name} {d.last_name}
@@ -217,7 +219,7 @@ export default function NewInspectionPage() {
                   ))}
                 </Select>
               </Field>
-              <Field label={`Odometer (${tenant.distance_unit})`}>
+              <Field label={`${t("field.odometer")} (${tenant.distance_unit})`}>
                 <Input
                   type="number" min={0} step="1"
                   value={odometer}
@@ -228,10 +230,10 @@ export default function NewInspectionPage() {
           </Card>
 
           <Card className="p-5">
-            <h3 className="mb-3 text-sm font-semibold text-slate-900">Checklist</h3>
+            <h3 className="mb-3 text-sm font-semibold text-slate-900">{t("inspections.checklist")}</h3>
             {grouped.length === 0 && (
               <p className="text-sm text-slate-500">
-                No active inspection template with items. You can still record general notes.
+                {t("inspections.noTemplate")}
               </p>
             )}
             {grouped.map(([section, items]) => (
@@ -259,7 +261,7 @@ export default function NewInspectionPage() {
                                     : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50")
                                 }
                               >
-                                {o.label}
+                                {t(o.labelKey)}
                               </button>
                             ))}
                           </div>
@@ -267,7 +269,7 @@ export default function NewInspectionPage() {
                         {a.result === "fail" && (
                           <Input
                             className="mt-2"
-                            placeholder="What's wrong? (optional)"
+                            placeholder={t("inspections.whatsWrong")}
                             value={a.note}
                             onChange={(e) => setNote(item.id, e.target.value)}
                           />
@@ -281,23 +283,27 @@ export default function NewInspectionPage() {
           </Card>
 
           <Card className="p-5">
-            <Field label="General notes">
+            <Field label={t("inspections.generalNotes")}>
               <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
             </Field>
           </Card>
 
           <div className="flex items-center justify-end gap-3">
             {failCount > 0 && (
-              <span className="mr-auto text-sm text-red-600">
-                {failCount} failed item{failCount > 1 ? "s" : ""} — high-priority issues will be
-                created
+              <span className="me-auto text-sm text-red-600">
+                {t(
+                  failCount === 1
+                    ? "inspections.failedItemWarning"
+                    : "inspections.failedItemsWarning",
+                  { count: failCount },
+                )}
               </span>
             )}
             <Button type="button" variant="secondary" onClick={() => navigate("/inspections")}>
-              Cancel
+              {t("action.cancel")}
             </Button>
             <Button type="submit" loading={mutation.isPending}>
-              Save inspection
+              {t("inspections.save")}
             </Button>
           </div>
         </form>

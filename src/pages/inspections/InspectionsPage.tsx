@@ -6,30 +6,33 @@ import { listRows } from "../../lib/db";
 import { formatDateTime } from "../../lib/format";
 import type { Inspection, InspectionResult } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useT, type MessageKey } from "../../i18n";
 import {
   Badge, EmptyState, ErrorState, LoadingState, Modal, PageHeader, Table, type BadgeTone,
 } from "../../components/ui";
 
 type InspectionRow = Inspection & { vehicles: { name: string } | null };
 
-const resultBadge: Record<InspectionResult["result"], { label: string; tone: BadgeTone }> = {
-  pass: { label: "Pass", tone: "green" },
-  fail: { label: "Fail", tone: "red" },
-  na: { label: "N/A", tone: "slate" },
+const resultBadge: Record<InspectionResult["result"], { labelKey: MessageKey; tone: BadgeTone }> = {
+  pass: { labelKey: "inspections.resultPass", tone: "green" },
+  fail: { labelKey: "inspections.resultFail", tone: "red" },
+  na: { labelKey: "inspections.resultNa", tone: "slate" },
 };
 
 function NewInspectionLink() {
+  const t = useT();
   return (
     <Link
       to="/inspections/new"
       className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
     >
-      <ClipboardCheck className="h-4 w-4" /> New inspection
+      <ClipboardCheck className="h-4 w-4" /> {t("inspections.new")}
     </Link>
   );
 }
 
 export default function InspectionsPage() {
+  const t = useT();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [viewing, setViewing] = useState<InspectionRow | null>(null);
@@ -45,8 +48,8 @@ export default function InspectionsPage() {
   return (
     <>
       <PageHeader
-        title="Inspections"
-        description={`${inspections?.length ?? 0} inspections recorded`}
+        title={t("inspections.title")}
+        description={t("inspections.countRecorded", { count: inspections?.length ?? 0 })}
         actions={isManager && <NewInspectionLink />}
       />
 
@@ -56,14 +59,22 @@ export default function InspectionsPage() {
       {!isLoading && !error && !inspections?.length && (
         <EmptyState
           icon={<ClipboardCheck className="h-10 w-10" />}
-          title="No inspections yet"
-          description="Run your first inspection to record vehicle condition and catch problems early."
+          title={t("inspections.emptyTitle")}
+          description={t("inspections.emptyDescription")}
           action={isManager ? <NewInspectionLink /> : undefined}
         />
       )}
 
       {!isLoading && !error && !!inspections?.length && (
-        <Table headers={["Date", "Vehicle", "Result", "Failed items", "Notes"]}>
+        <Table
+          headers={[
+            t("field.date"),
+            t("field.vehicle"),
+            t("inspections.result"),
+            t("inspections.failedItems"),
+            t("field.notes"),
+          ]}
+        >
           {inspections.map((i) => {
             const failed = i.results.filter((r) => r.result === "fail").length;
             return (
@@ -79,15 +90,18 @@ export default function InspectionsPage() {
                   <button
                     type="button"
                     onClick={() => setViewing(i)}
-                    aria-label={`View inspection details for ${i.vehicles?.name ?? "unknown vehicle"}, ${formatDateTime(i.performed_at, tenant.timezone)}`}
+                    aria-label={t("inspections.viewDetailsAria", {
+                      vehicle: i.vehicles?.name ?? t("inspections.unknownVehicle"),
+                      date: formatDateTime(i.performed_at, tenant.timezone),
+                    })}
                     className="font-medium text-brand-700 hover:underline"
                   >
-                    {i.vehicles?.name ?? "—"}
+                    {i.vehicles?.name ?? t("common.dash")}
                   </button>
                 </td>
                 <td className="px-4 py-3">
                   <Badge tone={i.status === "pass" ? "green" : "red"}>
-                    {i.status === "pass" ? "Pass" : "Fail"}
+                    {t(i.status === "pass" ? "inspections.resultPass" : "inspections.resultFail")}
                   </Badge>
                 </td>
                 <td className="px-4 py-3">
@@ -98,7 +112,7 @@ export default function InspectionsPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-slate-500">
-                  <div className="max-w-xs truncate">{i.notes ?? "—"}</div>
+                  <div className="max-w-xs truncate">{i.notes ?? t("common.dash")}</div>
                 </td>
               </tr>
             );
@@ -106,20 +120,20 @@ export default function InspectionsPage() {
         </Table>
       )}
 
-      <Modal title="Inspection details" open={!!viewing} onClose={() => setViewing(null)} wide>
+      <Modal title={t("inspections.detailsTitle")} open={!!viewing} onClose={() => setViewing(null)} wide>
         {viewing && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="text-sm font-medium text-slate-800">
-                  {viewing.vehicles?.name ?? "—"}
+                  {viewing.vehicles?.name ?? t("common.dash")}
                 </div>
                 <div className="text-xs text-slate-500">
                   {formatDateTime(viewing.performed_at, tenant.timezone)}
                 </div>
               </div>
               <Badge tone={viewing.status === "pass" ? "green" : "red"}>
-                {viewing.status === "pass" ? "Pass" : "Fail"}
+                {t(viewing.status === "pass" ? "inspections.resultPass" : "inspections.resultFail")}
               </Badge>
             </div>
 
@@ -130,7 +144,7 @@ export default function InspectionsPage() {
                     <div className="text-sm text-slate-700">{r.label}</div>
                     {r.note && <div className="mt-0.5 text-xs text-slate-500">{r.note}</div>}
                   </div>
-                  <Badge tone={resultBadge[r.result].tone}>{resultBadge[r.result].label}</Badge>
+                  <Badge tone={resultBadge[r.result].tone}>{t(resultBadge[r.result].labelKey)}</Badge>
                 </li>
               ))}
             </ul>

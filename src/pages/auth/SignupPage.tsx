@@ -9,6 +9,7 @@ import {
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, Select } from "../../components/ui";
+import { useT } from "../../i18n";
 import { AuthShell } from "./AuthShell";
 
 const CURRENCIES = Array.from(
@@ -28,6 +29,7 @@ function browserTimezones(): string[] {
 export default function SignupPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const t = useT();
 
   const defaultTz = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
@@ -81,7 +83,7 @@ export default function SignupPage() {
       await signIn(form.email.trim(), form.password);
       navigate("/", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed");
+      setError(err instanceof Error ? err.message : t("auth.signupFailed"));
     } finally {
       setBusy(false);
     }
@@ -90,13 +92,13 @@ export default function SignupPage() {
   return (
     <AuthShell
       wide
-      title="Create your organization"
-      subtitle="Set up your fleet workspace — you can invite your team right after."
+      title={t("auth.createOrg")}
+      subtitle={t("auth.createOrgSubtitle")}
       footer={
         <>
-          Already have an account?{" "}
+          {t("auth.haveAccount")}{" "}
           <Link to="/login" className="font-medium text-brand-600 hover:text-brand-700">
-            Sign in
+            {t("auth.signIn")}
           </Link>
         </>
       }
@@ -105,7 +107,7 @@ export default function SignupPage() {
         {error && <ErrorState message={error} />}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Your name" required>
+          <Field label={t("field.fullName")} required>
             <Input
               value={form.fullName}
               onChange={(e) => set("fullName", e.target.value)}
@@ -113,14 +115,14 @@ export default function SignupPage() {
               autoComplete="name"
             />
           </Field>
-          <Field label="Company / fleet name" required>
+          <Field label={t("auth.companyName")} required>
             <Input
               value={form.companyName}
               onChange={(e) => set("companyName", e.target.value)}
               required
             />
           </Field>
-          <Field label="Email" required>
+          <Field label={t("field.email")} required>
             <Input
               type="email"
               value={form.email}
@@ -129,7 +131,7 @@ export default function SignupPage() {
               autoComplete="email"
             />
           </Field>
-          <Field label="Password" required hint="At least 8 characters">
+          <Field label={t("field.password")} required hint={t("auth.atLeast8")}>
             <Input
               type="password"
               value={form.password}
@@ -140,23 +142,23 @@ export default function SignupPage() {
             />
           </Field>
           <Field
-            label="Country"
+            label={t("auth.country")}
             required
             hint={
               tax.rate > 0
-                ? `${tax.label} ${tax.rate}% will be applied to maintenance costs.`
+                ? t("auth.taxHint", { label: tax.label, rate: tax.rate })
                 : undefined
             }
           >
             <Select value={form.country} onChange={(e) => pickCountry(e.target.value)}>
-              <optgroup label="Middle East">
+              <optgroup label={t("auth.middleEast")}>
                 {MIDDLE_EAST_OPTIONS.map((c) => (
                   <option key={c.code} value={c.code}>
                     {c.name}
                   </option>
                 ))}
               </optgroup>
-              <optgroup label="Other countries">
+              <optgroup label={t("auth.otherCountries")}>
                 {OTHER_OPTIONS.map((c) => (
                   <option key={c.code} value={c.code}>
                     {c.name}
@@ -165,7 +167,7 @@ export default function SignupPage() {
               </optgroup>
             </Select>
           </Field>
-          <Field label="Currency" required>
+          <Field label={t("auth.currency")} required>
             <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
@@ -174,7 +176,7 @@ export default function SignupPage() {
               ))}
             </Select>
           </Field>
-          <Field label="Timezone" required>
+          <Field label={t("auth.timezone")} required>
             <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
               {timezones.map((tz) => (
                 <option key={tz} value={tz}>
@@ -184,29 +186,29 @@ export default function SignupPage() {
             </Select>
           </Field>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Distance">
+            <Field label={t("auth.distance")}>
               <Select
                 value={form.distanceUnit}
                 onChange={(e) => set("distanceUnit", e.target.value as "km" | "mi")}
               >
-                <option value="km">Kilometers</option>
-                <option value="mi">Miles</option>
+                <option value="km">{t("auth.kilometers")}</option>
+                <option value="mi">{t("auth.miles")}</option>
               </Select>
             </Field>
-            <Field label="Volume">
+            <Field label={t("auth.volume")}>
               <Select
                 value={form.volumeUnit}
                 onChange={(e) => set("volumeUnit", e.target.value as "L" | "gal")}
               >
-                <option value="L">Liters</option>
-                <option value="gal">Gallons (US)</option>
+                <option value="L">{t("auth.liters")}</option>
+                <option value="gal">{t("auth.gallons")}</option>
               </Select>
             </Field>
           </div>
         </div>
 
         <Button type="submit" loading={busy} className="w-full">
-          Create organization
+          {t("auth.createOrganization")}
         </Button>
       </form>
     </AuthShell>
