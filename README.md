@@ -90,72 +90,44 @@ cp .dev.vars.example .dev.vars             # set SUPABASE_URL + ANON + SERVICE_R
 **Option B — local Supabase (needs Docker):** `npx supabase start`, then copy the
 printed keys into `.env` / `.dev.vars` the same way.
 
-Run the app:
+Run the app (two terminals):
 
 ```bash
-npm run cf-typegen -- --include-runtime=false
-npm run dev          # SPA + Worker API inside workerd (Cloudflare's runtime)
-```
-
-If workerd cannot start on your machine (a known issue on some Windows hosts —
-symptom: `Error: write EOF`), use the workerd-free mode in two terminals:
-
-```bash
-npm run dev:api      # the same Hono API hosted on Node at :8788
-npm run dev:node     # Vite SPA at :5173, /api proxied to :8788
+npm run dev:api      # the Hono API hosted on Node at :8788 (reads .dev.vars)
+npm run dev          # Vite SPA at :5173, /api proxied to :8788
 ```
 
 Open http://localhost:5173, create an organization on `/signup`, and you're in.
 Optionally seed a demo tenant: `node scripts/seed-demo.mjs`.
 Run unit tests with `npm test`.
 
-## Deployment
+## Deployment — Cloudflare Pages (full-stack)
 
-### 1. Supabase (database + auth)
+Production runs on **Cloudflare Pages**: the SPA is served from `dist/` and the same
+Hono API runs as a Pages Function (`functions/api/[[route]].ts`). The GitHub repo is
+connected to the Pages project, so **every push to `main` auto-builds and deploys** to
+<https://fleetza.pages.dev>. Manual deploy from a workstation: `npm run deploy`
+(`wrangler pages deploy dist`). Full setup details: [docs/CICD.md](docs/CICD.md).
 
-```bash
-supabase login
-supabase projects create fleetmanage   # or use an existing project
-supabase link --project-ref <PROJECT_REF>
-supabase db push                        # applies supabase/migrations
-```
-
-Then in the Supabase dashboard → Authentication → URL Configuration, set **Site URL** to
-your production URL (e.g. `https://fleetmanage.<your>.workers.dev`).
-
-### 2. Cloudflare (worker + static assets)
-
-```bash
-npx wrangler login
-npx wrangler secret put SUPABASE_URL               # https://<PROJECT_REF>.supabase.co
-npx wrangler secret put SUPABASE_ANON_KEY
-npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY  # NEVER commit this
-
-# Build-time public env for the SPA
-echo VITE_SUPABASE_URL=https://<PROJECT_REF>.supabase.co > .env.production
-echo VITE_SUPABASE_ANON_KEY=<ANON_KEY> >> .env.production
-
-npm run deploy
-```
-
-`npm run deploy` builds the SPA + worker and runs `wrangler deploy`. Custom domains can be
-attached in the Cloudflare dashboard (Workers → your worker → Domains & Routes).
+Supabase schema changes are applied per [docs/MODULES.md](docs/MODULES.md) conventions
+(migrations live in `supabase/migrations/`). In the Supabase dashboard →
+Authentication → URL Configuration, set **Site URL** to the production URL.
 
 ### Secrets recap
 
 | Where | Key | Sensitivity |
 |---|---|---|
-| `.env` / `.env.production` (built into SPA) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | public |
-| Worker secrets (`wrangler secret put`) | `SUPABASE_SERVICE_ROLE_KEY` (+ URL, anon) | **secret** |
+| `.env.production` (committed; built into SPA) | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | public |
+| Pages project env vars (runtime, read by `/api/*`) | `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | **service-role key is secret — never commit** |
 
 ## Scripts
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Vite dev server with the Worker running in-process |
-| `npm run build` | Typecheck (`tsc -b`) + production build (SPA + worker) |
-| `npm run deploy` | Build then `wrangler deploy` |
-| `npm run cf-typegen` | Regenerate `worker-configuration.d.ts` (add `-- --include-runtime=false` on Windows) |
+| `npm run dev` | Vite dev server (SPA), proxies `/api` to :8788 |
+| `npm run dev:api` | Hosts the Hono API on Node at :8788 |
+| `npm run build` | Typecheck (`tsc -b`) + production build → `dist/` |
+| `npm run deploy` | Build then `wrangler pages deploy dist` |
 
 ## Project layout
 
