@@ -28,7 +28,15 @@ import {
   StatCard,
 } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
-import { ActivityCard, GRID_STROKE, ListCard, TICK_STYLE } from "./shared";
+import { ActivityCard, InsightsStrip, ListCard, type Insight } from "./shared";
+import {
+  CURSOR_FILL,
+  GRID_STROKE,
+  TICK_STYLE,
+  TOOLTIP_CONTENT_STYLE,
+  TOOLTIP_ITEM_STYLE,
+  TOOLTIP_LABEL_STYLE,
+} from "../../lib/chart";
 
 type UpcomingJob = SlJob & {
   customers: { name: string } | null;
@@ -259,6 +267,34 @@ export default function ProviderDashboard() {
   const jobCounts = jobCountsQ.data;
   const openJobs = (jobCounts?.scheduled ?? 0) + (jobCounts?.in_progress ?? 0);
 
+  // Deterministic, rule-based insights from data already on this page.
+  const insights: Insight[] = [];
+  const expiring30 = expiring.filter((c) => daysUntil(c.expires_at) <= 30).length;
+  if (certsOn && expiring30 > 0) {
+    insights.push({
+      key: "certs",
+      tone: "serious",
+      text: t("insights.certsExpiring", { count: expiring30 }),
+      to: "/speed-limiters/certificates",
+    });
+  }
+  if (slOn && (jobCounts?.completed ?? 0) > 0) {
+    insights.push({
+      key: "qc",
+      tone: "warn",
+      text: t("insights.qcBacklog", { count: jobCounts?.completed ?? 0 }),
+      to: "/speed-limiters/jobs",
+    });
+  }
+  if (slOn && (deviceCountsQ.data?.in_stock ?? 0) === 0 && (jobCounts?.scheduled ?? 0) > 0) {
+    insights.push({
+      key: "stock",
+      tone: "serious",
+      text: t("insights.stockOut", { count: jobCounts?.scheduled ?? 0 }),
+      to: "/speed-limiters/devices",
+    });
+  }
+
   const queries = [
     customersCountQ,
     deviceCountsQ,
@@ -324,6 +360,8 @@ export default function ProviderDashboard() {
             )}
           </div>
 
+          <InsightsStrip insights={insights} />
+
           {/* Installations trend + device stock */}
           {slOn && (
             <div className="grid gap-4 xl:grid-cols-3">
@@ -343,7 +381,7 @@ export default function ProviderDashboard() {
                         width={32}
                         allowDecimals={false}
                       />
-                      <Tooltip cursor={{ fill: "rgba(148, 163, 184, 0.08)" }} />
+                      <Tooltip cursor={{ fill: CURSOR_FILL }} contentStyle={TOOLTIP_CONTENT_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} />
                       <Bar
                         dataKey="installs"
                         name={t("dashboard.installationsTrend")}
@@ -368,14 +406,14 @@ export default function ProviderDashboard() {
                           innerRadius={62}
                           outerRadius={88}
                           paddingAngle={2}
-                          stroke="#ffffff"
+                          stroke="var(--color-surface)"
                           strokeWidth={2}
                         >
                           {deviceData.map((d) => (
                             <Cell key={d.key} fill={d.color} />
                           ))}
                         </Pie>
-                        <Tooltip />
+                        <Tooltip contentStyle={TOOLTIP_CONTENT_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>

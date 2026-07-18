@@ -11,8 +11,9 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination,
-  Table, Textarea,
+  Textarea,
 } from "../../components/ui";
+import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type CertRow = SpeedLimiterCertificate & {
   vehicles: Pick<Vehicle, "name" | "license_plate"> | null;
@@ -44,35 +45,21 @@ function bucketOf(c: SpeedLimiterCertificate): Bucket {
   return "ok";
 }
 
-function expiresCell(c: CertRow, t: Translate) {
+function statusLabel(c: CertRow, t: Translate): string {
   const bucket = bucketOf(c);
-  if (bucket === "ok") {
-    return <span className="text-slate-600">{formatDate(c.expires_at)}</span>;
-  }
-  const date = <span className="text-xs text-slate-500">{formatDate(c.expires_at)}</span>;
-  if (bucket === "revoked") {
-    return (
-      <div className="flex items-center gap-2">
-        <Badge tone="slate">{t("speedLimiters.certStatus.revoked")}</Badge>
-        {date}
-      </div>
-    );
-  }
-  if (bucket === "expired") {
-    return (
-      <div className="flex items-center gap-2">
-        <Badge tone="red">{t("speedLimiters.certStatus.expired")}</Badge>
-        {date}
-      </div>
-    );
-  }
+  if (bucket === "revoked") return t("speedLimiters.certStatus.revoked");
+  if (bucket === "expired") return t("speedLimiters.certStatus.expired");
+  if (bucket === "ok") return t("speedLimiters.certStatus.valid");
+  return t("slCertificates.expiresInDays", { count: daysUntil(c.expires_at) });
+}
+
+function statusBadge(c: CertRow, t: Translate) {
+  const bucket = bucketOf(c);
+  if (bucket === "revoked") return <Badge tone="slate">{statusLabel(c, t)}</Badge>;
+  if (bucket === "expired") return <Badge tone="red">{statusLabel(c, t)}</Badge>;
+  if (bucket === "ok") return <Badge tone="green">{statusLabel(c, t)}</Badge>;
   const tone = bucket === "d30" ? "red" : bucket === "d60" ? "yellow" : "blue";
-  return (
-    <div className="flex items-center gap-2">
-      <Badge tone={tone}>{t("slCertificates.expiresInDays", { count: daysUntil(c.expires_at) })}</Badge>
-      {date}
-    </div>
-  );
+  return <Badge tone={tone}>{statusLabel(c, t)}</Badge>;
 }
 
 function RenewForm({
@@ -363,6 +350,127 @@ export default function CertificatesPage() {
     window.setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 2000);
   }
 
+  const columns: Array<DataTableColumn<CertRow>> = [
+    {
+      id: "number",
+      header: t("slCertificates.number"),
+      cell: (c) => (
+        <>
+          <div className="font-medium text-slate-800">{c.certificate_number}</div>
+          {c.issuing_authority && (
+            <div className="text-xs text-slate-500">{c.issuing_authority}</div>
+          )}
+        </>
+      ),
+      sortValue: (c) => c.certificate_number,
+    },
+    {
+      id: "customer",
+      header: t("slCertificates.customer"),
+      cell: (c) => <span className="text-slate-600">{c.customers?.name ?? "—"}</span>,
+      sortValue: (c) => c.customers?.name ?? null,
+      minBreakpoint: "md",
+    },
+    {
+      id: "vehicle",
+      header: t("slCertificates.vehicle"),
+      cell: (c) => (
+        <>
+          <div className="text-slate-700">{c.vehicles?.name ?? "—"}</div>
+          {c.vehicles?.license_plate && (
+            <div className="text-xs text-slate-500">{c.vehicles.license_plate}</div>
+          )}
+        </>
+      ),
+      sortValue: (c) => c.vehicles?.name ?? null,
+    },
+    {
+      id: "issued",
+      header: t("slCertificates.issued"),
+      cell: (c) => <span className="text-slate-600">{formatDate(c.issued_at)}</span>,
+      sortValue: (c) => c.issued_at,
+      minBreakpoint: "lg",
+    },
+    {
+      id: "expires",
+      header: t("slCertificates.expires"),
+      cell: (c) => <span className="text-slate-600">{formatDate(c.expires_at)}</span>,
+      sortValue: (c) => c.expires_at,
+    },
+    {
+      id: "status",
+      header: t("common.status"),
+      cell: (c) => statusBadge(c, t),
+      sortValue: (c) => statusLabel(c, t),
+    },
+    {
+      id: "actions",
+      header: t("common.actions"),
+      align: "end",
+      cell: (c) =>
+        isManager && (
+          <div className="flex justify-end gap-1">
+            <Link
+              to={`/speed-limiters/certificates/${c.id}/print`}
+              className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              aria-label={t("slCertificates.print")}
+              title={t("slCertificates.print")}
+            >
+              <Printer className="h-4 w-4" />
+            </Link>
+            <button
+              onClick={() => copyVerifyLink(c.id)}
+              className={
+                copiedId === c.id
+                  ? "rounded p-1.5 text-emerald-600"
+                  : "rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              }
+              aria-label={
+                copiedId === c.id
+                  ? t("slCertificates.linkCopied")
+                  : t("slCertificates.copyVerifyLink")
+              }
+              title={
+                copiedId === c.id
+                  ? t("slCertificates.linkCopied")
+                  : t("slCertificates.copyVerifyLink")
+              }
+            >
+              {copiedId === c.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => setRenewing(c)}
+              className="rounded p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
+              aria-label={t("slCertificates.renew")}
+              title={t("slCertificates.renew")}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+            {c.status !== "revoked" && (
+              <button
+                onClick={() => setRevoking(c)}
+                className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                aria-label={t("slCertificates.revoke")}
+                title={t("slCertificates.revoke")}
+              >
+                <Ban className="h-4 w-4" />
+              </button>
+            )}
+            {isAdmin && (
+              <button
+                onClick={() => setDeleting(c)}
+                className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                aria-label={t("action.delete")}
+                title={t("action.delete")}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        ),
+    },
+  ];
+
   return (
     <>
       <PageHeader
@@ -417,119 +525,30 @@ export default function CertificatesPage() {
         </div>
       )}
 
-      {!isLoading && !error && certs.length === 0 && (
-        <EmptyState
-          icon={<ShieldCheck className="h-10 w-10" />}
-          title={
-            hasFilters || total > 0
-              ? t("slCertificates.emptyFilteredTitle")
-              : t("slCertificates.emptyTitle")
-          }
-          description={
-            hasFilters || total > 0
-              ? t("slCertificates.emptyFilteredDesc")
-              : t("slCertificates.emptyDesc")
-          }
-        />
-      )}
-
-      {!isLoading && !error && certs.length > 0 && (
-        <Table
-          headers={[
-            t("slCertificates.number"),
-            t("slCertificates.customer"),
-            t("slCertificates.vehicle"),
-            t("slCertificates.issued"),
-            t("slCertificates.expires"),
-            "",
-          ]}
-        >
-          {certs.map((c) => (
-            <tr key={c.id} className="hover:bg-slate-50">
-              <td className="px-4 py-3">
-                <div className="font-medium text-slate-800">{c.certificate_number}</div>
-                {c.issuing_authority && (
-                  <div className="text-xs text-slate-500">{c.issuing_authority}</div>
-                )}
-              </td>
-              <td className="px-4 py-3 text-slate-600">{c.customers?.name ?? "—"}</td>
-              <td className="px-4 py-3">
-                <div className="text-slate-700">{c.vehicles?.name ?? "—"}</div>
-                {c.vehicles?.license_plate && (
-                  <div className="text-xs text-slate-500">{c.vehicles.license_plate}</div>
-                )}
-              </td>
-              <td className="px-4 py-3 text-slate-600">{formatDate(c.issued_at)}</td>
-              <td className="px-4 py-3">{expiresCell(c, t)}</td>
-              <td className="px-4 py-3 text-end">
-                {isManager && (
-                  <div className="flex justify-end gap-1">
-                    <Link
-                      to={`/speed-limiters/certificates/${c.id}/print`}
-                      className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                      aria-label={t("slCertificates.print")}
-                      title={t("slCertificates.print")}
-                    >
-                      <Printer className="h-4 w-4" />
-                    </Link>
-                    <button
-                      onClick={() => copyVerifyLink(c.id)}
-                      className={
-                        copiedId === c.id
-                          ? "rounded p-1.5 text-emerald-600"
-                          : "rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                      }
-                      aria-label={
-                        copiedId === c.id
-                          ? t("slCertificates.linkCopied")
-                          : t("slCertificates.copyVerifyLink")
-                      }
-                      title={
-                        copiedId === c.id
-                          ? t("slCertificates.linkCopied")
-                          : t("slCertificates.copyVerifyLink")
-                      }
-                    >
-                      {copiedId === c.id ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                    </button>
-                    <button
-                      onClick={() => setRenewing(c)}
-                      className="rounded p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
-                      aria-label={t("slCertificates.renew")}
-                      title={t("slCertificates.renew")}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </button>
-                    {c.status !== "revoked" && (
-                      <button
-                        onClick={() => setRevoking(c)}
-                        className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                        aria-label={t("slCertificates.revoke")}
-                        title={t("slCertificates.revoke")}
-                      >
-                        <Ban className="h-4 w-4" />
-                      </button>
-                    )}
-                    {isAdmin && (
-                      <button
-                        onClick={() => setDeleting(c)}
-                        className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                        aria-label={t("action.delete")}
-                        title={t("action.delete")}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                )}
-              </td>
-            </tr>
-          ))}
-        </Table>
-      )}
-
       {!isLoading && !error && (
-        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
+        <DataTable<CertRow>
+          tableId="sl_certificates"
+          exportName="sl_certificates"
+          columns={columns}
+          rows={certs}
+          rowKey={(c) => c.id}
+          empty={
+            <EmptyState
+              icon={<ShieldCheck className="h-10 w-10" />}
+              title={
+                hasFilters || total > 0
+                  ? t("slCertificates.emptyFilteredTitle")
+                  : t("slCertificates.emptyTitle")
+              }
+              description={
+                hasFilters || total > 0
+                  ? t("slCertificates.emptyFilteredDesc")
+                  : t("slCertificates.emptyDesc")
+              }
+            />
+          }
+          footer={<Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />}
+        />
       )}
 
       <Modal title={t("slCertificates.renewTitle")} open={!!renewing} onClose={() => setRenewing(null)} wide>

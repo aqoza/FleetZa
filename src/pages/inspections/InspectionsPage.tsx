@@ -80,10 +80,10 @@ export default function InspectionsPage() {
             return (
               <tr
                 key={i.id}
-                className="cursor-pointer hover:bg-slate-50"
+                className="cursor-pointer hover:bg-canvas"
                 onClick={() => setViewing(i)}
               >
-                <td className="px-4 py-3 text-slate-600">
+                <td className="px-4 py-3 text-ink-2">
                   {formatDateTime(i.performed_at, tenant.timezone)}
                 </td>
                 <td className="px-4 py-3 font-medium">
@@ -108,10 +108,10 @@ export default function InspectionsPage() {
                   {failed > 0 ? (
                     <span className="font-medium text-red-600">{failed}</span>
                   ) : (
-                    <span className="text-slate-500">0</span>
+                    <span className="text-ink-3">0</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-slate-500">
+                <td className="px-4 py-3 text-ink-3">
                   <div className="max-w-xs truncate">{i.notes ?? t("common.dash")}</div>
                 </td>
               </tr>
@@ -125,10 +125,10 @@ export default function InspectionsPage() {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <div className="text-sm font-medium text-slate-800">
+                <div className="text-sm font-medium text-ink">
                   {viewing.vehicles?.name ?? t("common.dash")}
                 </div>
-                <div className="text-xs text-slate-500">
+                <div className="text-xs text-ink-3">
                   {formatDateTime(viewing.performed_at, tenant.timezone)}
                 </div>
               </div>
@@ -141,8 +141,8 @@ export default function InspectionsPage() {
               {viewing.results.map((r) => (
                 <li key={r.item_id} className="flex items-start justify-between gap-3 py-2">
                   <div>
-                    <div className="text-sm text-slate-700">{r.label}</div>
-                    {r.note && <div className="mt-0.5 text-xs text-slate-500">{r.note}</div>}
+                    <div className="text-sm text-ink-2">{r.label}</div>
+                    {r.note && <div className="mt-0.5 text-xs text-ink-3">{r.note}</div>}
                   </div>
                   <Badge tone={resultBadge[r.result].tone}>{t(resultBadge[r.result].labelKey)}</Badge>
                 </li>
@@ -150,7 +150,7 @@ export default function InspectionsPage() {
             </ul>
 
             {viewing.notes && (
-              <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{viewing.notes}</p>
+              <p className="rounded-lg bg-canvas p-3 text-sm text-ink-2">{viewing.notes}</p>
             )}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Pencil, Plus, Wrench } from "lucide-react";
 import { insertRow, listPage, listRows, updateRow } from "../../lib/db";
@@ -28,10 +28,10 @@ import {
   PageHeader,
   Pagination,
   Select,
-  Table,
   Textarea,
   type BadgeTone,
 } from "../../components/ui";
+import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type JobRow = SlJob & {
   vehicles: Pick<Vehicle, "name"> | null;
@@ -432,6 +432,7 @@ function TechniciansManager({
 
 export default function JobsPage() {
   const t = useT();
+  const navigate = useNavigate();
   const { isManager } = useAuth();
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -496,6 +497,66 @@ export default function JobsPage() {
     setter(value);
     setPage(0);
   }
+
+  const columns: Array<DataTableColumn<JobRow>> = [
+    {
+      id: "number",
+      header: t("slJobs.number"),
+      cell: (j) => (
+        <Link
+          to={`/speed-limiters/jobs/${j.id}`}
+          className="font-medium text-brand-700 hover:underline"
+        >
+          #{j.number}
+        </Link>
+      ),
+      sortValue: (j) => j.number,
+      exportValue: (j) => j.number,
+    },
+    {
+      id: "customer",
+      header: t("slJobs.customer"),
+      cell: (j) => <span className="text-slate-600">{j.customers?.name ?? "—"}</span>,
+      sortValue: (j) => j.customers?.name ?? null,
+      minBreakpoint: "md",
+    },
+    {
+      id: "vehicle",
+      header: t("field.vehicle"),
+      cell: (j) => <span className="text-slate-600">{j.vehicles?.name ?? "—"}</span>,
+      sortValue: (j) => j.vehicles?.name ?? null,
+    },
+    {
+      id: "type",
+      header: t("slJobs.type"),
+      cell: (j) => <span className="text-slate-600">{t(jobTypeKeys[j.job_type])}</span>,
+      sortValue: (j) => t(jobTypeKeys[j.job_type]),
+      minBreakpoint: "md",
+    },
+    {
+      id: "technician",
+      header: t("slJobs.technician"),
+      cell: (j) => <span className="text-slate-600">{j.sl_technicians?.name ?? "—"}</span>,
+      sortValue: (j) => j.sl_technicians?.name ?? null,
+      minBreakpoint: "lg",
+      defaultHidden: true,
+    },
+    {
+      id: "scheduled",
+      header: t("slJobs.scheduled"),
+      cell: (j) => <span className="text-slate-600">{formatDate(j.scheduled_date)}</span>,
+      sortValue: (j) => j.scheduled_date,
+      minBreakpoint: "lg",
+    },
+    {
+      id: "status",
+      header: t("common.status"),
+      cell: (j) => (
+        <Badge tone={jobStatusMeta[j.status].tone}>{t(jobStatusMeta[j.status].labelKey)}</Badge>
+      ),
+      sortValue: (j) => t(jobStatusMeta[j.status].labelKey),
+    },
+  ];
 
   return (
     <>
@@ -562,62 +623,34 @@ export default function JobsPage() {
       {isLoading && <LoadingState />}
       {error && <ErrorState message={(error as Error).message} />}
 
-      {!isLoading && !error && jobs.length === 0 && (
-        <EmptyState
-          icon={<ClipboardList className="h-10 w-10" />}
-          title={hasFilters || total > 0 ? t("slJobs.emptyFilteredTitle") : t("slJobs.emptyTitle")}
-          description={
-            hasFilters || total > 0 ? t("slJobs.emptyFilteredDesc") : t("slJobs.emptyDesc")
-          }
-          action={
-            isManager && !hasFilters && total === 0 ? (
-              <Button onClick={() => setCreating(true)}>
-                <Plus className="h-4 w-4" /> {t("slJobs.newJob")}
-              </Button>
-            ) : undefined
-          }
-        />
-      )}
-
-      {!isLoading && !error && jobs.length > 0 && (
-        <Table
-          headers={[
-            t("slJobs.number"),
-            t("slJobs.type"),
-            t("slJobs.customer"),
-            t("field.vehicle"),
-            t("slJobs.technician"),
-            t("slJobs.scheduled"),
-            t("common.status"),
-          ]}
-        >
-          {jobs.map((j) => (
-            <tr key={j.id} className="hover:bg-slate-50">
-              <td className="px-4 py-3">
-                <Link
-                  to={`/speed-limiters/jobs/${j.id}`}
-                  className="font-medium text-brand-700 hover:underline"
-                >
-                  #{j.number}
-                </Link>
-              </td>
-              <td className="px-4 py-3 text-slate-600">{t(jobTypeKeys[j.job_type])}</td>
-              <td className="px-4 py-3 text-slate-600">{j.customers?.name ?? "—"}</td>
-              <td className="px-4 py-3 text-slate-600">{j.vehicles?.name ?? "—"}</td>
-              <td className="px-4 py-3 text-slate-600">{j.sl_technicians?.name ?? "—"}</td>
-              <td className="px-4 py-3 text-slate-600">{formatDate(j.scheduled_date)}</td>
-              <td className="px-4 py-3">
-                <Badge tone={jobStatusMeta[j.status].tone}>
-                  {t(jobStatusMeta[j.status].labelKey)}
-                </Badge>
-              </td>
-            </tr>
-          ))}
-        </Table>
-      )}
-
       {!isLoading && !error && (
-        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
+        <DataTable<JobRow>
+          tableId="sl_jobs"
+          exportName="sl_jobs"
+          columns={columns}
+          rows={jobs}
+          rowKey={(j) => j.id}
+          onRowClick={(j) => navigate(`/speed-limiters/jobs/${j.id}`)}
+          empty={
+            <EmptyState
+              icon={<ClipboardList className="h-10 w-10" />}
+              title={
+                hasFilters || total > 0 ? t("slJobs.emptyFilteredTitle") : t("slJobs.emptyTitle")
+              }
+              description={
+                hasFilters || total > 0 ? t("slJobs.emptyFilteredDesc") : t("slJobs.emptyDesc")
+              }
+              action={
+                isManager && !hasFilters && total === 0 ? (
+                  <Button onClick={() => setCreating(true)}>
+                    <Plus className="h-4 w-4" /> {t("slJobs.newJob")}
+                  </Button>
+                ) : undefined
+              }
+            />
+          }
+          footer={<Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />}
+        />
       )}
 
       <Modal title={t("slJobs.newJob")} open={creating} onClose={() => setCreating(false)} wide>

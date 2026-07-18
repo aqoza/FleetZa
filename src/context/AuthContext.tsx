@@ -69,8 +69,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
         setTenant(null);
         // Drop every cached query so a later sign-in (possibly as a different
-        // tenant) can never be served the previous tenant's data.
+        // tenant) can never be served the previous tenant's data — and the
+        // recently-viewed list, which carries entity names across accounts.
         qc.clear();
+        try {
+          localStorage.removeItem("fm.recent");
+        } catch {
+          /* ignore */
+        }
       } else if (event === "SIGNED_IN") {
         setTimeout(() => void loadMembership(s), 0);
       }

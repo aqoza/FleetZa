@@ -30,6 +30,17 @@ export const enCommon = {
   // Global search
   "search.placeholder": "Search vehicles, customers, certificates…",
   "search.noResults": "No matches",
+  "theme.toggle": "Toggle dark mode",
+  "search.recent": "Recent",
+  "panel.quickActions": "Quick actions",
+  "panel.dueSoon": "Due soon",
+  "panel.hide": "Hide panel",
+  "panel.show": "Show panel",
+  "table.columns": "Columns",
+  "table.selected": "{count} selected",
+  "table.clearSelection": "Clear selection",
+  "table.selectAll": "Select all",
+  "search.goto": "Go to",
 
   // Generic actions
   "action.save": "Save",

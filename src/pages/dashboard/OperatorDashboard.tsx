@@ -45,7 +45,15 @@ import {
   Card,
 } from "../../components/ui";
 import { useT } from "../../i18n";
-import { ActivityCard, GRID_STROKE, ListCard, NothingDue, TICK_STYLE } from "./shared";
+import { ActivityCard, InsightsStrip, ListCard, NothingDue, type Insight } from "./shared";
+import {
+  CURSOR_FILL,
+  GRID_STROKE,
+  TICK_STYLE,
+  TOOLTIP_CONTENT_STYLE,
+  TOOLTIP_ITEM_STYLE,
+  TOOLTIP_LABEL_STYLE,
+} from "../../lib/chart";
 
 type ReminderRow = ServiceReminder & { vehicles: { name: string; odometer: number } };
 type RenewalRow = Renewal & { vehicles: { name: string } | null };
@@ -242,6 +250,47 @@ export default function OperatorDashboard() {
 
   const openWorkOrders = workOrdersQ.data ?? [];
 
+  // Deterministic, rule-based insights from data already on this page.
+  const insights: Insight[] = [];
+  const overdueService = dueReminders.filter((r) => r.overdue).length;
+  if (preventiveOn && overdueService > 0) {
+    insights.push({
+      key: "service",
+      tone: "serious",
+      text: t("insights.overdueService", { count: overdueService }),
+      to: "/maintenance",
+    });
+  }
+  const overdueRenewals = dueRenewals.filter((r) => r.days < 0).length;
+  if (renewalsOn && overdueRenewals > 0) {
+    insights.push({
+      key: "renewals",
+      tone: "serious",
+      text: t("insights.overdueRenewals", { count: overdueRenewals }),
+      to: "/renewals",
+    });
+  }
+  // Includes already-expired certificates — mirrors the Attention KPI so the
+  // strip and the KPI can never contradict each other.
+  const certs30 = dueCertificates.filter((c) => c.days <= 30).length;
+  if (slCertsOn && certs30 > 0) {
+    insights.push({
+      key: "certs",
+      tone: "warn",
+      text: t("insights.certsExpiring", { count: certs30 }),
+      to: "/speed-limiters/certificates",
+    });
+  }
+  const inShop = fleetVehicles.filter((v) => v.status === "in_shop").length;
+  if (fleetVehicles.length >= 4 && inShop / fleetVehicles.length > 0.25) {
+    insights.push({
+      key: "shop",
+      tone: "warn",
+      text: t("insights.inShop", { count: inShop, total: fleetVehicles.length }),
+      to: "/vehicles",
+    });
+  }
+
   const queries = [
     vehiclesQ,
     issuesQ,
@@ -325,6 +374,8 @@ export default function OperatorDashboard() {
             )}
           </div>
 
+          <InsightsStrip insights={insights} />
+
           {/* Spend + fleet status */}
           <div className="grid gap-4 xl:grid-cols-3">
             {(fuelOn || maintenanceOn) && (
@@ -367,7 +418,10 @@ export default function OperatorDashboard() {
                         tickFormatter={(v) => formatCompact(Number(v))}
                       />
                       <Tooltip
-                        cursor={{ fill: "rgba(148, 163, 184, 0.08)" }}
+                        cursor={{ fill: CURSOR_FILL }}
+                        contentStyle={TOOLTIP_CONTENT_STYLE}
+                        labelStyle={TOOLTIP_LABEL_STYLE}
+                        itemStyle={TOOLTIP_ITEM_STYLE}
                         formatter={(value) => formatMoney(Number(value), tenant.currency)}
                       />
                       {fuelOn && (
@@ -407,14 +461,14 @@ export default function OperatorDashboard() {
                         innerRadius={62}
                         outerRadius={88}
                         paddingAngle={2}
-                        stroke="#ffffff"
+                        stroke="var(--color-surface)"
                         strokeWidth={2}
                       >
                         {statusData.map((s) => (
                           <Cell key={s.key} fill={s.color} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip contentStyle={TOOLTIP_CONTENT_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>

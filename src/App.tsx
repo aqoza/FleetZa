@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useParams } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nProvider, useI18n } from "./i18n";
+import { ThemeProvider } from "./lib/theme";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ModulesProvider, useModules } from "./context/ModulesContext";
 import AppLayout from "./components/AppLayout";
@@ -65,6 +66,7 @@ function PublicOnly() {
 export default function App() {
   return (
     <I18nProvider>
+      <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <ModulesProvider>
@@ -182,6 +184,7 @@ export default function App() {
           </ModulesProvider>
         </AuthProvider>
       </QueryClientProvider>
+      </ThemeProvider>
     </I18nProvider>
   );
 }

@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Pencil, Trash2, UserCheck } from "lucide-react";
 import { deleteRow, getRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { recordRecent } from "../../lib/recent";
 import { daysUntil, formatDate, formatDistance, formatMoney } from "../../lib/format";
 import { fuelTypes, vehicleStatus, vehicleTypes, workOrderStatus, issueStatus } from "../../lib/labels";
 import type {
@@ -67,6 +68,10 @@ export default function VehicleDetailPage() {
     queryKey: ["vehicles", id],
     queryFn: () => getRow<Vehicle>("vehicles", id),
   });
+
+  useEffect(() => {
+    if (vehicle) recordRecent(vehicle.name, `/vehicles/${vehicle.id}`);
+  }, [vehicle]);
 
   const { data: assignment } = useQuery({
     queryKey: ["assignments", "open", id],

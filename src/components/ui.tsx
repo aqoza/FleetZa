@@ -70,19 +70,19 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-slate-700">
+      <span className="mb-1 block text-sm font-medium text-ink-2">
         {label}
-        {required && <span className="text-red-500"> *</span>}
+        {required && <span className="text-serious"> *</span>}
       </span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-slate-500">{hint}</span>}
-      {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
+      {hint && !error && <span className="mt-1 block text-xs text-ink-3">{hint}</span>}
+      {error && <span className="mt-1 block text-xs text-serious">{error}</span>}
     </label>
   );
 }
 
 const inputBase =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-2 focus:outline-brand-500/30 disabled:bg-slate-50 disabled:text-slate-500";
+  "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-brand-500 focus:outline-2 focus:outline-brand-500/30 disabled:bg-canvas disabled:text-ink-3";
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cx(inputBase, className)} {...rest} />;
@@ -247,7 +247,7 @@ export function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-sidebar/50 p-4 pt-[8vh] backdrop-blur-[2px]">
       <div
-        className={cx("w-full rounded-2xl bg-surface shadow-pop", wide ? "max-w-2xl" : "max-w-md")}
+        className={cx("animate-pop-in w-full rounded-2xl bg-surface shadow-pop", wide ? "max-w-2xl" : "max-w-md")}
         role="dialog"
         aria-modal="true"
         aria-label={title}

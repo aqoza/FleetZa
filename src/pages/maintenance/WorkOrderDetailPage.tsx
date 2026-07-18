@@ -1,9 +1,10 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Ban, Check, Pencil, Play, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { getCountry, taxBreakdown } from "../../../shared/countries";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { recordRecent } from "../../lib/recent";
 import {
   displayToKm, formatDate, formatDateTime, formatDistance, formatMoney, kmToDisplay,
 } from "../../lib/format";
@@ -171,6 +172,10 @@ export default function WorkOrderDetailPage() {
       return rows[0] ?? null;
     },
   });
+
+  useEffect(() => {
+    if (workOrder) recordRecent(`#${workOrder.number} ${workOrder.title}`, `/maintenance/work-orders/${workOrder.id}`);
+  }, [workOrder]);
 
   const { data: lines, isLoading: linesLoading, error: linesError } = useQuery({
     queryKey: ["work_order_lines", id],

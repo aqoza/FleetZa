@@ -30,6 +30,17 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
 
   "search.placeholder": "ابحث عن مركبات أو عملاء أو شهادات…",
   "search.noResults": "لا توجد نتائج مطابقة",
+  "theme.toggle": "تبديل الوضع الداكن",
+  "search.recent": "الأخيرة",
+  "panel.quickActions": "إجراءات سريعة",
+  "panel.dueSoon": "مستحق قريبًا",
+  "panel.hide": "إخفاء اللوحة",
+  "panel.show": "إظهار اللوحة",
+  "table.columns": "الأعمدة",
+  "table.selected": "{count} محدد",
+  "table.clearSelection": "إلغاء التحديد",
+  "table.selectAll": "تحديد الكل",
+  "search.goto": "الانتقال إلى",
 
   "action.save": "حفظ",
   "action.saveChanges": "حفظ التغييرات",

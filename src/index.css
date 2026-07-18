@@ -54,6 +54,124 @@
   --shadow-pop: 0 4px 6px rgb(15 23 42 / 0.05), 0 12px 32px rgb(15 23 42 / 0.12);
 }
 
+/**
+ * Dark theme — a designed palette, not an inversion. Every token that carries
+ * meaning in light mode gets a hand-picked dark counterpart, including the
+ * soft tints behind chips/badges and their text steps. Chart SERIES colors are
+ * intentionally identical in both modes (the deep palette passes the CVD +
+ * contrast validation on light and dark surfaces); only chart chrome themes.
+ * Applied via <html data-theme="dark"> (src/lib/theme.tsx).
+ */
+[data-theme="dark"] {
+  /* Surfaces */
+  --color-canvas: #0b0f1a;
+  --color-surface: #131a29;
+  --color-line: #232e44;
+
+  /* Ink */
+  --color-ink: #e7ecf5;
+  --color-ink-2: #a7b2c5;
+  --color-ink-3: #667691;
+
+  /* Sidebar (already dark — nudge for separation from the canvas) */
+  --color-sidebar: #070b13;
+  --color-sidebar-2: #131c2e;
+  --color-sidebar-line: #1c2740;
+
+  /* Status softs */
+  --color-good-soft: #0a2b22;
+  --color-warn-soft: #2b2008;
+  --color-serious-soft: #331416;
+
+  /* Soft tints (chips, badges, active pill) + their on-tint text steps */
+  --color-brand-50: #142445;
+  --color-brand-100: #1a2f5c;
+  --color-brand-700: #8ab6ff;
+  --color-blue-50: #142445;
+  --color-blue-700: #8ab6ff;
+  --color-emerald-50: #0a2b22;
+  --color-emerald-600: #34d399;
+  --color-emerald-700: #4ade9d;
+  --color-amber-50: #2b2008;
+  --color-amber-600: #fbbf24;
+  --color-amber-700: #fcd34d;
+  --color-red-50: #331416;
+  --color-red-600: #f87171;
+  --color-red-700: #fca5a5;
+  --color-violet-50: #231a3d;
+  --color-violet-600: #a78bfa;
+  --color-purple-50: #231a3d;
+  --color-purple-700: #c4b5fd;
+  --color-slate-50: #182130;
+  --color-slate-100: #1d2939;
+  /* Legacy pages still carry slate text/border classes — remap the whole ramp
+     so they stay readable until the token sweep converts them. */
+  --color-slate-200: #232e44;
+  --color-slate-300: #33405e;
+  --color-slate-400: #667691;
+  --color-slate-500: #8593aa;
+  --color-slate-600: #9aa7ba;
+  --color-slate-700: #c3cdde;
+  --color-slate-800: #dbe2ee;
+  --color-slate-900: #e7ecf5;
+
+  color-scheme: dark;
+
+  /* Elevation reads differently on dark — broader, softer */
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 16px rgb(0 0 0 / 0.35);
+  --shadow-pop: 0 4px 6px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.55);
+}
+
+:root {
+  color-scheme: light;
+}
+
+/* Paper is always light: printing from dark mode must not carry dark ink
+   values (a REVOKED stamp in dark-red-on-paper would be illegible). Reset
+   every dark override back to the light palette for print. */
+@media print {
+  [data-theme="dark"] {
+    --color-canvas: #f5f6fa;
+    --color-surface: #ffffff;
+    --color-line: #e6e9f0;
+    --color-ink: #0f172a;
+    --color-ink-2: #475569;
+    --color-ink-3: #94a3b8;
+    --color-good-soft: #ecfdf5;
+    --color-warn-soft: #fffbeb;
+    --color-serious-soft: #fef2f2;
+    --color-brand-50: #eef6ff;
+    --color-brand-100: #d9ecff;
+    --color-brand-700: #1552de;
+    --color-blue-50: #eff6ff;
+    --color-blue-700: #1d4ed8;
+    --color-emerald-50: #ecfdf5;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #047857;
+    --color-amber-50: #fffbeb;
+    --color-amber-600: #d97706;
+    --color-amber-700: #b45309;
+    --color-red-50: #fef2f2;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    --color-violet-50: #f5f3ff;
+    --color-violet-600: #7c3aed;
+    --color-purple-50: #faf5ff;
+    --color-purple-700: #7e22ce;
+    --color-slate-50: #f8fafc;
+    --color-slate-100: #f1f5f9;
+    --color-slate-200: #e2e8f0;
+    --color-slate-300: #cbd5e1;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+    --color-slate-600: #475569;
+    --color-slate-700: #334155;
+    --color-slate-800: #1e293b;
+    --color-slate-900: #0f172a;
+    color-scheme: light;
+  }
+}
+
 html,
 body,
 #root {
@@ -62,4 +180,21 @@ body,
 
 body {
   @apply bg-canvas text-ink antialiased;
+}
+
+/* Motion — tasteful entries only, and only when the user hasn't opted out. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fm-pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .animate-pop-in {
+    animation: fm-pop-in 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }

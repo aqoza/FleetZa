@@ -58,7 +58,7 @@ export default function AcceptInvitePage() {
     return (
       <AuthShell title={t("auth.inviteProblem")}>
         <ErrorState message={loadError} />
-        <p className="mt-4 text-sm text-slate-500">
+        <p className="mt-4 text-sm text-ink-3">
           {t("auth.inviteHelp")}{" "}
           <Link to="/login" className="font-medium text-brand-600">
             {t("auth.signInLink")}

@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteRow, insertRow, listPage, listRows, updateRow, sanitizeSearch } from "../../lib/db";
@@ -9,8 +9,9 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Pagination, Select, Table, Textarea, type BadgeTone,
+  Pagination, Select, Textarea, type BadgeTone,
 } from "../../components/ui";
+import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 const PAGE_SIZE = 25;
 
@@ -157,6 +158,7 @@ export function CustomerForm({
 export default function CustomersPage() {
   const t = useT();
   const tenant = useTenant();
+  const navigate = useNavigate();
   const { isManager } = useAuth();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
@@ -225,6 +227,127 @@ export default function CustomersPage() {
 
   const filtersOn = term !== "" || statusFilter !== "all";
 
+  const columns: Array<DataTableColumn<Customer>> = [
+    {
+      id: "company",
+      header: t("customers.company"),
+      cell: (c) => (
+        <>
+          <Link
+            to={`/customers/${c.id}`}
+            className="font-medium text-brand-700 hover:underline"
+          >
+            {c.name}
+          </Link>
+          {c.cr_number && <div className="text-xs text-slate-500">{c.cr_number}</div>}
+        </>
+      ),
+      sortValue: (c) => c.name,
+      exportValue: (c) => c.name,
+    },
+    {
+      id: "cityCountry",
+      header: t("customers.cityCountry"),
+      minBreakpoint: "md",
+      cell: (c) => (
+        <span className="text-slate-600">
+          {[c.city, c.country].filter(Boolean).join(", ") || "—"}
+        </span>
+      ),
+      sortValue: (c) => [c.city, c.country].filter(Boolean).join(", ") || null,
+      exportValue: (c) => [c.city, c.country].filter(Boolean).join(", "),
+    },
+    {
+      id: "contact",
+      header: t("customers.contact"),
+      minBreakpoint: "lg",
+      cell: (c) => {
+        const contact = contactByCustomer.get(c.id);
+        return contact ? (
+          <>
+            <div className="text-slate-700">{contact.name}</div>
+            {contact.phone && <div className="text-xs text-slate-500">{contact.phone}</div>}
+          </>
+        ) : (
+          <span className="text-slate-600">{c.phone ?? "—"}</span>
+        );
+      },
+      sortValue: (c) => contactByCustomer.get(c.id)?.name ?? c.phone ?? null,
+      exportValue: (c) => {
+        const contact = contactByCustomer.get(c.id);
+        return contact
+          ? [contact.name, contact.phone].filter(Boolean).join(" ")
+          : (c.phone ?? "");
+      },
+    },
+    {
+      id: "billingTerms",
+      header: t("customers.billingTerms"),
+      minBreakpoint: "xl",
+      defaultHidden: true,
+      cell: (c) => <span className="text-slate-600">{c.billing_terms ?? "—"}</span>,
+      sortValue: (c) => c.billing_terms,
+      exportValue: (c) => c.billing_terms ?? "",
+    },
+    {
+      id: "creditLimit",
+      header: t("customers.creditLimit"),
+      align: "end",
+      minBreakpoint: "xl",
+      defaultHidden: true,
+      cell: (c) => (
+        <span className="text-slate-600">{formatMoney(c.credit_limit, tenant.currency)}</span>
+      ),
+      sortValue: (c) => c.credit_limit,
+      exportValue: (c) => c.credit_limit,
+    },
+    {
+      id: "status",
+      header: t("common.status"),
+      cell: (c) => {
+        const st = customerStatusMeta[c.status];
+        return <Badge tone={st.tone}>{t(st.labelKey)}</Badge>;
+      },
+      sortValue: (c) => t(customerStatusMeta[c.status].labelKey),
+      exportValue: (c) => t(customerStatusMeta[c.status].labelKey),
+    },
+    ...(isManager
+      ? [
+          {
+            id: "actions",
+            header: "",
+            align: "end",
+            cell: (c) => (
+              <div className="flex justify-end gap-1">
+                <button
+                  className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditing(c);
+                  }}
+                  aria-label={t("customers.editCustomer")}
+                  title={t("action.edit")}
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleting(c);
+                  }}
+                  aria-label={t("customers.deleteCustomer")}
+                  title={t("action.delete")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ),
+          } satisfies DataTableColumn<Customer>,
+        ]
+      : []),
+  ];
+
   return (
     <>
       <PageHeader
@@ -272,99 +395,32 @@ export default function CustomersPage() {
         </div>
       )}
 
-      {!isLoading && !error && total === 0 && (
-        <EmptyState
-          icon={<Building2 className="h-10 w-10" />}
-          title={filtersOn ? t("customers.emptyFilteredTitle") : t("customers.emptyTitle")}
-          description={filtersOn ? t("customers.emptyFilteredDesc") : t("customers.emptyDesc")}
-          action={
-            isManager && !filtersOn ? (
-              <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> {t("customers.newCustomer")}
-              </Button>
-            ) : undefined
-          }
-        />
-      )}
-
-      {!isLoading && !error && customers.length > 0 && (
-        <Table
-          headers={[
-            t("customers.company"),
-            t("customers.cityCountry"),
-            t("customers.contact"),
-            t("customers.billingTerms"),
-            t("customers.creditLimit"),
-            t("common.status"),
-            "",
-          ]}
-        >
-          {customers.map((c) => {
-            const contact = contactByCustomer.get(c.id);
-            const st = customerStatusMeta[c.status];
-            return (
-              <tr key={c.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3">
-                  <Link
-                    to={`/customers/${c.id}`}
-                    className="font-medium text-brand-700 hover:underline"
-                  >
-                    {c.name}
-                  </Link>
-                  {c.cr_number && <div className="text-xs text-slate-500">{c.cr_number}</div>}
-                </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {[c.city, c.country].filter(Boolean).join(", ") || "—"}
-                </td>
-                <td className="px-4 py-3">
-                  {contact ? (
-                    <>
-                      <div className="text-slate-700">{contact.name}</div>
-                      {contact.phone && (
-                        <div className="text-xs text-slate-500">{contact.phone}</div>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-slate-600">{c.phone ?? "—"}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-slate-600">{c.billing_terms ?? "—"}</td>
-                <td className="px-4 py-3 text-slate-600">
-                  {formatMoney(c.credit_limit, tenant.currency)}
-                </td>
-                <td className="px-4 py-3">
-                  <Badge tone={st.tone}>{t(st.labelKey)}</Badge>
-                </td>
-                <td className="px-4 py-3 text-end">
-                  {isManager && (
-                    <div className="flex justify-end gap-1">
-                      <button
-                        className="rounded p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                        onClick={() => setEditing(c)}
-                        aria-label={t("customers.editCustomer")}
-                        title={t("action.edit")}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                        onClick={() => setDeleting(c)}
-                        aria-label={t("customers.deleteCustomer")}
-                        title={t("action.delete")}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </Table>
-      )}
-
       {!isLoading && !error && (
-        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
+        <DataTable<Customer>
+          tableId="customers"
+          exportName="customers"
+          rows={customers}
+          rowKey={(c) => c.id}
+          onRowClick={(c) => navigate(`/customers/${c.id}`)}
+          columns={columns}
+          empty={
+            <EmptyState
+              icon={<Building2 className="h-10 w-10" />}
+              title={filtersOn ? t("customers.emptyFilteredTitle") : t("customers.emptyTitle")}
+              description={
+                filtersOn ? t("customers.emptyFilteredDesc") : t("customers.emptyDesc")
+              }
+              action={
+                isManager && !filtersOn ? (
+                  <Button onClick={() => setAdding(true)}>
+                    <Plus className="h-4 w-4" /> {t("customers.newCustomer")}
+                  </Button>
+                ) : undefined
+              }
+            />
+          }
+          footer={<Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />}
+        />
       )}
 
       <Modal title={t("customers.newCustomer")} open={adding} onClose={() => setAdding(false)} wide>

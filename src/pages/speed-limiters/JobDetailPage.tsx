@@ -1,9 +1,10 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { Archive, ArrowLeft, Award, Ban, Check, Play, ShieldCheck } from "lucide-react";
 import { listRows, updateRow, wrapDbError } from "../../lib/db";
+import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDateTime } from "../../lib/format";
 import { supabase } from "../../lib/supabase";
 import type {
@@ -326,6 +327,10 @@ export default function JobDetailPage() {
       return rows[0] ?? null;
     },
   });
+
+  useEffect(() => {
+    if (job) recordRecent(`#${job.number} · ${job.customers?.name ?? job.vehicles?.name ?? ""}`, `/speed-limiters/jobs/${job.id}`);
+  }, [job]);
 
   const { data: settings } = useQuery({
     queryKey: ["sl_settings"],

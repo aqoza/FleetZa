@@ -6,8 +6,11 @@ Pages Function) · Supabase Postgres with RLS tenant isolation · typed en/ar i1
 
 ## Read before changing things
 
-- **[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)** — tokens, primitives, chart rules.
-  Every UI change follows it; no raw `bg-white`/`text-slate-*` in new code.
+- **[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)** — tokens (light + dark themes),
+  primitives (`DataTable` for list pages), chart rules, motion, workspace shell.
+  Every UI change follows it; no raw `bg-white`/`text-slate-*` in new code; new soft
+  tints get a dark counterpart in the same commit; chart colors only from the
+  validated palette (chrome via `src/lib/chart.ts` CSS vars).
 - **[docs/MODULES.md](docs/MODULES.md)** — the end-to-end contract for building a module
   (registry → i18n → DB/RLS → page → nav → gated route → tests).
 - **[docs/ARCHITECTURE_REVIEW.md](docs/ARCHITECTURE_REVIEW.md)** — the platform plan:

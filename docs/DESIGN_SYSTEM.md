@@ -1,9 +1,28 @@
 # FleetManage Design System
 
 The single visual contract for every page. Tokens live in [`src/index.css`](../src/index.css)
-(`@theme`); primitives live in [`src/components/ui.tsx`](../src/components/ui.tsx).
+(`@theme`); primitives live in [`src/components/ui.tsx`](../src/components/ui.tsx) and
+[`src/components/DataTable.tsx`](../src/components/DataTable.tsx).
 **New code never hardcodes raw palette classes for surfaces, text, or borders — it uses
 tokens (via their generated utilities) and the shared primitives.**
+
+## 0. Themes (light + dark)
+
+Both themes are first-class. Dark is a **designed palette** under
+`[data-theme="dark"]` in `index.css` — surfaces, ink, sidebar, soft tints, on-tint text
+steps, and elevation each get hand-picked values (never a filter/invert). The theme is
+applied as `<html data-theme>` by `ThemeProvider` ([`src/lib/theme.tsx`](../src/lib/theme.tsx));
+initial = stored preference or the OS `prefers-color-scheme`; the header toggle persists it.
+Rules:
+
+- Components style through tokens only, so they theme for free. If a new soft tint or
+  text step is introduced, add its dark counterpart to the `[data-theme="dark"]` block
+  in the same commit.
+- **Chart series/status colors are identical in both themes** — the deep palette is
+  validated (CVD + ≥3:1 contrast) against light *and* dark surfaces, so identity never
+  shifts. Chart *chrome* (grid, ticks, donut stroke, tooltips) uses CSS variables from
+  [`src/lib/chart.ts`](../src/lib/chart.ts) and themes automatically. Never hardcode
+  chart chrome hex in a page.
 
 ## 1. Tokens
 
@@ -88,7 +107,8 @@ System stack (`--font-sans`); no webfont (Arabic glyph coverage comes from the O
 | `IconChip` | Tinted square icon holder; tones blue/green/amber/violet/red/slate. One tone per concept, consistent across pages (vehicles=blue, customers=green, issues=amber, maintenance=violet, alerts=red). |
 | `PageHeader` | Every page starts with it. |
 | `Badge` | Enum/status labels; tone from the enum's `labels.ts` map. |
-| `Table` | Lists; pair with `Pagination` + `listPage` (never unbounded fetches). |
+| `DataTable` | **The list-page table**: tokenized shell, sort on loaded rows (aria-sort), per-user column chooser persisted per `tableId`, CSV export, responsive column priorities (`minBreakpoint`), optional row selection + bulk-action slot. Pair with `Pagination` (as `footer`) + `listPage`. `Table` remains only for small embedded lists. |
+| `Table` | Small embedded lists inside cards/detail pages only. |
 | `Modal` | Create/quick-edit only; entities with detail routes navigate instead. |
 | `EmptyState / LoadingState / ErrorState` | Every list renders all three paths. |
 
@@ -107,6 +127,26 @@ System stack (`--font-sans`); no webfont (Arabic glyph coverage comes from the O
    `format.ts` helpers (money/compact), never raw.
 6. Charts are wrapped in `dir="ltr"` (RTL pages keep numeric axes readable).
 7. One y-axis per chart, ever.
+
+## 5b. Workspace shell (large displays) & wayfinding
+
+- **Command palette** (`GlobalSearch`, Ctrl/⌘+K): recently viewed → navigation
+  commands → entity results, fully keyboard-driven (listbox semantics). Entity detail
+  pages call `recordRecent()` ([`src/lib/recent.ts`](../src/lib/recent.ts)) so the
+  palette and context panel stay useful.
+- **Context panel** (`ContextPanel`, 2xl+ ≈1536px): quick actions, due-soon, recently
+  viewed, admin activity — collapsible, real data only, module-gated. Content max-width
+  is 1600px; the panel is how ≥27" displays earn their space.
+- **Insights** (`InsightsStrip` on dashboards): deterministic, rule-based checks over
+  data the page already fetched — never generated/fabricated content. New rules ship
+  with en+ar keys and a link to the surface that resolves them.
+
+## 5c. Motion
+
+One entry animation (`animate-pop-in`, 140ms spring-ish cubic-bezier) for modals,
+palettes, and dropdown surfaces; `transition-colors` on interactive rows/controls.
+Everything sits behind `prefers-reduced-motion: no-preference`. No scroll-jacking, no
+parallax, no attention-seeking loops.
 
 ## 6. RTL & i18n (unchanged, now part of this contract)
 

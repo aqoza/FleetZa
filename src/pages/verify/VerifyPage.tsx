@@ -50,7 +50,7 @@ const banners: Record<
   not_found: {
     labelKey: "speedLimiters.verify.status.not_found",
     descKey: "speedLimiters.verify.status.not_foundDesc",
-    wrap: "border-slate-200 bg-slate-100 text-slate-700",
+    wrap: "border-line bg-canvas text-ink-2",
     icon: SearchX,
   },
 };
@@ -60,13 +60,13 @@ function VerifyLanguageSwitcher() {
   const { language, setLanguage, t } = useI18n();
   return (
     <div className="mb-6 flex justify-center">
-      <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
+      <div className="inline-flex rounded-lg border border-line bg-surface p-0.5 shadow-sm">
         {LANGUAGES.map(({ code, labelKey }) => (
           <button
             key={code}
             onClick={() => setLanguage(code)}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-              language === code ? "bg-brand-600 text-white" : "text-slate-500 hover:text-slate-700"
+              language === code ? "bg-brand-600 text-white" : "text-ink-3 hover:text-ink-2"
             }`}
           >
             {t(labelKey)}
@@ -140,23 +140,23 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="flex min-h-full items-center justify-center bg-slate-50 px-4 py-10">
+    <div className="flex min-h-full items-center justify-center bg-canvas px-4 py-10">
       <div className="w-full max-w-md">
         <VerifyLanguageSwitcher />
         <div className="mb-6 flex items-center justify-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-base font-bold text-white">
             F
           </div>
-          <span className="text-lg font-semibold text-slate-900">{t("app.name")}</span>
+          <span className="text-lg font-semibold text-ink">{t("app.name")}</span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-          <h1 className="mb-5 text-center text-lg font-semibold text-slate-900">
+        <div className="rounded-2xl border border-line bg-surface p-7 shadow-sm">
+          <h1 className="mb-5 text-center text-lg font-semibold text-ink">
             {t("speedLimiters.verify.title")}
           </h1>
 
           {loading && (
-            <div className="flex items-center justify-center gap-2 py-10 text-sm text-slate-500">
+            <div className="flex items-center justify-center gap-2 py-10 text-sm text-ink-3">
               <Loader2 className="h-5 w-5 animate-spin" />
               {t("speedLimiters.verify.checking")}
             </div>
@@ -182,8 +182,8 @@ export default function VerifyPage() {
                 <dl className="mt-5 divide-y divide-slate-100">
                   {rows.map(([labelKey, value]) => (
                     <div key={labelKey} className="flex items-center justify-between gap-4 py-2.5">
-                      <dt className="text-sm text-slate-500">{t(labelKey)}</dt>
-                      <dd className="text-end text-sm font-medium text-slate-900">{value}</dd>
+                      <dt className="text-sm text-ink-3">{t(labelKey)}</dt>
+                      <dd className="text-end text-sm font-medium text-ink">{value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -192,7 +192,7 @@ export default function VerifyPage() {
           )}
         </div>
 
-        <p className="mt-4 text-center text-xs text-slate-400">
+        <p className="mt-4 text-center text-xs text-ink-3">
           {t("speedLimiters.verify.poweredBy", { app: t("app.name") })}
         </p>
       </div>

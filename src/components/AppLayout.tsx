@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, Moon, Sun, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useModules } from "../context/ModulesContext";
 import { LANGUAGES, useI18n } from "../i18n";
 import { NAV_ITEMS, NAV_SECTIONS } from "../modules/nav";
+import { useTheme } from "../lib/theme";
 import { GlobalSearch } from "./GlobalSearch";
+import { ContextPanel } from "./ContextPanel";
 
 function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
   const { language, t } = useI18n();
@@ -35,6 +37,7 @@ function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
 
 export default function AppLayout() {
   const { tenant, profile, signOut } = useAuth();
+  const { theme, toggle } = useTheme();
   const { isEnabled } = useModules();
   const { t } = useI18n();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -191,16 +194,29 @@ export default function AppLayout() {
             <Menu className="h-5 w-5" />
           </button>
           <GlobalSearch />
-          <div className="ms-auto hidden shrink-0 lg:block">
-            <LanguageSwitcher />
+          <div className="ms-auto flex shrink-0 items-center gap-2">
+            <button
+              onClick={toggle}
+              aria-label={t("theme.toggle")}
+              title={t("theme.toggle")}
+              className="rounded-lg p-2 text-ink-2 transition-colors hover:bg-canvas hover:text-ink"
+            >
+              {theme === "dark" ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+            </button>
+            <div className="hidden lg:block">
+              <LanguageSwitcher />
+            </div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
-            <Outlet />
-          </div>
-        </main>
+        <div className="flex min-h-0 flex-1">
+          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-[1600px]">
+              <Outlet />
+            </div>
+          </main>
+          <ContextPanel />
+        </div>
       </div>
     </div>
   );

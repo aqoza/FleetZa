@@ -18,8 +18,9 @@ import type { Driver, FuelLog, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Table, Textarea,
+  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Textarea,
 } from "../../components/ui";
+import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type FuelLogRow = FuelLog & { vehicles: { name: string } | null };
 
@@ -297,6 +298,110 @@ export default function FuelPage() {
     return `${eff.toFixed(1)} ${efficiencyLabel(tenant)}`;
   }
 
+  const columns: Array<DataTableColumn<FuelLogRow>> = [
+    {
+      id: "date",
+      header: t("field.date"),
+      cell: (log) => (
+        <span className="text-ink-2">{formatDate(log.filled_at, tenant.timezone)}</span>
+      ),
+      sortValue: (log) => log.filled_at,
+      exportValue: (log) => formatDate(log.filled_at, tenant.timezone),
+    },
+    {
+      id: "vehicle",
+      header: t("field.vehicle"),
+      cell: (log) => (
+        <span className="font-medium text-ink">{log.vehicles?.name ?? t("common.dash")}</span>
+      ),
+      sortValue: (log) => log.vehicles?.name ?? null,
+      exportValue: (log) => log.vehicles?.name ?? "",
+    },
+    {
+      id: "odometer",
+      header: t("field.odometer"),
+      cell: (log) => (
+        <span className="text-ink-2">{formatDistance(log.odometer, tenant.distance_unit)}</span>
+      ),
+      sortValue: (log) => log.odometer,
+      exportValue: (log) => formatDistance(log.odometer, tenant.distance_unit),
+      align: "end",
+      minBreakpoint: "md",
+    },
+    {
+      id: "volume",
+      header: t("fuel.volume"),
+      cell: (log) => (
+        <span className="text-ink-2">{formatVolume(log.volume, tenant.volume_unit)}</span>
+      ),
+      sortValue: (log) => log.volume,
+      exportValue: (log) => formatVolume(log.volume, tenant.volume_unit),
+      align: "end",
+      minBreakpoint: "md",
+    },
+    {
+      id: "total_cost",
+      header: t("fuel.totalCost"),
+      cell: (log) => (
+        <span className="font-medium text-ink">
+          {formatMoney(log.total_cost, tenant.currency)}
+        </span>
+      ),
+      sortValue: (log) => log.total_cost,
+      exportValue: (log) => formatMoney(log.total_cost, tenant.currency),
+      align: "end",
+    },
+    {
+      id: "price",
+      header: `${t("fuel.price")}/${tenant.volume_unit}`,
+      cell: (log) => <span className="text-ink-2">{pricePerUnit(log)}</span>,
+      sortValue: (log) => {
+        const displayVolume = litersToDisplay(log.volume, tenant.volume_unit);
+        return displayVolume > 0 ? log.total_cost / displayVolume : null;
+      },
+      exportValue: (log) => pricePerUnit(log),
+      align: "end",
+      minBreakpoint: "lg",
+    },
+    {
+      id: "efficiency",
+      header: t("fuel.efficiency"),
+      cell: (log) => <span className="text-ink-2">{efficiencyCell(log)}</span>,
+      sortValue: (log) => efficiency.get(log.id) ?? null,
+      exportValue: (log) => efficiencyCell(log),
+      minBreakpoint: "lg",
+      defaultHidden: true,
+    },
+    {
+      id: "vendor",
+      header: t("field.vendor"),
+      cell: (log) => <span className="text-ink-2">{log.vendor ?? t("common.dash")}</span>,
+      sortValue: (log) => log.vendor,
+      exportValue: (log) => log.vendor ?? "",
+      minBreakpoint: "xl",
+      defaultHidden: true,
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: (log) =>
+        isManager && (
+          <button
+            className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteError("");
+              setDeleting(log);
+            }}
+            aria-label={t("fuel.deleteLog")}
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        ),
+      align: "end",
+    },
+  ];
+
   return (
     <>
       <PageHeader
@@ -359,82 +464,40 @@ export default function FuelPage() {
         </div>
       )}
 
-      {!isLoading && !error && logs.length === 0 && (
-        <EmptyState
-          icon={<Fuel className="h-10 w-10" />}
-          title={vehicleFilter !== "all" ? t("fuel.emptyFilteredTitle") : t("fuel.emptyTitle")}
-          description={
-            vehicleFilter !== "all" ? t("fuel.emptyFilteredDesc") : t("fuel.emptyDesc")
+      {!isLoading && !error && (
+        <DataTable
+          tableId="fuel_logs"
+          exportName="fuel-logs"
+          columns={columns}
+          rows={logs}
+          rowKey={(log) => log.id}
+          empty={
+            <EmptyState
+              icon={<Fuel className="h-10 w-10" />}
+              title={
+                vehicleFilter !== "all" ? t("fuel.emptyFilteredTitle") : t("fuel.emptyTitle")
+              }
+              description={
+                vehicleFilter !== "all" ? t("fuel.emptyFilteredDesc") : t("fuel.emptyDesc")
+              }
+              action={
+                isManager && vehicleFilter === "all" ? (
+                  <Button onClick={() => setAdding(true)}>
+                    <Plus className="h-4 w-4" /> {t("fuel.logFuel")}
+                  </Button>
+                ) : undefined
+              }
+            />
           }
-          action={
-            isManager && vehicleFilter === "all" ? (
-              <Button onClick={() => setAdding(true)}>
-                <Plus className="h-4 w-4" /> {t("fuel.logFuel")}
-              </Button>
-            ) : undefined
+          footer={
+            <Pagination
+              page={page}
+              pageSize={PAGE_SIZE}
+              total={logsPage?.total ?? 0}
+              onPage={setPage}
+            />
           }
         />
-      )}
-
-      {!isLoading && !error && logs.length > 0 && (
-        <>
-          <Table
-            headers={[
-              t("field.date"),
-              t("field.vehicle"),
-              t("field.odometer"),
-              t("fuel.volume"),
-              t("fuel.totalCost"),
-              `${t("fuel.price")}/${tenant.volume_unit}`,
-              t("fuel.efficiency"),
-              t("field.vendor"),
-              "",
-            ]}
-          >
-            {logs.map((log) => (
-              <tr key={log.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-600">
-                  {formatDate(log.filled_at, tenant.timezone)}
-                </td>
-                <td className="px-4 py-3 font-medium text-slate-800">
-                  {log.vehicles?.name ?? t("common.dash")}
-                </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {formatDistance(log.odometer, tenant.distance_unit)}
-                </td>
-                <td className="px-4 py-3 text-slate-600">
-                  {formatVolume(log.volume, tenant.volume_unit)}
-                </td>
-                <td className="px-4 py-3 font-medium text-slate-800">
-                  {formatMoney(log.total_cost, tenant.currency)}
-                </td>
-                <td className="px-4 py-3 text-slate-600">{pricePerUnit(log)}</td>
-                <td className="px-4 py-3 text-slate-600">{efficiencyCell(log)}</td>
-                <td className="px-4 py-3 text-slate-600">{log.vendor ?? t("common.dash")}</td>
-                <td className="px-4 py-3 text-end">
-                  {isManager && (
-                    <button
-                      className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                      onClick={() => {
-                        setDeleteError("");
-                        setDeleting(log);
-                      }}
-                      aria-label={t("fuel.deleteLog")}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </Table>
-          <Pagination
-            page={page}
-            pageSize={PAGE_SIZE}
-            total={logsPage?.total ?? 0}
-            onPage={setPage}
-          />
-        </>
       )}
 
       <Modal title={t("fuel.logFuel")} open={adding} onClose={() => setAdding(false)} wide>

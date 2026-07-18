@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { GRID_STROKE, TICK_STYLE, TOOLTIP_CONTENT_STYLE, TOOLTIP_ITEM_STYLE, TOOLTIP_LABEL_STYLE, CURSOR_FILL } from "../../lib/chart";
 import { getCountry } from "../../../shared/countries";
 import { wrapDbError } from "../../lib/db";
 import {
@@ -234,10 +235,10 @@ export default function ReportsPage() {
                       layout="vertical"
                       margin={{ top: 5, right: 20, bottom: 5, left: 5 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke={GRID_STROKE} horizontal={false} />
                       <XAxis
                         type="number"
-                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tick={TICK_STYLE}
                         axisLine={false}
                         tickLine={false}
                       />
@@ -245,12 +246,12 @@ export default function ReportsPage() {
                         type="category"
                         dataKey="name"
                         width={140}
-                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tick={TICK_STYLE}
                         axisLine={false}
                         tickLine={false}
                       />
                       <Tooltip
-                        cursor={{ fill: "#f1f5f9" }}
+                        cursor={{ fill: CURSOR_FILL }} contentStyle={TOOLTIP_CONTENT_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} itemStyle={TOOLTIP_ITEM_STYLE}
                         formatter={(value) => formatMoney(Number(value), tenant.currency)}
                       />
                       <Bar

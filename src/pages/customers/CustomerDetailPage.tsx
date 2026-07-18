@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Pencil, Plus, Star, Trash2, Unlink } from "lucide-react";
 import { deleteRow, getRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { recordRecent } from "../../lib/recent";
 import { daysUntil, formatDate } from "../../lib/format";
 import type {
   Contact, Customer, SlJob, SlJobStatus, SlJobType, SpeedLimiterCertificate,
@@ -250,6 +251,10 @@ export default function CustomerDetailPage() {
     queryKey: ["customers", customerId],
     queryFn: () => getRow<Customer>("customers", customerId),
   });
+
+  useEffect(() => {
+    if (customer) recordRecent(customer.name, `/customers/${customer.id}`);
+  }, [customer]);
 
   const contactsQ = useQuery({
     queryKey: ["contacts", customerId],

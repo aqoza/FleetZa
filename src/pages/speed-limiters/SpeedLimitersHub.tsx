@@ -39,7 +39,7 @@ export default function SpeedLimitersHub() {
             className={({ isActive }) =>
               isActive
                 ? "rounded-full bg-brand-600 px-4 py-1.5 text-sm font-medium text-white shadow-sm"
-                : "rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                : "rounded-full border border-line bg-surface px-4 py-1.5 text-sm font-medium text-ink-2 hover:bg-canvas"
             }
           >
             {t(labelKey)}

@@ -18,7 +18,7 @@ type ResultValue = InspectionResult["result"];
 const resultOptions: Array<{ value: ResultValue; labelKey: MessageKey; selected: string }> = [
   { value: "pass", labelKey: "inspections.resultPass", selected: "border-emerald-600 bg-emerald-600 text-white" },
   { value: "fail", labelKey: "inspections.resultFail", selected: "border-red-600 bg-red-600 text-white" },
-  { value: "na", labelKey: "inspections.resultNa", selected: "border-slate-500 bg-slate-500 text-white" },
+  { value: "na", labelKey: "inspections.resultNa", selected: "border-slate-500 bg-canvas0 text-white" },
 ];
 
 export default function NewInspectionPage() {
@@ -168,7 +168,7 @@ export default function NewInspectionPage() {
     <>
       <Link
         to="/inspections"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-ink-3 hover:text-ink-2"
       >
         <ArrowLeft className="h-4 w-4 rtl:-scale-x-100" /> {t("inspections.title")}
       </Link>
@@ -230,15 +230,15 @@ export default function NewInspectionPage() {
           </Card>
 
           <Card className="p-5">
-            <h3 className="mb-3 text-sm font-semibold text-slate-900">{t("inspections.checklist")}</h3>
+            <h3 className="mb-3 text-sm font-semibold text-ink">{t("inspections.checklist")}</h3>
             {grouped.length === 0 && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-ink-3">
                 {t("inspections.noTemplate")}
               </p>
             )}
             {grouped.map(([section, items]) => (
               <div key={section} className="mb-4 last:mb-0">
-                <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-3">
                   {section}
                 </h4>
                 <ul className="divide-y divide-slate-100">
@@ -247,7 +247,7 @@ export default function NewInspectionPage() {
                     return (
                       <li key={item.id} className="py-2.5">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-slate-700">{item.label}</span>
+                          <span className="text-sm text-ink-2">{item.label}</span>
                           <div className="flex shrink-0 gap-1">
                             {resultOptions.map((o) => (
                               <button
@@ -258,7 +258,7 @@ export default function NewInspectionPage() {
                                   "rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors " +
                                   (a.result === o.value
                                     ? o.selected
-                                    : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50")
+                                    : "border-line bg-surface text-ink-2 hover:bg-canvas")
                                 }
                               >
                                 {t(o.labelKey)}

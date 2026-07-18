@@ -1,16 +1,14 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Activity } from "lucide-react";
+import { Activity, ArrowRight, Lightbulb } from "lucide-react";
 import { listRows } from "../../lib/db";
 import { formatDateTime } from "../../lib/format";
 import { useAuth } from "../../context/AuthContext";
 import { Badge, Card, ErrorState } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
 
-/** Chart chrome shared by both dashboards (docs/DESIGN_SYSTEM.md §5). */
-export const GRID_STROKE = "#e6e9f0";
-export const TICK_STYLE = { fill: "#94a3b8", fontSize: 12 };
+export { GRID_STROKE, TICK_STYLE } from "../../lib/chart";
 
 export function ListCard({
   title,
@@ -33,6 +31,54 @@ export function ListCard({
         )}
       </div>
       {children}
+    </Card>
+  );
+}
+
+export interface Insight {
+  key: string;
+  tone: "info" | "warn" | "serious";
+  text: string;
+  to?: string;
+}
+
+const INSIGHT_DOT: Record<Insight["tone"], string> = {
+  info: "bg-brand-500",
+  warn: "bg-warn",
+  serious: "bg-serious",
+};
+
+/**
+ * Rule-based insights computed from data the dashboard already fetched —
+ * deterministic checks, not generated content.
+ */
+export function InsightsStrip({ insights }: { insights: Insight[] }) {
+  const t = useT();
+  return (
+    <Card className="p-5">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
+          <Lightbulb className="h-4 w-4" />
+        </span>
+        <h2 className="text-sm font-semibold text-ink">{t("insights.title")}</h2>
+      </div>
+      {insights.length === 0 ? (
+        <p className="text-sm text-ink-3">{t("insights.allClear")}</p>
+      ) : (
+        <ul className="grid gap-x-8 gap-y-2 lg:grid-cols-2">
+          {insights.map((i) => (
+            <li key={i.key} className="flex items-center gap-2.5 text-sm text-ink-2">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${INSIGHT_DOT[i.tone]}`} />
+              <span className="min-w-0 flex-1 truncate">{i.text}</span>
+              {i.to && (
+                <Link to={i.to} className="shrink-0 text-ink-3 hover:text-brand-700">
+                  <ArrowRight className="h-4 w-4 rtl:-scale-x-100" />
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </Card>
   );
 }
