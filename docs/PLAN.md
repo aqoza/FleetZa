@@ -28,13 +28,14 @@ units (km/mi, L/gal), timezone.
 - [x] Phase 6 — Dashboard (KPIs, 6-mo spend chart, status donut, due-soon lists), reports (cost/vehicle + fuel efficiency + CSV export), settings (org/members/invitations) — 7 review findings fixed (incl. invitations tenant_id default)
 - [x] Phase 7 — Polish: code-split heavy pages (recharts lazy chunk)
 - [x] Phase 8 — Deployment: wrangler config, README (deploy + no-docker dev path), seed script, unit tests (16 passing), build green
-- [~] Phase 9 — Verification (as far as possible without a Supabase backend):
-  - [x] Build + typecheck green; 16 unit tests pass (unit conversions, money, efficiency)
-  - [x] Browser smoke test: auth redirect, login + signup render, global onboarding selects populated, TZ auto-detect
-  - [x] /api/health OK (Node host direct + vite proxy); client→API error path surfaces cleanly
-  - [x] workerd broken on this machine (exit 53) → added workerd-free dev mode (dev:node + dev:api via @hono/node-server)
-  - [ ] BLOCKED on credentials: full data E2E + production deploy need a hosted Supabase project (user account) + `wrangler login`
-    Docker path abandoned per user instruction (Docker Desktop also crashed on stale AF_UNIX sockets + factory reset removed WSL distro).
+- [x] Phase 9 — Verification & launch: COMPLETE 2026-07-18
+  - [x] Build + typecheck green; 16 unit tests pass; workerd-free dev mode added (workerd broken on this host)
+  - [x] Schema + security-hardening migrations applied to hosted Supabase (project ugfdexoaxladblafcrlc "Fleetz"); all security advisors remediated
+  - [x] Full browser E2E vs hosted Supabase: login, dashboard, vehicles (odometer trigger), drivers, maintenance (WO totals/numbering), fuel (efficiency), inspection→auto-issue→WO chain, issues, renewals, reports, settings + invitation create
+  - [x] Worker flows w/ service key: self-serve signup (global tenant), invitation lookup + accept, all verified
+  - [x] DEPLOYED: https://fleetmanage.aqozatechnologies.workers.dev (worker + SPA assets, 3 secrets set)
+  - [x] Production E2E: fresh tenant signup on the live URL; RLS tenant isolation confirmed in prod; test tenants cleaned up
+  - Demo login: demo@fleetmanage.test / Demo1234! (tenant "Acme Logistics", + manager teammate@acme.test / Teammate1234!)
 
 ## Conventions
 - Money stored as numeric cents-free `numeric(12,2)` + tenant currency code; distances stored in km, volumes in liters (canonical), converted for display by tenant units.
