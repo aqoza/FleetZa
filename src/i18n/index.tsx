@@ -50,6 +50,14 @@ import { enModules } from "./messages/en/modules";
 import { arModules } from "./messages/ar/modules";
 import { enSpeedLimiters } from "./messages/en/speedLimiters";
 import { arSpeedLimiters } from "./messages/ar/speedLimiters";
+import { enSlCustomers } from "./messages/en/slCustomers";
+import { arSlCustomers } from "./messages/ar/slCustomers";
+import { enSlDevices } from "./messages/en/slDevices";
+import { arSlDevices } from "./messages/ar/slDevices";
+import { enSlJobs } from "./messages/en/slJobs";
+import { arSlJobs } from "./messages/ar/slJobs";
+import { enSlCertificates } from "./messages/en/slCertificates";
+import { arSlCertificates } from "./messages/ar/slCertificates";
 
 export type Language = "en" | "ar";
 export type Direction = "ltr" | "rtl";
@@ -74,6 +82,10 @@ const en = {
   ...enSettings,
   ...enModules,
   ...enSpeedLimiters,
+  ...enSlCustomers,
+  ...enSlDevices,
+  ...enSlJobs,
+  ...enSlCertificates,
 };
 
 const ar: Record<string, string> = {
@@ -91,6 +103,10 @@ const ar: Record<string, string> = {
   ...arSettings,
   ...arModules,
   ...arSpeedLimiters,
+  ...arSlCustomers,
+  ...arSlDevices,
+  ...arSlJobs,
+  ...arSlCertificates,
 };
 
 /** Every valid translation key. Use this to type any `labelKey` fields. */

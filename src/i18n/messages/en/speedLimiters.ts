@@ -1,71 +1,86 @@
 export const enSpeedLimiters = {
+  // Hub
   "speedLimiters.title": "Speed limiters",
-  "speedLimiters.subtitle": "Speed limiter installations and certificates across your fleet",
+  "speedLimiters.subtitle":
+    "Customers, devices, jobs and compliance certificates for your speed limiter operation",
+  "speedLimiters.tab.overview": "Overview",
+  "speedLimiters.tab.customers": "Customers",
+  "speedLimiters.tab.devices": "Devices",
+  "speedLimiters.tab.jobs": "Jobs",
+  "speedLimiters.tab.certificates": "Certificates",
 
-  // Tabs
-  "speedLimiters.tabInstallations": "Installations",
-  "speedLimiters.tabCertificates": "Certificates",
+  // --- Shared enum labels (contract: referenced by every speed limiter page) ---
+  "speedLimiters.jobType.installation": "Installation",
+  "speedLimiters.jobType.inspection": "Inspection",
+  "speedLimiters.jobType.maintenance": "Maintenance",
+  "speedLimiters.jobType.removal": "Removal",
+  "speedLimiters.jobType.replacement": "Replacement",
+  "speedLimiters.jobType.emergency": "Emergency",
 
-  // KPIs
-  "speedLimiters.kpiActiveInstallations": "Active installations",
-  "speedLimiters.kpiVehiclesCovered": "Vehicles covered",
+  "speedLimiters.jobStatus.scheduled": "Scheduled",
+  "speedLimiters.jobStatus.in_progress": "In progress",
+  "speedLimiters.jobStatus.completed": "Completed",
+  "speedLimiters.jobStatus.qc_approved": "QC approved",
+  "speedLimiters.jobStatus.closed": "Closed",
+  "speedLimiters.jobStatus.canceled": "Canceled",
 
-  // Installations table
-  "speedLimiters.device": "Device",
-  "speedLimiters.setSpeed": "Set speed",
+  "speedLimiters.deviceStatus.in_stock": "In stock",
+  "speedLimiters.deviceStatus.installed": "Installed",
+  "speedLimiters.deviceStatus.faulty": "Faulty",
+  "speedLimiters.deviceStatus.retired": "Retired",
+
+  "speedLimiters.certStatus.valid": "Valid",
+  "speedLimiters.certStatus.expiring": "Expiring",
+  "speedLimiters.certStatus.expired": "Expired",
+  "speedLimiters.certStatus.revoked": "Revoked",
+
   "speedLimiters.kmhValue": "{value} km/h",
-  "speedLimiters.installed": "Installed",
-  "speedLimiters.status.active": "Active",
-  "speedLimiters.status.maintenance": "Maintenance",
-  "speedLimiters.status.removed": "Removed",
 
-  // Installation actions & form
-  "speedLimiters.newInstallation": "New installation",
-  "speedLimiters.editInstallation": "Edit installation",
-  "speedLimiters.deleteInstallation": "Delete installation",
-  "speedLimiters.selectVehicle": "Select vehicle…",
-  "speedLimiters.deviceSerial": "Device serial",
-  "speedLimiters.brand": "Brand",
-  "speedLimiters.model": "Model",
-  "speedLimiters.setSpeedKmh": "Set speed (km/h)",
-  "speedLimiters.installedAt": "Installation date",
-  "speedLimiters.technician": "Technician",
-  "speedLimiters.deleteInstallationConfirm":
-    "Delete the installation of device {serial} on {vehicle}? This cannot be undone.",
+  // --- Overview (command center) ---
+  "speedLimiters.overview.kpiCustomers": "Customers",
+  "speedLimiters.overview.kpiDevicesInstalled": "Devices installed",
+  "speedLimiters.overview.kpiInStock": "{count} in stock",
+  "speedLimiters.overview.kpiOpenJobs": "Open jobs",
+  "speedLimiters.overview.kpiValidCertificates": "Valid certificates",
+  "speedLimiters.overview.expiryBoard": "Certificate expiry board",
+  "speedLimiters.overview.bucketExpired": "Expired",
+  "speedLimiters.overview.bucket30": "Within 30 days",
+  "speedLimiters.overview.bucket60": "31–60 days",
+  "speedLimiters.overview.bucket90": "61–90 days",
+  "speedLimiters.overview.bucketEmpty": "No certificates",
+  "speedLimiters.overview.daysOverdue": "{count} d overdue",
+  "speedLimiters.overview.inDays": "in {count} d",
+  "speedLimiters.overview.viewAll": "View all",
+  "speedLimiters.overview.recentJobs": "Recent jobs",
+  "speedLimiters.overview.jobNumber": "#{number}",
+  "speedLimiters.overview.noJobs": "No jobs yet",
+  "speedLimiters.overview.noJobsDesc": "Jobs you schedule for customers will appear here.",
 
-  // Installations empty state
-  "speedLimiters.noInstallationsYet": "No installations yet",
-  "speedLimiters.installationsEmptyDesc":
-    "Record the speed limiter devices installed on your vehicles to track them and their certificates.",
-
-  // Certificates table
-  "speedLimiters.certificateNumber": "Certificate #",
-  "speedLimiters.issued": "Issued",
-  "speedLimiters.expires": "Expires",
-  "speedLimiters.expired": "Expired",
-  "speedLimiters.expiresInDays": "Expires in {count} d",
-
-  // Certificate actions & form
-  "speedLimiters.newCertificate": "New certificate",
-  "speedLimiters.editCertificate": "Edit certificate",
-  "speedLimiters.deleteCertificate": "Delete certificate",
-  "speedLimiters.renewCertificate": "Renew certificate",
-  "speedLimiters.renew": "Renew",
-  "speedLimiters.installation": "Installation",
-  "speedLimiters.installationHint": "Optional — link the certificate to an installed device",
-  "speedLimiters.noLinkedInstallation": "No linked installation",
-  "speedLimiters.issuingAuthority": "Issuing authority",
-  "speedLimiters.issuedAt": "Issue date",
-  "speedLimiters.expiresAt": "Expiry date",
-  "speedLimiters.deleteCertificateConfirm":
-    "Delete certificate {number} for {vehicle}? This cannot be undone.",
-
-  // Certificates empty state
-  "speedLimiters.noCertificatesYet": "No certificates yet",
-  "speedLimiters.certificatesEmptyDesc":
-    "Track speed limiter certificates so they are renewed before they expire.",
-
-  // Errors
-  "speedLimiters.saveFailed": "Save failed",
-  "speedLimiters.deleteFailed": "Delete failed",
+  // --- Public certificate verification page ---
+  "speedLimiters.verify.title": "Certificate verification",
+  "speedLimiters.verify.checking": "Verifying certificate…",
+  "speedLimiters.verify.status.valid": "Certificate valid",
+  "speedLimiters.verify.status.validDesc":
+    "This speed limiter certificate is authentic and currently valid.",
+  "speedLimiters.verify.status.expired": "Certificate expired",
+  "speedLimiters.verify.status.expiredDesc":
+    "This certificate exists but its validity period has ended.",
+  "speedLimiters.verify.status.revoked": "Certificate revoked",
+  "speedLimiters.verify.status.revokedDesc":
+    "This certificate has been revoked by the issuer and is no longer valid.",
+  "speedLimiters.verify.status.not_found": "Certificate not found",
+  "speedLimiters.verify.status.not_foundDesc":
+    "No certificate matches this verification code.",
+  "speedLimiters.verify.noCode": "The verification link is missing its code.",
+  "speedLimiters.verify.error": "Verification failed. Please check your connection and try again.",
+  "speedLimiters.verify.certificateNumber": "Certificate number",
+  "speedLimiters.verify.issuedBy": "Issued by",
+  "speedLimiters.verify.customer": "Customer",
+  "speedLimiters.verify.vehicle": "Vehicle",
+  "speedLimiters.verify.plate": "License plate",
+  "speedLimiters.verify.setSpeed": "Set speed",
+  "speedLimiters.verify.issuedAt": "Issue date",
+  "speedLimiters.verify.expiresAt": "Expiry date",
+  "speedLimiters.verify.issuingAuthority": "Issuing authority",
+  "speedLimiters.verify.poweredBy": "Verification service by {app}",
 } as const;

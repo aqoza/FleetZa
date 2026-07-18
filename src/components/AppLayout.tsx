@@ -92,11 +92,11 @@ export default function AppLayout() {
   return (
     <div className="flex h-full">
       {/* Desktop sidebar — flexbox places it at the inline-start (right in RTL) */}
-      <aside className="hidden w-60 shrink-0 bg-slate-900 lg:block">{sidebar}</aside>
+      <aside className="hidden w-60 shrink-0 bg-slate-900 print:hidden lg:block">{sidebar}</aside>
 
       {/* Mobile sidebar */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-0 z-40 print:hidden lg:hidden">
           <div className="absolute inset-0 bg-slate-900/50" onClick={() => setMobileOpen(false)} />
           <aside className="absolute inset-y-0 start-0 w-64 bg-slate-900">
             <button
@@ -113,7 +113,7 @@ export default function AppLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile top bar */}
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 print:hidden lg:hidden">
           <button
             onClick={() => setMobileOpen(true)}
             className="rounded-md p-1.5 text-slate-600 hover:bg-slate-100"

@@ -21,11 +21,13 @@ import NewInspectionPage from "./pages/inspections/NewInspectionPage";
 import IssuesPage from "./pages/issues/IssuesPage";
 import RenewalsPage from "./pages/renewals/RenewalsPage";
 import SettingsPage from "./pages/settings/SettingsPage";
+import VerifyPage from "./pages/verify/VerifyPage";
 
 // recharts is heavy — split the chart pages into their own chunks
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
-const SpeedLimitersPage = lazy(() => import("./pages/speed-limiters/SpeedLimitersPage"));
+// The speed limiter hub carries its own sub-routes, so it gets its own chunk
+const SpeedLimitersHub = lazy(() => import("./pages/speed-limiters/SpeedLimitersHub"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,6 +65,8 @@ export default function App() {
               <Route path="/signup" element={<SignupPage />} />
             </Route>
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
+            {/* Public certificate verification (QR code target) — no auth. */}
+            <Route path="/verify" element={<VerifyPage />} />
 
             <Route element={<Protected />}>
               <Route element={<AppLayout />}>
@@ -115,11 +119,11 @@ export default function App() {
                   element={<ModuleGate module="renewals"><RenewalsPage /></ModuleGate>}
                 />
                 <Route
-                  path="/speed-limiters"
+                  path="/speed-limiters/*"
                   element={
                     <Suspense fallback={<LoadingState />}>
                       <ModuleGate module="speed_limiters">
-                        <SpeedLimitersPage />
+                        <SpeedLimitersHub />
                       </ModuleGate>
                     </Suspense>
                   }

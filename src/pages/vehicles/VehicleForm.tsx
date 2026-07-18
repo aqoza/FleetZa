@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { insertRow, updateRow } from "../../lib/db";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { insertRow, listRows, updateRow } from "../../lib/db";
 import { displayToKm, kmToDisplay } from "../../lib/format";
 import { fuelTypes, vehicleStatus, vehicleTypes } from "../../lib/labels";
-import type { Vehicle } from "../../lib/types";
+import type { SlCustomer, Vehicle } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import { Button, ErrorState, Field, Input, Select, Textarea } from "../../components/ui";
 
@@ -18,6 +19,15 @@ export function VehicleForm({
   const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
+  const { isEnabled } = useModules();
+  const slEnabled = isEnabled("speed_limiters");
+
+  const { data: customers } = useQuery({
+    queryKey: ["sl_customers", "active"],
+    queryFn: () =>
+      listRows<SlCustomer>("sl_customers", (q) => q.eq("status", "active").order("name")),
+    enabled: slEnabled,
+  });
 
   const [form, setForm] = useState({
     name: vehicle?.name ?? "",
@@ -34,6 +44,9 @@ export function VehicleForm({
       : "0",
     purchase_date: vehicle?.purchase_date ?? "",
     purchase_price: vehicle?.purchase_price?.toString() ?? "",
+    customer_id: vehicle?.customer_id ?? "",
+    chassis_number: vehicle?.chassis_number ?? "",
+    fleet_number: vehicle?.fleet_number ?? "",
     notes: vehicle?.notes ?? "",
   });
   const [error, setError] = useState("");
@@ -57,8 +70,13 @@ export function VehicleForm({
         odometer: displayToKm(Number(form.odometer) || 0, tenant.distance_unit),
         purchase_date: form.purchase_date || null,
         purchase_price: form.purchase_price ? Number(form.purchase_price) : null,
+        chassis_number: form.chassis_number.trim() || null,
+        fleet_number: form.fleet_number.trim() || null,
         notes: form.notes.trim() || null,
       };
+      // Only touch customer_id when the module (and thus the select) is active,
+      // so a disabled module never silently unlinks a vehicle from a customer.
+      if (slEnabled) values.customer_id = form.customer_id || null;
       return vehicle
         ? updateRow<Vehicle>("vehicles", vehicle.id, values)
         : insertRow<Vehicle>("vehicles", values);
@@ -127,6 +145,28 @@ export function VehicleForm({
         </Field>
         <Field label={t("field.vin")}>
           <Input value={form.vin} onChange={(e) => set("vin", e.target.value)} />
+        </Field>
+        {slEnabled && (
+          <Field label={t("slCustomers.vehicleCustomer")}>
+            <Select value={form.customer_id} onChange={(e) => set("customer_id", e.target.value)}>
+              <option value="">{t("slCustomers.vehicleCustomerOwnFleet")}</option>
+              {(customers ?? []).map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </Select>
+          </Field>
+        )}
+        <Field label={t("slCustomers.vehicleChassisNumber")}>
+          <Input
+            value={form.chassis_number}
+            onChange={(e) => set("chassis_number", e.target.value)}
+          />
+        </Field>
+        <Field label={t("slCustomers.vehicleFleetNumber")}>
+          <Input
+            value={form.fleet_number}
+            onChange={(e) => set("fleet_number", e.target.value)}
+          />
         </Field>
         <Field label={t("vehicles.purchaseDate")}>
           <Input

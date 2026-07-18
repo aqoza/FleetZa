@@ -79,3 +79,17 @@ existing tenants backfilled with the default module set.
 - [ ] i18n — module names/descriptions + speed limiter namespaces (en + ar)
 - [x] Docs + tests — `docs/MODULES.md` end-to-end module contract, `shared/modules.test.ts` registry invariants, README modular architecture section
 
+## Iteration 5 — Speed Limiter enterprise suite (2026-07-19)
+
+Upgrade the Speed Limiter module into a service-provider platform: the tenant installs
+speed limiters for client organizations (customers), runs a QC-gated job workflow, and
+issues compliance certificates with public QR verification. See `docs/SPEED_LIMITERS.md`.
+
+- [x] Schema + RPC + verify API — sl_customers/sl_contacts/sl_devices/sl_technicians/sl_jobs/sl_settings tables (RLS: members read, managers write), extended vehicles/installations/certificates columns, job-number trigger, atomic `next_certificate_number()` RPC, public Worker `GET /api/verify/:certUuid`
+- [ ] Hub + overview + verify page — /speed-limiters hub with lazy sub-routes, shared enum i18n keys, public `/verify?c=<uuid>` page
+- [ ] Customers 360 — CustomersPage + CustomerDetailPage (contacts, vehicles, jobs, certificates per customer)
+- [ ] Devices — DevicesPage stock tracking (in_stock/installed/faulty/retired, current vehicle)
+- [ ] Jobs workflow — JobsPage + JobDetailPage state machine (scheduled → in_progress → completed → qc_approved → closed, cancel path) with per-type device/installation side-effects, checklist, signatures
+- [ ] Certificates + print + QR — CertificatesPage + CertificatePrintPage, atomic numbering at issue, validity from sl_settings, renewal chains, revocation, QR to public verify
+- [x] Docs — `docs/SPEED_LIMITERS.md` module guide, README modular-architecture blurb, this checklist
+

@@ -50,6 +50,9 @@ export interface Vehicle {
   tenant_id: string;
   name: string;
   vin: string | null;
+  customer_id: string | null;
+  chassis_number: string | null;
+  fleet_number: string | null;
   license_plate: string | null;
   make: string | null;
   model: string | null;
@@ -240,10 +243,15 @@ export interface SpeedLimiterInstallation {
   installed_at: string;
   technician: string | null;
   status: SpeedLimiterStatus;
+  customer_id: string | null;
+  device_id: string | null;
+  job_id: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export type SlCertificateStatus = "valid" | "revoked";
 
 export interface SpeedLimiterCertificate {
   id: string;
@@ -255,8 +263,130 @@ export interface SpeedLimiterCertificate {
   issued_at: string;
   expires_at: string;
   renewed_from: string | null;
+  customer_id: string | null;
+  job_id: string | null;
+  device_id: string | null;
+  set_speed_kmh: number | null;
+  status: SlCertificateStatus;
+  revoked_at: string | null;
+  revoked_reason: string | null;
   notes: string | null;
   created_at: string;
+  updated_at: string;
+}
+
+// --- Speed limiter enterprise (service-provider) model ---
+
+export interface SlCustomer {
+  id: string;
+  tenant_id: string;
+  name: string;
+  cr_number: string | null;
+  tax_number: string | null;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  city: string | null;
+  country: string | null;
+  billing_terms: string | null;
+  credit_limit: number | null;
+  status: "active" | "inactive";
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SlContact {
+  id: string;
+  tenant_id: string;
+  customer_id: string;
+  name: string;
+  title: string | null;
+  department: string | null;
+  email: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  is_primary: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SlDeviceStatus = "in_stock" | "installed" | "faulty" | "retired";
+
+export interface SlDevice {
+  id: string;
+  tenant_id: string;
+  serial: string;
+  manufacturer: string | null;
+  model: string | null;
+  firmware_version: string | null;
+  imei: string | null;
+  purchase_date: string | null;
+  purchase_price: number | null;
+  supplier: string | null;
+  warranty_until: string | null;
+  status: SlDeviceStatus;
+  current_vehicle_id: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SlTechnician {
+  id: string;
+  tenant_id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SlJobType =
+  | "installation" | "inspection" | "maintenance" | "removal" | "replacement" | "emergency";
+export type SlJobStatus =
+  | "scheduled" | "in_progress" | "completed" | "qc_approved" | "closed" | "canceled";
+
+export interface SlChecklistItem {
+  id: string;
+  label: string;
+  done: boolean;
+}
+
+export interface SlJob {
+  id: string;
+  tenant_id: string;
+  number: number;
+  job_type: SlJobType;
+  customer_id: string | null;
+  vehicle_id: string;
+  device_id: string | null;
+  technician_id: string | null;
+  status: SlJobStatus;
+  scheduled_date: string | null;
+  set_speed_kmh: number | null;
+  checklist: SlChecklistItem[];
+  location: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  duration_minutes: number | null;
+  qc_by: string | null;
+  qc_at: string | null;
+  customer_signed: boolean;
+  technician_signed: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SlSettings {
+  tenant_id: string;
+  cert_prefix: string;
+  cert_next_number: number;
+  cert_validity_months: number;
   updated_at: string;
 }
 

@@ -104,5 +104,8 @@ onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
     })),
   );
 
+  // Seed speed-limiter settings so certificate numbering starts cleanly.
+  await admin.from("sl_settings").insert({ tenant_id: tenant.id });
+
   return c.json({ ok: true, tenantId: tenant.id }, 201);
 });

@@ -62,6 +62,12 @@ inspections, issues, renewals, reports, speed limiters, speed limiter certificat
 plus a catalog of coming-soon modules (GPS tracking, dispatch, TMS, workshop, finance,
 CRM, …) that become enableable as they're implemented.
 
+The Speed Limiter module is a full **service-provider suite**: the tenant is a company
+that installs speed limiters for client organizations, with customer 360 views, device
+stock tracking, a QC-gated job workflow, and compliance certificates carrying public QR
+verification (`/verify`). See [docs/SPEED_LIMITERS.md](docs/SPEED_LIMITERS.md) for the
+business model, entity map, job state machine, and certificate lifecycle.
+
 See [docs/MODULES.md](docs/MODULES.md) for the end-to-end contract for building a new
 module (registry entry → i18n → DB + RLS → page → nav → gated route → tests).
 
