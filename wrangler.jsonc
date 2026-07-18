@@ -1,16 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "fleetmanage",
-  "main": "worker/index.ts",
+  "name": "fleetza",
+  "pages_build_output_dir": "dist",
   "compatibility_date": "2025-06-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
-  },
-  "observability": {
-    "enabled": true
-  }
-  // Secrets (set via `wrangler secret put` in prod, .dev.vars locally):
-  // SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+  "compatibility_flags": ["nodejs_compat"]
+  // Cloudflare Pages project config. The SPA is built by `npm run build` (Vite)
+  // into dist/; the /api/* Pages Function (functions/) is bundled by Cloudflare.
+  // Runtime secrets (SUPABASE_URL / SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY)
+  // are set as Pages environment variables, not here. See docs/CICD.md.
 }

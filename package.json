@@ -5,14 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:node": "cross-env DISABLE_CF_PLUGIN=1 vite",
     "dev:api": "tsx scripts/dev-api.ts",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "preview": "vite preview",
     "test": "vitest run",
-    "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "deploy": "npm run build && wrangler pages deploy dist"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.9.0",

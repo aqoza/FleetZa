@@ -1,48 +1,59 @@
-# CI/CD — Cloudflare Git integration (no GitHub Actions)
+# Deployment — Cloudflare Pages (full-stack)
 
-Deploy by connecting the GitHub repo directly to Cloudflare, so every push to `main`
-auto-builds and deploys. No `.github/workflows` YAML is used.
+The app is a Cloudflare **Pages** project: the Vite SPA is served as static assets and
+the Hono API runs as a **Pages Function** at `/api/*`.
 
-## Important: this app is a Worker, not a static site
+- `dist/` — the built SPA (`index.html`, `assets/`, `_redirects` for SPA routing).
+- `functions/api/[[route]].ts` — a thin adapter (`handle(app)`) over `worker/index.ts`,
+  so the entire API is one Pages Function. Cloudflare bundles `functions/` automatically.
+- `wrangler.jsonc` — Pages config (`pages_build_output_dir: "dist"`, `nodejs_compat`).
 
-FleetManage is a **Cloudflare Worker with static assets** — the Hono API at `/api/*`
-(`worker/index.ts`) and the SPA are served by the same Worker. So use **Workers Builds**
-(Cloudflare's Git integration *for Workers*), NOT the classic **Pages** product.
+Connecting the GitHub repo (`aqoza/FleetZa`) means every push to `main` auto-builds and
+deploys — no GitHub Actions YAML.
 
-- ✅ **Workers Builds** keeps the API working and deploys the exact same artifact as
-  `wrangler deploy` (same worker `fleetmanage`, same URL).
-- ⚠️ **Classic Cloudflare Pages** serves only static output; the `/api/*` routes would
-  stop working unless the Hono API is rewritten as Pages Functions. Don't use it as-is.
-  (If you specifically want Pages, that conversion is a separate task — ask for it.)
+## Create the Pages project (dashboard)
 
-## Set it up (Cloudflare dashboard, ~2 minutes)
+**Workers & Pages → Create → Pages → Connect to Git →** pick `aqoza/FleetZa`, branch `main`.
 
-1. **Dashboard → Workers & Pages → the `fleetmanage` Worker → Settings → Build →
-   Connect** (or **Import a repository**). Authorize GitHub and pick **`aqoza/FleetZa`**,
-   production branch **`main`**.
-2. **Build command:** `npm run build`
-3. **Deploy command:** `npx wrangler deploy`  *(usually the default)*
-4. **Build variables** (needed at build time — baked into the browser bundle):
+| Setting | Value |
+|---|---|
+| Framework preset | React (Vite) |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
 
-   | Variable | Value |
-   |---|---|
-   | `VITE_SUPABASE_URL` | `https://ugfdexoaxladblafcrlc.supabase.co` |
-   | `VITE_SUPABASE_ANON_KEY` | your Supabase anon key (`eyJ…`, the value in `.env`) |
+## Environment variables & secrets (Pages → Settings → Variables and Secrets)
 
-5. Save. Cloudflare now builds + deploys on every push to `main` (and gives preview
-   builds for other branches / PRs).
+Set for **Production** (and Preview if you want branch previews):
 
-## What you do NOT need (unlike the GitHub Actions route)
+**Build-time** (baked into the browser bundle) — type *Plaintext*:
+| Name | Value |
+|---|---|
+| `VITE_SUPABASE_URL` | `https://ugfdexoaxladblafcrlc.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | your Supabase anon key (`eyJ…`) |
 
-- **No `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`** — Cloudflare is deploying inside
-  your own account, already authenticated.
-- **No Worker runtime secrets in Git or the build** — `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
-  `SUPABASE_SERVICE_ROLE_KEY` are already stored on the Worker (`wrangler secret put`) and
-  persist across deploys. `wrangler deploy` never wipes them. (Rotate the service-role key
-  with `wrangler secret put SUPABASE_SERVICE_ROLE_KEY` if ever needed.)
+**Runtime** (read by the `/api/*` Function) — type *Secret*:
+| Name | Value |
+|---|---|
+| `SUPABASE_URL` | `https://ugfdexoaxladblafcrlc.supabase.co` |
+| `SUPABASE_ANON_KEY` | your Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | your Supabase **service-role** key (keep secret) |
 
-## Prerequisite
+> Unlike the old Worker, these runtime secrets live on the **Pages** project now, so they
+> must be added here (they were not carried over from the Worker deployment).
 
-The repo must contain the code first — finish the initial `git push` to
-`https://github.com/aqoza/FleetZa` (complete the GitHub sign-in), then connect it in the
-Cloudflare dashboard.
+`nodejs_compat` is already set in `wrangler.jsonc`; if the dashboard asks, ensure the
+Functions compatibility flags include `nodejs_compat`.
+
+## After first deploy
+
+- New URL: **`fleetza.pages.dev`** (attach a custom domain under the project's Domains tab).
+- In **Supabase → Authentication → URL Configuration**, set **Site URL** to the Pages URL.
+- The old Worker at `fleetmanage.aqozatechnologies.workers.dev` is now superseded — you can
+  delete it once the Pages URL is verified.
+
+## Local development (unchanged)
+
+Two terminals: `npm run dev:api` (Node-hosts the same Hono app on :8788) and
+`npm run dev` (Vite SPA on :5173, proxies `/api` → :8788).
+
+Manual deploy from your machine: `npm run deploy` (`wrangler pages deploy dist`).
