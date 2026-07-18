@@ -63,11 +63,18 @@ System stack (`--font-sans`); no webfont (Arabic glyph coverage comes from the O
 
 ## 3. Shell anatomy
 
-- **Sidebar** (240px, `bg-sidebar`): brand block → nav grouped by **module-registry
-  category** with uppercase eyebrows (`nav.section.*` keys; groups render only when a
-  module in them is enabled — the sidebar is generated from `NAV_SECTIONS` × `NAV_ITEMS`
-  in [`src/modules/nav.ts`](../src/modules/nav.ts), never hand-grouped) → user card with
-  initials avatar + sign out.
+- **Sidebar** is a dual-rail:
+  - *Icon rail* (56px, `bg-sidebar` dark): brand mark on top, then icon-only shortcuts
+    for every enabled nav item (active = `bg-sidebar-2 text-brand-400`).
+  - *Main panel* (208px, `bg-surface`, `border-e border-line`): wordmark + tenant name,
+    nav grouped by **module-registry category** with uppercase eyebrows
+    (`nav.section.*` keys, `rtl:tracking-normal`; groups render only when a module in
+    them is enabled — generated from `NAV_SECTIONS` × `NAV_ITEMS` in
+    [`src/modules/nav.ts`](../src/modules/nav.ts), never hand-grouped), active item =
+    soft pill `bg-brand-50 text-brand-700`, then the user card (initials avatar in
+    `bg-brand-50 text-brand-700`, name + role, sign out).
+  In RTL the whole composite flips to the inline-start (right) automatically — flex
+  order and logical borders only, no positional overrides.
 - **Header** (`bg-surface border-b border-line`): mobile menu button · `GlobalSearch`
   (Ctrl/⌘+K) · language switcher.
 - **Main**: `max-w-7xl` centered, `px-4/6/8 py-6`, vertical rhythm `space-y-5`.

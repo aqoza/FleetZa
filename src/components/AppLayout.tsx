@@ -52,23 +52,49 @@ export default function AppLayout() {
     .join("")
     .toUpperCase();
 
-  const sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white shadow-sm">
-          F
+  /** Narrow dark rail: brand mark + icon-only shortcuts for the enabled nav. */
+  const iconRail = (
+    <div className="flex h-full w-14 flex-col items-center gap-1 bg-sidebar py-4">
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white shadow-sm">
+        F
+      </div>
+      {enabledItems.map(({ to, labelKey: itemKey, icon: Icon, end }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={end}
+          title={t(itemKey)}
+          aria-label={t(itemKey)}
+          onClick={() => setMobileOpen(false)}
+          className={({ isActive }) =>
+            `flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+              isActive
+                ? "bg-sidebar-2 text-brand-400"
+                : "text-slate-500 hover:bg-sidebar-2 hover:text-slate-300"
+            }`
+          }
+        >
+          <Icon className="h-4.5 w-4.5" />
+        </NavLink>
+      ))}
+    </div>
+  );
+
+  /** Light main panel: wordmark, grouped nav with soft-blue active pill, user card. */
+  const navPanel = (
+    <div className="flex h-full w-52 flex-col border-e border-line bg-surface">
+      <div className="px-4 pb-3 pt-5">
+        <div className="truncate text-[15px] font-bold tracking-tight text-ink">
+          {t("app.name")}
         </div>
-        <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-white">{t("app.name")}</div>
-          <div className="truncate text-xs text-slate-400">{tenant?.name}</div>
-        </div>
+        <div className="truncate text-xs text-ink-3">{tenant?.name}</div>
       </div>
 
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 pb-4">
         {sections.map(({ id, labelKey, items }) => (
           <div key={id}>
             {id !== "overview" && (
-              <div className="px-3 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500 rtl:tracking-normal">
+              <div className="px-3 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-3 rtl:tracking-normal">
                 {t(labelKey)}
               </div>
             )}
@@ -80,10 +106,10 @@ export default function AppLayout() {
                   end={end}
                   onClick={() => setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-brand-600 text-white shadow-sm"
-                        : "text-slate-400 hover:bg-sidebar-2 hover:text-slate-200"
+                        ? "bg-brand-50 text-brand-700"
+                        : "text-ink-2 hover:bg-canvas hover:text-ink"
                     }`
                   }
                 >
@@ -96,21 +122,19 @@ export default function AppLayout() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-line p-4">
-        <div className="lg:hidden">
-          <div className="mb-3">
-            <LanguageSwitcher dark />
-          </div>
+      <div className="border-t border-line p-3">
+        <div className="mb-3 lg:hidden">
+          <LanguageSwitcher />
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-2 text-xs font-semibold text-slate-200">
+        <div className="flex items-center gap-2.5 rounded-xl px-1.5 py-1">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-medium text-slate-200">
+            <div className="truncate text-sm font-medium text-ink">
               {profile?.full_name || profile?.email}
             </div>
-            <div className="truncate text-xs text-slate-500">
+            <div className="truncate text-xs text-ink-3">
               {profile?.role ? t(`role.${profile.role}`) : ""}
             </div>
           </div>
@@ -118,7 +142,7 @@ export default function AppLayout() {
             onClick={() => void signOut()}
             title={t("action.signOut")}
             aria-label={t("action.signOut")}
-            className="rounded-lg p-2 text-slate-400 hover:bg-sidebar-2 hover:text-white"
+            className="rounded-lg p-2 text-ink-3 hover:bg-canvas hover:text-ink"
           >
             <LogOut className="h-4 w-4 rtl:-scale-x-100" />
           </button>
@@ -127,18 +151,25 @@ export default function AppLayout() {
     </div>
   );
 
+  const sidebar = (
+    <div className="flex h-full">
+      {iconRail}
+      {navPanel}
+    </div>
+  );
+
   return (
     <div className="flex h-full">
       {/* Desktop sidebar — flexbox places it at the inline-start (right in RTL) */}
-      <aside className="hidden w-60 shrink-0 bg-sidebar print:hidden lg:block">{sidebar}</aside>
+      <aside className="hidden shrink-0 print:hidden lg:block">{sidebar}</aside>
 
       {/* Mobile sidebar */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 print:hidden lg:hidden">
           <div className="absolute inset-0 bg-sidebar/60" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute inset-y-0 start-0 w-64 bg-sidebar">
+          <aside className="absolute inset-y-0 start-0 flex bg-surface shadow-pop">
             <button
-              className="absolute end-3 top-4 rounded-md p-1 text-slate-400 hover:text-white"
+              className="absolute end-3 top-4 z-10 rounded-md p-1 text-ink-3 hover:bg-canvas hover:text-ink"
               onClick={() => setMobileOpen(false)}
               aria-label={t("action.closeMenu")}
             >
