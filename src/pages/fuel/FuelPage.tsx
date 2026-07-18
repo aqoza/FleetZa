@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fuel, Plus, Trash2 } from "lucide-react";
-import { deleteRow, insertRow, listRows } from "../../lib/db";
+import { deleteRow, insertRow, listPage, listRows, wrapDbError } from "../../lib/db";
+import { supabase } from "../../lib/supabase";
 import {
   computeEfficiency,
   displayToKm,
@@ -17,10 +18,12 @@ import type { Driver, FuelLog, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Table, Textarea,
 } from "../../components/ui";
 
 type FuelLogRow = FuelLog & { vehicles: { name: string } | null };
+
+const PAGE_SIZE = 25;
 
 /** Current local date-time formatted for a datetime-local input. */
 function nowForInput(): string {
@@ -184,16 +187,37 @@ export default function FuelPage() {
   const { isManager } = useAuth();
   const qc = useQueryClient();
   const [vehicleFilter, setVehicleFilter] = useState("all");
+  const [page, setPage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [deleting, setDeleting] = useState<FuelLogRow | null>(null);
   const [deleteError, setDeleteError] = useState("");
 
-  const { data: logs, isLoading, error } = useQuery({
-    queryKey: ["fuel_logs"],
+  const { data: logsPage, isLoading, error } = useQuery({
+    queryKey: ["fuel_logs", page, vehicleFilter],
     queryFn: () =>
-      listRows<FuelLogRow>("fuel_logs", (q) =>
-        q.select("*, vehicles(name)").order("filled_at", { ascending: false }),
-      ),
+      listPage<FuelLogRow>("fuel_logs", page, PAGE_SIZE, (q) => {
+        // Re-select keeps listPage's count=exact Prefer; only the columns change.
+        let query = q
+          .select("*, vehicles(name)")
+          .order("filled_at", { ascending: false });
+        if (vehicleFilter !== "all") query = query.eq("vehicle_id", vehicleFilter);
+        return query;
+      }),
+  });
+  const logs = logsPage?.rows ?? [];
+
+  /** Fleet-wide totals for the same filter — the paged rows only cover one
+   *  page. Aggregated by the fuel_summary RPC (PostgREST aggregate selects
+   *  are disabled on this project). */
+  const { data: fuelTotals } = useQuery({
+    queryKey: ["fuel_logs", "totals", vehicleFilter],
+    queryFn: async () => {
+      const { data, error: aggError } = await supabase
+        .rpc("fuel_summary", vehicleFilter !== "all" ? { p_vehicle_id: vehicleFilter } : {})
+        .single();
+      if (aggError) throw wrapDbError(aggError);
+      return { spend: data.total_cost, liters: data.total_liters, count: data.fill_count };
+    },
   });
 
   const { data: vehicles } = useQuery({
@@ -216,11 +240,15 @@ export default function FuelPage() {
       setDeleteError(err instanceof Error ? err.message : t("fuel.deleteFailed")),
   });
 
-  /** Efficiency per log id, vs the previous fill-up (next-lower odometer) of the same vehicle. */
+  /**
+   * Efficiency per log id, vs the previous fill-up (next-lower odometer) of the
+   * same vehicle — computed within the loaded page only, so the oldest row per
+   * vehicle on a page shows a dash.
+   */
   const efficiency = useMemo(() => {
     const map = new Map<string, number | null>();
     const byVehicle = new Map<string, FuelLogRow[]>();
-    for (const log of logs ?? []) {
+    for (const log of logs) {
       if (log.odometer === null) continue;
       const group = byVehicle.get(log.vehicle_id);
       if (group) group.push(log);
@@ -246,21 +274,16 @@ export default function FuelPage() {
     return map;
   }, [logs, tenant]);
 
-  const filtered = useMemo(() => {
-    if (vehicleFilter === "all") return logs ?? [];
-    return (logs ?? []).filter((l) => l.vehicle_id === vehicleFilter);
-  }, [logs, vehicleFilter]);
-
   const totals = useMemo(() => {
-    const spend = filtered.reduce((sum, l) => sum + l.total_cost, 0);
-    const liters = filtered.reduce((sum, l) => sum + l.volume, 0);
+    const spend = fuelTotals?.spend ?? 0;
+    const liters = fuelTotals?.liters ?? 0;
     const displayVolume = litersToDisplay(liters, tenant.volume_unit);
     return {
       spend,
       liters,
       avgPrice: displayVolume > 0 ? spend / displayVolume : null,
     };
-  }, [filtered, tenant]);
+  }, [fuelTotals, tenant]);
 
   function pricePerUnit(log: FuelLogRow): string {
     const displayVolume = litersToDisplay(log.volume, tenant.volume_unit);
@@ -278,7 +301,7 @@ export default function FuelPage() {
     <>
       <PageHeader
         title={t("fuel.title")}
-        description={t("fuel.logCount", { count: logs?.length ?? 0 })}
+        description={t("fuel.logCount", { count: logsPage?.total ?? 0 })}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>
@@ -291,7 +314,10 @@ export default function FuelPage() {
       <div className="mb-4">
         <Select
           value={vehicleFilter}
-          onChange={(e) => setVehicleFilter(e.target.value)}
+          onChange={(e) => {
+            setVehicleFilter(e.target.value);
+            setPage(0);
+          }}
           className="max-w-xs"
         >
           <option value="all">{t("fuel.allVehicles")}</option>
@@ -333,15 +359,15 @@ export default function FuelPage() {
         </div>
       )}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && logs.length === 0 && (
         <EmptyState
           icon={<Fuel className="h-10 w-10" />}
-          title={logs?.length ? t("fuel.emptyFilteredTitle") : t("fuel.emptyTitle")}
+          title={vehicleFilter !== "all" ? t("fuel.emptyFilteredTitle") : t("fuel.emptyTitle")}
           description={
-            logs?.length ? t("fuel.emptyFilteredDesc") : t("fuel.emptyDesc")
+            vehicleFilter !== "all" ? t("fuel.emptyFilteredDesc") : t("fuel.emptyDesc")
           }
           action={
-            isManager && !logs?.length ? (
+            isManager && vehicleFilter === "all" ? (
               <Button onClick={() => setAdding(true)}>
                 <Plus className="h-4 w-4" /> {t("fuel.logFuel")}
               </Button>
@@ -350,57 +376,65 @@ export default function FuelPage() {
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
-        <Table
-          headers={[
-            t("field.date"),
-            t("field.vehicle"),
-            t("field.odometer"),
-            t("fuel.volume"),
-            t("fuel.totalCost"),
-            `${t("fuel.price")}/${tenant.volume_unit}`,
-            t("fuel.efficiency"),
-            t("field.vendor"),
-            "",
-          ]}
-        >
-          {filtered.map((log) => (
-            <tr key={log.id} className="hover:bg-slate-50">
-              <td className="px-4 py-3 text-slate-600">
-                {formatDate(log.filled_at, tenant.timezone)}
-              </td>
-              <td className="px-4 py-3 font-medium text-slate-800">
-                {log.vehicles?.name ?? t("common.dash")}
-              </td>
-              <td className="px-4 py-3 text-slate-600">
-                {formatDistance(log.odometer, tenant.distance_unit)}
-              </td>
-              <td className="px-4 py-3 text-slate-600">
-                {formatVolume(log.volume, tenant.volume_unit)}
-              </td>
-              <td className="px-4 py-3 font-medium text-slate-800">
-                {formatMoney(log.total_cost, tenant.currency)}
-              </td>
-              <td className="px-4 py-3 text-slate-600">{pricePerUnit(log)}</td>
-              <td className="px-4 py-3 text-slate-600">{efficiencyCell(log)}</td>
-              <td className="px-4 py-3 text-slate-600">{log.vendor ?? t("common.dash")}</td>
-              <td className="px-4 py-3 text-end">
-                {isManager && (
-                  <button
-                    className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                    onClick={() => {
-                      setDeleteError("");
-                      setDeleting(log);
-                    }}
-                    aria-label={t("fuel.deleteLog")}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </Table>
+      {!isLoading && !error && logs.length > 0 && (
+        <>
+          <Table
+            headers={[
+              t("field.date"),
+              t("field.vehicle"),
+              t("field.odometer"),
+              t("fuel.volume"),
+              t("fuel.totalCost"),
+              `${t("fuel.price")}/${tenant.volume_unit}`,
+              t("fuel.efficiency"),
+              t("field.vendor"),
+              "",
+            ]}
+          >
+            {logs.map((log) => (
+              <tr key={log.id} className="hover:bg-slate-50">
+                <td className="px-4 py-3 text-slate-600">
+                  {formatDate(log.filled_at, tenant.timezone)}
+                </td>
+                <td className="px-4 py-3 font-medium text-slate-800">
+                  {log.vehicles?.name ?? t("common.dash")}
+                </td>
+                <td className="px-4 py-3 text-slate-600">
+                  {formatDistance(log.odometer, tenant.distance_unit)}
+                </td>
+                <td className="px-4 py-3 text-slate-600">
+                  {formatVolume(log.volume, tenant.volume_unit)}
+                </td>
+                <td className="px-4 py-3 font-medium text-slate-800">
+                  {formatMoney(log.total_cost, tenant.currency)}
+                </td>
+                <td className="px-4 py-3 text-slate-600">{pricePerUnit(log)}</td>
+                <td className="px-4 py-3 text-slate-600">{efficiencyCell(log)}</td>
+                <td className="px-4 py-3 text-slate-600">{log.vendor ?? t("common.dash")}</td>
+                <td className="px-4 py-3 text-end">
+                  {isManager && (
+                    <button
+                      className="rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                      onClick={() => {
+                        setDeleteError("");
+                        setDeleting(log);
+                      }}
+                      aria-label={t("fuel.deleteLog")}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </Table>
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={logsPage?.total ?? 0}
+            onPage={setPage}
+          />
+        </>
       )}
 
       <Modal title={t("fuel.logFuel")} open={adding} onClose={() => setAdding(false)} wide>

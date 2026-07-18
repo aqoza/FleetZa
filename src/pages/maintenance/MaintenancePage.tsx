@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { BellRing, CheckCircle2, Pencil, Plus, Trash2, Wrench } from "lucide-react";
 import { getCountry, taxBreakdown } from "../../../shared/countries";
-import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { deleteRow, insertRow, listPage, listRows, updateRow } from "../../lib/db";
 import {
   daysUntil, displayToKm, formatDate, formatDistance, formatMoney, kmToDisplay,
 } from "../../lib/format";
@@ -13,10 +13,12 @@ import type { ServiceReminder, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Table, Textarea,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
+
+const PAGE_SIZE = 25;
 
 // --- Service reminders ---
 
@@ -512,28 +514,35 @@ function WorkOrdersTab({
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [status, setStatus] = useState("all");
+  const [page, setPage] = useState(0);
   const taxLabel = getCountry(tenant.country).tax.label;
   const currencyDecimals = getCountry(tenant.country).currencyDecimals;
 
-  const { data: workOrders, isLoading, error } = useQuery({
-    queryKey: ["work_orders"],
+  const { data: workOrdersPage, isLoading, error } = useQuery({
+    queryKey: ["work_orders", page, status],
     queryFn: () =>
-      listRows<WorkOrderRow>("work_orders", (q) =>
-        q
+      listPage<WorkOrderRow>("work_orders", page, PAGE_SIZE, (q) => {
+        // Re-select keeps listPage's count=exact Prefer; only the columns change.
+        let query = q
           .select("*, vehicles(name), work_order_lines(quantity, unit_cost)")
-          .order("created_at", { ascending: false }),
-      ),
+          .order("created_at", { ascending: false });
+        if (status !== "all") query = query.eq("status", status);
+        return query;
+      }),
   });
-
-  const filtered = useMemo(
-    () => (workOrders ?? []).filter((w) => status === "all" || w.status === status),
-    [workOrders, status],
-  );
+  const workOrders = workOrdersPage?.rows ?? [];
 
   return (
     <>
       <div className="mb-4 flex flex-wrap gap-3">
-        <Select value={status} onChange={(e) => setStatus(e.target.value)} className="max-w-44">
+        <Select
+          value={status}
+          onChange={(e) => {
+            setStatus(e.target.value);
+            setPage(0);
+          }}
+          className="max-w-44"
+        >
           <option value="all">{t("maintenance.allStatuses")}</option>
           {Object.entries(workOrderStatus).map(([v, s]) => (
             <option key={v} value={v}>{t(s.labelKey)}</option>
@@ -544,17 +553,17 @@ function WorkOrdersTab({
       {isLoading && <LoadingState />}
       {error && <ErrorState message={(error as Error).message} />}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && workOrders.length === 0 && (
         <EmptyState
           icon={<Wrench className="h-10 w-10" />}
-          title={workOrders?.length ? t("maintenance.noWorkOrdersMatch") : t("maintenance.noWorkOrdersYet")}
+          title={status !== "all" ? t("maintenance.noWorkOrdersMatch") : t("maintenance.noWorkOrdersYet")}
           description={
-            workOrders?.length
+            status !== "all"
               ? t("maintenance.tryDifferentStatusFilter")
               : t("maintenance.workOrdersEmptyDesc")
           }
           action={
-            isManager && !workOrders?.length ? (
+            isManager && status === "all" ? (
               <Button onClick={() => setAdding(true)}>
                 <Plus className="h-4 w-4" /> {t("maintenance.newWorkOrder")}
               </Button>
@@ -563,56 +572,64 @@ function WorkOrdersTab({
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
-        <Table
-          headers={[
-            "#",
-            t("maintenance.woTitle"),
-            t("field.priority"),
-            t("common.status"),
-            t("maintenance.scheduled"),
-            t("maintenance.total"),
-          ]}
-        >
-          {filtered.map((w) => {
-            const subtotal = w.work_order_lines.reduce(
-              (sum, l) => sum + l.quantity * l.unit_cost,
-              0,
-            );
-            const total = taxBreakdown(subtotal, w.tax_rate, currencyDecimals).total;
-            return (
-              <tr key={w.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 text-slate-500">{w.number}</td>
-                <td className="px-4 py-3">
-                  <Link
-                    to={`/maintenance/work-orders/${w.id}`}
-                    className="font-medium text-brand-700 hover:underline"
-                  >
-                    {w.title}
-                  </Link>
-                  <div className="text-xs text-slate-500">{w.vehicles.name}</div>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge tone={priority[w.priority].tone}>{t(priority[w.priority].labelKey)}</Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge tone={workOrderStatus[w.status].tone}>
-                    {t(workOrderStatus[w.status].labelKey)}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-slate-600">{formatDate(w.scheduled_date)}</td>
-                <td className="px-4 py-3 font-medium text-slate-800">
-                  {formatMoney(total, tenant.currency)}
-                  {w.tax_rate > 0 && (
-                    <div className="text-xs font-normal text-slate-500">
-                      {t("maintenance.inclTax", { label: taxLabel, rate: w.tax_rate })}
-                    </div>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </Table>
+      {!isLoading && !error && workOrders.length > 0 && (
+        <>
+          <Table
+            headers={[
+              "#",
+              t("maintenance.woTitle"),
+              t("field.priority"),
+              t("common.status"),
+              t("maintenance.scheduled"),
+              t("maintenance.total"),
+            ]}
+          >
+            {workOrders.map((w) => {
+              const subtotal = w.work_order_lines.reduce(
+                (sum, l) => sum + l.quantity * l.unit_cost,
+                0,
+              );
+              const total = taxBreakdown(subtotal, w.tax_rate, currencyDecimals).total;
+              return (
+                <tr key={w.id} className="hover:bg-slate-50">
+                  <td className="px-4 py-3 text-slate-500">{w.number}</td>
+                  <td className="px-4 py-3">
+                    <Link
+                      to={`/maintenance/work-orders/${w.id}`}
+                      className="font-medium text-brand-700 hover:underline"
+                    >
+                      {w.title}
+                    </Link>
+                    <div className="text-xs text-slate-500">{w.vehicles.name}</div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge tone={priority[w.priority].tone}>{t(priority[w.priority].labelKey)}</Badge>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge tone={workOrderStatus[w.status].tone}>
+                      {t(workOrderStatus[w.status].labelKey)}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">{formatDate(w.scheduled_date)}</td>
+                  <td className="px-4 py-3 font-medium text-slate-800">
+                    {formatMoney(total, tenant.currency)}
+                    {w.tax_rate > 0 && (
+                      <div className="text-xs font-normal text-slate-500">
+                        {t("maintenance.inclTax", { label: taxLabel, rate: w.tax_rate })}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </Table>
+          <Pagination
+            page={page}
+            pageSize={PAGE_SIZE}
+            total={workOrdersPage?.total ?? 0}
+            onPage={setPage}
+          />
+        </>
       )}
 
       <Modal title={t("maintenance.newWorkOrder")} open={adding} onClose={() => setAdding(false)} wide>

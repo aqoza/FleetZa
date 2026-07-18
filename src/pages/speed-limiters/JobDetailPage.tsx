@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { Archive, ArrowLeft, Award, Ban, Check, Play, ShieldCheck } from "lucide-react";
-import { insertRow, listRows, updateRow } from "../../lib/db";
+import { listRows, updateRow, wrapDbError } from "../../lib/db";
 import { formatDate, formatDateTime } from "../../lib/format";
 import { supabase } from "../../lib/supabase";
 import type {
@@ -13,7 +13,6 @@ import type {
   SlJobStatus,
   SlJobType,
   SlSettings,
-  SpeedLimiterCertificate,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
@@ -103,21 +102,19 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
     // frees their devices, inserts the new installation, and updates the
     // job's device (removal jobs return the device to stock).
     mutationFn: async () => {
-      const speed = setSpeed === "" ? null : Number(setSpeed);
+      const speed = setSpeed === "" ? undefined : Number(setSpeed);
       const { error } = await supabase.rpc("complete_sl_job", {
         p_job_id: job.id,
-        p_duration_minutes: duration === "" ? null : Number(duration),
+        p_duration_minutes: duration === "" ? undefined : Number(duration),
         p_set_speed_kmh: speed,
         p_customer_signed: customerSigned,
         p_technician_signed: technicianSigned,
       });
       if (error) {
-        throw new Error(
-          error.message === "JOB_NOT_IN_PROGRESS" ||
-          error.message.includes("JOB_NOT_IN_PROGRESS")
-            ? t("slJobs.notInProgress")
-            : error.message,
-        );
+        if (error.message.includes("JOB_NOT_IN_PROGRESS")) {
+          throw new Error(t("slJobs.notInProgress"));
+        }
+        throw wrapDbError(error);
       }
     },
     onSuccess: () => {
@@ -234,23 +231,17 @@ function IssueCertificateForm({
 
   const mutation = useMutation({
     mutationFn: async () => {
-      // Atomic numbering: the RPC is called exactly once per issued certificate.
-      const { data: num, error: rpcError } = await supabase.rpc("next_certificate_number");
-      if (rpcError) throw new Error(rpcError.message);
-      await insertRow<SpeedLimiterCertificate>("speed_limiter_certificates", {
-        certificate_number: num as string,
-        vehicle_id: job.vehicle_id,
-        customer_id: job.customer_id,
-        job_id: job.id,
-        device_id: job.device_id,
-        installation_id: null,
-        set_speed_kmh: job.set_speed_kmh,
-        issuing_authority: authority.trim() || null,
-        issued_at: format(new Date(), "yyyy-MM-dd"),
-        expires_at: expiresAt,
-        notes: notes.trim() || null,
+      // The RPC atomically allocates the certificate number, resolves the
+      // job's installation, snapshots customer/vehicle/device/set-speed from
+      // the job, and enforces the certifiable-job gate server-side.
+      const { data, error: rpcError } = await supabase.rpc("issue_certificate", {
+        p_job_id: job.id,
+        p_issuing_authority: authority.trim() || undefined,
+        p_expires_at: expiresAt || undefined,
+        p_notes: notes.trim() || undefined,
       });
-      return num as string;
+      if (rpcError) throw wrapDbError(rpcError);
+      return data.certificate_number;
     },
     onSuccess: (num) => {
       setError("");
@@ -345,6 +336,20 @@ export default function JobDetailPage() {
     enabled: certificatesEnabled,
   });
 
+  // The DB refuses a second valid certificate per job (CERT_ALREADY_ISSUED) —
+  // mirror that in the UI: show the issued number instead of the Issue button.
+  const { data: existingCert } = useQuery({
+    queryKey: ["speed_limiter_certificates", "job", jobId],
+    enabled: certificatesEnabled,
+    queryFn: async () => {
+      const rows = await listRows<{ id: string; certificate_number: string }>(
+        "speed_limiter_certificates",
+        (q) => q.eq("job_id", jobId).eq("status", "valid").limit(1),
+      );
+      return rows[0] ?? null;
+    },
+  });
+
   const setStatus = useMutation({
     mutationFn: (values: Record<string, unknown>) => updateRow<SlJob>("sl_jobs", jobId, values),
     onSuccess: () => {
@@ -395,6 +400,7 @@ export default function JobDetailPage() {
   const canIssue =
     isManager &&
     certificatesEnabled &&
+    !existingCert &&
     (job.status === "completed" || job.status === "qc_approved") &&
     CERT_JOB_TYPES.includes(job.job_type);
 
@@ -533,6 +539,15 @@ export default function JobDetailPage() {
                 <Button variant="secondary" onClick={() => setIssuing(true)}>
                   <Award className="h-4 w-4" /> {t("slJobs.issueCertificate")}
                 </Button>
+              )}
+              {existingCert && (
+                <Link
+                  to="/speed-limiters/certificates"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+                >
+                  <Award className="h-4 w-4" />
+                  {t("slJobs.certIssued", { number: existingCert.certificate_number })}
+                </Link>
               )}
             </div>
           )}

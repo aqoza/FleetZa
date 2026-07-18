@@ -4,7 +4,7 @@ export const enSlCertificates = {
   "slCertificates.description":
     "Speed limiter compliance certificates issued to your customers",
   "slCertificates.settings": "Certificate settings",
-  "slCertificates.searchPlaceholder": "Search by number, customer, or vehicle…",
+  "slCertificates.searchPlaceholder": "Search by certificate number…",
 
   // Filter chips
   "slCertificates.filterAll": "All",

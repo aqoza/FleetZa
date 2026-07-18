@@ -2,15 +2,17 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { deleteRow, insertRow, listPage, listRows, updateRow, sanitizeSearch } from "../../lib/db";
 import { formatMoney } from "../../lib/format";
 import type { Contact, Customer } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select,
-  Table, Textarea, type BadgeTone,
+  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
+  Pagination, Select, Table, Textarea, type BadgeTone,
 } from "../../components/ui";
+
+const PAGE_SIZE = 25;
 
 export const customerStatusMeta: Record<
   Customer["status"],
@@ -159,19 +161,40 @@ export default function CustomersPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Customer | null>(null);
   const [deleting, setDeleting] = useState<Customer | null>(null);
   const [actionError, setActionError] = useState("");
 
-  const { data: customers, isLoading, error } = useQuery({
-    queryKey: ["customers"],
-    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
+  // Server-side search term; % and , would break the .or(...) ilike pattern.
+  const term = sanitizeSearch(search);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["customers", { page, term, status: statusFilter }],
+    queryFn: () =>
+      listPage<Customer>("customers", page, PAGE_SIZE, (q) => {
+        let f = q;
+        if (statusFilter !== "all") f = f.eq("status", statusFilter);
+        if (term) {
+          f = f.or(
+            `name.ilike.%${term}%,cr_number.ilike.%${term}%,` +
+              `email.ilike.%${term}%,phone.ilike.%${term}%`,
+          );
+        }
+        return f.order("name");
+      }),
   });
+  const customers = data?.rows ?? [];
+  const total = data?.total ?? 0;
+
+  // Contact preview only needs the customers on the current page.
+  const customerIds = useMemo(() => (data?.rows ?? []).map((c) => c.id), [data]);
 
   const { data: contacts } = useQuery({
-    queryKey: ["contacts"],
-    queryFn: () => listRows<Contact>("contacts"),
+    queryKey: ["contacts", { customerIds }],
+    queryFn: () => listRows<Contact>("contacts", (q) => q.in("customer_id", customerIds)),
+    enabled: customerIds.length > 0,
   });
 
   // Client-side join: preferred contact (primary if one exists) per customer.
@@ -200,16 +223,7 @@ export default function CustomersPage() {
     },
   });
 
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    return (customers ?? []).filter((c) => {
-      if (statusFilter !== "all" && c.status !== statusFilter) return false;
-      if (!needle) return true;
-      return [c.name, c.cr_number, c.phone, c.email].some((v) =>
-        v?.toLowerCase().includes(needle),
-      );
-    });
-  }, [customers, search, statusFilter]);
+  const filtersOn = term !== "" || statusFilter !== "all";
 
   return (
     <>
@@ -228,13 +242,19 @@ export default function CustomersPage() {
       <div className="mb-4 flex flex-wrap gap-3">
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
           placeholder={t("customers.searchPlaceholder")}
           className="max-w-80"
         />
         <Select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(0);
+          }}
           className="max-w-44"
         >
           <option value="all">{t("customers.allStatuses")}</option>
@@ -252,17 +272,13 @@ export default function CustomersPage() {
         </div>
       )}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && total === 0 && (
         <EmptyState
           icon={<Building2 className="h-10 w-10" />}
-          title={
-            customers?.length ? t("customers.emptyFilteredTitle") : t("customers.emptyTitle")
-          }
-          description={
-            customers?.length ? t("customers.emptyFilteredDesc") : t("customers.emptyDesc")
-          }
+          title={filtersOn ? t("customers.emptyFilteredTitle") : t("customers.emptyTitle")}
+          description={filtersOn ? t("customers.emptyFilteredDesc") : t("customers.emptyDesc")}
           action={
-            isManager && !customers?.length ? (
+            isManager && !filtersOn ? (
               <Button onClick={() => setAdding(true)}>
                 <Plus className="h-4 w-4" /> {t("customers.newCustomer")}
               </Button>
@@ -271,7 +287,7 @@ export default function CustomersPage() {
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
+      {!isLoading && !error && customers.length > 0 && (
         <Table
           headers={[
             t("customers.company"),
@@ -283,7 +299,7 @@ export default function CustomersPage() {
             "",
           ]}
         >
-          {filtered.map((c) => {
+          {customers.map((c) => {
             const contact = contactByCustomer.get(c.id);
             const st = customerStatusMeta[c.status];
             return (
@@ -345,6 +361,10 @@ export default function CustomersPage() {
             );
           })}
         </Table>
+      )}
+
+      {!isLoading && !error && (
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
       )}
 
       <Modal title={t("customers.newCustomer")} open={adding} onClose={() => setAdding(false)} wide>

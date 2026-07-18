@@ -171,7 +171,17 @@ name. Full recipe in `docs/I18N.md`.
 Ship schema as a new timestamped file `supabase/migrations/<YYYYMMDDHHMMSS>_<name>.sql`
 (additive only — live tenants exist). Apply it to the hosted project with the
 Supabase MCP `apply_migration` tool (or `npx supabase db push`), then run the
-security advisors to confirm no RLS regressions.
+security advisors to confirm no RLS regressions, and **regenerate
+`src/lib/database.types.ts`** with the MCP `generate_typescript_types` tool —
+table names in `src/lib/db.ts` are compile-checked against it, so a stale file
+fails the build.
+
+New-table conventions beyond the RLS loop: give every business table
+`created_by`/`updated_by` (the `app.stamp_actor` trigger), add it to the
+`app.log_audit` trigger list if it's master data or a document, and number
+documents via `app.next_doc_number(tenant_id, doc_type)` — never `max()+1`.
+List pages use `listPage` + `<Pagination>` (server-side filters/search), never
+unbounded `listRows`.
 
 ### 10. Tests
 

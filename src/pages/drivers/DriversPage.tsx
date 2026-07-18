@@ -129,6 +129,7 @@ export default function DriversPage() {
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Driver | null>(null);
   const [deleting, setDeleting] = useState<Driver | null>(null);
+  const [actionError, setActionError] = useState("");
 
   const { data: drivers, isLoading, error } = useQuery({
     queryKey: ["drivers"],
@@ -138,8 +139,13 @@ export default function DriversPage() {
   const remove = useMutation({
     mutationFn: (id: string) => deleteRow("drivers", id),
     onSuccess: () => {
+      setActionError("");
       void qc.invalidateQueries({ queryKey: ["drivers"] });
       setDeleting(null);
+    },
+    onError: (err) => {
+      setDeleting(null);
+      setActionError(err instanceof Error ? err.message : t("common.error"));
     },
   });
 
@@ -166,6 +172,12 @@ export default function DriversPage() {
           )
         }
       />
+
+      {actionError && (
+        <div className="mb-4">
+          <ErrorState message={actionError} />
+        </div>
+      )}
 
       <div className="mb-4">
         <Input

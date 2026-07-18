@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -262,6 +263,56 @@ export function ErrorState({ message }: { message: string }) {
   return (
     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
       {message}
+    </div>
+  );
+}
+
+// --- Pagination ---
+
+/**
+ * Server-side pagination controls for lists backed by `listPage` (src/lib/db).
+ * `page` is 0-based; renders nothing when everything fits on one page.
+ */
+export function Pagination({
+  page,
+  pageSize,
+  total,
+  onPage,
+}: {
+  page: number;
+  pageSize: number;
+  total: number;
+  onPage: (page: number) => void;
+}) {
+  const t = useT();
+  const lastPage = Math.max(0, Math.ceil(total / pageSize) - 1);
+
+  // Deleting the last row of the final page leaves `page` out of range —
+  // snap back to the last page that still has rows.
+  useEffect(() => {
+    if (page > lastPage) onPage(lastPage);
+  }, [page, lastPage, onPage]);
+
+  if (total <= pageSize && page === 0) return null;
+  const from = total === 0 ? 0 : page * pageSize + 1;
+  const to = Math.min(total, (page + 1) * pageSize);
+  return (
+    <div className="flex items-center justify-between gap-2 pt-3">
+      <span className="text-xs text-slate-500">
+        {t("pagination.range", { from, to, total })}
+      </span>
+      <div className="flex gap-2">
+        <Button variant="secondary" disabled={page === 0} onClick={() => onPage(page - 1)}>
+          {t("pagination.prev")}
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={page >= lastPage}
+          onClick={() => onPage(page + 1)}
+        >
+          {t("pagination.next")}
+        </Button>
+      </div>
     </div>
   );
 }

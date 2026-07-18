@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { format, subDays } from "date-fns";
 import { BarChart3, Download, Fuel } from "lucide-react";
 import {
   Bar,
@@ -10,8 +11,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { getCountry, taxBreakdown } from "../../../shared/countries";
-import { listRows } from "../../lib/db";
+import { getCountry } from "../../../shared/countries";
+import { wrapDbError } from "../../lib/db";
 import {
   computeEfficiency,
   efficiencyLabel,
@@ -20,18 +21,13 @@ import {
   kmToDisplay,
   litersToDisplay,
 } from "../../lib/format";
-import type { FuelLog, Vehicle, WorkOrder, WorkOrderLine } from "../../lib/types";
+import { supabase } from "../../lib/supabase";
 import { useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import {
   Button, Card, EmptyState, ErrorState, LoadingState, PageHeader, Select, Table,
 } from "../../components/ui";
-
-type FuelLogRow = FuelLog & { vehicles: { name: string } | null };
-type WorkOrderRow = WorkOrder & {
-  vehicles: { name: string } | null;
-  work_order_lines: Array<Pick<WorkOrderLine, "quantity" | "unit_cost">>;
-};
 
 interface CostRow {
   vehicleId: string;
@@ -45,7 +41,6 @@ interface CostRow {
 interface EfficiencyRow {
   vehicleId: string;
   name: string;
-  fillUps: number;
   liters: number;
   avgEfficiency: number | null;
 }
@@ -71,157 +66,86 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
 export default function ReportsPage() {
   const t = useT();
   const tenant = useTenant();
+  const { isEnabled } = useModules();
+  const customersOn = isEnabled("customers");
   const [period, setPeriod] = useState("90");
+  const [owner, setOwner] = useState("company");
   const currencyDecimals = getCountry(tenant.country).currencyDecimals;
   const hasTax = getCountry(tenant.country).tax.rate > 0;
   // On-screen header is translated; the CSV keeps English column headers (stable export).
   const maintenanceHeader = hasTax ? t("reports.maintenanceInclTax") : t("reports.maintenance");
   const maintenanceCsvHeader = hasTax ? "Maintenance (incl. tax)" : "Maintenance";
 
-  const { data: vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useQuery({
-    queryKey: ["vehicles", "reports"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
+  // Aggregation runs in Postgres (RLS-scoped, SECURITY INVOKER RPCs). Omitting
+  // p_ownership means SQL null = all vehicles (also when the module is off).
+  const ownership = customersOn && owner !== "all" ? owner : undefined;
+  const rpcArgs = () => ({
+    p_from: format(subDays(new Date(), Number(period)), "yyyy-MM-dd"),
+    p_to: format(new Date(), "yyyy-MM-dd"),
+    p_ownership: ownership,
   });
 
-  const { data: fuelLogs, isLoading: fuelLoading, error: fuelError } = useQuery({
-    queryKey: ["fuel_logs", "reports"],
-    queryFn: () =>
-      listRows<FuelLogRow>("fuel_logs", (q) =>
-        q.select("*, vehicles(name)").order("filled_at"),
-      ),
+  const costQ = useQuery({
+    queryKey: ["report_cost_by_vehicle", period, ownership ?? "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("report_cost_by_vehicle", rpcArgs());
+      if (error) throw wrapDbError(error);
+      return data;
+    },
   });
 
-  const { data: workOrders, isLoading: ordersLoading, error: ordersError } = useQuery({
-    queryKey: ["work_orders", "reports", "completed"],
-    queryFn: () =>
-      listRows<WorkOrderRow>("work_orders", (q) =>
-        q
-          .select("*, vehicles(name), work_order_lines(quantity, unit_cost)")
-          .eq("status", "completed"),
-      ),
+  const efficiencyQ = useQuery({
+    queryKey: ["report_fuel_efficiency", period, ownership ?? "all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("report_fuel_efficiency", rpcArgs());
+      if (error) throw wrapDbError(error);
+      return data;
+    },
   });
 
-  const isLoading = vehiclesLoading || fuelLoading || ordersLoading;
-  const error = vehiclesError ?? fuelError ?? ordersError;
+  const isLoading = costQ.isLoading || efficiencyQ.isLoading;
+  const error = costQ.error ?? efficiencyQ.error;
 
-  const cutoffMs = useMemo(
-    () => Date.now() - Number(period) * 86_400_000,
-    [period],
-  );
-
-  const periodFuel = useMemo(
-    () => (fuelLogs ?? []).filter((l) => new Date(l.filled_at).getTime() >= cutoffMs),
-    [fuelLogs, cutoffMs],
-  );
-
-  const periodOrders = useMemo(
-    () =>
-      (workOrders ?? []).filter(
-        (w) => w.completed_at !== null && new Date(w.completed_at).getTime() >= cutoffMs,
-      ),
-    [workOrders, cutoffMs],
-  );
-
-  const vehicleNames = useMemo(
-    () => new Map((vehicles ?? []).map((v) => [v.id, v.name])),
-    [vehicles],
-  );
-
-  /** Section 1: fuel + maintenance cost per vehicle, sorted by total desc. */
+  /** Section 1: fuel + maintenance cost per vehicle (the RPC pre-sorts by total
+   *  desc). Cost per distance reuses the efficiency RPC's canonical km. */
   const costRows = useMemo(() => {
-    const byVehicle = new Map<
-      string,
-      { fuel: number; maintenance: number; odometers: number[] }
-    >();
-    const entry = (vehicleId: string) => {
-      let e = byVehicle.get(vehicleId);
-      if (!e) {
-        e = { fuel: 0, maintenance: 0, odometers: [] };
-        byVehicle.set(vehicleId, e);
-      }
-      return e;
-    };
-    for (const log of periodFuel) {
-      const e = entry(log.vehicle_id);
-      e.fuel += log.total_cost;
-      if (log.odometer !== null) e.odometers.push(log.odometer);
-    }
-    for (const wo of periodOrders) {
-      const lineSum = wo.work_order_lines.reduce(
-        (sum, line) => sum + line.quantity * line.unit_cost,
-        0,
-      );
-      entry(wo.vehicle_id).maintenance += taxBreakdown(lineSum, wo.tax_rate, currencyDecimals).total;
-    }
-    const rows: CostRow[] = [];
-    for (const [vehicleId, e] of byVehicle) {
-      const total = e.fuel + e.maintenance;
-      if (total <= 0) continue;
-      let costPerDistance: number | null = null;
-      if (e.odometers.length >= 2) {
-        const distKm = Math.max(...e.odometers) - Math.min(...e.odometers);
-        const distance = kmToDisplay(distKm, tenant.distance_unit);
-        if (distance > 0) costPerDistance = total / distance;
-      }
-      rows.push({
-        vehicleId,
-        name: vehicleNames.get(vehicleId) ?? t("reports.unknownVehicle"),
-        fuel: e.fuel,
-        maintenance: e.maintenance,
-        total,
-        costPerDistance,
-      });
-    }
-    rows.sort((a, b) => b.total - a.total);
-    return rows;
-  }, [periodFuel, periodOrders, vehicleNames, tenant, currencyDecimals, t]);
+    const kmByVehicle = new Map(
+      (efficiencyQ.data ?? []).map((r) => [r.vehicle_id, r.total_km]),
+    );
+    return (costQ.data ?? []).map((r): CostRow => {
+      const km = kmByVehicle.get(r.vehicle_id) ?? 0;
+      const distance = kmToDisplay(km, tenant.distance_unit);
+      return {
+        vehicleId: r.vehicle_id,
+        name: r.vehicle_name,
+        fuel: r.fuel_cost,
+        maintenance: r.maintenance_net + r.maintenance_tax,
+        total: r.total_cost,
+        costPerDistance: distance > 0 ? r.total_cost / distance : null,
+      };
+    });
+  }, [costQ.data, efficiencyQ.data, tenant.distance_unit]);
 
-  /** Section 2: fill-ups, volume, and average full-tank efficiency per vehicle. */
-  const efficiencyRows = useMemo(() => {
-    const byVehicle = new Map<string, FuelLogRow[]>();
-    for (const log of periodFuel) {
-      const group = byVehicle.get(log.vehicle_id);
-      if (group) group.push(log);
-      else byVehicle.set(log.vehicle_id, [log]);
-    }
-    const rows: EfficiencyRow[] = [];
-    for (const [vehicleId, group] of byVehicle) {
-      const withOdometer = group.filter((l) => l.odometer !== null);
-      withOdometer.sort((a, b) =>
-        a.odometer! !== b.odometer!
-          ? a.odometer! - b.odometer!
-          : a.filled_at.localeCompare(b.filled_at),
-      );
-      const samples: number[] = [];
-      let lastFull: FuelLogRow | null = null;
-      let volumeSinceLastFull = 0;
-      for (const cur of withOdometer) {
-        volumeSinceLastFull += cur.volume;
-        if (!cur.is_full_tank) continue;
-        if (lastFull) {
-          const eff = computeEfficiency(
-            cur.odometer! - lastFull.odometer!,
-            volumeSinceLastFull,
-            tenant,
-          );
-          if (eff !== null) samples.push(eff);
-        }
-        lastFull = cur;
-        volumeSinceLastFull = 0;
-      }
-      rows.push({
-        vehicleId,
-        name: vehicleNames.get(vehicleId) ?? t("reports.unknownVehicle"),
-        fillUps: group.length,
-        liters: group.reduce((sum, l) => sum + l.volume, 0),
-        avgEfficiency: samples.length
-          ? samples.reduce((sum, v) => sum + v, 0) / samples.length
-          : null,
-      });
-    }
-    rows.sort((a, b) => a.name.localeCompare(b.name));
-    return rows;
-  }, [periodFuel, vehicleNames, tenant, t]);
+  /** Section 2: fuel volume and efficiency per vehicle. The RPC returns
+   *  canonical km/liters; conversion to tenant units happens on display.
+   *  Volume covers ALL fuel logged in the window; the efficiency math uses
+   *  only full-tank-to-full-tank segments (pair_liters over total_km) and is
+   *  null for vehicles without a complete pair — rendered as a dash. */
+  const efficiencyRows = useMemo(
+    () =>
+      (efficiencyQ.data ?? []).map(
+        (r): EfficiencyRow => ({
+          vehicleId: r.vehicle_id,
+          name: r.vehicle_name,
+          liters: r.total_liters,
+          avgEfficiency:
+            r.pair_liters != null && r.total_km > 0
+              ? computeEfficiency(r.total_km, r.pair_liters, tenant)
+              : null,
+        }),
+      ),
+    [efficiencyQ.data, tenant],
+  );
 
   const chartHeight = Math.min(400, 60 + 36 * costRows.length);
 
@@ -242,13 +166,11 @@ export default function ReportsPage() {
     downloadCsv("fuel-efficiency.csv", [
       [
         "Vehicle",
-        "Fill-ups",
         `Volume (${tenant.volume_unit})`,
         `Avg efficiency (${efficiencyLabel(tenant)})`,
       ],
       ...efficiencyRows.map((r) => [
         r.name,
-        r.fillUps,
         litersToDisplay(r.liters, tenant.volume_unit).toFixed(2),
         r.avgEfficiency === null ? "" : r.avgEfficiency.toFixed(1),
       ]),
@@ -262,7 +184,7 @@ export default function ReportsPage() {
         description={t("reports.subtitle")}
       />
 
-      <div className="mb-4">
+      <div className="mb-4 flex flex-wrap gap-3">
         <Select
           value={period}
           onChange={(e) => setPeriod(e.target.value)}
@@ -272,6 +194,13 @@ export default function ReportsPage() {
           <option value="90">{t("reports.period90")}</option>
           <option value="365">{t("reports.period365")}</option>
         </Select>
+        {customersOn && (
+          <Select value={owner} onChange={(e) => setOwner(e.target.value)} className="max-w-44">
+            <option value="company">{t("vehicles.ownerCompany")}</option>
+            <option value="customer">{t("vehicles.ownerCustomer")}</option>
+            <option value="all">{t("vehicles.allOwners")}</option>
+          </Select>
+        )}
       </div>
 
       {isLoading && <LoadingState />}
@@ -386,7 +315,6 @@ export default function ReportsPage() {
               <Table
                 headers={[
                   t("field.vehicle"),
-                  t("reports.fillUps"),
                   t("reports.volume"),
                   t("reports.avgEfficiency"),
                 ]}
@@ -394,7 +322,6 @@ export default function ReportsPage() {
                 {efficiencyRows.map((r) => (
                   <tr key={r.vehicleId} className="hover:bg-slate-50">
                     <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.fillUps}</td>
                     <td className="px-4 py-3 text-slate-600">
                       {formatVolume(r.liters, tenant.volume_unit)}
                     </td>

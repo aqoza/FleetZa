@@ -9,7 +9,7 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.title": "الشهادات",
   "slCertificates.description": "شهادات مطابقة محددات السرعة الصادرة لعملائك",
   "slCertificates.settings": "إعدادات الشهادات",
-  "slCertificates.searchPlaceholder": "ابحث بالرقم أو العميل أو المركبة…",
+  "slCertificates.searchPlaceholder": "ابحث برقم الشهادة…",
 
   // Filter chips
   "slCertificates.filterAll": "الكل",

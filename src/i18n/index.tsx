@@ -58,6 +58,8 @@ import { enSlJobs } from "./messages/en/slJobs";
 import { arSlJobs } from "./messages/ar/slJobs";
 import { enSlCertificates } from "./messages/en/slCertificates";
 import { arSlCertificates } from "./messages/ar/slCertificates";
+import { enErrors } from "./messages/en/errors";
+import { arErrors } from "./messages/ar/errors";
 
 export type Language = "en" | "ar";
 export type Direction = "ltr" | "rtl";
@@ -86,6 +88,7 @@ const en = {
   ...enSlDevices,
   ...enSlJobs,
   ...enSlCertificates,
+  ...enErrors,
 };
 
 const ar: Record<string, string> = {
@@ -107,6 +110,7 @@ const ar: Record<string, string> = {
   ...arSlDevices,
   ...arSlJobs,
   ...arSlCertificates,
+  ...arErrors,
 };
 
 /** Every valid translation key. Use this to type any `labelKey` fields. */
@@ -137,6 +141,22 @@ function initialLanguage(): Language {
   }
 }
 
+// Current language mirrored outside React so non-component code (e.g. the
+// db error mapper in src/lib/db.ts) can translate. Kept in sync by the
+// provider; same pattern as format.ts's activeLocale.
+let activeLanguage: Language = initialLanguage();
+
+/** Translate outside React components. Prefer useT() inside components. */
+export function translate(key: MessageKey, vars?: TranslateVars): string {
+  let str = DICTS[activeLanguage][key] ?? DICTS.en[key] ?? (key as string);
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      str = str.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return str;
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(initialLanguage);
   const dir: Direction = language === "ar" ? "rtl" : "ltr";
@@ -149,6 +169,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
+    activeLanguage = lang;
     try {
       localStorage.setItem(STORAGE_KEY, lang);
     } catch {

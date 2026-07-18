@@ -1,8 +1,9 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Cpu, History, Pencil, Plus, Trash2 } from "lucide-react";
-import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { deleteRow, insertRow, listPage, listRows, updateRow, wrapDbError, sanitizeSearch } from "../../lib/db";
+import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
 import type { SlDevice, SlDeviceStatus, SlJob, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
@@ -10,7 +11,7 @@ import { useT, type MessageKey, type Translate } from "../../i18n";
 import type { BadgeTone } from "../../components/ui";
 import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Select, Table, Textarea,
+  Pagination, Select, Table, Textarea,
 } from "../../components/ui";
 
 type DeviceRow = SlDevice & { vehicles: Pick<Vehicle, "name"> | null };
@@ -44,6 +45,8 @@ const jobStatus: Record<SlJob["status"], { labelKey: MessageKey; tone: BadgeTone
 };
 
 const STATUS_FILTERS: Array<SlDeviceStatus> = ["in_stock", "installed", "faulty", "retired"];
+
+const PAGE_SIZE = 25;
 
 function warrantyCell(d: SlDevice, t: Translate) {
   if (!d.warranty_until) return <span className="text-slate-400">—</span>;
@@ -261,16 +264,53 @@ export default function DevicesPage() {
   const qc = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<SlDeviceStatus | "all">("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<DeviceRow | null>(null);
   const [historyFor, setHistoryFor] = useState<DeviceRow | null>(null);
   const [deleting, setDeleting] = useState<DeviceRow | null>(null);
   const [actionError, setActionError] = useState("");
 
-  const { data: devices, isLoading, error } = useQuery({
-    queryKey: ["sl_devices"],
+  // The raw term goes inside an .or(...) pattern, so strip ilike wildcards
+  // and the comma that separates or-branches.
+  const searchTerm = sanitizeSearch(search);
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["sl_devices", "list", page, statusFilter, searchTerm],
     queryFn: () =>
-      listRows<DeviceRow>("sl_devices", (q) => q.select("*, vehicles(name)").order("serial")),
+      listPage<DeviceRow>("sl_devices", page, PAGE_SIZE, (q) => {
+        let query = q.select("*, vehicles(name)").order("serial");
+        if (statusFilter !== "all") query = query.eq("status", statusFilter);
+        if (searchTerm) {
+          query = query.or(
+            `serial.ilike.%${searchTerm}%,manufacturer.ilike.%${searchTerm}%,model.ilike.%${searchTerm}%,imei.ilike.%${searchTerm}%`,
+          );
+        }
+        return query;
+      }),
+  });
+  const devices = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const hasFilters = statusFilter !== "all" || searchTerm !== "";
+
+  // Server-side counts instead of reducing the full device list client-side.
+  // PostgREST aggregates (select=status,id.count()) are disabled on this
+  // project (PGRST123), so issue one zero-row head count per status.
+  const { data: statusCounts } = useQuery({
+    queryKey: ["sl_devices", "statusCounts"],
+    queryFn: async () => {
+      const entries = await Promise.all(
+        STATUS_FILTERS.map(async (status) => {
+          const { count, error: countError } = await supabase
+            .from("sl_devices")
+            .select("id", { count: "exact", head: true })
+            .eq("status", status);
+          if (countError) throw wrapDbError(countError);
+          return [status, count ?? 0] as const;
+        }),
+      );
+      return Object.fromEntries(entries) as Record<SlDeviceStatus, number>;
+    },
   });
 
   const remove = useMutation({
@@ -286,24 +326,10 @@ export default function DevicesPage() {
     },
   });
 
-  const kpis = useMemo(() => {
-    const counts: Record<SlDeviceStatus, number> = {
-      in_stock: 0, installed: 0, faulty: 0, retired: 0,
-    };
-    for (const d of devices ?? []) counts[d.status] += 1;
-    return counts;
-  }, [devices]);
-
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    return (devices ?? []).filter((d) => {
-      if (statusFilter !== "all" && d.status !== statusFilter) return false;
-      if (!needle) return true;
-      return [d.serial, d.manufacturer, d.model, d.imei].some((f) =>
-        f?.toLowerCase().includes(needle),
-      );
-    });
-  }, [devices, statusFilter, search]);
+  const kpis: Record<SlDeviceStatus, number> = {
+    in_stock: 0, installed: 0, faulty: 0, retired: 0,
+    ...statusCounts,
+  };
 
   function chip(value: SlDeviceStatus | "all", label: string) {
     const selected = statusFilter === value;
@@ -311,7 +337,10 @@ export default function DevicesPage() {
       <button
         key={value}
         type="button"
-        onClick={() => setStatusFilter(value)}
+        onClick={() => {
+          setStatusFilter(value);
+          setPage(0);
+        }}
         aria-pressed={selected}
         className={
           selected
@@ -352,7 +381,10 @@ export default function DevicesPage() {
         </div>
         <Input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
           placeholder={t("slDevices.searchPlaceholder")}
           className="max-w-72"
           aria-label={t("action.search")}
@@ -367,15 +399,17 @@ export default function DevicesPage() {
         </div>
       )}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && devices.length === 0 && (
         <EmptyState
           icon={<Cpu className="h-10 w-10" />}
-          title={devices?.length ? t("slDevices.emptyFilteredTitle") : t("slDevices.emptyTitle")}
+          title={
+            hasFilters || total > 0 ? t("slDevices.emptyFilteredTitle") : t("slDevices.emptyTitle")
+          }
           description={
-            devices?.length ? t("slDevices.emptyFilteredDesc") : t("slDevices.emptyDesc")
+            hasFilters || total > 0 ? t("slDevices.emptyFilteredDesc") : t("slDevices.emptyDesc")
           }
           action={
-            isManager && !devices?.length ? (
+            isManager && !hasFilters && total === 0 ? (
               <Button onClick={() => setAdding(true)}>
                 <Plus className="h-4 w-4" /> {t("slDevices.addDevice")}
               </Button>
@@ -384,7 +418,7 @@ export default function DevicesPage() {
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
+      {!isLoading && !error && devices.length > 0 && (
         <Table
           headers={[
             t("slDevices.serial"),
@@ -396,7 +430,7 @@ export default function DevicesPage() {
             "",
           ]}
         >
-          {filtered.map((d) => {
+          {devices.map((d) => {
             const sub = [d.manufacturer, d.model].filter(Boolean).join(" · ");
             return (
               <tr key={d.id} className="hover:bg-slate-50">
@@ -458,6 +492,10 @@ export default function DevicesPage() {
             );
           })}
         </Table>
+      )}
+
+      {!isLoading && !error && (
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
       )}
 
       <Modal title={t("slDevices.addDevice")} open={adding} onClose={() => setAdding(false)} wide>

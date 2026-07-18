@@ -1,16 +1,17 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addMonths, format } from "date-fns";
+import { addDays, addMonths, format } from "date-fns";
 import { Ban, Check, Copy, Printer, RefreshCw, Settings, ShieldCheck, Trash2 } from "lucide-react";
-import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
+import { deleteRow, insertRow, listPage, listRows, updateRow, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
 import type { Customer, SlSettings, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Table, Textarea,
+  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination,
+  Table, Textarea,
 } from "../../components/ui";
 
 type CertRow = SpeedLimiterCertificate & {
@@ -20,6 +21,8 @@ type CertRow = SpeedLimiterCertificate & {
 
 type Bucket = "revoked" | "expired" | "d30" | "d60" | "d90" | "ok";
 type FilterId = "all" | "valid" | "d30" | "d60" | "d90" | "expired" | "revoked";
+
+const PAGE_SIZE = 25;
 
 const FILTERS: { id: FilterId; labelKey: MessageKey }[] = [
   { id: "all", labelKey: "slCertificates.filterAll" },
@@ -39,12 +42,6 @@ function bucketOf(c: SpeedLimiterCertificate): Bucket {
   if (days <= 60) return "d60";
   if (days <= 90) return "d90";
   return "ok";
-}
-
-function matchesFilter(bucket: Bucket, filter: FilterId): boolean {
-  if (filter === "all") return true;
-  if (filter === "valid") return bucket !== "revoked" && bucket !== "expired";
-  return bucket === filter;
 }
 
 function expiresCell(c: CertRow, t: Translate) {
@@ -105,7 +102,7 @@ function RenewForm({
     mutationFn: async () => {
       // Atomic number allocation: call the RPC exactly once, at insert time.
       const { data: certNumber, error: rpcError } = await supabase.rpc("next_certificate_number");
-      if (rpcError) throw new Error(rpcError.message);
+      if (rpcError) throw wrapDbError(rpcError);
       return insertRow<SpeedLimiterCertificate>("speed_limiter_certificates", {
         certificate_number: certNumber as string,
         vehicle_id: cert.vehicle_id,
@@ -303,6 +300,7 @@ export default function CertificatesPage() {
   const qc = useQueryClient();
   const [filter, setFilter] = useState<FilterId>("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
   const [renewing, setRenewing] = useState<CertRow | null>(null);
   const [revoking, setRevoking] = useState<CertRow | null>(null);
   const [deleting, setDeleting] = useState<CertRow | null>(null);
@@ -310,13 +308,35 @@ export default function CertificatesPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [actionError, setActionError] = useState("");
 
-  const { data: certs, isLoading, error } = useQuery({
-    queryKey: ["speed_limiter_certificates"],
+  // ilike pattern characters are stripped so user input stays a literal match.
+  const searchTerm = search.trim().replace(/[%,]/g, "");
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["speed_limiter_certificates", "list", page, filter, searchTerm],
     queryFn: () =>
-      listRows<CertRow>("speed_limiter_certificates", (q) =>
-        q.select("*, vehicles(name, license_plate), customers(name)").order("expires_at"),
-      ),
+      listPage<CertRow>("speed_limiter_certificates", page, PAGE_SIZE, (q) => {
+        let query = q
+          .select("*, vehicles(name, license_plate), customers(name)")
+          .order("expires_at");
+        // Server-side equivalents of bucketOf/matchesFilter (daysUntil counts
+        // whole days from today, so date-only boundaries line up).
+        const day = (offset: number) => format(addDays(new Date(), offset), "yyyy-MM-dd");
+        if (filter === "revoked") query = query.eq("status", "revoked");
+        else if (filter === "valid") query = query.neq("status", "revoked").gte("expires_at", day(0));
+        else if (filter === "expired") query = query.neq("status", "revoked").lt("expires_at", day(0));
+        else if (filter === "d30")
+          query = query.neq("status", "revoked").gte("expires_at", day(0)).lte("expires_at", day(30));
+        else if (filter === "d60")
+          query = query.neq("status", "revoked").gte("expires_at", day(31)).lte("expires_at", day(60));
+        else if (filter === "d90")
+          query = query.neq("status", "revoked").gte("expires_at", day(61)).lte("expires_at", day(90));
+        if (searchTerm) query = query.ilike("certificate_number", `%${searchTerm}%`);
+        return query;
+      }),
   });
+  const certs = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const hasFilters = filter !== "all" || searchTerm !== "";
 
   const { data: settingsRows } = useQuery({
     queryKey: ["sl_settings"],
@@ -343,26 +363,6 @@ export default function CertificatesPage() {
     window.setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 2000);
   }
 
-  const filtered = useMemo(() => {
-    const needle = search.trim().toLowerCase();
-    return (certs ?? []).filter((c) => {
-      if (!matchesFilter(bucketOf(c), filter)) return false;
-      if (needle) {
-        const hay = [
-          c.certificate_number,
-          c.customers?.name,
-          c.vehicles?.name,
-          c.vehicles?.license_plate,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        if (!hay.includes(needle)) return false;
-      }
-      return true;
-    });
-  }, [certs, filter, search]);
-
   return (
     <>
       <PageHeader
@@ -382,7 +382,10 @@ export default function CertificatesPage() {
           {FILTERS.map((f) => (
             <button
               key={f.id}
-              onClick={() => setFilter(f.id)}
+              onClick={() => {
+                setFilter(f.id);
+                setPage(0);
+              }}
               aria-pressed={filter === f.id}
               className={
                 filter === f.id
@@ -397,7 +400,10 @@ export default function CertificatesPage() {
         <div className="ms-auto w-full sm:w-72">
           <Input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(0);
+            }}
             placeholder={t("slCertificates.searchPlaceholder")}
           />
         </div>
@@ -411,17 +417,23 @@ export default function CertificatesPage() {
         </div>
       )}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && certs.length === 0 && (
         <EmptyState
           icon={<ShieldCheck className="h-10 w-10" />}
-          title={certs?.length ? t("slCertificates.emptyFilteredTitle") : t("slCertificates.emptyTitle")}
+          title={
+            hasFilters || total > 0
+              ? t("slCertificates.emptyFilteredTitle")
+              : t("slCertificates.emptyTitle")
+          }
           description={
-            certs?.length ? t("slCertificates.emptyFilteredDesc") : t("slCertificates.emptyDesc")
+            hasFilters || total > 0
+              ? t("slCertificates.emptyFilteredDesc")
+              : t("slCertificates.emptyDesc")
           }
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
+      {!isLoading && !error && certs.length > 0 && (
         <Table
           headers={[
             t("slCertificates.number"),
@@ -432,7 +444,7 @@ export default function CertificatesPage() {
             "",
           ]}
         >
-          {filtered.map((c) => (
+          {certs.map((c) => (
             <tr key={c.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <div className="font-medium text-slate-800">{c.certificate_number}</div>
@@ -514,6 +526,10 @@ export default function CertificatesPage() {
             </tr>
           ))}
         </Table>
+      )}
+
+      {!isLoading && !error && (
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
       )}
 
       <Modal title={t("slCertificates.renewTitle")} open={!!renewing} onClose={() => setRenewing(null)} wide>

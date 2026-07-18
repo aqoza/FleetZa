@@ -1,8 +1,8 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Pencil, Plus, Wrench } from "lucide-react";
-import { insertRow, listRows, updateRow } from "../../lib/db";
+import { insertRow, listPage, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import type {
   SlChecklistItem,
@@ -26,6 +26,7 @@ import {
   LoadingState,
   Modal,
   PageHeader,
+  Pagination,
   Select,
   Table,
   Textarea,
@@ -37,6 +38,8 @@ type JobRow = SlJob & {
   customers: { name: string } | null;
   sl_technicians: { name: string } | null;
 };
+
+const PAGE_SIZE = 25;
 
 // Shared enum labels — defined once in the speedLimiters namespace.
 const jobTypeKeys: Record<SlJobType, MessageKey> = {
@@ -434,18 +437,26 @@ export default function JobsPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [technicianFilter, setTechnicianFilter] = useState("all");
   const [customerFilter, setCustomerFilter] = useState("all");
+  const [page, setPage] = useState(0);
   const [creating, setCreating] = useState(false);
   const [managingTechnicians, setManagingTechnicians] = useState(false);
 
-  const { data: jobs, isLoading, error } = useQuery({
-    queryKey: ["sl_jobs"],
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["sl_jobs", "list", page, typeFilter, statusFilter, technicianFilter, customerFilter],
     queryFn: () =>
-      listRows<JobRow>("sl_jobs", (q) =>
-        q
+      listPage<JobRow>("sl_jobs", page, PAGE_SIZE, (q) => {
+        let query = q
           .select("*, vehicles(name), customers(name), sl_technicians(name)")
-          .order("created_at", { ascending: false }),
-      ),
+          .order("created_at", { ascending: false });
+        if (typeFilter !== "all") query = query.eq("job_type", typeFilter);
+        if (statusFilter !== "all") query = query.eq("status", statusFilter);
+        if (technicianFilter !== "all") query = query.eq("technician_id", technicianFilter);
+        if (customerFilter !== "all") query = query.eq("customer_id", customerFilter);
+        return query;
+      }),
   });
+  const jobs = data?.rows ?? [];
+  const total = data?.total ?? 0;
 
   const {
     data: technicians,
@@ -475,17 +486,16 @@ export default function JobsPage() {
     queryFn: () => listRows<SlDevice>("sl_devices", (q) => q.order("serial")),
   });
 
-  const filtered = useMemo(
-    () =>
-      (jobs ?? []).filter((j) => {
-        if (typeFilter !== "all" && j.job_type !== typeFilter) return false;
-        if (statusFilter !== "all" && j.status !== statusFilter) return false;
-        if (technicianFilter !== "all" && j.technician_id !== technicianFilter) return false;
-        if (customerFilter !== "all" && j.customer_id !== customerFilter) return false;
-        return true;
-      }),
-    [jobs, typeFilter, statusFilter, technicianFilter, customerFilter],
-  );
+  const hasFilters =
+    typeFilter !== "all" ||
+    statusFilter !== "all" ||
+    technicianFilter !== "all" ||
+    customerFilter !== "all";
+
+  function setFilter(setter: (value: string) => void, value: string) {
+    setter(value);
+    setPage(0);
+  }
 
   return (
     <>
@@ -507,13 +517,21 @@ export default function JobsPage() {
       />
 
       <div className="mb-4 flex flex-wrap gap-3">
-        <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="max-w-44">
+        <Select
+          value={typeFilter}
+          onChange={(e) => setFilter(setTypeFilter, e.target.value)}
+          className="max-w-44"
+        >
           <option value="all">{t("slJobs.allTypes")}</option>
           {Object.entries(jobTypeKeys).map(([value, labelKey]) => (
             <option key={value} value={value}>{t(labelKey)}</option>
           ))}
         </Select>
-        <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="max-w-44">
+        <Select
+          value={statusFilter}
+          onChange={(e) => setFilter(setStatusFilter, e.target.value)}
+          className="max-w-44"
+        >
           <option value="all">{t("slJobs.allStatuses")}</option>
           {Object.entries(jobStatusMeta).map(([value, meta]) => (
             <option key={value} value={value}>{t(meta.labelKey)}</option>
@@ -521,7 +539,7 @@ export default function JobsPage() {
         </Select>
         <Select
           value={technicianFilter}
-          onChange={(e) => setTechnicianFilter(e.target.value)}
+          onChange={(e) => setFilter(setTechnicianFilter, e.target.value)}
           className="max-w-44"
         >
           <option value="all">{t("slJobs.allTechnicians")}</option>
@@ -531,7 +549,7 @@ export default function JobsPage() {
         </Select>
         <Select
           value={customerFilter}
-          onChange={(e) => setCustomerFilter(e.target.value)}
+          onChange={(e) => setFilter(setCustomerFilter, e.target.value)}
           className="max-w-44"
         >
           <option value="all">{t("slJobs.allCustomers")}</option>
@@ -544,13 +562,15 @@ export default function JobsPage() {
       {isLoading && <LoadingState />}
       {error && <ErrorState message={(error as Error).message} />}
 
-      {!isLoading && !error && filtered.length === 0 && (
+      {!isLoading && !error && jobs.length === 0 && (
         <EmptyState
           icon={<ClipboardList className="h-10 w-10" />}
-          title={jobs?.length ? t("slJobs.emptyFilteredTitle") : t("slJobs.emptyTitle")}
-          description={jobs?.length ? t("slJobs.emptyFilteredDesc") : t("slJobs.emptyDesc")}
+          title={hasFilters || total > 0 ? t("slJobs.emptyFilteredTitle") : t("slJobs.emptyTitle")}
+          description={
+            hasFilters || total > 0 ? t("slJobs.emptyFilteredDesc") : t("slJobs.emptyDesc")
+          }
           action={
-            isManager && !jobs?.length ? (
+            isManager && !hasFilters && total === 0 ? (
               <Button onClick={() => setCreating(true)}>
                 <Plus className="h-4 w-4" /> {t("slJobs.newJob")}
               </Button>
@@ -559,7 +579,7 @@ export default function JobsPage() {
         />
       )}
 
-      {!isLoading && !error && filtered.length > 0 && (
+      {!isLoading && !error && jobs.length > 0 && (
         <Table
           headers={[
             t("slJobs.number"),
@@ -571,7 +591,7 @@ export default function JobsPage() {
             t("common.status"),
           ]}
         >
-          {filtered.map((j) => (
+          {jobs.map((j) => (
             <tr key={j.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <Link
@@ -594,6 +614,10 @@ export default function JobsPage() {
             </tr>
           ))}
         </Table>
+      )}
+
+      {!isLoading && !error && (
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
       )}
 
       <Modal title={t("slJobs.newJob")} open={creating} onClose={() => setCreating(false)} wide>

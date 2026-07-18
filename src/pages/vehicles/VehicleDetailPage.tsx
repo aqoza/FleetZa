@@ -61,6 +61,7 @@ export default function VehicleDetailPage() {
   const [assigning, setAssigning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState("");
+  const [actionError, setActionError] = useState("");
 
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ["vehicles", id],
@@ -155,8 +156,13 @@ export default function VehicleDetailPage() {
       }
     },
     onSuccess: () => {
+      setActionError("");
       void qc.invalidateQueries({ queryKey: ["assignments"] });
       setAssigning(false);
+    },
+    onError: (err) => {
+      setAssigning(false);
+      setActionError(err instanceof Error ? err.message : t("common.error"));
     },
   });
 
@@ -165,6 +171,12 @@ export default function VehicleDetailPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       navigate("/vehicles");
+    },
+    // The delete guard (issued certificates / completed work) surfaces here
+    // with a localized message from wrapDbError.
+    onError: (err) => {
+      setConfirmDelete(false);
+      setActionError(err instanceof Error ? err.message : t("common.error"));
     },
   });
 
@@ -218,6 +230,12 @@ export default function VehicleDetailPage() {
           )
         }
       />
+
+      {actionError && (
+        <div className="mb-4">
+          <ErrorState message={actionError} />
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5">
