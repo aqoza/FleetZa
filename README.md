@@ -22,6 +22,24 @@ world (per-tenant currency, units, and timezone).
 - Privileged flows (tenant signup, invitation accept, role change, member removal) run in
   the Worker with `SUPABASE_SERVICE_ROLE_KEY`; the browser only ever holds the anon key.
 
+### Country engine
+
+`shared/countries.ts` is the single source of truth for per-country behavior, shared by
+the SPA and the Worker. Each tenant's country drives:
+
+- **Currency and locale formats** — dates, numbers, and currency rendering via the
+  country's locale, including 3-decimal (KWD/BHD/OMR/JOD) and 0-decimal (IQD, YER)
+  currencies.
+- **Tax rules** — the standard VAT/GST rate and local labels (e.g. "TRN" in the UAE),
+  applied to work-order totals (`taxBreakdown`: net lines, tax added on top).
+- **Regulation-based renewal defaults** — per-country vehicle renewal types and
+  intervals (registration, periodic inspection, insurance, etc.).
+- **Onboarding defaults** — currency, timezone, distance/volume units, and week start.
+
+Middle East countries carry detailed tax + regulation profiles; unknown codes resolve to
+a safe generic fallback. Adding support for a new country is adding one `CountryConfig`
+entry in that file.
+
 ## Local development
 
 Prereqs: Node 20+. Two backend options:

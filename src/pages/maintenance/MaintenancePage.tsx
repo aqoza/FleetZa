@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { BellRing, CheckCircle2, Pencil, Plus, Trash2, Wrench } from "lucide-react";
+import { getCountry, taxBreakdown } from "../../../shared/countries";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import {
   daysUntil, displayToKm, formatDate, formatDistance, formatMoney, kmToDisplay,
@@ -408,6 +409,7 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
         vendor: form.vendor.trim() || null,
         scheduled_date: form.scheduled_date || null,
         odometer: form.odometer ? Math.round(displayToKm(Number(form.odometer), unit)) : null,
+        tax_rate: getCountry(tenant.country).tax.rate,
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["work_orders"] });
@@ -490,6 +492,8 @@ function WorkOrdersTab({
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [status, setStatus] = useState("all");
+  const taxLabel = getCountry(tenant.country).tax.label;
+  const currencyDecimals = getCountry(tenant.country).currencyDecimals;
 
   const { data: workOrders, isLoading, error } = useQuery({
     queryKey: ["work_orders"],
@@ -542,10 +546,11 @@ function WorkOrdersTab({
       {!isLoading && !error && filtered.length > 0 && (
         <Table headers={["#", "Title", "Priority", "Status", "Scheduled", "Total"]}>
           {filtered.map((w) => {
-            const total = w.work_order_lines.reduce(
+            const subtotal = w.work_order_lines.reduce(
               (sum, l) => sum + l.quantity * l.unit_cost,
               0,
             );
+            const total = taxBreakdown(subtotal, w.tax_rate, currencyDecimals).total;
             return (
               <tr key={w.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3 text-slate-500">{w.number}</td>
@@ -569,6 +574,11 @@ function WorkOrdersTab({
                 <td className="px-4 py-3 text-slate-600">{formatDate(w.scheduled_date)}</td>
                 <td className="px-4 py-3 font-medium text-slate-800">
                   {formatMoney(total, tenant.currency)}
+                  {w.tax_rate > 0 && (
+                    <div className="text-xs font-normal text-slate-500">
+                      incl. {taxLabel} {w.tax_rate}%
+                    </div>
+                  )}
                 </td>
               </tr>
             );

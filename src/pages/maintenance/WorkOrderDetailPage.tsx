@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Ban, Check, Pencil, Play, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { getCountry, taxBreakdown } from "../../../shared/countries";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import {
   displayToKm, formatDate, formatDateTime, formatDistance, formatMoney, kmToDisplay,
@@ -241,7 +242,10 @@ export default function WorkOrderDetailPage() {
 
   const st = workOrderStatus[workOrder.status];
   const pr = priority[workOrder.priority];
-  const total = (lines ?? []).reduce((sum, l) => sum + l.quantity * l.unit_cost, 0);
+  const subtotal = (lines ?? []).reduce((sum, l) => sum + l.quantity * l.unit_cost, 0);
+  const currencyDecimals = getCountry(tenant.country).currencyDecimals;
+  const { taxAmount, total } = taxBreakdown(subtotal, workOrder.tax_rate, currencyDecimals);
+  const taxLabel = getCountry(tenant.country).tax.label;
 
   return (
     <>
@@ -401,17 +405,48 @@ export default function WorkOrderDetailPage() {
                   </td>
                 </tr>
               )}
-              {(lines ?? []).length > 0 && (
-                <tr className="bg-slate-50">
-                  <td colSpan={4} className="px-4 py-3 text-right font-semibold text-slate-700">
-                    Total
-                  </td>
-                  <td className="px-4 py-3 font-semibold text-slate-900">
-                    {formatMoney(total, tenant.currency)}
-                  </td>
-                  <td />
-                </tr>
-              )}
+              {(lines ?? []).length > 0 &&
+                (workOrder.tax_rate > 0 ? (
+                  <>
+                    <tr className="bg-slate-50">
+                      <td colSpan={4} className="px-4 py-2 text-right text-slate-600">
+                        Subtotal
+                      </td>
+                      <td className="px-4 py-2 text-slate-700">
+                        {formatMoney(subtotal, tenant.currency)}
+                      </td>
+                      <td />
+                    </tr>
+                    <tr className="bg-slate-50">
+                      <td colSpan={4} className="px-4 py-2 text-right text-slate-600">
+                        {taxLabel} ({workOrder.tax_rate}%)
+                      </td>
+                      <td className="px-4 py-2 text-slate-700">
+                        {formatMoney(taxAmount, tenant.currency)}
+                      </td>
+                      <td />
+                    </tr>
+                    <tr className="bg-slate-50">
+                      <td colSpan={4} className="px-4 py-3 text-right font-semibold text-slate-700">
+                        Total
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-slate-900">
+                        {formatMoney(total, tenant.currency)}
+                      </td>
+                      <td />
+                    </tr>
+                  </>
+                ) : (
+                  <tr className="bg-slate-50">
+                    <td colSpan={4} className="px-4 py-3 text-right font-semibold text-slate-700">
+                      Total
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-slate-900">
+                      {formatMoney(total, tenant.currency)}
+                    </td>
+                    <td />
+                  </tr>
+                ))}
             </Table>
           )}
           {isManager && (

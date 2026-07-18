@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { getCountry, taxBreakdown } from "../../../shared/countries";
 import { listRows } from "../../lib/db";
 import {
   computeEfficiency,
@@ -69,6 +70,9 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
 export default function ReportsPage() {
   const tenant = useTenant();
   const [period, setPeriod] = useState("90");
+  const currencyDecimals = getCountry(tenant.country).currencyDecimals;
+  const maintenanceHeader =
+    getCountry(tenant.country).tax.rate > 0 ? "Maintenance (incl. tax)" : "Maintenance";
 
   const { data: vehicles, isLoading: vehiclesLoading, error: vehiclesError } = useQuery({
     queryKey: ["vehicles", "reports"],
@@ -139,10 +143,11 @@ export default function ReportsPage() {
       if (log.odometer !== null) e.odometers.push(log.odometer);
     }
     for (const wo of periodOrders) {
-      entry(wo.vehicle_id).maintenance += wo.work_order_lines.reduce(
+      const lineSum = wo.work_order_lines.reduce(
         (sum, line) => sum + line.quantity * line.unit_cost,
         0,
       );
+      entry(wo.vehicle_id).maintenance += taxBreakdown(lineSum, wo.tax_rate, currencyDecimals).total;
     }
     const rows: CostRow[] = [];
     for (const [vehicleId, e] of byVehicle) {
@@ -165,7 +170,7 @@ export default function ReportsPage() {
     }
     rows.sort((a, b) => b.total - a.total);
     return rows;
-  }, [periodFuel, periodOrders, vehicleNames, tenant]);
+  }, [periodFuel, periodOrders, vehicleNames, tenant, currencyDecimals]);
 
   /** Section 2: fill-ups, volume, and average full-tank efficiency per vehicle. */
   const efficiencyRows = useMemo(() => {
@@ -218,13 +223,13 @@ export default function ReportsPage() {
 
   function exportCostCsv() {
     downloadCsv("cost-per-vehicle.csv", [
-      ["Vehicle", "Fuel", "Maintenance", "Total", `Cost per ${tenant.distance_unit}`],
+      ["Vehicle", "Fuel", maintenanceHeader, "Total", `Cost per ${tenant.distance_unit}`],
       ...costRows.map((r) => [
         r.name,
-        r.fuel.toFixed(2),
-        r.maintenance.toFixed(2),
-        r.total.toFixed(2),
-        r.costPerDistance === null ? "" : r.costPerDistance.toFixed(2),
+        r.fuel.toFixed(currencyDecimals),
+        r.maintenance.toFixed(currencyDecimals),
+        r.total.toFixed(currencyDecimals),
+        r.costPerDistance === null ? "" : r.costPerDistance.toFixed(currencyDecimals),
       ]),
     ]);
   }
@@ -328,7 +333,7 @@ export default function ReportsPage() {
                   headers={[
                     "Vehicle",
                     "Fuel",
-                    "Maintenance",
+                    maintenanceHeader,
                     "Total",
                     `Cost / ${tenant.distance_unit}`,
                   ]}

@@ -46,3 +46,20 @@ units (km/mi, L/gal), timezone.
 ## Deployment blockers needing user credentials (surface at end)
 - `supabase login` / project creation + `supabase db push`
 - `wrangler login` + secrets (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
+
+## Iteration 2 — Middle East country engine (2026-07-18)
+
+First-class Middle East support: per-country tax (VAT/GST/KDV), locale-correct
+formatting (incl. 3-decimal dinars/rials), and regulation-driven renewal defaults.
+Backward-compatible with existing live tenants (DB stays km + liters canonical;
+all schema changes additive).
+
+- [x] Country engine `shared/countries.ts` — `CountryConfig` (currency/locale/timezone/units/weekStart, tax profile, regulation renewal defaults), `getCountry` safe fallback, `isSupportedCountry`, grouped `middleEastCountries()`/`otherCountries()`, `taxBreakdown`
+- [ ] DB columns — additive migration: tenant country code + tax registration number, work-order tax fields
+- [ ] Worker onboarding — validate country code, derive currency/timezone/units defaults from the engine
+- [ ] Locale formatting — dates/numbers/currency via tenant country locale in `src/lib/format.ts`
+- [ ] Onboarding UI — grouped country select (Middle East first, then other countries)
+- [ ] Settings — country profile card + tax registration number field
+- [ ] Work orders — net subtotal + country tax breakdown + total
+- [ ] Renewals — country regulation-based renewal type/interval defaults
+- [x] Tests — `shared/countries.test.ts` engine unit tests; vitest include extended to `shared/**/*.test.ts`

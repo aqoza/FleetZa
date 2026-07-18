@@ -1,6 +1,14 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Mail, Plus, Users } from "lucide-react";
+import {
+  COUNTRIES,
+  getCountry,
+  isSupportedCountry,
+  middleEastCountries,
+  otherCountries,
+} from "../../../shared/countries";
+import type { CountryConfig } from "../../../shared/countries";
 import { apiFetch } from "../../lib/api";
 import { insertRow, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
@@ -20,11 +28,11 @@ import type { BadgeTone } from "../../components/ui";
 
 // --- shared helpers (option lists mirror SignupPage) ---
 
-const COMMON_CURRENCIES = [
-  "USD", "EUR", "GBP", "INR", "AUD", "CAD", "JPY", "CNY", "AED", "SAR",
-  "SGD", "CHF", "SEK", "NOK", "DKK", "NZD", "ZAR", "BRL", "MXN", "NGN",
-  "KES", "EGP", "TRY", "PLN", "IDR", "MYR", "THB", "PHP", "VND", "KRW",
-];
+const CURRENCIES = Array.from(
+  new Set(Object.values(COUNTRIES).map((c) => c.currency)),
+).sort();
+const MIDDLE_EAST_OPTIONS = middleEastCountries();
+const OTHER_OPTIONS = otherCountries();
 
 function browserTimezones(): string[] {
   try {
@@ -34,23 +42,8 @@ function browserTimezones(): string[] {
   }
 }
 
-function countryOptions(): Array<{ code: string; name: string }> {
-  const codes = [
-    "US", "GB", "IN", "AU", "CA", "DE", "FR", "ES", "IT", "NL", "AE", "SA",
-    "SG", "CH", "SE", "NO", "DK", "NZ", "ZA", "BR", "MX", "NG", "KE", "EG",
-    "TR", "PL", "ID", "MY", "TH", "PH", "VN", "KR", "JP", "CN",
-  ];
-  try {
-    const dn = new Intl.DisplayNames(undefined, { type: "region" });
-    return codes
-      .map((code) => ({ code, name: dn.of(code) ?? code }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  } catch {
-    return codes.map((code) => ({ code, name: code }));
-  }
-}
-
 function countryName(code: string): string {
+  if (isSupportedCountry(code)) return getCountry(code).name;
   try {
     return new Intl.DisplayNames(undefined, { type: "region" }).of(code) ?? code;
   } catch {
@@ -79,17 +72,11 @@ function OrganizationTab() {
     const list = browserTimezones();
     return list.includes(tenant.timezone) ? list : [tenant.timezone, ...list];
   }, [tenant.timezone]);
-  const countries = useMemo(() => {
-    const list = countryOptions();
-    return list.some((c) => c.code === tenant.country)
-      ? list
-      : [{ code: tenant.country, name: countryName(tenant.country) }, ...list];
-  }, [tenant.country]);
   const currencies = useMemo(
     () =>
-      COMMON_CURRENCIES.includes(tenant.currency)
-        ? COMMON_CURRENCIES
-        : [tenant.currency, ...COMMON_CURRENCIES],
+      CURRENCIES.includes(tenant.currency)
+        ? CURRENCIES
+        : [tenant.currency, ...CURRENCIES],
     [tenant.currency],
   );
 
@@ -100,6 +87,7 @@ function OrganizationTab() {
     timezone: tenant.timezone,
     distance_unit: tenant.distance_unit,
     volume_unit: tenant.volume_unit,
+    tax_registration_number: tenant.tax_registration_number ?? "",
   });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -118,6 +106,7 @@ function OrganizationTab() {
         timezone: form.timezone,
         distance_unit: form.distance_unit,
         volume_unit: form.volume_unit,
+        tax_registration_number: form.tax_registration_number.trim() || null,
       });
       await refresh();
     },
@@ -156,73 +145,179 @@ function OrganizationTab() {
   }
 
   return (
-    <Card className="max-w-2xl p-5">
-      <form onSubmit={onSubmit} className="space-y-4">
-        {error && <ErrorState message={error} />}
+    <div className="grid max-w-5xl items-start gap-4 lg:grid-cols-5">
+      <Card className="p-5 lg:col-span-3">
+        <form onSubmit={onSubmit} className="space-y-4">
+          {error && <ErrorState message={error} />}
 
-        <Field label="Organization name" required>
-          <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
-        </Field>
+          <Field label="Organization name" required>
+            <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
+          </Field>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Country" required>
-            <Select value={form.country} onChange={(e) => set("country", e.target.value)}>
-              {countries.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.name}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Currency" required>
-            <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
-              {currencies.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Timezone" required>
-            <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
-              {timezones.map((tz) => (
-                <option key={tz} value={tz}>
-                  {tz}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Distance">
-              <Select
-                value={form.distance_unit}
-                onChange={(e) => set("distance_unit", e.target.value as DistanceUnit)}
-              >
-                <option value="km">Kilometers</option>
-                <option value="mi">Miles</option>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Country"
+              required
+              hint={
+                form.country !== tenant.country
+                  ? "Changing country updates formats and tax defaults for the whole organization."
+                  : undefined
+              }
+            >
+              <Select value={form.country} onChange={(e) => set("country", e.target.value)}>
+                {!isSupportedCountry(tenant.country) && (
+                  <option value={tenant.country}>{countryName(tenant.country)}</option>
+                )}
+                <optgroup label="Middle East">
+                  {MIDDLE_EAST_OPTIONS.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Other countries">
+                  {OTHER_OPTIONS.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </optgroup>
               </Select>
             </Field>
-            <Field label="Volume">
-              <Select
-                value={form.volume_unit}
-                onChange={(e) => set("volume_unit", e.target.value as VolumeUnit)}
-              >
-                <option value="L">Liters</option>
-                <option value="gal">Gallons (US)</option>
+            <Field label="Currency" required>
+              <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
+                {currencies.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </Select>
             </Field>
+            <Field label="Timezone" required>
+              <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
+                {timezones.map((tz) => (
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Distance">
+                <Select
+                  value={form.distance_unit}
+                  onChange={(e) => set("distance_unit", e.target.value as DistanceUnit)}
+                >
+                  <option value="km">Kilometers</option>
+                  <option value="mi">Miles</option>
+                </Select>
+              </Field>
+              <Field label="Volume">
+                <Select
+                  value={form.volume_unit}
+                  onChange={(e) => set("volume_unit", e.target.value as VolumeUnit)}
+                >
+                  <option value="L">Liters</option>
+                  <option value="gal">Gallons (US)</option>
+                </Select>
+              </Field>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center justify-end gap-3">
-          {saved && !save.isPending && (
-            <span className="text-sm font-medium text-emerald-600">Saved.</span>
-          )}
-          <Button type="submit" loading={save.isPending}>
-            Save changes
-          </Button>
+          <Field label={getCountry(form.country).tax.registrationLabel}>
+            <Input
+              value={form.tax_registration_number}
+              onChange={(e) => set("tax_registration_number", e.target.value)}
+              autoComplete="off"
+            />
+          </Field>
+
+          <div className="flex items-center justify-end gap-3">
+            {saved && !save.isPending && (
+              <span className="text-sm font-medium text-emerald-600">Saved.</span>
+            )}
+            <Button type="submit" loading={save.isPending}>
+              Save changes
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      <CountryProfileCard cfg={getCountry(tenant.country)} />
+    </div>
+  );
+}
+
+// --- Country profile card (read-only) ---
+
+function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
+  const currencySample = useMemo(() => {
+    try {
+      return new Intl.NumberFormat(cfg.locale, {
+        style: "currency",
+        currency: cfg.currency,
+      }).format(1234.56);
+    } catch {
+      return `${cfg.currency} 1,234.56`;
+    }
+  }, [cfg]);
+
+  const dateSample = useMemo(() => {
+    try {
+      return new Intl.DateTimeFormat(cfg.locale, { dateStyle: "medium" }).format(new Date());
+    } catch {
+      return new Date().toDateString();
+    }
+  }, [cfg]);
+
+  return (
+    <Card className="p-5 lg:col-span-2">
+      <h2 className="text-sm font-semibold text-slate-900">Country profile</h2>
+      <p className="mt-1 text-xs text-slate-500">Defaults for {cfg.name} applied across the app.</p>
+
+      <dl className="mt-4 space-y-4">
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Currency
+          </dt>
+          <dd className="mt-1 text-sm text-slate-800">
+            {cfg.currency} <span className="text-slate-500">— e.g. {currencySample}</span>
+          </dd>
         </div>
-      </form>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Date format
+          </dt>
+          <dd className="mt-1 text-sm text-slate-800">{dateSample}</dd>
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tax</dt>
+          <dd className="mt-1 text-sm text-slate-800">
+            {cfg.tax.rate > 0 ? `${cfg.tax.label} ${cfg.tax.rate}%` : `No ${cfg.tax.label}`}
+          </dd>
+          {cfg.tax.note && <dd className="mt-1 text-xs text-slate-500">{cfg.tax.note}</dd>}
+        </div>
+        <div>
+          <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Renewal defaults
+          </dt>
+          <dd className="mt-1">
+            <ul className="space-y-1.5">
+              {cfg.regulations.renewals.map((r) => (
+                <li
+                  key={`${r.type}-${r.label}`}
+                  className="flex items-baseline justify-between gap-3 text-sm"
+                >
+                  <span className="text-slate-700">{r.label}</span>
+                  <span className="whitespace-nowrap text-xs text-slate-500">
+                    every {r.months} mo
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
     </Card>
   );
 }

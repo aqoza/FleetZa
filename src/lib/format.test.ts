@@ -21,6 +21,7 @@ const tenant = (over: Partial<Tenant> = {}): Tenant => ({
   distance_unit: "km",
   volume_unit: "L",
   timezone: "UTC",
+  tax_registration_number: null,
   created_at: "2026-01-01T00:00:00Z",
   ...over,
 });

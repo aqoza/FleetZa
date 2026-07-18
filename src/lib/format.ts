@@ -23,10 +23,21 @@ export function displayToLiters(value: number, unit: VolumeUnit): number {
 
 // --- formatting ---
 
+/**
+ * Module-level formatting context. When set (e.g. from the tenant's country
+ * config), all formatters below use this locale; when undefined they fall back
+ * to the browser default, preserving prior behavior.
+ */
+let activeLocale: string | undefined;
+
+export function configureFormatting(opts: { locale?: string }): void {
+  activeLocale = opts.locale;
+}
+
 export function formatMoney(amount: number | null | undefined, currency: string): string {
   if (amount === null || amount === undefined) return "—";
   try {
-    return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(amount);
+    return new Intl.NumberFormat(activeLocale, { style: "currency", currency }).format(amount);
   } catch {
     return `${currency} ${amount.toFixed(2)}`;
   }
@@ -35,19 +46,19 @@ export function formatMoney(amount: number | null | undefined, currency: string)
 export function formatDistance(km: number | null | undefined, unit: DistanceUnit): string {
   if (km === null || km === undefined) return "—";
   const v = kmToDisplay(km, unit);
-  return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(v)} ${unit}`;
+  return `${new Intl.NumberFormat(activeLocale, { maximumFractionDigits: 0 }).format(v)} ${unit}`;
 }
 
 export function formatVolume(liters: number | null | undefined, unit: VolumeUnit): string {
   if (liters === null || liters === undefined) return "—";
   const v = litersToDisplay(liters, unit);
-  return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(v)} ${unit}`;
+  return `${new Intl.NumberFormat(activeLocale, { maximumFractionDigits: 2 }).format(v)} ${unit}`;
 }
 
 export function formatDate(iso: string | null | undefined, timezone?: string): string {
   if (!iso) return "—";
   const d = new Date(iso.length === 10 ? `${iso}T00:00:00` : iso);
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(activeLocale, {
     dateStyle: "medium",
     ...(iso.length > 10 && timezone ? { timeZone: timezone } : {}),
   }).format(d);
@@ -55,7 +66,7 @@ export function formatDate(iso: string | null | undefined, timezone?: string): s
 
 export function formatDateTime(iso: string | null | undefined, timezone?: string): string {
   if (!iso) return "—";
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(activeLocale, {
     dateStyle: "medium",
     timeStyle: "short",
     ...(timezone ? { timeZone: timezone } : {}),

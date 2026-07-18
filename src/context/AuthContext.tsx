@@ -3,10 +3,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { getCountry } from "../../shared/countries";
+import { configureFormatting } from "../lib/format";
 import { supabase } from "../lib/supabase";
 import type { Profile, Tenant } from "../lib/types";
 
@@ -70,6 +73,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sub.subscription.unsubscribe();
     };
   }, [loadMembership]);
+
+  // Keep the app-wide formatting locale in sync with the tenant's country.
+  // Applied during render (useMemo, not useEffect) so the locale is set before
+  // children render — otherwise the first commit after tenant loads paints with
+  // the browser locale and can mix locales across components.
+  useMemo(() => {
+    configureFormatting({ locale: tenant ? getCountry(tenant.country).locale : undefined });
+  }, [tenant]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });

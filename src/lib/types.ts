@@ -10,6 +10,7 @@ export interface Tenant {
   distance_unit: DistanceUnit;
   volume_unit: VolumeUnit;
   timezone: string;
+  tax_registration_number: string | null;
   created_at: string;
 }
 
@@ -121,6 +122,7 @@ export interface WorkOrder {
   priority: Priority;
   vendor: string | null;
   odometer: number | null;
+  tax_rate: number;
   scheduled_date: string | null;
   completed_at: string | null;
   issue_id: string | null;

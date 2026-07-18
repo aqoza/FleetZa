@@ -4,7 +4,7 @@ import { defineConfig } from "vitest/config";
 // which is incompatible with the vitest runner. Pure-logic tests only.
 export default defineConfig({
   test: {
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "shared/**/*.test.ts"],
     environment: "node",
   },
 });

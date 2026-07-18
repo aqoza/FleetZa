@@ -1,15 +1,21 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  COUNTRIES,
+  getCountry,
+  middleEastCountries,
+  otherCountries,
+} from "../../../shared/countries";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, Select } from "../../components/ui";
 import { AuthShell } from "./AuthShell";
 
-const COMMON_CURRENCIES = [
-  "USD", "EUR", "GBP", "INR", "AUD", "CAD", "JPY", "CNY", "AED", "SAR",
-  "SGD", "CHF", "SEK", "NOK", "DKK", "NZD", "ZAR", "BRL", "MXN", "NGN",
-  "KES", "EGP", "TRY", "PLN", "IDR", "MYR", "THB", "PHP", "VND", "KRW",
-];
+const CURRENCIES = Array.from(
+  new Set(Object.values(COUNTRIES).map((c) => c.currency)),
+).sort();
+const MIDDLE_EAST_OPTIONS = middleEastCountries();
+const OTHER_OPTIONS = otherCountries();
 
 function browserTimezones(): string[] {
   try {
@@ -19,28 +25,10 @@ function browserTimezones(): string[] {
   }
 }
 
-function countryOptions(): Array<{ code: string; name: string }> {
-  const codes = [
-    "US", "GB", "IN", "AU", "CA", "DE", "FR", "ES", "IT", "NL", "AE", "SA",
-    "SG", "CH", "SE", "NO", "DK", "NZ", "ZA", "BR", "MX", "NG", "KE", "EG",
-    "TR", "PL", "ID", "MY", "TH", "PH", "VN", "KR", "JP", "CN",
-  ];
-  try {
-    const dn = new Intl.DisplayNames(undefined, { type: "region" });
-    return codes
-      .map((code) => ({ code, name: dn.of(code) ?? code }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  } catch {
-    return codes.map((code) => ({ code, name: code }));
-  }
-}
-
 export default function SignupPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
 
-  const timezones = useMemo(browserTimezones, []);
-  const countries = useMemo(countryOptions, []);
   const defaultTz = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone ?? "UTC",
     [],
@@ -60,9 +48,29 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const timezones = useMemo(() => {
+    const list = browserTimezones();
+    return list.includes(form.timezone) ? list : [form.timezone, ...list];
+  }, [form.timezone]);
+
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  /** Picking a country auto-fills its defaults; the fields stay editable. */
+  function pickCountry(code: string) {
+    const cfg = getCountry(code);
+    setForm((f) => ({
+      ...f,
+      country: code,
+      currency: cfg.currency,
+      timezone: cfg.timezone,
+      distanceUnit: cfg.distanceUnit,
+      volumeUnit: cfg.volumeUnit,
+    }));
+  }
+
+  const tax = getCountry(form.country).tax;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -131,18 +139,35 @@ export default function SignupPage() {
               autoComplete="new-password"
             />
           </Field>
-          <Field label="Country" required>
-            <Select value={form.country} onChange={(e) => set("country", e.target.value)}>
-              {countries.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.name}
-                </option>
-              ))}
+          <Field
+            label="Country"
+            required
+            hint={
+              tax.rate > 0
+                ? `${tax.label} ${tax.rate}% will be applied to maintenance costs.`
+                : undefined
+            }
+          >
+            <Select value={form.country} onChange={(e) => pickCountry(e.target.value)}>
+              <optgroup label="Middle East">
+                {MIDDLE_EAST_OPTIONS.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Other countries">
+                {OTHER_OPTIONS.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
             </Select>
           </Field>
           <Field label="Currency" required>
             <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
-              {COMMON_CURRENCIES.map((c) => (
+              {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>

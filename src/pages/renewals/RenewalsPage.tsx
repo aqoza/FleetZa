@@ -1,7 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
-import { CalendarClock, Check, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, Check, Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
+import { getCountry } from "../../../shared/countries";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { daysUntil, formatDate, formatMoney } from "../../lib/format";
 import { renewalTypes } from "../../lib/labels";
@@ -145,6 +146,116 @@ function RenewalForm({
   );
 }
 
+function CountryDefaultsForm({
+  vehicles,
+  onDone,
+}: {
+  vehicles: Vehicle[];
+  onDone: () => void;
+}) {
+  const tenant = useTenant();
+  const qc = useQueryClient();
+  const country = getCountry(tenant.country);
+  const catalog = country.regulations.renewals;
+  const notes = country.regulations.notes;
+  const [vehicleId, setVehicleId] = useState("");
+  const [result, setResult] = useState<{ added: number } | null>(null);
+  const [error, setError] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      // Dedup against the server, not the client cache: the `renewals` query can
+      // be empty or stale here, which would cause duplicate inserts.
+      const current = await listRows<Renewal>("renewals", (q) =>
+        q.eq("vehicle_id", vehicleId).is("completed_at", null),
+      );
+      const missing = catalog.filter(
+        (entry) => !current.some((r) => r.renewal_type === entry.type),
+      );
+      for (const entry of missing) {
+        await insertRow<Renewal>("renewals", {
+          vehicle_id: vehicleId,
+          renewal_type: entry.type,
+          name: entry.label,
+          due_date: format(addMonths(new Date(), entry.months), "yyyy-MM-dd"),
+          recurrence_months: entry.months,
+        });
+      }
+      return missing.length;
+    },
+    onSuccess: (added) => {
+      setError("");
+      setResult({ added });
+      if (added > 0) void qc.invalidateQueries({ queryKey: ["renewals"] });
+    },
+    onError: (err) => {
+      setError(err instanceof Error ? err.message : "Failed to add renewals");
+      // Some inserts may have landed before the failure — refresh the list.
+      void qc.invalidateQueries({ queryKey: ["renewals"] });
+    },
+  });
+
+  function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setResult(null);
+    mutation.mutate();
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      {error && <ErrorState message={error} />}
+      <Field label="Vehicle" required>
+        <Select
+          value={vehicleId}
+          onChange={(e) => {
+            setVehicleId(e.target.value);
+            setResult(null);
+          }}
+          required
+        >
+          <option value="">Select vehicle…</option>
+          {vehicles.map((v) => (
+            <option key={v.id} value={v.id}>{v.name}</option>
+          ))}
+        </Select>
+      </Field>
+      <div>
+        <span className="mb-1 block text-sm font-medium text-slate-700">
+          Standard renewals for {country.name}
+        </span>
+        <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-slate-50">
+          {catalog.map((entry) => (
+            <li key={entry.type} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+              <span className="text-slate-700">{entry.label}</span>
+              <span className="whitespace-nowrap text-xs text-slate-500">
+                every {entry.months} months
+              </span>
+            </li>
+          ))}
+        </ul>
+        {notes?.map((note) => (
+          <p key={note} className="mt-2 text-xs text-slate-500">{note}</p>
+        ))}
+      </div>
+      {result && (
+        <p
+          className={
+            result.added > 0 ? "text-sm font-medium text-emerald-700" : "text-sm text-slate-600"
+          }
+        >
+          {result.added > 0
+            ? `Added ${result.added} renewal${result.added === 1 ? "" : "s"}`
+            : "All standard renewals already exist for this vehicle."}
+        </p>
+      )}
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="secondary" onClick={onDone}>Close</Button>
+        <Button type="submit" loading={mutation.isPending}>Create</Button>
+      </div>
+    </form>
+  );
+}
+
 export default function RenewalsPage() {
   const tenant = useTenant();
   const { isManager } = useAuth();
@@ -152,6 +263,7 @@ export default function RenewalsPage() {
   const [statusFilter, setStatusFilter] = useState("pending");
   const [vehicleFilter, setVehicleFilter] = useState("all");
   const [adding, setAdding] = useState(false);
+  const [addingDefaults, setAddingDefaults] = useState(false);
   const [editing, setEditing] = useState<RenewalRow | null>(null);
   const [deleting, setDeleting] = useState<RenewalRow | null>(null);
   const [actionError, setActionError] = useState("");
@@ -175,14 +287,16 @@ export default function RenewalsPage() {
           "yyyy-MM-dd",
         );
         // Idempotency guard: a retried completion (insert ok, update failed)
-        // must not insert a duplicate next occurrence.
-        const existing = await listRows<Renewal>("renewals", (q) =>
-          q
+        // must not insert a duplicate next occurrence. Match on name too so two
+        // same-type chains with different names both roll over.
+        const existing = await listRows<Renewal>("renewals", (q) => {
+          let query = q
             .eq("vehicle_id", r.vehicle_id)
             .eq("renewal_type", r.renewal_type)
-            .eq("due_date", nextDue)
-            .limit(1),
-        );
+            .eq("due_date", nextDue);
+          query = r.name !== null ? query.eq("name", r.name) : query.is("name", null);
+          return query.limit(1);
+        });
         if (existing.length === 0) {
           await insertRow<Renewal>("renewals", {
             vehicle_id: r.vehicle_id,
@@ -238,9 +352,14 @@ export default function RenewalsPage() {
         description="Registrations, insurance, permits and other expiring documents"
         actions={
           isManager && (
-            <Button onClick={() => setAdding(true)}>
-              <Plus className="h-4 w-4" /> Add renewal
-            </Button>
+            <>
+              <Button variant="secondary" onClick={() => setAddingDefaults(true)}>
+                <ShieldCheck className="h-4 w-4" /> Add country defaults
+              </Button>
+              <Button onClick={() => setAdding(true)}>
+                <Plus className="h-4 w-4" /> Add renewal
+              </Button>
+            </>
           )
         }
       />
@@ -351,6 +470,17 @@ export default function RenewalsPage() {
 
       <Modal title="Add renewal" open={adding} onClose={() => setAdding(false)} wide>
         <RenewalForm vehicles={vehicles ?? []} onDone={() => setAdding(false)} />
+      </Modal>
+
+      <Modal
+        title="Add country defaults"
+        open={addingDefaults}
+        onClose={() => setAddingDefaults(false)}
+      >
+        <CountryDefaultsForm
+          vehicles={vehicles ?? []}
+          onDone={() => setAddingDefaults(false)}
+        />
       </Modal>
 
       <Modal title="Edit renewal" open={!!editing} onClose={() => setEditing(null)} wide>

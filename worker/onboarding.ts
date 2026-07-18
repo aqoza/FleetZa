@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { adminClient, DEFAULT_INSPECTION_ITEMS, type AppEnv } from "./lib";
+import { getCountry, isSupportedCountry } from "../shared/countries";
 
 const signupSchema = z.object({
   email: z.string().email().max(254),
@@ -9,10 +10,10 @@ const signupSchema = z.object({
   fullName: z.string().min(1).max(120),
   companyName: z.string().min(1).max(120),
   country: z.string().length(2).default("US"),
-  currency: z.string().length(3).default("USD"),
-  timezone: z.string().min(1).max(64).default("UTC"),
-  distanceUnit: z.enum(["km", "mi"]).default("km"),
-  volumeUnit: z.enum(["L", "gal"]).default("L"),
+  currency: z.string().length(3).optional(),
+  timezone: z.string().min(1).max(64).optional(),
+  distanceUnit: z.enum(["km", "mi"]).optional(),
+  volumeUnit: z.enum(["L", "gal"]).optional(),
 });
 
 export const onboarding = new Hono<AppEnv>();
@@ -24,6 +25,10 @@ export const onboarding = new Hono<AppEnv>();
  */
 onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
   const body = c.req.valid("json");
+  if (!isSupportedCountry(body.country)) {
+    return c.json({ error: `Unsupported country code "${body.country}".` }, 400);
+  }
+  const cfg = getCountry(body.country);
   const admin = adminClient(c.env);
 
   const { data: created, error: userErr } = await admin.auth.admin.createUser({
@@ -51,10 +56,10 @@ onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
     .insert({
       name: body.companyName,
       country: body.country.toUpperCase(),
-      currency: body.currency.toUpperCase(),
-      timezone: body.timezone,
-      distance_unit: body.distanceUnit,
-      volume_unit: body.volumeUnit,
+      currency: (body.currency ?? cfg.currency).toUpperCase(),
+      timezone: body.timezone ?? cfg.timezone,
+      distance_unit: body.distanceUnit ?? cfg.distanceUnit,
+      volume_unit: body.volumeUnit ?? cfg.volumeUnit,
     })
     .select("id")
     .single();
