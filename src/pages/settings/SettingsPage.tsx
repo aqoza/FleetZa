@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Mail, Plus, Users } from "lucide-react";
 import {
@@ -9,6 +10,13 @@ import {
   otherCountries,
 } from "../../../shared/countries";
 import type { CountryConfig } from "../../../shared/countries";
+import {
+  CATEGORY_ORDER,
+  MODULES,
+  getModule,
+  requirementsOf,
+} from "../../../shared/modules";
+import type { ModuleDef } from "../../../shared/modules";
 import { apiFetch } from "../../lib/api";
 import { insertRow, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
@@ -21,7 +29,8 @@ import type {
   VolumeUnit,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT, type Translate } from "../../i18n";
+import { useModules } from "../../context/ModulesContext";
+import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
@@ -333,6 +342,156 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
         </div>
       </dl>
     </Card>
+  );
+}
+
+// --- Modules tab ---
+
+const moduleNameKey = (id: string) => ("modules." + id + ".name") as MessageKey;
+const moduleDescriptionKey = (id: string) => ("modules." + id + ".description") as MessageKey;
+
+function ModuleCard({
+  mod,
+  pending,
+  onToggle,
+}: {
+  mod: ModuleDef;
+  pending: boolean;
+  onToggle: (id: string, next: boolean) => void;
+}) {
+  const t = useT();
+  const { isAdmin } = useAuth();
+  const { isEnabled } = useModules();
+
+  const enabled = isEnabled(mod.id);
+  const missingRequirements =
+    mod.status === "available" && !mod.alwaysOn && !enabled
+      ? requirementsOf(mod.id).filter((dep) => !isEnabled(dep))
+      : [];
+
+  let badge: ReactNode;
+  if (mod.alwaysOn) {
+    badge = <Badge tone="blue">{t("settings.modules.badge.included")}</Badge>;
+  } else if (enabled) {
+    badge = <Badge tone="green">{t("settings.modules.badge.enabled")}</Badge>;
+  } else if (mod.status === "coming_soon") {
+    badge = <Badge tone="slate">{t("settings.modules.badge.comingSoon")}</Badge>;
+  } else {
+    badge = (
+      <span className="inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5 text-xs font-medium text-slate-500">
+        {t("settings.modules.badge.available")}
+      </span>
+    );
+  }
+
+  return (
+    <Card className="flex flex-col p-4">
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="text-sm font-semibold text-slate-900">{t(moduleNameKey(mod.id))}</h3>
+        <div className="shrink-0">{badge}</div>
+      </div>
+      <p className="mt-1 flex-1 text-xs leading-relaxed text-slate-500">
+        {t(moduleDescriptionKey(mod.id))}
+      </p>
+
+      {isAdmin && !mod.alwaysOn && (
+        <div className="mt-3">
+          {mod.status === "coming_soon" ? (
+            <Button variant="secondary" disabled className="px-3 py-1.5 text-xs">
+              {t("settings.modules.comingSoon")}
+            </Button>
+          ) : enabled ? (
+            <Button
+              variant="secondary"
+              className="px-3 py-1.5 text-xs"
+              loading={pending}
+              onClick={() => onToggle(mod.id, false)}
+            >
+              {t("settings.modules.disable")}
+            </Button>
+          ) : (
+            <>
+              <Button
+                className="px-3 py-1.5 text-xs"
+                loading={pending}
+                onClick={() => onToggle(mod.id, true)}
+              >
+                {t("settings.modules.enable")}
+              </Button>
+              {missingRequirements.length > 0 && (
+                <p className="mt-2 text-xs text-slate-500">
+                  {t("settings.modules.willAlsoEnable", {
+                    list: missingRequirements
+                      .map((dep) => t(moduleNameKey(dep)))
+                      .join(t("common.listSeparator")),
+                  })}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function ModulesTab() {
+  const t = useT();
+  const { setModuleEnabled } = useModules();
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  async function toggle(id: string, next: boolean) {
+    setPendingId(id);
+    try {
+      await setModuleEnabled(id, next);
+      setError("");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.startsWith("DEPENDENTS:")) {
+        const list = message
+          .slice("DEPENDENTS:".length)
+          .split(",")
+          .filter((depId) => getModule(depId))
+          .map((depId) => t(moduleNameKey(depId)))
+          .join(t("common.listSeparator"));
+        setError(t("settings.modules.blockedByDependents", { list }));
+      } else {
+        setError(message);
+      }
+    } finally {
+      setPendingId(null);
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <p className="max-w-2xl text-sm text-slate-500">{t("settings.modules.intro")}</p>
+
+      {error && <ErrorState message={error} />}
+
+      {CATEGORY_ORDER.map((category) => {
+        const mods = MODULES.filter((mod) => mod.category === category);
+        if (mods.length === 0) return null;
+        return (
+          <section key={category}>
+            <h2 className="mb-3 text-sm font-semibold text-slate-900">
+              {t(`settings.modules.cat.${category}`)}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {mods.map((mod) => (
+                <ModuleCard
+                  key={mod.id}
+                  mod={mod}
+                  pending={pendingId === mod.id}
+                  onToggle={(id, next) => void toggle(id, next)}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
   );
 }
 
@@ -687,13 +846,25 @@ function InvitationsTab({
 
 // --- Page ---
 
-type Tab = "organization" | "members" | "invitations";
+type Tab = "organization" | "modules" | "members" | "invitations";
+
+const isModulesPath = (pathname: string) =>
+  pathname === "/settings/modules" || pathname.startsWith("/settings/modules/");
 
 export default function SettingsPage() {
   const t = useT();
   const { isAdmin } = useAuth();
-  const [tab, setTab] = useState<Tab>("organization");
+  const { pathname } = useLocation();
+  const [tab, setTab] = useState<Tab>(() =>
+    isModulesPath(pathname) ? "modules" : "organization",
+  );
   const [inviting, setInviting] = useState(false);
+
+  // ModuleGate links to /settings/modules — land on (or switch to) the
+  // Modules tab when the URL says so; tab clicks stay plain local state.
+  useEffect(() => {
+    if (isModulesPath(pathname)) setTab("modules");
+  }, [pathname]);
 
   return (
     <>
@@ -710,10 +881,11 @@ export default function SettingsPage() {
         }
       />
 
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         {(
           [
             ["organization", "settings.tab.organization"],
+            ["modules", "settings.tab.modules"],
             ["members", "settings.tab.members"],
             ["invitations", "settings.tab.invitations"],
           ] as const
@@ -733,6 +905,7 @@ export default function SettingsPage() {
       </div>
 
       {tab === "organization" && <OrganizationTab />}
+      {tab === "modules" && <ModulesTab />}
       {tab === "members" && <MembersTab />}
       {tab === "invitations" &&
         (isAdmin ? (

@@ -3,6 +3,7 @@ export const enSettings = {
   "settings.title": "Settings",
   "settings.subtitle": "Your organization, team members, and invitations",
   "settings.tab.organization": "Organization",
+  "settings.tab.modules": "Modules",
   "settings.tab.members": "Members",
   "settings.tab.invitations": "Invitations",
   "settings.adminsOnlyInvitations": "Only admins manage invitations.",
@@ -72,4 +73,28 @@ export const enSettings = {
   "settings.statusAccepted": "Accepted",
   "settings.statusRevoked": "Revoked",
   "settings.statusExpired": "Expired",
+
+  // Modules
+  "settings.modules.intro":
+    "Enable only what your business needs — the app adapts automatically.",
+  "settings.modules.cat.fleet_ops": "Fleet operations",
+  "settings.modules.cat.maintenance": "Maintenance & workshop",
+  "settings.modules.cat.compliance": "Compliance & certification",
+  "settings.modules.cat.logistics": "Logistics & transport",
+  "settings.modules.cat.commerce": "Commerce",
+  "settings.modules.cat.finance": "Finance",
+  "settings.modules.cat.people": "People",
+  "settings.modules.cat.customer": "Customer & partners",
+  "settings.modules.cat.analytics": "Analytics",
+  "settings.modules.cat.platform": "Platform",
+  "settings.modules.badge.enabled": "Enabled",
+  "settings.modules.badge.included": "Included",
+  "settings.modules.badge.comingSoon": "Coming soon",
+  "settings.modules.badge.available": "Available",
+  "settings.modules.enable": "Enable",
+  "settings.modules.disable": "Disable",
+  "settings.modules.comingSoon": "Coming soon",
+  "settings.modules.willAlsoEnable": "Will also enable: {list}",
+  "settings.modules.blockedByDependents":
+    "Disable the modules that depend on it first: {list}",
 } as const;

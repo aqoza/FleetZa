@@ -14,18 +14,20 @@ import {
   YAxis,
 } from "recharts";
 import { listRows } from "../lib/db";
-import { daysUntil, formatDate, formatDistance, formatMoney } from "../lib/format";
+import { daysUntil, formatCompact, formatDate, formatDistance, formatMoney } from "../lib/format";
 import { renewalTypes, vehicleStatus } from "../lib/labels";
 import type {
   FuelLog,
   Issue,
   Renewal,
   ServiceReminder,
+  SpeedLimiterCertificate,
   Vehicle,
   VehicleStatus,
   WorkOrder,
 } from "../lib/types";
 import { useTenant } from "../context/AuthContext";
+import { useModules } from "../context/ModulesContext";
 import { Badge, Card, ErrorState, LoadingState, PageHeader } from "../components/ui";
 import { useT } from "../i18n";
 
@@ -34,6 +36,7 @@ type RenewalRow = Renewal & { vehicles: { name: string } | null };
 type WorkOrderRow = WorkOrder & {
   work_order_lines: { quantity: number; unit_cost: number }[];
 };
+type CertificateRow = SpeedLimiterCertificate & { vehicles: { name: string } | null };
 
 const STATUS_COLORS: Record<VehicleStatus, string> = {
   active: "#10b981",
@@ -44,11 +47,6 @@ const STATUS_COLORS: Record<VehicleStatus, string> = {
 
 const FUEL_COLOR = "#1d67f1";
 const MAINTENANCE_COLOR = "#59aaff";
-
-const compactNumber = new Intl.NumberFormat(undefined, {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
 
 /** Overdue / due-soon state for a reminder, plus a sort key (lower = more urgent). */
 function reminderDue(r: ReminderRow) {
@@ -111,6 +109,14 @@ function NothingDue() {
 export default function DashboardPage() {
   const tenant = useTenant();
   const t = useT();
+  const { isEnabled } = useModules();
+
+  const issuesOn = isEnabled("issues");
+  const maintenanceOn = isEnabled("maintenance");
+  const preventiveOn = isEnabled("preventive");
+  const renewalsOn = isEnabled("renewals");
+  const fuelOn = isEnabled("fuel");
+  const slCertsOn = isEnabled("sl_certificates");
 
   const vehiclesQ = useQuery({
     queryKey: ["vehicles", "dashboard"],
@@ -121,6 +127,7 @@ export default function DashboardPage() {
     queryKey: ["issues", "dashboard", "open"],
     queryFn: () =>
       listRows<Issue>("issues", (q) => q.in("status", ["open", "in_progress"])),
+    enabled: issuesOn,
   });
 
   const workOrdersQ = useQuery({
@@ -131,6 +138,7 @@ export default function DashboardPage() {
           .select("*, work_order_lines(quantity, unit_cost)")
           .in("status", ["open", "in_progress"]),
       ),
+    enabled: maintenanceOn,
   });
 
   const maintenanceQ = useQuery({
@@ -142,6 +150,7 @@ export default function DashboardPage() {
           .eq("status", "completed")
           .gte("completed_at", subMonths(new Date(), 6).toISOString()),
       ),
+    enabled: maintenanceOn,
   });
 
   const remindersQ = useQuery({
@@ -150,6 +159,7 @@ export default function DashboardPage() {
       listRows<ReminderRow>("service_reminders", (q) =>
         q.select("*, vehicles(name, odometer)").eq("active", true),
       ),
+    enabled: preventiveOn,
   });
 
   const renewalsQ = useQuery({
@@ -158,6 +168,7 @@ export default function DashboardPage() {
       listRows<RenewalRow>("renewals", (q) =>
         q.select("*, vehicles(name)").is("completed_at", null).order("due_date"),
       ),
+    enabled: renewalsOn,
   });
 
   const fuelQ = useQuery({
@@ -166,6 +177,16 @@ export default function DashboardPage() {
       listRows<FuelLog>("fuel_logs", (q) =>
         q.gte("filled_at", subMonths(new Date(), 6).toISOString()),
       ),
+    enabled: fuelOn,
+  });
+
+  const certificatesQ = useQuery({
+    queryKey: ["speed_limiter_certificates", "dashboard"],
+    queryFn: () =>
+      listRows<CertificateRow>("speed_limiter_certificates", (q) =>
+        q.select("*, vehicles(name)").order("expires_at").limit(20),
+      ),
+    enabled: slCertsOn,
   });
 
   const vehicles = vehiclesQ.data ?? [];
@@ -223,11 +244,30 @@ export default function DashboardPage() {
     [renewals],
   );
 
-  const attentionCount =
-    dueReminders.filter((r) => r.overdue).length +
-    dueRenewals.filter((r) => r.days < 0).length;
+  const dueCertificates = useMemo(
+    () =>
+      (certificatesQ.data ?? [])
+        .map((c) => ({ certificate: c, days: daysUntil(c.expires_at) }))
+        .filter((c) => c.days <= 60),
+    [certificatesQ.data],
+  );
 
-  const queries = [vehiclesQ, issuesQ, workOrdersQ, maintenanceQ, remindersQ, renewalsQ, fuelQ];
+  const attentionCount =
+    (preventiveOn ? dueReminders.filter((r) => r.overdue).length : 0) +
+    (renewalsOn ? dueRenewals.filter((r) => r.days < 0).length : 0) +
+    (slCertsOn ? dueCertificates.filter((c) => c.days <= 30).length : 0);
+  const attentionOn = preventiveOn || renewalsOn || slCertsOn;
+
+  const queries = [
+    vehiclesQ,
+    issuesQ,
+    workOrdersQ,
+    maintenanceQ,
+    remindersQ,
+    renewalsQ,
+    fuelQ,
+    certificatesQ,
+  ];
   const isLoading = queries.some((q) => q.isLoading);
   const firstError = queries.map((q) => q.error).find(Boolean);
 
@@ -251,72 +291,97 @@ export default function DashboardPage() {
                 count: vehicles.filter((v) => v.status === "active").length,
               })}
             />
-            <KpiCard label={t("dashboard.openIssues")} value={issuesQ.data?.length ?? 0} />
-            <KpiCard label={t("dashboard.openWorkOrders")} value={workOrdersQ.data?.length ?? 0} />
-            <KpiCard
-              label={t("dashboard.attentionNeeded")}
-              value={attentionCount}
-              sub={t("dashboard.attentionSub")}
-              alert={attentionCount > 0}
-            />
+            {issuesOn && (
+              <KpiCard label={t("dashboard.openIssues")} value={issuesQ.data?.length ?? 0} />
+            )}
+            {maintenanceOn && (
+              <KpiCard
+                label={t("dashboard.openWorkOrders")}
+                value={workOrdersQ.data?.length ?? 0}
+              />
+            )}
+            {attentionOn && (
+              <KpiCard
+                label={t("dashboard.attentionNeeded")}
+                value={attentionCount}
+                sub={t("dashboard.attentionSub")}
+                alert={attentionCount > 0}
+              />
+            )}
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <Card className="p-5">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-sm font-semibold text-slate-900">
-                  {t("dashboard.monthlySpend")}
-                </h2>
-                <div className="flex items-center gap-4 text-xs text-slate-500">
-                  <span className="flex items-center gap-1.5">
-                    <span
-                      className="h-2.5 w-2.5 rounded-sm"
-                      style={{ backgroundColor: FUEL_COLOR }}
-                    />
-                    {t("nav.fuel")}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span
-                      className="h-2.5 w-2.5 rounded-sm"
-                      style={{ backgroundColor: MAINTENANCE_COLOR }}
-                    />
-                    {t("nav.maintenance")}
-                  </span>
+            {(fuelOn || maintenanceOn) && (
+              <Card className="p-5">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-sm font-semibold text-slate-900">
+                    {t("dashboard.monthlySpend")}
+                  </h2>
+                  <div className="flex items-center gap-4 text-xs text-slate-500">
+                    {fuelOn && (
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="h-2.5 w-2.5 rounded-sm"
+                          style={{ backgroundColor: FUEL_COLOR }}
+                        />
+                        {t("nav.fuel")}
+                      </span>
+                    )}
+                    {maintenanceOn && (
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="h-2.5 w-2.5 rounded-sm"
+                          style={{ backgroundColor: MAINTENANCE_COLOR }}
+                        />
+                        {t("nav.maintenance")}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div dir="ltr">
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={monthly}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                    <XAxis
-                      dataKey="month"
-                      tick={{ fill: "#64748b", fontSize: 12 }}
-                      tickLine={false}
-                      axisLine={false}
-                    />
-                    <YAxis
-                      tick={{ fill: "#64748b", fontSize: 12 }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={44}
-                      tickFormatter={(v) => compactNumber.format(Number(v))}
-                    />
-                    <Tooltip
-                      cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
-                      formatter={(value) => formatMoney(Number(value), tenant.currency)}
-                    />
-                    <Bar dataKey="fuel" name={t("nav.fuel")} stackId="spend" fill={FUEL_COLOR} />
-                    <Bar
-                      dataKey="maintenance"
-                      name={t("nav.maintenance")}
-                      stackId="spend"
-                      fill={MAINTENANCE_COLOR}
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
+                <div dir="ltr">
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={monthly}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                      <XAxis
+                        dataKey="month"
+                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis
+                        tick={{ fill: "#64748b", fontSize: 12 }}
+                        tickLine={false}
+                        axisLine={false}
+                        width={44}
+                        tickFormatter={(v) => formatCompact(Number(v))}
+                      />
+                      <Tooltip
+                        cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
+                        formatter={(value) => formatMoney(Number(value), tenant.currency)}
+                      />
+                      {fuelOn && (
+                        <Bar
+                          dataKey="fuel"
+                          name={t("nav.fuel")}
+                          stackId="spend"
+                          fill={FUEL_COLOR}
+                          radius={maintenanceOn ? undefined : [4, 4, 0, 0]}
+                        />
+                      )}
+                      {maintenanceOn && (
+                        <Bar
+                          dataKey="maintenance"
+                          name={t("nav.maintenance")}
+                          stackId="spend"
+                          fill={MAINTENANCE_COLOR}
+                          radius={[4, 4, 0, 0]}
+                        />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </Card>
+            )}
 
             <Card className="p-5">
               <h2 className="text-sm font-semibold text-slate-900">{t("dashboard.fleetStatus")}</h2>
@@ -365,65 +430,101 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <ListCard title={t("dashboard.dueSoonService")}>
-              {dueReminders.length === 0 ? (
-                <NothingDue />
-              ) : (
-                <ul className="divide-y divide-slate-100">
-                  {dueReminders.slice(0, 6).map(({ reminder: r, overdue }) => (
-                    <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-800">{r.task}</div>
-                        <div className="truncate text-xs text-slate-500">
-                          {r.vehicles.name}
-                          {" · "}
-                          {[
-                            r.due_date ? formatDate(r.due_date) : null,
-                            r.due_km != null
-                              ? formatDistance(r.due_km, tenant.distance_unit)
-                              : null,
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
+            {preventiveOn && (
+              <ListCard title={t("dashboard.dueSoonService")}>
+                {dueReminders.length === 0 ? (
+                  <NothingDue />
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {dueReminders.slice(0, 6).map(({ reminder: r, overdue }) => (
+                      <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-slate-800">
+                            {r.task}
+                          </div>
+                          <div className="truncate text-xs text-slate-500">
+                            {r.vehicles.name}
+                            {" · "}
+                            {[
+                              r.due_date ? formatDate(r.due_date) : null,
+                              r.due_km != null
+                                ? formatDistance(r.due_km, tenant.distance_unit)
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </div>
                         </div>
-                      </div>
-                      <Badge tone={overdue ? "red" : "yellow"}>
-                        {overdue ? t("dashboard.overdue") : t("dashboard.dueSoon")}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </ListCard>
+                        <Badge tone={overdue ? "red" : "yellow"}>
+                          {overdue ? t("dashboard.overdue") : t("dashboard.dueSoon")}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </ListCard>
+            )}
 
-            <ListCard title={t("dashboard.dueSoonRenewals")}>
-              {dueRenewals.length === 0 ? (
-                <NothingDue />
-              ) : (
-                <ul className="divide-y divide-slate-100">
-                  {dueRenewals.slice(0, 6).map(({ renewal: r, days }) => (
-                    <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-800">
-                          {t(renewalTypes[r.renewal_type])}
-                          {r.name ? ` — ${r.name}` : ""}
+            {renewalsOn && (
+              <ListCard title={t("dashboard.dueSoonRenewals")}>
+                {dueRenewals.length === 0 ? (
+                  <NothingDue />
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {dueRenewals.slice(0, 6).map(({ renewal: r, days }) => (
+                      <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-slate-800">
+                            {t(renewalTypes[r.renewal_type])}
+                            {r.name ? ` — ${r.name}` : ""}
+                          </div>
+                          <div className="truncate text-xs text-slate-500">
+                            {r.vehicles?.name ?? t("common.dash")} · {formatDate(r.due_date)}
+                          </div>
                         </div>
-                        <div className="truncate text-xs text-slate-500">
-                          {r.vehicles?.name ?? t("common.dash")} · {formatDate(r.due_date)}
+                        <Badge tone={days < 0 ? "red" : days <= 30 ? "yellow" : "slate"}>
+                          {days < 0
+                            ? t("dashboard.overdue")
+                            : days === 0
+                              ? t("dashboard.dueToday")
+                              : t("dashboard.dueInDays", { count: days })}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </ListCard>
+            )}
+
+            {slCertsOn && (
+              <ListCard title={t("dashboard.slCertsTitle")}>
+                {dueCertificates.length === 0 ? (
+                  <NothingDue />
+                ) : (
+                  <ul className="divide-y divide-slate-100">
+                    {dueCertificates.slice(0, 6).map(({ certificate: c, days }) => (
+                      <li key={c.id} className="flex items-center justify-between gap-3 px-5 py-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-slate-800">
+                            {c.certificate_number}
+                          </div>
+                          <div className="truncate text-xs text-slate-500">
+                            {c.vehicles?.name ?? t("common.dash")} · {formatDate(c.expires_at)}
+                          </div>
                         </div>
-                      </div>
-                      <Badge tone={days < 0 ? "red" : days <= 30 ? "yellow" : "slate"}>
-                        {days < 0
-                          ? t("dashboard.overdue")
-                          : days === 0
-                            ? t("dashboard.dueToday")
-                            : t("dashboard.dueInDays", { count: days })}
-                      </Badge>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </ListCard>
+                        <Badge tone={days < 0 ? "red" : "yellow"}>
+                          {days < 0
+                            ? t("dashboard.expired")
+                            : days === 0
+                              ? t("dashboard.dueToday")
+                              : t("dashboard.dueInDays", { count: days })}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </ListCard>
+            )}
           </div>
         </div>
       )}

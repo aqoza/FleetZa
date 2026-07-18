@@ -3,7 +3,9 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nProvider, useI18n } from "./i18n";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ModulesProvider, useModules } from "./context/ModulesContext";
 import AppLayout from "./components/AppLayout";
+import { ModuleGate } from "./components/ModuleGate";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import AcceptInvitePage from "./pages/auth/AcceptInvitePage";
@@ -23,6 +25,7 @@ import SettingsPage from "./pages/settings/SettingsPage";
 // recharts is heavy — split the chart pages into their own chunks
 const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
+const SpeedLimitersPage = lazy(() => import("./pages/speed-limiters/SpeedLimitersPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,8 +35,9 @@ const queryClient = new QueryClient({
 
 function Protected() {
   const { session, tenant, loading } = useAuth();
+  const { loading: modulesLoading } = useModules();
   const { t } = useI18n();
-  if (loading) return <LoadingState label={t("common.loadingWorkspace")} />;
+  if (loading || modulesLoading) return <LoadingState label={t("common.loadingWorkspace")} />;
   if (!session) return <Navigate to="/login" replace />;
   if (!tenant) return <LoadingState label={t("common.preparingOrg")} />;
   return <Outlet />;
@@ -51,6 +55,7 @@ export default function App() {
     <I18nProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <ModulesProvider>
           <BrowserRouter>
           <Routes>
             <Route element={<PublicOnly />}>
@@ -69,21 +74,63 @@ export default function App() {
                     </Suspense>
                   }
                 />
-                <Route path="/vehicles" element={<VehiclesPage />} />
-                <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
-                <Route path="/drivers" element={<DriversPage />} />
-                <Route path="/maintenance" element={<MaintenancePage />} />
-                <Route path="/maintenance/work-orders/:id" element={<WorkOrderDetailPage />} />
-                <Route path="/fuel" element={<FuelPage />} />
-                <Route path="/inspections" element={<InspectionsPage />} />
-                <Route path="/inspections/new" element={<NewInspectionPage />} />
-                <Route path="/issues" element={<IssuesPage />} />
-                <Route path="/renewals" element={<RenewalsPage />} />
+                <Route
+                  path="/vehicles"
+                  element={<ModuleGate module="fleet"><VehiclesPage /></ModuleGate>}
+                />
+                <Route
+                  path="/vehicles/:id"
+                  element={<ModuleGate module="fleet"><VehicleDetailPage /></ModuleGate>}
+                />
+                <Route
+                  path="/drivers"
+                  element={<ModuleGate module="drivers"><DriversPage /></ModuleGate>}
+                />
+                <Route
+                  path="/maintenance"
+                  element={<ModuleGate module="maintenance"><MaintenancePage /></ModuleGate>}
+                />
+                <Route
+                  path="/maintenance/work-orders/:id"
+                  element={<ModuleGate module="maintenance"><WorkOrderDetailPage /></ModuleGate>}
+                />
+                <Route
+                  path="/fuel"
+                  element={<ModuleGate module="fuel"><FuelPage /></ModuleGate>}
+                />
+                <Route
+                  path="/inspections"
+                  element={<ModuleGate module="inspections"><InspectionsPage /></ModuleGate>}
+                />
+                <Route
+                  path="/inspections/new"
+                  element={<ModuleGate module="inspections"><NewInspectionPage /></ModuleGate>}
+                />
+                <Route
+                  path="/issues"
+                  element={<ModuleGate module="issues"><IssuesPage /></ModuleGate>}
+                />
+                <Route
+                  path="/renewals"
+                  element={<ModuleGate module="renewals"><RenewalsPage /></ModuleGate>}
+                />
+                <Route
+                  path="/speed-limiters"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="speed_limiters">
+                        <SpeedLimitersPage />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
                 <Route
                   path="/reports"
                   element={
                     <Suspense fallback={<LoadingState />}>
-                      <ReportsPage />
+                      <ModuleGate module="reports">
+                        <ReportsPage />
+                      </ModuleGate>
                     </Suspense>
                   }
                 />
@@ -94,6 +141,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           </BrowserRouter>
+          </ModulesProvider>
         </AuthProvider>
       </QueryClientProvider>
     </I18nProvider>

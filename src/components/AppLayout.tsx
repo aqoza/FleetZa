@@ -1,35 +1,10 @@
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import {
-  AlertTriangle,
-  BarChart3,
-  ClipboardCheck,
-  Fuel,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Settings,
-  ShieldCheck,
-  Truck,
-  Users,
-  Wrench,
-  X,
-} from "lucide-react";
+import { LogOut, Menu, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { LANGUAGES, useI18n, type MessageKey } from "../i18n";
-
-const nav: { to: string; labelKey: MessageKey; icon: typeof Truck; end?: boolean }[] = [
-  { to: "/", labelKey: "nav.dashboard", icon: LayoutDashboard, end: true },
-  { to: "/vehicles", labelKey: "nav.vehicles", icon: Truck },
-  { to: "/drivers", labelKey: "nav.drivers", icon: Users },
-  { to: "/maintenance", labelKey: "nav.maintenance", icon: Wrench },
-  { to: "/fuel", labelKey: "nav.fuel", icon: Fuel },
-  { to: "/inspections", labelKey: "nav.inspections", icon: ClipboardCheck },
-  { to: "/issues", labelKey: "nav.issues", icon: AlertTriangle },
-  { to: "/renewals", labelKey: "nav.renewals", icon: ShieldCheck },
-  { to: "/reports", labelKey: "nav.reports", icon: BarChart3 },
-  { to: "/settings", labelKey: "nav.settings", icon: Settings },
-];
+import { useModules } from "../context/ModulesContext";
+import { LANGUAGES, useI18n } from "../i18n";
+import { NAV_ITEMS } from "../modules/nav";
 
 function LanguageSwitcher() {
   const { language, t } = useI18n();
@@ -53,8 +28,11 @@ function LanguageSwitcher() {
 
 export default function AppLayout() {
   const { tenant, profile, signOut } = useAuth();
+  const { isEnabled } = useModules();
   const { t } = useI18n();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navItems = NAV_ITEMS.filter(({ moduleId }) => isEnabled(moduleId));
 
   const sidebar = (
     <div className="flex h-full flex-col">
@@ -68,7 +46,7 @@ export default function AppLayout() {
         </div>
       </div>
       <nav className="flex-1 space-y-0.5 px-3">
-        {nav.map(({ to, labelKey, icon: Icon, end }) => (
+        {navItems.map(({ to, labelKey, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}

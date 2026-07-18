@@ -46,6 +46,10 @@ import { enReports } from "./messages/en/reports";
 import { arReports } from "./messages/ar/reports";
 import { enSettings } from "./messages/en/settings";
 import { arSettings } from "./messages/ar/settings";
+import { enModules } from "./messages/en/modules";
+import { arModules } from "./messages/ar/modules";
+import { enSpeedLimiters } from "./messages/en/speedLimiters";
+import { arSpeedLimiters } from "./messages/ar/speedLimiters";
 
 export type Language = "en" | "ar";
 export type Direction = "ltr" | "rtl";
@@ -68,6 +72,8 @@ const en = {
   ...enRenewals,
   ...enReports,
   ...enSettings,
+  ...enModules,
+  ...enSpeedLimiters,
 };
 
 const ar: Record<string, string> = {
@@ -83,6 +89,8 @@ const ar: Record<string, string> = {
   ...arRenewals,
   ...arReports,
   ...arSettings,
+  ...arModules,
+  ...arSpeedLimiters,
 };
 
 /** Every valid translation key. Use this to type any `labelKey` fields. */

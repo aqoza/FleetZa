@@ -13,6 +13,7 @@ export const enCommon = {
   "nav.inspections": "Inspections",
   "nav.issues": "Issues",
   "nav.renewals": "Renewals",
+  "nav.speedLimiters": "Speed limiters",
   "nav.reports": "Reports",
   "nav.settings": "Settings",
 
@@ -54,6 +55,7 @@ export const enCommon = {
   "common.saving": "Saving…",
   "common.deleting": "Deleting…",
   "common.dash": "—",
+  "common.listSeparator": ", ",
 
   // Common fields
   "field.name": "Name",

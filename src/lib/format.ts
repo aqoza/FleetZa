@@ -34,6 +34,14 @@ export function configureFormatting(opts: { locale?: string }): void {
   activeLocale = opts.locale;
 }
 
+/** Compact notation (1.5K, 3M) in the tenant locale — evaluated per call, not frozen at import. */
+export function formatCompact(n: number): string {
+  return new Intl.NumberFormat(activeLocale, {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(n);
+}
+
 export function formatMoney(amount: number | null | undefined, currency: string): string {
   if (amount === null || amount === undefined) return "—";
   try {

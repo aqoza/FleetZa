@@ -7,7 +7,7 @@ export const enDashboard = {
   "dashboard.openIssues": "Open issues",
   "dashboard.openWorkOrders": "Open work orders",
   "dashboard.attentionNeeded": "Attention needed",
-  "dashboard.attentionSub": "Overdue reminders & renewals",
+  "dashboard.attentionSub": "Overdue items that need action",
 
   // Charts
   "dashboard.monthlySpend": "Monthly spend — last 6 months",
@@ -17,10 +17,12 @@ export const enDashboard = {
   // Due-soon lists
   "dashboard.dueSoonService": "Due soon — service",
   "dashboard.dueSoonRenewals": "Due soon — renewals",
+  "dashboard.slCertsTitle": "Expiring — speed limiter certificates",
   "dashboard.nothingDue": "Nothing due — nice and healthy fleet.",
 
   // Badges
   "dashboard.overdue": "Overdue",
+  "dashboard.expired": "Expired",
   "dashboard.dueSoon": "Due soon",
   "dashboard.dueToday": "Due today",
   "dashboard.dueInDays": "Due in {count} d",

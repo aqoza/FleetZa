@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import { getCountry } from "../../shared/countries";
 import { useI18n } from "../i18n";
 import { configureFormatting } from "../lib/format";
@@ -31,6 +32,7 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { setLanguage: applyLanguage } = useI18n();
+  const qc = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -66,6 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === "SIGNED_OUT") {
         setProfile(null);
         setTenant(null);
+        // Drop every cached query so a later sign-in (possibly as a different
+        // tenant) can never be served the previous tenant's data.
+        qc.clear();
       } else if (event === "SIGNED_IN") {
         setTimeout(() => void loadMembership(s), 0);
       }
@@ -75,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       sub.subscription.unsubscribe();
     };
-  }, [loadMembership]);
+  }, [loadMembership, qc]);
 
   // Keep the app-wide formatting locale in sync with the tenant's country.
   // Applied during render (useMemo, not useEffect) so the locale is set before

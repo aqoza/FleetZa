@@ -3,6 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { adminClient, DEFAULT_INSPECTION_ITEMS, type AppEnv } from "./lib";
 import { getCountry, isSupportedCountry } from "../shared/countries";
+import { DEFAULT_MODULES } from "../shared/modules";
 
 const signupSchema = z.object({
   email: z.string().email().max(254),
@@ -93,6 +94,15 @@ onboarding.post("/signup", zValidator("json", signupSchema), async (c) => {
     name: "Standard vehicle inspection",
     items: DEFAULT_INSPECTION_ITEMS,
   });
+
+  // Subscribe the new tenant to the default module set.
+  await admin.from("tenant_modules").insert(
+    DEFAULT_MODULES.map((moduleId) => ({
+      tenant_id: tenant.id,
+      module_id: moduleId,
+      enabled_by: userId,
+    })),
+  );
 
   return c.json({ ok: true, tenantId: tenant.id }, 201);
 });

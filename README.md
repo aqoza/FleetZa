@@ -40,6 +40,31 @@ Middle East countries carry detailed tax + regulation profiles; unknown codes re
 a safe generic fallback. Adding support for a new country is adding one `CountryConfig`
 entry in that file.
 
+## Modular architecture
+
+FleetManage is modular (Zoho/Odoo-style): tenants subscribe to the modules they need
+and the whole app adapts. `shared/modules.ts` is the module registry — the single
+source of truth for every module (category, status, dependencies, owned routes),
+shared by the SPA and the Worker. Subscriptions live in the `tenant_modules` table
+(RLS: members read, admins write); new tenants start with the default set at signup.
+
+The app adapts automatically to what's enabled:
+
+- **Navigation** shows only enabled modules' entries.
+- **Routes** are wrapped in `<ModuleGate>` — visiting a disabled module's URL shows a
+  friendly "enable this module" screen (with a manage link for admins) instead of the page.
+- **Dashboard** widgets render only for enabled modules.
+- **Settings → Modules** is the admin catalog: browse by category, enable/disable per
+  tenant. Dependencies auto-enable; disabling warns when enabled modules depend on it.
+
+11 modules are live today (fleet core, drivers, fuel, maintenance, preventive service,
+inspections, issues, renewals, reports, speed limiters, speed limiter certificates),
+plus a catalog of coming-soon modules (GPS tracking, dispatch, TMS, workshop, finance,
+CRM, …) that become enableable as they're implemented.
+
+See [docs/MODULES.md](docs/MODULES.md) for the end-to-end contract for building a new
+module (registry entry → i18n → DB + RLS → page → nav → gated route → tests).
+
 ## Local development
 
 Prereqs: Node 20+. Two backend options:
@@ -131,6 +156,7 @@ attached in the Cloudflare dashboard (Workers → your worker → Domains & Rout
 ```
 src/            React SPA (pages, components, context, lib)
 worker/         Hono API: onboarding, invitations, members
+shared/         country engine + module registry
 supabase/       config.toml + SQL migrations (schema, RLS, triggers)
-docs/           PLAN.md (phase tracker), RESEARCH.md (market research)
+docs/           PLAN.md (phase tracker), MODULES.md (module contract), RESEARCH.md (market research)
 ```

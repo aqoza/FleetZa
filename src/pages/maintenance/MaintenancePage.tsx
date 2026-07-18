@@ -11,6 +11,7 @@ import {
 import { priority, workOrderStatus } from "../../lib/labels";
 import type { ServiceReminder, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -628,7 +629,12 @@ type Tab = "reminders" | "work_orders";
 export default function MaintenancePage() {
   const t = useT();
   const { isManager } = useAuth();
-  const [tab, setTab] = useState<Tab>("reminders");
+  const { isEnabled } = useModules();
+  // Service reminders belong to the "preventive" module — without it the page
+  // only offers work orders.
+  const preventiveEnabled = isEnabled("preventive");
+  const [tab, setTab] = useState<Tab>(preventiveEnabled ? "reminders" : "work_orders");
+  const activeTab: Tab = preventiveEnabled ? tab : "work_orders";
   const [addingReminder, setAddingReminder] = useState(false);
   const [addingWorkOrder, setAddingWorkOrder] = useState(false);
 
@@ -639,7 +645,7 @@ export default function MaintenancePage() {
         description={t("maintenance.subtitle")}
         actions={
           isManager &&
-          (tab === "reminders" ? (
+          (activeTab === "reminders" ? (
             <Button onClick={() => setAddingReminder(true)}>
               <Plus className="h-4 w-4" /> {t("maintenance.addReminder")}
             </Button>
@@ -657,12 +663,14 @@ export default function MaintenancePage() {
             ["reminders", t("maintenance.tabReminders")],
             ["work_orders", t("maintenance.tabWorkOrders")],
           ] as [Tab, string][]
-        ).map(([value, label]) => (
+        )
+          .filter(([value]) => value !== "reminders" || preventiveEnabled)
+          .map(([value, label]) => (
           <button
             key={value}
             onClick={() => setTab(value)}
             className={
-              tab === value
+              activeTab === value
                 ? "rounded-full bg-brand-600 px-4 py-1.5 text-sm font-medium text-white shadow-sm"
                 : "rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50"
             }
@@ -672,7 +680,7 @@ export default function MaintenancePage() {
         ))}
       </div>
 
-      {tab === "reminders" ? (
+      {activeTab === "reminders" ? (
         <RemindersTab adding={addingReminder} setAdding={setAddingReminder} />
       ) : (
         <WorkOrdersTab adding={addingWorkOrder} setAdding={setAddingWorkOrder} />

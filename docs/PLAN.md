@@ -64,3 +64,18 @@ all schema changes additive).
 - [ ] Renewals â€” country regulation-based renewal type/interval defaults
 - [x] Tests â€” `shared/countries.test.ts` engine unit tests; vitest include extended to `shared/**/*.test.ts`
 
+## Iteration 4 — Modular platform (2026-07-18)
+
+Zoho/Odoo-style modularity: tenants subscribe to modules (`tenant_modules`) and the
+app adapts (nav, routes, dashboard, settings catalog). Registry `shared/modules.ts`
+is the single source of truth (41 modules: 11 available, rest coming_soon). First
+add-on modules: speed limiters + speed limiter certificates. Additive only —
+existing tenants backfilled with the default module set.
+
+- [x] Registry + DB + worker defaults — `shared/modules.ts` (MODULES/MODULE_MAP/requirementsOf/dependentsOf/moduleForPath), `tenant_modules` + speed limiter tables migration (RLS, backfill), signup subscribes `DEFAULT_MODULES`
+- [ ] Gating — nav filtered by enabled modules, routes wrapped in `<ModuleGate>`, dashboard widgets behind `isEnabled`
+- [ ] Module catalog UI — `/settings/modules` admin catalog (category groups, enable/disable, dependency prompts, coming-soon)
+- [ ] Speed limiter modules — installations + certificates pages (list/forms, expiry badges)
+- [ ] i18n — module names/descriptions + speed limiter namespaces (en + ar)
+- [x] Docs + tests — `docs/MODULES.md` end-to-end module contract, `shared/modules.test.ts` registry invariants, README modular architecture section
+

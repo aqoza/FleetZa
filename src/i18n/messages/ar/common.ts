@@ -15,6 +15,7 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "nav.inspections": "الفحوصات",
   "nav.issues": "الأعطال",
   "nav.renewals": "التجديدات",
+  "nav.speedLimiters": "محددات السرعة",
   "nav.reports": "التقارير",
   "nav.settings": "الإعدادات",
 
@@ -54,6 +55,7 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "common.saving": "جارٍ الحفظ…",
   "common.deleting": "جارٍ الحذف…",
   "common.dash": "—",
+  "common.listSeparator": "، ",
 
   "field.name": "الاسم",
   "field.email": "البريد الإلكتروني",

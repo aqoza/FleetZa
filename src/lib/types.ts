@@ -219,6 +219,47 @@ export interface Issue {
   updated_at: string;
 }
 
+export interface TenantModule {
+  tenant_id: string;
+  module_id: string;
+  enabled: boolean;
+  enabled_at: string;
+  enabled_by: string | null;
+}
+
+export type SpeedLimiterStatus = "active" | "maintenance" | "removed";
+
+export interface SpeedLimiterInstallation {
+  id: string;
+  tenant_id: string;
+  vehicle_id: string;
+  device_serial: string;
+  brand: string | null;
+  model: string | null;
+  set_speed_kmh: number | null;
+  installed_at: string;
+  technician: string | null;
+  status: SpeedLimiterStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SpeedLimiterCertificate {
+  id: string;
+  tenant_id: string;
+  installation_id: string | null;
+  vehicle_id: string;
+  certificate_number: string;
+  issuing_authority: string | null;
+  issued_at: string;
+  expires_at: string;
+  renewed_from: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export type RenewalType =
   | "registration" | "insurance" | "permit" | "emission_test" | "roadworthiness" | "other";
 

@@ -2,12 +2,14 @@ import { enSettings } from "../en/settings";
 
 // Arabic (MSA). Glossary: الإعدادات (settings), المؤسسة (organization),
 // عضو (member), دعوة (invitation), الضريبة (tax), تجديد (renewal),
-// المسافة/الحجم (distance/volume). The Record type enforces completeness.
+// المسافة/الحجم (distance/volume), وحدة (module).
+// The Record type enforces completeness.
 export const arSettings: Record<keyof typeof enSettings, string> = {
   // Page
   "settings.title": "الإعدادات",
   "settings.subtitle": "مؤسستك وأعضاء فريقك والدعوات",
   "settings.tab.organization": "المؤسسة",
+  "settings.tab.modules": "الوحدات",
   "settings.tab.members": "الأعضاء",
   "settings.tab.invitations": "الدعوات",
   "settings.adminsOnlyInvitations": "إدارة الدعوات متاحة للمدراء فقط.",
@@ -75,4 +77,27 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.statusAccepted": "مقبولة",
   "settings.statusRevoked": "ملغاة",
   "settings.statusExpired": "منتهية",
+
+  // Modules
+  "settings.modules.intro": "فعّل ما يحتاجه عملك فقط — يتكيّف التطبيق تلقائيًا.",
+  "settings.modules.cat.fleet_ops": "عمليات الأسطول",
+  "settings.modules.cat.maintenance": "الصيانة والورشة",
+  "settings.modules.cat.compliance": "الامتثال والشهادات",
+  "settings.modules.cat.logistics": "الخدمات اللوجستية والنقل",
+  "settings.modules.cat.commerce": "التجارة",
+  "settings.modules.cat.finance": "المالية",
+  "settings.modules.cat.people": "شؤون الموظفين",
+  "settings.modules.cat.customer": "العملاء والشركاء",
+  "settings.modules.cat.analytics": "التحليلات",
+  "settings.modules.cat.platform": "المنصة",
+  "settings.modules.badge.enabled": "مفعّلة",
+  "settings.modules.badge.included": "مضمّنة",
+  "settings.modules.badge.comingSoon": "قريبًا",
+  "settings.modules.badge.available": "متاحة",
+  "settings.modules.enable": "تفعيل",
+  "settings.modules.disable": "تعطيل",
+  "settings.modules.comingSoon": "قريبًا",
+  "settings.modules.willAlsoEnable": "سيتم أيضًا تفعيل: {list}",
+  "settings.modules.blockedByDependents":
+    "عطّل أولًا الوحدات التي تعتمد عليها: {list}",
 };
