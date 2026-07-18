@@ -1,40 +1,48 @@
-# CI/CD — auto-deploy to Cloudflare
+# CI/CD — Cloudflare Git integration (no GitHub Actions)
 
-`.github/workflows/deploy.yml` runs on every push/PR to `main`:
+Deploy by connecting the GitHub repo directly to Cloudflare, so every push to `main`
+auto-builds and deploys. No `.github/workflows` YAML is used.
 
-- **Pull request → `main`:** install → `npm test` → `npm run build` (a required check; no deploy).
-- **Merge into `main` (push):** the same, then `npx wrangler deploy`.
+## Important: this app is a Worker, not a static site
 
-## Required GitHub Actions secrets
+FleetManage is a **Cloudflare Worker with static assets** — the Hono API at `/api/*`
+(`worker/index.ts`) and the SPA are served by the same Worker. So use **Workers Builds**
+(Cloudflare's Git integration *for Workers*), NOT the classic **Pages** product.
 
-Add these in **GitHub → your repo → Settings → Secrets and variables → Actions → New repository secret**:
+- ✅ **Workers Builds** keeps the API working and deploys the exact same artifact as
+  `wrangler deploy` (same worker `fleetmanage`, same URL).
+- ⚠️ **Classic Cloudflare Pages** serves only static output; the `/api/*` routes would
+  stop working unless the Hono API is rewritten as Pages Functions. Don't use it as-is.
+  (If you specifically want Pages, that conversion is a separate task — ask for it.)
 
-| Secret | Value | Sensitive? |
-|---|---|---|
-| `CLOUDFLARE_API_TOKEN` | *Create one — see below* | **Yes — secret** |
-| `CLOUDFLARE_ACCOUNT_ID` | `e1ef5fefa821e2e7d57568291f632a1d` | No (identifier) |
-| `VITE_SUPABASE_URL` | `https://ugfdexoaxladblafcrlc.supabase.co` | No (public) |
-| `VITE_SUPABASE_ANON_KEY` | *your Supabase anon key* (the `eyJ…` value in `.env`) | No (public, shipped to browser) |
+## Set it up (Cloudflare dashboard, ~2 minutes)
 
-Only `CLOUDFLARE_API_TOKEN` is truly secret; the other three are non-sensitive but
-live here so they stay out of the repo and in one place.
+1. **Dashboard → Workers & Pages → the `fleetmanage` Worker → Settings → Build →
+   Connect** (or **Import a repository**). Authorize GitHub and pick **`aqoza/FleetZa`**,
+   production branch **`main`**.
+2. **Build command:** `npm run build`
+3. **Deploy command:** `npx wrangler deploy`  *(usually the default)*
+4. **Build variables** (needed at build time — baked into the browser bundle):
 
-### Creating `CLOUDFLARE_API_TOKEN`
+   | Variable | Value |
+   |---|---|
+   | `VITE_SUPABASE_URL` | `https://ugfdexoaxladblafcrlc.supabase.co` |
+   | `VITE_SUPABASE_ANON_KEY` | your Supabase anon key (`eyJ…`, the value in `.env`) |
 
-1. Go to <https://dash.cloudflare.com/profile/api-tokens> → **Create Token**.
-2. Use the **"Edit Cloudflare Workers"** template.
-3. Account Resources → your account; Zone Resources → All zones (or none for `*.workers.dev`).
-4. **Create token**, copy it, and paste it as the `CLOUDFLARE_API_TOKEN` secret.
+5. Save. Cloudflare now builds + deploys on every push to `main` (and gives preview
+   builds for other branches / PRs).
 
-## What you do NOT need to add
+## What you do NOT need (unlike the GitHub Actions route)
 
-The Worker runtime secrets — `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
-`SUPABASE_SERVICE_ROLE_KEY` — are already stored on Cloudflare (`wrangler secret put`)
-and **persist across deploys**. `wrangler deploy` never wipes them, so they do not go
-into GitHub and are not re-set on each run. (If you ever rotate the service-role key,
-update it once with `wrangler secret put SUPABASE_SERVICE_ROLE_KEY`.)
+- **No `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`** — Cloudflare is deploying inside
+  your own account, already authenticated.
+- **No Worker runtime secrets in Git or the build** — `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY` are already stored on the Worker (`wrangler secret put`) and
+  persist across deploys. `wrangler deploy` never wipes them. (Rotate the service-role key
+  with `wrangler secret put SUPABASE_SERVICE_ROLE_KEY` if ever needed.)
 
-## Recommended: protect `main`
+## Prerequisite
 
-Settings → Branches → add a rule for `main`: require the **Deploy** check to pass and
-require a PR before merging — so nothing reaches production without green tests.
+The repo must contain the code first — finish the initial `git push` to
+`https://github.com/aqoza/FleetZa` (complete the GitHub sign-in), then connect it in the
+Cloudflare dashboard.
