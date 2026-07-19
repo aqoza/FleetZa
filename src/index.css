@@ -182,6 +182,13 @@ body {
   @apply bg-canvas text-ink antialiased;
 }
 
+/* Official documents keep their banner fills on paper (browsers strip
+   backgrounds by default). Scope to elements that opt in. */
+.print-exact {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
 /* Motion — tasteful entries only, and only when the user hasn't opted out. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes fm-pop-in {
