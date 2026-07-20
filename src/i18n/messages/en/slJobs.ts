@@ -38,6 +38,7 @@ export const enSlJobs = {
   "slJobs.unassigned": "Unassigned",
   "slJobs.scheduledDate": "Scheduled date",
   "slJobs.setSpeedKmh": "Set speed (km/h)",
+  "slJobs.tamperSealNumber": "Tamper seal no.",
   "slJobs.location": "Location",
   "slJobs.createJob": "Create job",
   "slJobs.saveFailed": "Save failed",

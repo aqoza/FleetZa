@@ -97,6 +97,8 @@ function OrganizationTab() {
     distance_unit: tenant.distance_unit,
     volume_unit: tenant.volume_unit,
     tax_registration_number: tenant.tax_registration_number ?? "",
+    address: tenant.address ?? "",
+    phone: tenant.phone ?? "",
   });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -117,6 +119,8 @@ function OrganizationTab() {
         distance_unit: form.distance_unit,
         volume_unit: form.volume_unit,
         tax_registration_number: form.tax_registration_number.trim() || null,
+        address: form.address.trim() || null,
+        phone: form.phone.trim() || null,
       });
       await refresh();
     },
@@ -150,6 +154,8 @@ function OrganizationTab() {
         t("settings.volumeUnit"),
         tenant.volume_unit === "gal" ? t("settings.gallons") : t("settings.liters"),
       ],
+      [t("settings.address"), tenant.address ?? t("common.dash")],
+      [t("field.phone"), tenant.phone ?? t("common.dash")],
       [t("settings.created"), formatDate(tenant.created_at)],
     ];
     return (
@@ -263,6 +269,20 @@ function OrganizationTab() {
               autoComplete="off"
             />
           </Field>
+
+          {/* Dealer contact block — printed on RSL certificates. */}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label={t("settings.address")} hint={t("settings.addressHint")}>
+              <Input value={form.address} onChange={(e) => set("address", e.target.value)} />
+            </Field>
+            <Field label={t("field.phone")}>
+              <Input
+                type="tel" dir="ltr"
+                value={form.phone}
+                onChange={(e) => set("phone", e.target.value)}
+              />
+            </Field>
+          </div>
 
           <div className="flex items-center justify-end gap-3">
             {saved && !save.isPending && (

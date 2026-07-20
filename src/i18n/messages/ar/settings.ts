@@ -16,6 +16,8 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
 
   // Organization form
   "settings.orgName": "اسم المؤسسة",
+  "settings.address": "العنوان",
+  "settings.addressHint": "يُطبع على شهادات محدد السرعة كعنوان الوكيل.",
   "settings.archetype": "نوع النشاط التجاري",
   "settings.archetypeOperator": "مشغّل أسطول",
   "settings.archetypeProvider": "مزوّد خدمات أساطيل",

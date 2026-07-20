@@ -93,6 +93,7 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
   const [setSpeed, setSetSpeed] = useState(
     job.set_speed_kmh != null ? String(job.set_speed_kmh) : "",
   );
+  const [tamperSeal, setTamperSeal] = useState(job.tamper_seal_number ?? "");
   const [customerSigned, setCustomerSigned] = useState(job.customer_signed);
   const [technicianSigned, setTechnicianSigned] = useState(job.technician_signed);
   const [overrideNote, setOverrideNote] = useState("");
@@ -110,6 +111,7 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
         p_set_speed_kmh: speed,
         p_customer_signed: customerSigned,
         p_technician_signed: technicianSigned,
+        p_tamper_seal_number: tamperSeal.trim() || undefined,
       });
       if (error) {
         if (error.message.includes("JOB_NOT_IN_PROGRESS")) {
@@ -170,6 +172,11 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
             onChange={(e) => setSetSpeed(e.target.value)}
           />
         </Field>
+        {CERT_JOB_TYPES.includes(job.job_type) && (
+          <Field label={t("slJobs.tamperSealNumber")}>
+            <Input value={tamperSeal} onChange={(e) => setTamperSeal(e.target.value)} />
+          </Field>
+        )}
       </div>
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm text-slate-700">
@@ -481,6 +488,9 @@ export default function JobDetailPage() {
                 : "—"
             }
           />
+          {job.tamper_seal_number && (
+            <InfoRow label={t("slJobs.tamperSealNumber")} value={job.tamper_seal_number} />
+          )}
           {job.notes && (
             <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{job.notes}</p>
           )}

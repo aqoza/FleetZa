@@ -13,6 +13,7 @@ export const enVehicles = {
   "vehicles.speedLimiterPanel": "Speed limiter",
   "vehicles.noSpeedLimiter": "No speed limiter installed.",
   "vehicles.chassisNumber": "Chassis number",
+  "vehicles.engineNumber": "Engine number",
   "vehicles.fleetNumber": "Fleet number",
   "vehicles.searchPlaceholder": "Search name, plate, VIN…",
   "vehicles.allStatuses": "All statuses",

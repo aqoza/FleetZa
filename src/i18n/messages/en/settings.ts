@@ -10,6 +10,8 @@ export const enSettings = {
 
   // Organization form
   "settings.orgName": "Organization name",
+  "settings.address": "Address",
+  "settings.addressHint": "Printed on speed limiter certificates as the dealer address.",
   "settings.archetype": "Business type",
   "settings.archetypeOperator": "Fleet operator",
   "settings.archetypeProvider": "Fleet service provider",

@@ -899,6 +899,7 @@ export type Database = {
           set_speed_kmh: number | null
           started_at: string | null
           status: string
+          tamper_seal_number: string | null
           technician_id: string | null
           technician_signed: boolean
           tenant_id: string
@@ -926,6 +927,7 @@ export type Database = {
           set_speed_kmh?: number | null
           started_at?: string | null
           status?: string
+          tamper_seal_number?: string | null
           technician_id?: string | null
           technician_signed?: boolean
           tenant_id?: string
@@ -953,6 +955,7 @@ export type Database = {
           set_speed_kmh?: number | null
           started_at?: string | null
           status?: string
+          tamper_seal_number?: string | null
           technician_id?: string | null
           technician_signed?: boolean
           tenant_id?: string
@@ -1103,6 +1106,7 @@ export type Database = {
           revoked_reason: string | null
           set_speed_kmh: number | null
           status: string
+          tamper_seal_number: string | null
           tenant_id: string
           updated_at: string
           updated_by: string | null
@@ -1126,6 +1130,7 @@ export type Database = {
           revoked_reason?: string | null
           set_speed_kmh?: number | null
           status?: string
+          tamper_seal_number?: string | null
           tenant_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -1149,6 +1154,7 @@ export type Database = {
           revoked_reason?: string | null
           set_speed_kmh?: number | null
           status?: string
+          tamper_seal_number?: string | null
           tenant_id?: string
           updated_at?: string
           updated_by?: string | null
@@ -1228,6 +1234,7 @@ export type Database = {
           notes: string | null
           set_speed_kmh: number | null
           status: string
+          tamper_seal_number: string | null
           technician: string | null
           tenant_id: string
           updated_at: string
@@ -1248,6 +1255,7 @@ export type Database = {
           notes?: string | null
           set_speed_kmh?: number | null
           status?: string
+          tamper_seal_number?: string | null
           technician?: string | null
           tenant_id?: string
           updated_at?: string
@@ -1268,6 +1276,7 @@ export type Database = {
           notes?: string | null
           set_speed_kmh?: number | null
           status?: string
+          tamper_seal_number?: string | null
           technician?: string | null
           tenant_id?: string
           updated_at?: string
@@ -1353,6 +1362,7 @@ export type Database = {
       }
       tenants: {
         Row: {
+          address: string | null
           archetype: string
           country: string
           created_at: string
@@ -1360,12 +1370,14 @@ export type Database = {
           distance_unit: string
           id: string
           name: string
+          phone: string | null
           tax_registration_number: string | null
           timezone: string
           updated_at: string
           volume_unit: string
         }
         Insert: {
+          address?: string | null
           archetype?: string
           country?: string
           created_at?: string
@@ -1373,12 +1385,14 @@ export type Database = {
           distance_unit?: string
           id?: string
           name: string
+          phone?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
           volume_unit?: string
         }
         Update: {
+          address?: string | null
           archetype?: string
           country?: string
           created_at?: string
@@ -1386,6 +1400,7 @@ export type Database = {
           distance_unit?: string
           id?: string
           name?: string
+          phone?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
@@ -1460,6 +1475,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_id: string | null
+          engine_number: string | null
           fleet_number: string | null
           fuel_type: string
           id: string
@@ -1486,6 +1502,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          engine_number?: string | null
           fleet_number?: string | null
           fuel_type?: string
           id?: string
@@ -1512,6 +1529,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          engine_number?: string | null
           fleet_number?: string | null
           fuel_type?: string
           id?: string
@@ -1854,6 +1872,7 @@ export type Database = {
           p_duration_minutes?: number
           p_job_id: string
           p_set_speed_kmh?: number
+          p_tamper_seal_number?: string
           p_technician_signed?: boolean
         }
         Returns: undefined
@@ -1891,6 +1910,7 @@ export type Database = {
           revoked_reason: string | null
           set_speed_kmh: number | null
           status: string
+          tamper_seal_number: string | null
           tenant_id: string
           updated_at: string
           updated_by: string | null
@@ -2058,4 +2078,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

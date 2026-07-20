@@ -18,6 +18,7 @@ export const arVehicles: Record<keyof typeof enVehicles, string> = {
   "vehicles.speedLimiterPanel": "محدد السرعة",
   "vehicles.noSpeedLimiter": "لا يوجد محدد سرعة مركّب.",
   "vehicles.chassisNumber": "رقم الهيكل",
+  "vehicles.engineNumber": "رقم المحرك",
   "vehicles.fleetNumber": "رقم الأسطول",
   "vehicles.searchPlaceholder": "ابحث بالاسم أو اللوحة أو رقم الهيكل…",
   "vehicles.allStatuses": "جميع الحالات",
