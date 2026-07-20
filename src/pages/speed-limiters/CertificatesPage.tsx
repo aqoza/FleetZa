@@ -98,6 +98,7 @@ function RenewForm({
         installation_id: cert.installation_id,
         issuing_authority: form.issuing_authority.trim() || null,
         set_speed_kmh: form.set_speed_kmh === "" ? null : Number(form.set_speed_kmh),
+        tamper_seal_number: cert.tamper_seal_number,
         issued_at: form.issued_at,
         expires_at: form.expires_at,
         renewed_from: cert.id,

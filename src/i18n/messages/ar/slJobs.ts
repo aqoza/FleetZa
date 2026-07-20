@@ -37,6 +37,7 @@ export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
   "slJobs.unassigned": "غير مُسندة",
   "slJobs.scheduledDate": "تاريخ الجدولة",
   "slJobs.setSpeedKmh": "السرعة المضبوطة (كم/س)",
+  "slJobs.tamperSealNumber": "رقم ختم الحماية",
   "slJobs.location": "الموقع",
   "slJobs.createJob": "إنشاء المهمة",
   "slJobs.saveFailed": "فشل الحفظ",

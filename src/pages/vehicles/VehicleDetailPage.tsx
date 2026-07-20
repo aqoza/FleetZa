@@ -255,6 +255,9 @@ export default function VehicleDetailPage() {
           {vehicle.chassis_number && (
             <InfoRow label={t("vehicles.chassisNumber")} value={vehicle.chassis_number} />
           )}
+          {vehicle.engine_number && (
+            <InfoRow label={t("vehicles.engineNumber")} value={vehicle.engine_number} />
+          )}
           {vehicle.fleet_number && (
             <InfoRow label={t("vehicles.fleetNumber")} value={vehicle.fleet_number} />
           )}

@@ -17,6 +17,9 @@ export interface Tenant {
   volume_unit: VolumeUnit;
   timezone: string;
   tax_registration_number: string | null;
+  /** Dealer contact block printed on RSL certificates (and future letterheads). */
+  address: string | null;
+  phone: string | null;
   created_at: string;
 }
 
@@ -58,6 +61,7 @@ export interface Vehicle {
   ownership: "company" | "customer";
   customer_id: string | null;
   chassis_number: string | null;
+  engine_number: string | null;
   fleet_number: string | null;
   license_plate: string | null;
   make: string | null;
@@ -246,6 +250,7 @@ export interface SpeedLimiterInstallation {
   brand: string | null;
   model: string | null;
   set_speed_kmh: number | null;
+  tamper_seal_number: string | null;
   installed_at: string;
   technician: string | null;
   status: SpeedLimiterStatus;
@@ -273,6 +278,8 @@ export interface SpeedLimiterCertificate {
   job_id: string | null;
   device_id: string | null;
   set_speed_kmh: number | null;
+  /** Snapshotted at issuance (from the job/installation), like set_speed_kmh. */
+  tamper_seal_number: string | null;
   status: SlCertificateStatus;
   revoked_at: string | null;
   revoked_reason: string | null;
@@ -374,6 +381,7 @@ export interface SlJob {
   status: SlJobStatus;
   scheduled_date: string | null;
   set_speed_kmh: number | null;
+  tamper_seal_number: string | null;
   checklist: SlChecklistItem[];
   location: string | null;
   started_at: string | null;

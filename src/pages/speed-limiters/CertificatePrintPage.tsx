@@ -22,14 +22,18 @@ import { Button, Card, ErrorState, LoadingState } from "../../components/ui";
 type CertPrintRow = SpeedLimiterCertificate & {
   vehicles: Pick<
     Vehicle,
-    "name" | "license_plate" | "chassis_number" | "vin" | "make" | "model" | "year"
+    | "name" | "license_plate" | "chassis_number" | "engine_number" | "vin"
+    | "make" | "model" | "year"
   > | null;
   customers: Pick<Customer, "name"> | null;
   sl_devices: Pick<SlDevice, "serial" | "manufacturer" | "model"> | null;
   sl_jobs:
     | (Pick<SlJob, "completed_at"> & { sl_technicians: Pick<SlTechnician, "name"> | null })
     | null;
-  speed_limiter_installations: Pick<SpeedLimiterInstallation, "installed_at"> | null;
+  speed_limiter_installations: Pick<
+    SpeedLimiterInstallation,
+    "installed_at" | "tamper_seal_number"
+  > | null;
 };
 
 /** Black section banner in the official document style — fills survive print. */
@@ -76,10 +80,10 @@ export default function CertificatePrintPage() {
       const rows = await listRows<CertPrintRow>("speed_limiter_certificates", (q) =>
         q
           .select(
-            "*, vehicles(name, license_plate, chassis_number, vin, make, model, year), " +
+            "*, vehicles(name, license_plate, chassis_number, engine_number, vin, make, model, year), " +
               "customers(name), sl_devices(serial, manufacturer, model), " +
               "sl_jobs(completed_at, sl_technicians(name)), " +
-              "speed_limiter_installations(installed_at)",
+              "speed_limiter_installations(installed_at, tamper_seal_number)",
           )
           .eq("id", certId)
           .limit(1),
@@ -129,7 +133,13 @@ export default function CertificatePrintPage() {
     cert.speed_limiter_installations?.installed_at ??
     (cert.sl_jobs?.completed_at ? cert.sl_jobs.completed_at.slice(0, 10) : null) ??
     cert.issued_at;
+  const tamperSeal =
+    cert.tamper_seal_number ??
+    cert.speed_limiter_installations?.tamper_seal_number ??
+    "N/A";
   const countryName = getCountry(tenant.country).name;
+  const dealerContact =
+    [tenant.address, tenant.phone].filter(Boolean).join(" · ") || countryName;
 
   return (
     <>
@@ -219,7 +229,10 @@ export default function CertificatePrintPage() {
             />
           </div>
           <div className="flex">
-            <Cell label={t("slCertificates.report.engineNo")} value={DASH} />
+            <Cell
+              label={t("slCertificates.report.engineNo")}
+              value={vehicle?.engine_number ?? DASH}
+            />
             <Cell
               label={t("slCertificates.report.makeOfVehicle")}
               value={vehicle?.make ?? DASH}
@@ -246,7 +259,7 @@ export default function CertificatePrintPage() {
           </div>
           <div className="flex">
             <Cell label={t("slCertificates.report.serialNo")} value={device?.serial ?? DASH} />
-            <Cell label={t("slCertificates.report.tamperSealNo")} value="N/A" />
+            <Cell label={t("slCertificates.report.tamperSealNo")} value={tamperSeal} />
           </div>
           <div className="flex">
             <Cell
@@ -267,7 +280,7 @@ export default function CertificatePrintPage() {
             <Cell label={t("slCertificates.report.dealerName")} value={tenant.name} grow />
           </div>
           <div className="flex">
-            <Cell label={t("slCertificates.report.addressPhone")} value={countryName} grow />
+            <Cell label={t("slCertificates.report.addressPhone")} value={dealerContact} grow />
           </div>
         </div>
 

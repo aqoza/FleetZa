@@ -56,6 +56,7 @@ export function VehicleForm({
     purchase_price: vehicle?.purchase_price?.toString() ?? "",
     customer_id: vehicle?.customer_id ?? "",
     chassis_number: vehicle?.chassis_number ?? "",
+    engine_number: vehicle?.engine_number ?? "",
     fleet_number: vehicle?.fleet_number ?? "",
     notes: vehicle?.notes ?? "",
   });
@@ -81,6 +82,7 @@ export function VehicleForm({
         purchase_date: form.purchase_date || null,
         purchase_price: form.purchase_price ? Number(form.purchase_price) : null,
         chassis_number: form.chassis_number.trim() || null,
+        engine_number: form.engine_number.trim() || null,
         fleet_number: form.fleet_number.trim() || null,
         notes: form.notes.trim() || null,
       };
@@ -186,6 +188,12 @@ export function VehicleForm({
           <Input
             value={form.chassis_number}
             onChange={(e) => set("chassis_number", e.target.value)}
+          />
+        </Field>
+        <Field label={t("vehicles.engineNumber")}>
+          <Input
+            value={form.engine_number}
+            onChange={(e) => set("engine_number", e.target.value)}
           />
         </Field>
         <Field label={t("vehicles.fleetNumber")}>
