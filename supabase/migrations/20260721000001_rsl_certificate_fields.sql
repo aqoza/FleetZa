@@ -28,7 +28,7 @@ alter table public.tenants add column if not exists phone text;
 --    dropped so PostgREST resolves the previously deployed bundle's
 --    named-arg calls unambiguously onto this one (the new arg defaults).
 drop function if exists public.complete_sl_job(uuid, int, int, boolean, boolean);
-create function public.complete_sl_job(
+create or replace function public.complete_sl_job(
   p_job_id uuid,
   p_duration_minutes int default null,
   p_set_speed_kmh int default null,

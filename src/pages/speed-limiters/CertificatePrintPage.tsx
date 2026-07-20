@@ -136,10 +136,19 @@ export default function CertificatePrintPage() {
   const tamperSeal =
     cert.tamper_seal_number ??
     cert.speed_limiter_installations?.tamper_seal_number ??
-    "N/A";
+    DASH;
   const countryName = getCountry(tenant.country).name;
-  const dealerContact =
-    [tenant.address, tenant.phone].filter(Boolean).join(" · ") || countryName;
+  // Phone stays LTR-isolated so digit groups don't bidi-reorder on an Arabic
+  // certificate (same treatment as the settings form and the verify URL).
+  const phoneNode = tenant.phone ? <span dir="ltr">{tenant.phone}</span> : null;
+  const dealerContact: ReactNode =
+    tenant.address && phoneNode ? (
+      <>
+        {tenant.address} · {phoneNode}
+      </>
+    ) : (
+      tenant.address ?? phoneNode ?? countryName
+    );
 
   return (
     <>
