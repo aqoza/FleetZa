@@ -17,6 +17,7 @@ Pages Function) · Supabase Postgres with RLS tenant isolation · typed en/ar i1
   phased roadmap, DB refactoring waves, verified problem list. Check it before
   architectural decisions; Phases 1–2 are shipped.
 - docs/I18N.md (RTL + translation contract) · docs/SPEED_LIMITERS.md (SL domain) ·
+  **docs/SALES.md** (quote → order → invoice chain, document money rules) ·
   docs/CICD.md (deploy).
 
 ## Hard rules

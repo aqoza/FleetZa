@@ -404,6 +404,184 @@ export interface SlSettings {
   updated_at: string;
 }
 
+// --- Sales & billing (quote → order → invoice → payment) ---
+
+export type ProductKind = "service" | "part" | "fee" | "other";
+
+export interface Product {
+  id: string;
+  tenant_id: string;
+  sku: string | null;
+  name: string;
+  description: string | null;
+  kind: ProductKind;
+  unit: string;
+  unit_price: number;
+  tax_rate: number;
+  active: boolean;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SalesSettings {
+  tenant_id: string;
+  quote_prefix: string;
+  order_prefix: string;
+  invoice_prefix: string;
+  quote_valid_days: number;
+  payment_terms_days: number;
+  /** null = fall back to the tenant country's VAT rate (shared/countries.ts). */
+  default_tax_rate: number | null;
+  quote_terms: string | null;
+  invoice_terms: string | null;
+  updated_at: string;
+}
+
+/**
+ * Every sales document shares this shape. Amounts are maintained by DB
+ * triggers from the lines — never written from the client.
+ */
+interface SalesDocument {
+  id: string;
+  tenant_id: string;
+  number: number;
+  /** Human reference, e.g. "QT-00042" (prefix from sales_settings). */
+  doc_number: string;
+  customer_id: string;
+  contact_id: string | null;
+  vehicle_id: string | null;
+  /** Snapshotted at creation so re-rounding can never touch an issued doc. */
+  currency: string;
+  currency_decimals: number;
+  subtotal: number;
+  discount_total: number;
+  tax_total: number;
+  total: number;
+  title: string | null;
+  customer_reference: string | null;
+  terms: string | null;
+  notes: string | null;
+  internal_notes: string | null;
+  created_by: string | null;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Line shape shared by quote_lines / sales_order_lines / invoice_lines. */
+interface SalesDocumentLine {
+  id: string;
+  tenant_id: string;
+  sort_order: number;
+  product_id: string | null;
+  vehicle_id: string | null;
+  description: string;
+  quantity: number;
+  unit: string | null;
+  unit_price: number;
+  discount_percent: number;
+  tax_rate: number;
+  line_gross: number;
+  line_discount: number;
+  line_net: number;
+  line_tax: number;
+  line_total: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type QuoteStatus =
+  | "draft" | "sent" | "accepted" | "declined" | "expired" | "canceled";
+
+export interface Quote extends SalesDocument {
+  status: QuoteStatus;
+  issue_date: string;
+  valid_until: string | null;
+  /** Capability URL token for the customer-facing quote page. */
+  public_token: string;
+  sent_at: string | null;
+  accepted_at: string | null;
+  accepted_by_name: string | null;
+  declined_at: string | null;
+  decline_reason: string | null;
+  revision: number;
+  revision_of: string | null;
+  sales_order_id: string | null;
+}
+
+export interface QuoteLine extends SalesDocumentLine {
+  quote_id: string;
+}
+
+export type SalesOrderStatus = "draft" | "confirmed" | "fulfilled" | "closed" | "canceled";
+
+export interface SalesOrder extends SalesDocument {
+  quote_id: string | null;
+  status: SalesOrderStatus;
+  order_date: string;
+  expected_date: string | null;
+  /** Sum of this order's non-void invoices (DB trigger). */
+  invoiced_total: number;
+  confirmed_at: string | null;
+  fulfilled_at: string | null;
+  closed_at: string | null;
+}
+
+export interface SalesOrderLine extends SalesDocumentLine {
+  sales_order_id: string;
+}
+
+/** `void` is stored; "overdue" is derived from due_date + balance at render. */
+export type InvoiceStatus = "draft" | "issued" | "partially_paid" | "paid" | "void";
+
+export interface Invoice extends SalesDocument {
+  sales_order_id: string | null;
+  status: InvoiceStatus;
+  issue_date: string;
+  due_date: string | null;
+  /** Sum of this invoice's payments (DB trigger). */
+  amount_paid: number;
+  issued_at: string | null;
+  voided_at: string | null;
+  void_reason: string | null;
+}
+
+export interface InvoiceLine extends SalesDocumentLine {
+  invoice_id: string;
+}
+
+export type PaymentMethod = "cash" | "bank_transfer" | "card" | "cheque" | "online" | "other";
+
+export interface Payment {
+  id: string;
+  tenant_id: string;
+  invoice_id: string;
+  paid_at: string;
+  amount: number;
+  method: PaymentMethod;
+  reference: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** One row from the sales_summary() RPC — the hub's KPI source. */
+export interface SalesSummary {
+  open_quotes: number;
+  open_quote_value: number;
+  accepted_quotes_90d: number;
+  decided_quotes_90d: number;
+  open_orders: number;
+  open_order_value: number;
+  unbilled_order_value: number;
+  outstanding_amount: number;
+  overdue_invoices: number;
+  overdue_amount: number;
+  collected_30d: number;
+}
+
 export type RenewalType =
   | "registration" | "insurance" | "permit" | "emission_test" | "roadworthiness" | "other";
 

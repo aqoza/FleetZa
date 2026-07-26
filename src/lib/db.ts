@@ -23,6 +23,23 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   JOB_NOT_FOUND: "errors.jobNotFound",
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
+  CUSTOMER_HAS_INVOICES: "errors.customerHasInvoices",
+  DOC_NOT_EDITABLE: "errors.docNotEditable",
+  DOC_NOT_DELETABLE: "errors.docNotDeletable",
+  DOC_LOCKED: "errors.docLocked",
+  EMPTY_DOCUMENT: "errors.emptyDocument",
+  ILLEGAL_QUOTE_TRANSITION: "errors.illegalQuoteTransition",
+  ILLEGAL_ORDER_TRANSITION: "errors.illegalOrderTransition",
+  ILLEGAL_INVOICE_TRANSITION: "errors.illegalInvoiceTransition",
+  QUOTE_NOT_FOUND: "errors.quoteNotFound",
+  QUOTE_NOT_CONVERTIBLE: "errors.quoteNotConvertible",
+  QUOTE_ALREADY_CONVERTED: "errors.quoteAlreadyConverted",
+  QUOTE_NOT_REVISABLE: "errors.quoteNotRevisable",
+  ORDER_NOT_FOUND: "errors.orderNotFound",
+  ORDER_NOT_INVOICEABLE: "errors.orderNotInvoiceable",
+  INVOICE_NOT_FOUND: "errors.invoiceNotFound",
+  INVOICE_NOT_PAYABLE: "errors.invoiceNotPayable",
+  PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
 };
 
 /**

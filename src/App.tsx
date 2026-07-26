@@ -30,6 +30,10 @@ const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
 // The speed limiter hub carries its own sub-routes, so it gets its own chunk
 const SpeedLimitersHub = lazy(() => import("./pages/speed-limiters/SpeedLimitersHub"));
 // Customers is global master data with its own module + chunk
+// Sales carries its own sub-routes (quotes/orders/invoices), so it gets its own chunk
+const SalesHub = lazy(() => import("./pages/sales/SalesHub"));
+// Customer-facing quote page — public, like /verify
+const PublicQuotePage = lazy(() => import("./pages/sales/PublicQuotePage"));
 const CustomersPage = lazy(() => import("./pages/customers/CustomersPage"));
 const CustomerDetailPage = lazy(() => import("./pages/customers/CustomerDetailPage"));
 
@@ -79,6 +83,15 @@ export default function App() {
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
             {/* Public certificate verification (QR code target) — no auth. */}
             <Route path="/verify" element={<VerifyPage />} />
+            {/* Public quote review + acceptance (shared link) — no auth. */}
+            <Route
+              path="/q/:token"
+              element={
+                <Suspense fallback={<LoadingState />}>
+                  <PublicQuotePage />
+                </Suspense>
+              }
+            />
 
             <Route element={<Protected />}>
               <Route element={<AppLayout />}>
@@ -160,6 +173,16 @@ export default function App() {
                     <Suspense fallback={<LoadingState />}>
                       <ModuleGate module="speed_limiters">
                         <SpeedLimitersHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/sales/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="sales">
+                        <SalesHub />
                       </ModuleGate>
                     </Suspense>
                   }

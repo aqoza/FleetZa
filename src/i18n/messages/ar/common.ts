@@ -16,6 +16,7 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "nav.inspections": "الفحوصات",
   "nav.issues": "الأعطال",
   "nav.renewals": "التجديدات",
+  "nav.sales": "المبيعات",
   "nav.speedLimiters": "محددات السرعة",
   "nav.reports": "التقارير",
   "nav.settings": "الإعدادات",
@@ -24,6 +25,7 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "nav.section.fleet_ops": "عمليات الأسطول",
   "nav.section.maintenance": "الصيانة",
   "nav.section.compliance": "الامتثال",
+  "nav.section.commerce": "المبيعات والفوترة",
   "nav.section.customer": "العملاء والشركاء",
   "nav.section.analytics": "التحليلات",
   "nav.section.admin": "الإدارة",
@@ -182,4 +184,40 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "enum.renewalType.emission_test": "فحص الانبعاثات",
   "enum.renewalType.roadworthiness": "صلاحية للسير",
   "enum.renewalType.other": "أخرى",
+  // تعدادات — حالة عرض السعر
+  "enum.quoteStatus.draft": "مسودة",
+  "enum.quoteStatus.sent": "مُرسل",
+  "enum.quoteStatus.accepted": "مقبول",
+  "enum.quoteStatus.declined": "مرفوض",
+  "enum.quoteStatus.expired": "منتهي الصلاحية",
+  "enum.quoteStatus.canceled": "ملغى",
+
+  // تعدادات — حالة أمر البيع
+  "enum.salesOrderStatus.draft": "مسودة",
+  "enum.salesOrderStatus.confirmed": "مؤكد",
+  "enum.salesOrderStatus.fulfilled": "منفَّذ",
+  "enum.salesOrderStatus.closed": "مغلق",
+  "enum.salesOrderStatus.canceled": "ملغى",
+
+  // تعدادات — حالة الفاتورة
+  "enum.invoiceStatus.draft": "مسودة",
+  "enum.invoiceStatus.issued": "صادرة",
+  "enum.invoiceStatus.partially_paid": "مدفوعة جزئيًا",
+  "enum.invoiceStatus.paid": "مدفوعة",
+  "enum.invoiceStatus.void": "ملغاة",
+  "enum.invoiceStatus.overdue": "متأخرة",
+
+  // تعدادات — نوع البند في الكتالوج
+  "enum.productKind.service": "خدمة",
+  "enum.productKind.part": "قطعة",
+  "enum.productKind.fee": "رسوم",
+  "enum.productKind.other": "أخرى",
+
+  // تعدادات — طريقة الدفع
+  "enum.paymentMethod.cash": "نقدًا",
+  "enum.paymentMethod.bank_transfer": "تحويل بنكي",
+  "enum.paymentMethod.card": "بطاقة",
+  "enum.paymentMethod.cheque": "شيك",
+  "enum.paymentMethod.online": "دفع إلكتروني",
+  "enum.paymentMethod.other": "أخرى",
 };

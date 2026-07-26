@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { Suspense, lazy, useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Pencil, Plus, Star, Trash2, Unlink } from "lucide-react";
@@ -17,6 +17,10 @@ import {
   Textarea, type BadgeTone,
 } from "../../components/ui";
 import { CustomerForm, customerStatusMeta } from "./CustomersPage";
+
+// Contributed by the sales module — kept in its own chunk so customers pages
+// stay lean for tenants that do not sell.
+const CustomerSalesPanel = lazy(() => import("../sales/CustomerSalesPanel"));
 
 type JobRow = SlJob & { vehicles: Pick<Vehicle, "name"> | null };
 type CertRow = SpeedLimiterCertificate & { vehicles: Pick<Vehicle, "name"> | null };
@@ -237,6 +241,7 @@ export default function CustomerDetailPage() {
   // Customers is standalone master data — only surface speed-limiter panels
   // for tenants that actually run that module.
   const slEnabled = isEnabled("speed_limiters");
+  const salesEnabled = isEnabled("sales");
   const certificatesEnabled = slEnabled && isEnabled("sl_certificates");
 
   const [editing, setEditing] = useState(false);
@@ -554,6 +559,14 @@ export default function CustomerDetailPage() {
           )}
         </Card>
       </div>
+
+      {salesEnabled && (
+        <div className="mb-4">
+          <Suspense fallback={<LoadingState />}>
+            <CustomerSalesPanel customerId={customerId} />
+          </Suspense>
+        </div>
+      )}
 
       {slEnabled && (
       <div className={`grid gap-4 ${certificatesEnabled ? "lg:grid-cols-2" : ""}`}>

@@ -15,6 +15,7 @@ export const enCommon = {
   "nav.issues": "Issues",
   "nav.renewals": "Renewals",
   "nav.speedLimiters": "Speed limiters",
+  "nav.sales": "Sales",
   "nav.reports": "Reports",
   "nav.settings": "Settings",
 
@@ -23,6 +24,7 @@ export const enCommon = {
   "nav.section.fleet_ops": "Fleet operations",
   "nav.section.maintenance": "Maintenance",
   "nav.section.compliance": "Compliance",
+  "nav.section.commerce": "Sales & billing",
   "nav.section.customer": "Customers & partners",
   "nav.section.analytics": "Analytics",
   "nav.section.admin": "Administration",
@@ -196,4 +198,40 @@ export const enCommon = {
   "enum.renewalType.emission_test": "Emission test",
   "enum.renewalType.roadworthiness": "Roadworthiness",
   "enum.renewalType.other": "Other",
+  // Enums — quote status ("expired" is derived from valid_until, see lib/sales.ts)
+  "enum.quoteStatus.draft": "Draft",
+  "enum.quoteStatus.sent": "Sent",
+  "enum.quoteStatus.accepted": "Accepted",
+  "enum.quoteStatus.declined": "Declined",
+  "enum.quoteStatus.expired": "Expired",
+  "enum.quoteStatus.canceled": "Canceled",
+
+  // Enums — sales order status
+  "enum.salesOrderStatus.draft": "Draft",
+  "enum.salesOrderStatus.confirmed": "Confirmed",
+  "enum.salesOrderStatus.fulfilled": "Fulfilled",
+  "enum.salesOrderStatus.closed": "Closed",
+  "enum.salesOrderStatus.canceled": "Canceled",
+
+  // Enums — invoice status ("overdue" is derived from due_date, see lib/sales.ts)
+  "enum.invoiceStatus.draft": "Draft",
+  "enum.invoiceStatus.issued": "Issued",
+  "enum.invoiceStatus.partially_paid": "Partially paid",
+  "enum.invoiceStatus.paid": "Paid",
+  "enum.invoiceStatus.void": "Void",
+  "enum.invoiceStatus.overdue": "Overdue",
+
+  // Enums — catalog item kind
+  "enum.productKind.service": "Service",
+  "enum.productKind.part": "Part",
+  "enum.productKind.fee": "Fee",
+  "enum.productKind.other": "Other",
+
+  // Enums — payment method
+  "enum.paymentMethod.cash": "Cash",
+  "enum.paymentMethod.bank_transfer": "Bank transfer",
+  "enum.paymentMethod.card": "Card",
+  "enum.paymentMethod.cheque": "Cheque",
+  "enum.paymentMethod.online": "Online",
+  "enum.paymentMethod.other": "Other",
 } as const;

@@ -157,7 +157,7 @@ Key observations (all verified against the live database):
 | Missing FK indexes (~12–19, confirmed by live performance advisors) incl. `fuel_logs.vehicle_id`, `fuel_logs.driver_id`, both sides of issue↔work-order | live advisor output | Driver-360/issue pages and cascade deletes become seq scans at scale |
 | One tenant per user by construction (`profiles.id` = auth user id, single JWT claim) | init.sql:72-81 | An accountant serving two fleets, or a customer-portal contact, has no place in the model |
 
-**Nonexistent entities (greenfield — no rework needed):** suppliers, employees, branches, warehouses, quotes, invoices, payments, price lists, product catalog, audit log, attachments/documents. None appear in any migration.
+**Nonexistent entities (greenfield — no rework needed):** suppliers, employees, branches, warehouses, quotes, invoices, payments, price lists, product catalog, audit log, attachments/documents. None appear in any migration. *(Since this audit: audit log shipped in Wave 2; quotes, invoices, payments and the product catalog shipped with the commerce wave — see SALES.md.)*
 
 ## 4. Module dependency matrix
 
@@ -474,6 +474,17 @@ DB-enforced QC gate · device lifecycle RPCs + device-360 route (merged timeline
 ### Phase 6 — Commerce wave (L)
 `app.module_enabled()` enforcement + `modules` catalog + per-module permissions (`app.can`) **first**, then: Quotes → Sales Orders → Invoices (reusing `document_sequences`, `taxBreakdown`, customer 360 panels) · Suppliers + Purchasing · Inventory/warehouses (device stock migrates onto it).
 
+> **Status (2026-07-26): the document chain shipped ahead of the enforcement layer.**
+> `sales` (quotes, sales orders, catalog) and `billing` (invoices, payments) are
+> `available` — see [SALES.md](SALES.md). They reuse `app.next_doc_number`, the
+> country tax engine, the audit triggers and the capability-URL pattern as planned,
+> and add DB-enforced state machines, issued-document immutability and
+> server-computed money (rounded to the tenant's currency minor units).
+> **The recommended prerequisite was deliberately deferred:** these tables carry the
+> standard tenant+role RLS but no `app.module_enabled()` check, so the client-only
+> entitlement gap in §5-B now covers commerce data too. Close it before any of this
+> becomes a paid tier. Suppliers/Purchasing/Inventory remain unbuilt.
+
 ### Phase 7 — Portal & multi-membership (L)
 `memberships` refactor · customer-portal principal + invitation reuse · portal surfaces (my vehicles, certificates, invoices) · SaaS billing substrate (plans/seats) when go-to-market needs it.
 
@@ -543,7 +554,7 @@ Realtime invalidation on hot tables (jobs board, stock) · PWA/offline capture f
 | 6 | Email + scheduler + attachments | Most customer-visible absences (reminders! documents!) | M | 4 |
 | 7 | Module-enablement RLS enforcement + permission vocabulary | Prerequisite for paid plans and portal | M | 6 |
 | 8 | SL suite completion (QC gate, device 360, calibration) | Deepens the wedge vertical | M | 5 |
-| 9 | Quotes/Sales/Invoices | First revenue-side module wave | L | 6 |
+| 9 | Quotes/Sales/Invoices | First revenue-side module wave | L | 6 — **shipped** (docs/SALES.md); item 7 still outstanding |
 | 10 | Customer portal + memberships | Archetype-2 differentiator | L | 7 |
 
 ---

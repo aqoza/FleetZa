@@ -87,13 +87,17 @@ export const MODULES: ModuleDef[] = [
 
   // --- Commerce ---
   m("purchasing", "commerce", "coming_soon"),
-  m("sales", "commerce", "coming_soon"),
+  // Quotes + sales orders + the product catalog. Customers is a *data*
+  // dependency, not just a UI one: every document FKs a customer.
+  m("sales", "commerce", "available", { requires: ["customers"], routes: ["/sales"] }),
   m("pos", "commerce", "coming_soon", { requires: ["sales"] }),
   m("crm", "commerce", "coming_soon"),
 
   // --- Finance ---
   m("finance", "finance", "coming_soon"),
-  m("billing", "finance", "coming_soon"),
+  // Invoices + payments. Rides on the sales hub (its own tab there), the way
+  // sl_certificates rides on speed_limiters.
+  m("billing", "finance", "available", { requires: ["sales"] }),
   m("contracts", "finance", "coming_soon"),
 
   // --- People ---
