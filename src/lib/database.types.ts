@@ -529,6 +529,256 @@ export type Database = {
           },
         ]
       }
+      invoice_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          discount_percent: number
+          id: string
+          invoice_id: string
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          product_id: string | null
+          quantity: number
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          discount_percent?: number
+          id?: string
+          invoice_id: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          discount_percent?: number
+          id?: string
+          invoice_id?: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_lines_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_paid: number
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          discount_total: number
+          doc_number: string | null
+          due_date: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          issued_at: string | null
+          notes: string | null
+          number: number | null
+          sales_order_id: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          due_date?: string | null
+          id?: string
+          internal_notes?: string | null
+          issue_date?: string
+          issued_at?: string | null
+          notes?: string | null
+          number?: number | null
+          sales_order_id?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          customer_id?: string
+          customer_reference?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          due_date?: string | null
+          id?: string
+          internal_notes?: string | null
+          issue_date?: string
+          issued_at?: string | null
+          notes?: string | null
+          number?: number | null
+          sales_order_id?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "sl_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
           created_at: string
@@ -618,6 +868,122 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_id: string
+          method: string
+          notes: string | null
+          paid_at: string
+          reference: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          name: string
+          notes: string | null
+          sku: string | null
+          tax_rate: number
+          tenant_id: string
+          unit: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          name: string
+          notes?: string | null
+          sku?: string | null
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          notes?: string | null
+          sku?: string | null
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -658,6 +1024,275 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          discount_percent: number
+          id: string
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          product_id: string | null
+          quantity: number
+          quote_id: string
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          discount_percent?: number
+          id?: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          quote_id: string
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          discount_percent?: number
+          id?: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          quote_id?: string
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_lines_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_lines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          accepted_at: string | null
+          accepted_by_name: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          decline_reason: string | null
+          declined_at: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          notes: string | null
+          number: number | null
+          public_token: string
+          revision: number
+          revision_of: string | null
+          sales_order_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by_name?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference?: string | null
+          decline_reason?: string | null
+          declined_at?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          internal_notes?: string | null
+          issue_date?: string
+          notes?: string | null
+          number?: number | null
+          public_token?: string
+          revision?: number
+          revision_of?: string | null
+          sales_order_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by_name?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          customer_id?: string
+          customer_reference?: string | null
+          decline_reason?: string | null
+          declined_at?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          internal_notes?: string | null
+          issue_date?: string
+          notes?: string | null
+          number?: number | null
+          public_token?: string
+          revision?: number
+          revision_of?: string | null
+          sales_order_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          valid_until?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "sl_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_revision_of_fkey"
+            columns: ["revision_of"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -724,6 +1359,303 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_order_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          discount_percent: number
+          id: string
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          product_id: string | null
+          quantity: number
+          sales_order_id: string
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          discount_percent?: number
+          id?: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          sales_order_id: string
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          discount_percent?: number
+          id?: string
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          product_id?: string | null
+          quantity?: number
+          sales_order_id?: string
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_order_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_order_lines_sales_order_id_fkey"
+            columns: ["sales_order_id"]
+            isOneToOne: false
+            referencedRelation: "sales_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_order_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_order_lines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_orders: {
+        Row: {
+          closed_at: string | null
+          confirmed_at: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          discount_total: number
+          doc_number: string | null
+          expected_date: string | null
+          fulfilled_at: string | null
+          id: string
+          internal_notes: string | null
+          invoiced_total: number
+          notes: string | null
+          number: number | null
+          order_date: string
+          quote_id: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          closed_at?: string | null
+          confirmed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          expected_date?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          invoiced_total?: number
+          notes?: string | null
+          number?: number | null
+          order_date?: string
+          quote_id?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          closed_at?: string | null
+          confirmed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          customer_id?: string
+          customer_reference?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          expected_date?: string | null
+          fulfilled_at?: string | null
+          id?: string
+          internal_notes?: string | null
+          invoiced_total?: number
+          notes?: string | null
+          number?: number | null
+          order_date?: string
+          quote_id?: string | null
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          title?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_orders_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "sl_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_settings: {
+        Row: {
+          default_tax_rate: number | null
+          invoice_prefix: string
+          invoice_terms: string | null
+          order_prefix: string
+          payment_terms_days: number
+          quote_prefix: string
+          quote_terms: string | null
+          quote_valid_days: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          default_tax_rate?: number | null
+          invoice_prefix?: string
+          invoice_terms?: string | null
+          order_prefix?: string
+          payment_terms_days?: number
+          quote_prefix?: string
+          quote_terms?: string | null
+          quote_valid_days?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          default_tax_rate?: number | null
+          invoice_prefix?: string
+          invoice_terms?: string | null
+          order_prefix?: string
+          payment_terms_days?: number
+          quote_prefix?: string
+          quote_terms?: string | null
+          quote_valid_days?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -1367,6 +2299,7 @@ export type Database = {
           country: string
           created_at: string
           currency: string
+          currency_decimals: number
           distance_unit: string
           id: string
           name: string
@@ -1382,6 +2315,7 @@ export type Database = {
           country?: string
           created_at?: string
           currency?: string
+          currency_decimals?: number
           distance_unit?: string
           id?: string
           name: string
@@ -1397,6 +2331,7 @@ export type Database = {
           country?: string
           created_at?: string
           currency?: string
+          currency_decimals?: number
           distance_unit?: string
           id?: string
           name?: string
@@ -1877,6 +2812,88 @@ export type Database = {
         }
         Returns: undefined
       }
+      convert_quote_to_order: {
+        Args: { p_quote_id: string }
+        Returns: {
+          closed_at: string | null
+          confirmed_at: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          discount_total: number
+          doc_number: string | null
+          expected_date: string | null
+          fulfilled_at: string | null
+          id: string
+          internal_notes: string | null
+          invoiced_total: number
+          notes: string | null
+          number: number | null
+          order_date: string
+          quote_id: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "sales_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_invoice_from_order: {
+        Args: { p_order_id: string }
+        Returns: {
+          amount_paid: number
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          discount_total: number
+          doc_number: string | null
+          due_date: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          issued_at: string | null
+          notes: string | null
+          number: number | null
+          sales_order_id: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "invoices"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -1944,6 +2961,67 @@ export type Database = {
           total_liters: number
           vehicle_id: string
           vehicle_name: string
+        }[]
+      }
+      revise_quote: {
+        Args: { p_quote_id: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_name: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          decline_reason: string | null
+          declined_at: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          notes: string | null
+          number: number | null
+          public_token: string
+          revision: number
+          revision_of: string | null
+          sales_order_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      sales_summary: {
+        Args: never
+        Returns: {
+          accepted_quotes_90d: number
+          collected_30d: number
+          decided_quotes_90d: number
+          open_order_value: number
+          open_orders: number
+          open_quote_value: number
+          open_quotes: number
+          outstanding_amount: number
+          overdue_amount: number
+          overdue_invoices: number
+          unbilled_order_value: number
         }[]
       }
     }

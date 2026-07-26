@@ -56,6 +56,8 @@ import { enSlDevices } from "./messages/en/slDevices";
 import { arSlDevices } from "./messages/ar/slDevices";
 import { enSlJobs } from "./messages/en/slJobs";
 import { arSlJobs } from "./messages/ar/slJobs";
+import { enSales } from "./messages/en/sales";
+import { arSales } from "./messages/ar/sales";
 import { enSlCertificates } from "./messages/en/slCertificates";
 import { arSlCertificates } from "./messages/ar/slCertificates";
 import { enErrors } from "./messages/en/errors";
@@ -87,6 +89,7 @@ const en = {
   ...enCustomers,
   ...enSlDevices,
   ...enSlJobs,
+  ...enSales,
   ...enSlCertificates,
   ...enErrors,
 };
@@ -109,6 +112,7 @@ const ar: Record<string, string> = {
   ...arCustomers,
   ...arSlDevices,
   ...arSlJobs,
+  ...arSales,
   ...arSlCertificates,
   ...arErrors,
 };

@@ -40,7 +40,9 @@ everywhere. If it should be on for every tenant by default, also add it to
 ## End-to-end checklist
 
 Use the speed limiter modules (`speed_limiters`, `sl_certificates`) as the
-reference implementation throughout.
+reference implementation throughout. For a module whose core is a *document*
+rather than a record — numbering, a state machine, immutability once issued,
+server-computed money — read `sales` / `billing` alongside it (docs/SALES.md).
 
 ### 1. Registry entry — `shared/modules.ts`
 

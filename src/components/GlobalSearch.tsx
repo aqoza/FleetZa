@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Award, Building2, Clock, Search, Truck, type LucideIcon } from "lucide-react";
+import {
+  Award, Building2, Clock, FileText, ReceiptText, Search, Truck, type LucideIcon,
+} from "lucide-react";
 import { listRows, sanitizeSearch } from "../lib/db";
 import { getRecent } from "../lib/recent";
-import type { Customer, SpeedLimiterCertificate, Vehicle } from "../lib/types";
+import type { Customer, Invoice, Quote, SpeedLimiterCertificate, Vehicle } from "../lib/types";
 import { useModules } from "../context/ModulesContext";
 import { NAV_ITEMS } from "../modules/nav";
 import { useT } from "../i18n";
@@ -17,7 +19,7 @@ interface PaletteItem {
   label: string;
   meta?: string;
   path: string;
-  group: "recent" | "goto" | "vehicles" | "customers" | "certificates";
+  group: "recent" | "goto" | "vehicles" | "customers" | "certificates" | "quotes" | "invoices";
 }
 
 /**
@@ -32,6 +34,8 @@ export function GlobalSearch() {
   const { isEnabled } = useModules();
   const customersOn = isEnabled("customers");
   const certsOn = isEnabled("sl_certificates");
+  const salesOn = isEnabled("sales");
+  const billingOn = isEnabled("billing");
 
   const [raw, setRaw] = useState("");
   const [term, setTerm] = useState("");
@@ -105,8 +109,37 @@ export function GlobalSearch() {
       ),
   });
 
-  const anyLoading = queriesOn && (vehiclesQ.isLoading || customersQ.isLoading || certsQ.isLoading);
-  const anyError = Boolean(vehiclesQ.error || customersQ.error || certsQ.error);
+  const quotesQ = useQuery({
+    queryKey: ["quotes", "globalSearch", term],
+    enabled: queriesOn && salesOn,
+    queryFn: () =>
+      listRows<Quote>("quotes", (q) =>
+        q
+          .or(`doc_number.ilike.%${term}%,title.ilike.%${term}%`)
+          .order("issue_date", { ascending: false })
+          .limit(LIMIT),
+      ),
+  });
+
+  const invoicesQ = useQuery({
+    queryKey: ["invoices", "globalSearch", term],
+    enabled: queriesOn && billingOn,
+    queryFn: () =>
+      listRows<Invoice>("invoices", (q) =>
+        q
+          .or(`doc_number.ilike.%${term}%,title.ilike.%${term}%`)
+          .order("issue_date", { ascending: false })
+          .limit(LIMIT),
+      ),
+  });
+
+  const anyLoading =
+    queriesOn &&
+    (vehiclesQ.isLoading || customersQ.isLoading || certsQ.isLoading ||
+      quotesQ.isLoading || invoicesQ.isLoading);
+  const anyError = Boolean(
+    vehiclesQ.error || customersQ.error || certsQ.error || quotesQ.error || invoicesQ.error,
+  );
 
   /** The flat, keyboard-navigable item list: recent → commands → results. */
   const items = useMemo<PaletteItem[]>(() => {
@@ -156,11 +189,35 @@ export function GlobalSearch() {
           group: "certificates",
         });
       }
+      for (const q of quotesQ.data ?? []) {
+        out.push({
+          key: `q:${q.id}`,
+          icon: FileText,
+          label: q.doc_number,
+          meta: q.title ?? undefined,
+          path: `/sales/quotes/${q.id}`,
+          group: "quotes",
+        });
+      }
+      for (const inv of invoicesQ.data ?? []) {
+        out.push({
+          key: `i:${inv.id}`,
+          icon: ReceiptText,
+          label: inv.doc_number,
+          meta: inv.title ?? undefined,
+          path: `/sales/invoices/${inv.id}`,
+          group: "invoices",
+        });
+      }
     }
     return out;
     // `open` is a dependency so the Recent section re-reads localStorage on
     // every palette open (visits since the last open would otherwise be stale).
-  }, [searching, term, t, isEnabled, vehiclesQ.data, customersQ.data, certsQ.data, open]);
+  }, [
+    searching, term, t, isEnabled,
+    vehiclesQ.data, customersQ.data, certsQ.data, quotesQ.data, invoicesQ.data,
+    open,
+  ]);
 
   // Keep the highlight valid as the list changes; scroll it into view.
   useEffect(() => {
@@ -202,6 +259,8 @@ export function GlobalSearch() {
     vehicles: t("nav.vehicles"),
     customers: t("nav.customers"),
     certificates: t("customers.certificates"),
+    quotes: t("sales.quotes.title"),
+    invoices: t("sales.invoices.title"),
   };
 
   const groupHeading =

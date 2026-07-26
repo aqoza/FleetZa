@@ -3,9 +3,14 @@ import type { MessageKey } from "../i18n";
 import type {
   DriverStatus,
   FuelType,
+  InvoiceStatus,
   IssueStatus,
+  PaymentMethod,
   Priority,
+  ProductKind,
+  QuoteStatus,
   RenewalType,
+  SalesOrderStatus,
   VehicleStatus,
   VehicleType,
   WorkOrderStatus,
@@ -66,6 +71,54 @@ export const priority: Record<Priority, { labelKey: MessageKey; tone: BadgeTone 
 export const driverStatus: Record<DriverStatus, { labelKey: MessageKey; tone: BadgeTone }> = {
   active: { labelKey: "enum.driverStatus.active", tone: "green" },
   inactive: { labelKey: "enum.driverStatus.inactive", tone: "slate" },
+};
+
+// --- Sales & billing ---
+// "expired" / "overdue" are *derived* states (valid_until, due_date) — see
+// src/lib/sales.ts. They get their own tones here so every surface agrees.
+
+export const quoteStatus: Record<QuoteStatus, { labelKey: MessageKey; tone: BadgeTone }> = {
+  draft: { labelKey: "enum.quoteStatus.draft", tone: "slate" },
+  sent: { labelKey: "enum.quoteStatus.sent", tone: "blue" },
+  accepted: { labelKey: "enum.quoteStatus.accepted", tone: "green" },
+  declined: { labelKey: "enum.quoteStatus.declined", tone: "red" },
+  expired: { labelKey: "enum.quoteStatus.expired", tone: "yellow" },
+  canceled: { labelKey: "enum.quoteStatus.canceled", tone: "slate" },
+};
+
+export const salesOrderStatus: Record<
+  SalesOrderStatus,
+  { labelKey: MessageKey; tone: BadgeTone }
+> = {
+  draft: { labelKey: "enum.salesOrderStatus.draft", tone: "slate" },
+  confirmed: { labelKey: "enum.salesOrderStatus.confirmed", tone: "blue" },
+  fulfilled: { labelKey: "enum.salesOrderStatus.fulfilled", tone: "purple" },
+  closed: { labelKey: "enum.salesOrderStatus.closed", tone: "green" },
+  canceled: { labelKey: "enum.salesOrderStatus.canceled", tone: "red" },
+};
+
+export const invoiceStatus: Record<InvoiceStatus, { labelKey: MessageKey; tone: BadgeTone }> = {
+  draft: { labelKey: "enum.invoiceStatus.draft", tone: "slate" },
+  issued: { labelKey: "enum.invoiceStatus.issued", tone: "blue" },
+  partially_paid: { labelKey: "enum.invoiceStatus.partially_paid", tone: "yellow" },
+  paid: { labelKey: "enum.invoiceStatus.paid", tone: "green" },
+  void: { labelKey: "enum.invoiceStatus.void", tone: "slate" },
+};
+
+export const productKinds: Record<ProductKind, MessageKey> = {
+  service: "enum.productKind.service",
+  part: "enum.productKind.part",
+  fee: "enum.productKind.fee",
+  other: "enum.productKind.other",
+};
+
+export const paymentMethods: Record<PaymentMethod, MessageKey> = {
+  cash: "enum.paymentMethod.cash",
+  bank_transfer: "enum.paymentMethod.bank_transfer",
+  card: "enum.paymentMethod.card",
+  cheque: "enum.paymentMethod.cheque",
+  online: "enum.paymentMethod.online",
+  other: "enum.paymentMethod.other",
 };
 
 export const renewalTypes: Record<RenewalType, MessageKey> = {
