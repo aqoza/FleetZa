@@ -4,7 +4,12 @@ export const enSlCertificates = {
   "slCertificates.description":
     "Speed limiter compliance certificates issued to your customers",
   "slCertificates.settings": "Certificate settings",
-  "slCertificates.searchPlaceholder": "Search by certificate number…",
+  "slCertificates.searchPlaceholder": "Certificate #, UIN, seal, vehicle or plate…",
+  "slCertificates.searchNarrowHint":
+    "More than {count} vehicles match this search — only the first {count} are included. Narrow the search to see the rest.",
+  "slCertificates.searchSupersededHint":
+    "{count} superseded certificates match — they were replaced by a later renewal, so they are hidden here.",
+  "slCertificates.searchSupersededLink": "Show them",
 
   // Filter chips
   "slCertificates.filterAll": "All",
@@ -14,6 +19,7 @@ export const enSlCertificates = {
   "slCertificates.filter90": "61–90 days",
   "slCertificates.filterExpired": "Expired",
   "slCertificates.filterRevoked": "Revoked",
+  "slCertificates.filterSuperseded": "Superseded",
 
   // Table
   "slCertificates.number": "Certificate #",
@@ -28,6 +34,9 @@ export const enSlCertificates = {
   "slCertificates.copyVerifyLink": "Copy verify link",
   "slCertificates.linkCopied": "Link copied",
   "slCertificates.renew": "Renew",
+  "slCertificates.renewBlockedRevoked": "Cannot be renewed — this certificate was revoked",
+  "slCertificates.renewBlockedSuperseded":
+    "Cannot be renewed — a later certificate has already replaced it",
   "slCertificates.revoke": "Revoke",
 
   // Renew modal
@@ -44,6 +53,27 @@ export const enSlCertificates = {
   "slCertificates.expiresAt": "Expiry date",
   "slCertificates.renewConfirm": "Issue certificate",
   "slCertificates.renewFailed": "Renewal failed",
+  "slCertificates.renewLoadFailed": "This certificate could not be loaded, so it cannot be renewed.",
+
+  // Bulk renew — one customer, several vehicles, one operation
+  "slCertificates.bulkRenew": "Renew selected",
+  "slCertificates.bulkRenewTitle": "Renew {count} certificates",
+  "slCertificates.bulkRenewLead":
+    "A replacement certificate is issued for each of the {count} vehicles below, carrying over its authority and set speeds.",
+  "slCertificates.bulkEligible": "Will be renewed ({count})",
+  "slCertificates.bulkSkipped": "Skipped ({count})",
+  "slCertificates.bulkSkipRevoked": "Revoked — cannot be renewed",
+  "slCertificates.bulkSkipSuperseded": "Already renewed",
+  "slCertificates.bulkNoneEligible": "None of the selected certificates can be renewed.",
+  "slCertificates.bulkProgress": "Issuing {done} of {total}…",
+  "slCertificates.bulkCloseBlocked":
+    "Certificates are being issued — this stays open until the run finishes, so you get the full report.",
+  "slCertificates.bulkConfirm": "Issue {count} certificates",
+  "slCertificates.bulkDoneAll": "Issued {count} certificates.",
+  "slCertificates.bulkDonePartial":
+    "Issued {done} of {total} certificates. {failed} failed — the ones below were not renewed.",
+  "slCertificates.bulkSucceeded": "Issued",
+  "slCertificates.bulkFailed": "Failed",
 
   // Revoke modal
   "slCertificates.revokeTitle": "Revoke certificate",

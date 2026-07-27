@@ -36,6 +36,10 @@ export const enCommon = {
   "search.recent": "Recent",
   "panel.quickActions": "Quick actions",
   "panel.dueSoon": "Due soon",
+  // Footer of the due-soon list: what the actionable window leaves out, so a
+  // short list never reads as "all clear" when a renewal backlog exists.
+  "panel.certBacklog": "{count} expired certificates to renew",
+  "panel.renewalBacklog": "{count} overdue renewals",
   "panel.hide": "Hide panel",
   "panel.show": "Show panel",
   "table.columns": "Columns",

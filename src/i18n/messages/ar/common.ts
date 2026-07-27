@@ -36,6 +36,8 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "search.recent": "الأخيرة",
   "panel.quickActions": "إجراءات سريعة",
   "panel.dueSoon": "مستحق قريبًا",
+  "panel.certBacklog": "{count} شهادة منتهية بحاجة إلى تجديد",
+  "panel.renewalBacklog": "{count} تجديد متأخر",
   "panel.hide": "إخفاء اللوحة",
   "panel.show": "إظهار اللوحة",
   "table.columns": "الأعمدة",

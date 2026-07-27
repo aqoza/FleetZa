@@ -55,6 +55,7 @@ erDiagram
     SL_JOBS ||--o{ INSTALLATIONS : "produces"
     SL_JOBS ||--o{ CERTIFICATES : "produces"
     CERTIFICATES ||--o| CERTIFICATES : "renewed_from"
+    CERTIFICATES ||--o| CERTIFICATES : "superseded_by"
     SL_SETTINGS ||--|| CERTIFICATES : "numbering + validity"
 ```
 
@@ -67,7 +68,7 @@ erDiagram
 | Technician | `sl_technicians` | Installer/inspector on staff (name, phone, email, active flag) | Assigned to jobs via `technician_id` |
 | Job | `sl_jobs` | The unit of work — see the state machine below. `number` is assigned by a DB trigger (never sent by the client); carries checklist, signatures, QC fields, timing | `customer_id`, `vehicle_id`, `device_id`, `technician_id` |
 | Installation | `speed_limiter_installations` | Historical record that a device was installed on a vehicle at a set speed, extended with `customer_id`, `device_id`, `job_id` | Links vehicle ↔ device ↔ job |
-| Certificate | `speed_limiter_certificates` | The compliance document — see the lifecycle below | `customer_id`, `vehicle_id`, `device_id`, `job_id`, `installation_id`, `renewed_from` |
+| Certificate | `speed_limiter_certificates` | The compliance document — see the lifecycle below | `customer_id`, `vehicle_id`, `device_id`, `job_id`, `installation_id`, `renewed_from`, `superseded_by` |
 | Settings | `sl_settings` | Per-tenant certificate policy: `cert_prefix`, `cert_next_number`, `cert_validity_months` | Read by the numbering RPC and issuance flow |
 
 ## Job workflow state machine
@@ -114,26 +115,32 @@ finalized through QC:
 
 ```mermaid
 stateDiagram-v2
-    [*] --> valid : issued (atomic number)
-    valid --> valid : renewal issues NEW cert\n(renewed_from → old)
-    valid --> expired : expires_at passes\n(derived, not stored)
-    valid --> revoked : manager revokes
-    expired --> [*]
+    [*] --> live : issued (atomic number,\nsuperseded_by NULL)
+    live --> live : expires_at passes —\nstill the vehicle's certificate
+    live --> superseded : the next certificate is issued\n(trigger sets superseded_by)
+    live --> revoked : manager revokes
+    superseded --> [*]
     revoked --> [*]
 ```
 
-- **Issuance** — created from a QC-approved job. The certificate number comes from
-  `supabase.rpc("next_certificate_number")`, which atomically increments
-  `sl_settings.cert_next_number` and returns the formatted number (e.g.
-  `SLC-00001` using `cert_prefix`). Call it **exactly once per issued certificate,
-  at insert time** — never preview it, never reuse it. `expires_at` is
-  `issued_at + sl_settings.cert_validity_months`. The row links customer, vehicle,
-  device, job, installation, and the certified `set_speed_kmh`.
+- **Issuance** — created from a QC-approved job, or from the renewal flow. The
+  certificate number comes from `supabase.rpc("next_certificate_number")`, which
+  atomically increments `sl_settings.cert_next_number` and returns the formatted
+  number (e.g. `SLC-00001` using `cert_prefix`). Call it **exactly once per issued
+  certificate, at insert time** — never preview it, never reuse it. `expires_at`
+  is `issued_at + sl_settings.cert_validity_months`. The row links customer,
+  vehicle, device, job, installation, and the certified `set_speed_kmh`.
 - **Expiry** — derived from `expires_at` at read time; there is no stored
-  `expired` status. UI shows *expiring soon* / *expired* badges from the date.
-- **Renewal** — an inspection job that passes QC issues a **new** certificate with
-  `renewed_from` pointing at the previous one, forming an auditable chain. Old
-  certificates are never edited in place.
+  `expired` status, and expiring does **not** change which certificate a vehicle
+  carries. A tenant that back-loaded its paper register holds hundreds of live,
+  long-expired certificates: that is the renewal backlog, not corrupt data, and
+  it is never hidden or deleted.
+- **Supersession** — issuing the next certificate for the same vehicle sets
+  `superseded_by` on the previous one. This is the *only* answer to "which
+  certificate does this vehicle carry"; see below.
+- **Renewal** — an inspection job that passes QC, or the renewal modal, issues a
+  **new** certificate with `renewed_from` pointing at the row the operator acted
+  on. Old certificates are never edited in place.
 - **Revocation** — a manager sets `status = "revoked"` with `revoked_at` and
   `revoked_reason` (device removed, tampering found, issued in error). Revocation
   is a stored status and wins over dates on the verify endpoint.
@@ -144,7 +151,154 @@ stateDiagram-v2
   public `GET /api/verify/:certUuid`, which returns
   `{ status: "valid" | "expired" | "revoked" | "not_found", certificateNumber, uin, issuedAt, expiresAt, setSpeedKmh, setSpeedSecondaryKmh, issuingAuthority, vehiclePlate, vehicleName, customerName, issuedBy }`.
   No authentication required; the certificate UUID is the capability. Nothing
-  beyond that response is exposed.
+  beyond that response is exposed. It deliberately does **not** consult
+  `superseded_by`: it answers about the document in the inspector's hand, from
+  that document's own dates and status. A superseded certificate still verifies
+  as `expired` (or `valid`, if a renewal was issued early) — printed certificates
+  already depend on this response shape, so it does not grow a fourth status.
+
+### Supersession — which certificate a vehicle carries
+
+A vehicle legally carries **one live RSL certificate at a time**, and
+`speed_limiter_certificates.superseded_by` is the column that says which.
+It points at the certificate that *immediately* replaced this one, so a
+vehicle's certificates form a linked list ending at the live head:
+
+```
+oldest → … → previous → newest   (newest.superseded_by IS NULL)
+```
+
+`superseded_by IS NULL` therefore means "this is the vehicle's current
+certificate". It is a linked list rather than "every historical row points at
+the head" on purpose: the FK is `ON DELETE SET NULL`, so deleting the head
+resurrects exactly **one** predecessor instead of resurrecting a dozen and
+leaving the vehicle with a dozen live certificates.
+
+**Keyed on `vehicle_id`, never `installation_id`.** Real renewal chains cross
+installations: an imported paper register mints one installation row per
+register entry, so in the reference tenant (GAWHRAT, 492 certificates over 477
+vehicles) **9 of the 15** `renewed_from` chains point at a predecessor with a
+*different* `installation_id`. The installation is bookkeeping about the fitted
+device; the certificate is a document about the vehicle. Group by the vehicle.
+
+**Not the same thing as `renewed_from`.** That column records only the row an
+operator pressed Renew on. It is NULL for every imported historical certificate
+(15 of 492 rows carry it), it is a hint rather than an invariant, and nothing
+maintains it. Never query it to decide what is live.
+
+The trigger — `app.sync_certificate_supersession()`, `after insert or delete
+for each row`, `security definer` with `search_path = ''` and every statement
+pinned to the row's own `tenant_id`:
+
+| Path | What it does |
+|---|---|
+| Ordering | Siblings rank by `(issued_at, created_at, id)`. `id` is a uuid PK, so the order is **total** — two certificates issued the same day for one vehicle can never both be newest. `superseded_by` always points strictly *up* that order, which makes cycles structurally impossible. |
+| INSERT | Finds the immediate predecessor (newest sibling ranking older) and points it at the new row. Also finds the immediate successor (oldest sibling ranking *newer*): when one exists the new row is back-dated — a historical import or a correction — so it is born superseded and the live head is left alone. |
+| DELETE | Splices the list: the predecessor is relinked onto the deleted row's own successor, so removing a row from the *middle* cannot leave two live certificates. The FK's `ON DELETE SET NULL` already covers deleting the head. |
+| Concurrency | `pg_advisory_xact_lock` on (tenant, vehicle) serializes issuance per vehicle. Without it two simultaneous renewals each see no sibling and both stay live — not hypothetical, the reference tenant already carries a double-submit pair. |
+| No UPDATE path | The only update the app performs on an issued certificate is revocation, which is orthogonal to ordering. If `issued_at` or `vehicle_id` ever become editable, the trigger must grow an `after update` path that repairs **both** the vacated position and the new one. |
+
+Backfill was one `lag()` statement over the newest-first window partitioned by
+`(tenant_id, vehicle_id)` — the same rule the trigger applies, so history and
+future rows agree. Two partial indexes back it: `sl_certificates_live_expiry_idx
+(tenant_id, expires_at) WHERE superseded_by IS NULL` for the hot "live
+certificates by expiry" query, and `sl_certificates_superseded_by_idx` so a
+certificate DELETE does not seq-scan to apply the FK action.
+
+**The predicate every query must use.** Supersession and revocation are separate
+axes and are never folded together — a revoked head means the vehicle has no
+valid certificate, it does not resurrect the predecessor:
+
+```ts
+live        → .is("superseded_by", null).eq("status", "valid")
+superseded  → .not("superseded_by", "is", null)
+revoked     → .eq("status", "revoked")
+```
+
+"Live" says nothing about expiry. `src/lib/certificateStatus.ts` mirrors these
+predicates client-side (`isLiveCertificate`, `isSupersededCertificate`) so a
+count computed in the browser can never disagree with a paginated server query,
+and it is where every surface gets its badge from.
+
+### Status buckets
+
+One bucket per certificate, first match wins (`certificateBucket`):
+
+| Bucket | Test | Badge |
+|---|---|---|
+| `revoked` | `status = "revoked"` | slate |
+| `superseded` | `superseded_by IS NOT NULL` | slate |
+| `expired` | days < 0 | red |
+| `d30` | 0 ≤ days ≤ 30 | red |
+| `d60` | 31–60 | yellow |
+| `d90` | 61–90 | blue |
+| `ok` | > 90 | green |
+
+Revocation outranks everything: an explicit act by the issuer beats any date.
+**Supersession is checked before expiry** — a renewed-then-lapsed certificate
+reads *Superseded*, not *Expired*, because it is history, not work, and a red
+badge there sends a technician out to renew a vehicle that is already compliant.
+Superseded is slate for the same reason; red is reserved for states that need
+someone to act. Days are whole days from today and a certificate is still good
+on its expiry date, so `days = 0` lands in `d30`, not `expired`.
+
+### Renewing a certificate
+
+`src/pages/speed-limiters/RenewCertificateModal.tsx` is the one implementation.
+Every surface mounts the same component, driven by a certificate id; it fetches
+the joined row it needs itself, so a caller that holds only an id (or an
+unjoined row) is safe.
+
+| Surface | Entry point |
+|---|---|
+| Certificates list | Row *Renew* icon; **Renew selected** over the `DataTable` selection for a customer who turns up with five vehicles |
+| Vehicle detail | Header *Renew certificate* button, plus *Renew* on the current-certificate card — shown only when the vehicle has a live head |
+| Customer detail | Row *Renew* icon in the vehicles card, shown when that vehicle's head is expired or inside the 90-day window |
+
+**The invariant: one certificate, one number, one RPC call.**
+`renewCertificate()` calls `next_certificate_number()` exactly once, at insert
+time. A number fetched early and then not used burns a number; a number reused
+across two inserts collides. Bulk renewal therefore runs **strictly
+sequentially** — awaited one row at a time, never `Promise.all` — and never
+rolls back: rows that succeeded stay issued, and the summary names every success
+and every failure rather than reporting one verdict for the batch. The bulk form
+lists what it will skip before it starts: revoked certificates (replaced by a
+new job, not renewed) and rows that are already superseded.
+
+A renewal carries forward customer, vehicle, device, installation, tamper seal,
+limiter type and the UIN (`resolveUin` — reprint what the installation carries,
+derive only when it has none, and write the derived one back so later renewals
+reprint it), and sets `renewed_from` to the row it replaced. The operator may
+change issuing authority, both set speeds, and the two dates (defaulted to today
+and today + `cert_validity_months`). The client never writes `superseded_by` —
+the trigger maintains both directions from the insert alone.
+
+### The actionable window
+
+"Due soon" is bounded on **both** sides: `expires_at` between today − 30 and
+today + 60, ordered ascending, limited to a handful. The lower bound is the
+whole point. With an upper bound only, an ascending order returns the *oldest*
+rows in the tenant rather than the nearest ones — in the reference tenant that
+pinned four 2022 certificates to the context panel forever while the three
+genuinely due sat hundreds of rows behind them.
+
+What the window excludes is **counted, not hidden**: head-only `countRows`
+queries for the live-and-lapsed backlog render as a link into
+`/speed-limiters/certificates?filter=expired`, and "Nothing due" appears only
+when the window *and* the backlogs are empty. The same rule governs the overview
+expiry board — four buckets, each a `listPage(0, 5)` so the chip shows the exact
+server-side total while only five rows travel, each card linking to the
+certificates list chip of the same name.
+
+That link works because the certificates list keeps its state in the URL
+(`?filter=&q=&page=`), which also makes "these are due" shareable and
+back-button-friendly. Its search covers certificate number, UIN and tamper seal
+plus the vehicle (name, plate, chassis, VIN) — PostgREST cannot OR a parent
+column against an embedded resource, so matching vehicles are resolved first and
+folded in as a capped id set, and hitting the cap is surfaced rather than
+silently dropping rows. The default view is live-only; when a search comes up
+empty there, superseded matches are counted and offered behind a link, so a
+technician typing an old certificate number never reads "no record of it".
 
 ## The printed certificate
 
@@ -212,12 +366,19 @@ additive, not a migration.
   `Tenant`, `SpeedLimiterInstallation`, `SpeedLimiterCertificate`)
 - Document text rules: `src/lib/certificate.ts` (speed band, document date,
   Arabic-Indic digits, footer registration line) — unit-tested
+- Status rules: `src/lib/certificateStatus.ts` (live predicate, buckets, badge
+  meta, fleet compliance) — the single source every surface renders from,
+  unit-tested in `certificateStatus.test.ts`
+- Renewal: `src/pages/speed-limiters/RenewCertificateModal.tsx` — the modal plus
+  `renewCertificate` / `fetchRenewSource` / `defaultRenewalDates`, mounted by the
+  certificates list (single + bulk), vehicle detail and customer detail
 - Pages: `src/pages/speed-limiters/` (hub + Devices, Jobs, Certificates, detail
   and print pages); customer pages live in the global `src/pages/customers/`
   (`/customers`, `/customers/:id`); public verify page at `/verify`
 - Worker: public `GET /api/verify/:certUuid`
 - DB: `supabase/migrations` (tables, RLS, job-number trigger,
   `next_certificate_number()` RPC; customers/contacts renamed global in
-  `20260720000001_customers_extraction.sql`)
+  `20260720000001_customers_extraction.sql`; `superseded_by` + its trigger,
+  indexes and backfill in `20260728000001_certificate_supersession.sql`)
 - i18n namespaces: `speedLimiters` (hub + shared enums), `customers` (global),
   `slDevices`, `slJobs`, `slCertificates` — English + Arabic, RTL-ready

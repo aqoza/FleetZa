@@ -1,10 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Pencil, Trash2, UserCheck } from "lucide-react";
+import { ArrowLeft, Pencil, Printer, RefreshCw, Trash2, UserCheck, Wrench } from "lucide-react";
 import { deleteRow, getRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
-import { daysUntil, formatDate, formatDistance, formatMoney } from "../../lib/format";
+import { formatDate, formatDistance, formatMoney } from "../../lib/format";
+import { certificateStatusMeta } from "../../lib/certificateStatus";
 import { fuelTypes, vehicleStatus, vehicleTypes, workOrderStatus, issueStatus } from "../../lib/labels";
 import type {
   Customer, Driver, FuelLog, Issue, SlJob, SlJobStatus, SlJobType,
@@ -18,6 +19,7 @@ import {
   type BadgeTone,
 } from "../../components/ui";
 import { VehicleForm } from "./VehicleForm";
+import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
 
 // Shared enum keys — defined in the speedLimiters namespace by the hub.
 const jobTypeKeys: Record<SlJobType, MessageKey> = {
@@ -63,6 +65,7 @@ export default function VehicleDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState("");
   const [actionError, setActionError] = useState("");
+  const [renewingId, setRenewingId] = useState<string | null>(null);
 
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ["vehicles", id],
@@ -131,7 +134,35 @@ export default function VehicleDetailPage() {
     },
   });
 
-  const { data: slCerts } = useQuery({
+  /**
+   * The one certificate this vehicle currently carries — the head of its
+   * supersession chain, and not revoked. Same predicate as the server-side
+   * "live" filter the certificates list uses, so this can never disagree with
+   * it: `superseded_by IS NULL AND status = 'valid'`.
+   *
+   * "Live" says nothing about expiry: hundreds of imported register rows are
+   * live and long expired, and those are exactly the renewals a technician
+   * comes here to issue.
+   */
+  const { data: currentCert, isLoading: currentCertLoading, error: currentCertError } = useQuery({
+    queryKey: ["speed_limiter_certificates", "vehicle-current", id],
+    enabled: slCertsOn,
+    queryFn: async () => {
+      const rows = await listRows<SpeedLimiterCertificate>(
+        "speed_limiter_certificates",
+        (q) =>
+          q
+            .eq("vehicle_id", id)
+            .is("superseded_by", null)
+            .eq("status", "valid")
+            .order("issued_at", { ascending: false })
+            .limit(1),
+      );
+      return rows[0] ?? null;
+    },
+  });
+
+  const { data: slCerts, isLoading: slCertsLoading, error: slCertsError } = useQuery({
     queryKey: ["speed_limiter_certificates", "vehicle", id],
     enabled: slCertsOn,
     queryFn: () =>
@@ -204,15 +235,31 @@ export default function VehicleDetailPage() {
       t("vehicles.ownerCompany")
     );
 
+  // One source of truth for certificate state (src/lib/certificateStatus.ts):
+  // revoked > superseded > expired > 30/60/90-day bands. A renewed-then-lapsed
+  // certificate reads "Superseded", not a misleading red "Expired".
   function certBadge(c: SpeedLimiterCertificate) {
-    if (c.status === "revoked") {
-      return <Badge tone="red">{t("speedLimiters.certStatus.revoked")}</Badge>;
-    }
-    const days = daysUntil(c.expires_at);
-    if (days < 0) return <Badge tone="red">{t("speedLimiters.certStatus.expired")}</Badge>;
-    if (days <= 60) return <Badge tone="yellow">{t("speedLimiters.certStatus.expiring")}</Badge>;
-    return <Badge tone="green">{t("speedLimiters.certStatus.valid")}</Badge>;
+    const { bucket, labelKey, tone, daysLeft } = certificateStatusMeta(c);
+    return (
+      <Badge tone={tone}>
+        {bucket === "d30" || bucket === "d60" || bucket === "d90"
+          ? t("speedLimiters.certStatus.expiresInDays", { count: daysLeft })
+          : t(labelKey)}
+      </Badge>
+    );
   }
+
+  // The current certificate gets its own block, so the list below is history.
+  // Three mutually exclusive states, in this order: a failed read is never
+  // allowed to fall through to "no certificate" — on a compliance surface that
+  // reads as a confirmed fact and gets a live certificate re-issued.
+  const certsError = currentCertError ?? slCertsError;
+  const certsLoading = currentCertLoading || slCertsLoading;
+  const historyCerts = (slCerts ?? []).filter((c) => c.id !== currentCert?.id);
+  // No live certificate but rows exist ⇒ the head was revoked (status is
+  // valid | revoked, and a vehicle has exactly one head). Only meaningful once
+  // both reads succeeded.
+  const hasRevokedHead = !currentCert && (slCerts?.length ?? 0) > 0;
 
   return (
     <>
@@ -225,6 +272,16 @@ export default function VehicleDetailPage() {
         actions={
           isManager && (
             <>
+              {/* Renewal is the job a technician opens this page to finish, so
+                  it leads — but only when there is a live certificate to
+                  replace; otherwise the card offers the job link instead.
+                  Suppressed while either certificate read is failing: we do not
+                  know what we would be renewing. */}
+              {slCertsOn && !certsError && currentCert && (
+                <Button onClick={() => setRenewingId(currentCert.id)}>
+                  <RefreshCw className="h-4 w-4" /> {t("vehicles.renewCertificate")}
+                </Button>
+              )}
               <Button variant="secondary" onClick={() => setEditing(true)}>
                 <Pencil className="h-4 w-4" /> {t("action.edit")}
               </Button>
@@ -365,24 +422,110 @@ export default function VehicleDetailPage() {
               <>
                 <div className="mb-2 mt-6 flex items-center justify-between">
                   <h3 className="text-sm font-semibold text-slate-900">{t("customers.certificates")}</h3>
-                  <Link to="/speed-limiters/certificates" className="text-xs text-brand-700 hover:underline">
+                  {/* Land on the certificates list already searched for this
+                      vehicle — its search matches plate, name, chassis and VIN. */}
+                  <Link
+                    to={`/speed-limiters/certificates?q=${encodeURIComponent(
+                      vehicle.license_plate ?? vehicle.name,
+                    )}`}
+                    className="text-xs text-brand-700 hover:underline"
+                  >
                     {t("customers.viewAllCertificates")}
                   </Link>
                 </div>
-                {slCerts?.length ? (
-                  <ul className="space-y-1.5">
-                    {slCerts.map((c) => (
-                      <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
-                        <span className="truncate text-slate-700">{c.certificate_number}</span>
-                        <span className="flex items-center gap-2">
-                          <span className="text-xs text-slate-500">{formatDate(c.expires_at)}</span>
-                          {certBadge(c)}
+                {/* Failed read — say so. Never render the empty state here. */}
+                {certsError && <ErrorState message={t("vehicles.certificatesError")} />}
+
+                {!certsError && !certsLoading && currentCert && (
+                  <div className="rounded-xl border border-line bg-canvas p-3">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-3">
+                      {t("vehicles.currentCertificate")}
+                    </div>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <span className="truncate text-sm font-medium text-ink">
+                        {currentCert.certificate_number}
+                      </span>
+                      {certBadge(currentCert)}
+                    </div>
+                    {currentCert.uin && (
+                      <div className="mt-1.5 flex justify-between gap-4 text-xs">
+                        <span className="text-ink-3">{t("speedLimiters.verify.uin")}</span>
+                        <span className="text-end font-medium text-ink-2 tabular-nums">
+                          {currentCert.uin}
                         </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-slate-500">{t("customers.noCertificates")}</p>
+                      </div>
+                    )}
+                    <div className="mt-1 flex justify-between gap-4 text-xs">
+                      <span className="text-ink-3">{t("slCertificates.expires")}</span>
+                      <span className="text-end font-medium text-ink-2 tabular-nums">
+                        {formatDate(currentCert.expires_at)}
+                      </span>
+                    </div>
+                    <div className="mt-2.5 flex flex-wrap items-center gap-4 border-t border-line pt-2.5">
+                      <Link
+                        to={`/speed-limiters/certificates/${currentCert.id}/print`}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline"
+                      >
+                        <Printer className="h-3.5 w-3.5" /> {t("slCertificates.print")}
+                      </Link>
+                      {isManager && (
+                        <button
+                          type="button"
+                          onClick={() => setRenewingId(currentCert.id)}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5" /> {t("slCertificates.renew")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Nothing to renew — and we know it, because both reads
+                    succeeded. Point at the job that issues the first
+                    certificate rather than offering a dead button. */}
+                {!certsError && !certsLoading && !currentCert && (
+                  <div className="rounded-xl border border-line bg-canvas p-3">
+                    <p className="text-sm text-ink-2">
+                      {hasRevokedHead
+                        ? t("vehicles.noValidCertificate")
+                        : t("vehicles.noCertificate")}
+                    </p>
+                    <p className="mt-1 text-xs text-ink-3">
+                      {hasRevokedHead
+                        ? t("vehicles.noValidCertificateHint")
+                        : t("vehicles.noCertificateHint")}
+                    </p>
+                    <Link
+                      to="/speed-limiters/jobs"
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline"
+                    >
+                      <Wrench className="h-3.5 w-3.5" /> {t("vehicles.createSlJob")}
+                    </Link>
+                  </div>
+                )}
+
+                {/* Without a trusted head we cannot say which rows are history:
+                    the live one would be listed among the superseded. */}
+                {!certsError && historyCerts.length > 0 && (
+                  <>
+                    <h4 className="mb-1.5 mt-4 text-[11px] font-semibold uppercase tracking-wider text-ink-3">
+                      {t("vehicles.certificateHistory")}
+                    </h4>
+                    <ul className="space-y-1.5">
+                      {historyCerts.map((c) => (
+                        <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
+                          <span className="truncate text-ink-2">{c.certificate_number}</span>
+                          <span className="flex items-center gap-2">
+                            <span className="text-xs tabular-nums text-ink-3">
+                              {formatDate(c.expires_at)}
+                            </span>
+                            {certBadge(c)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 )}
               </>
             )}
@@ -410,6 +553,21 @@ export default function VehicleDetailPage() {
           </Card>
         )}
       </div>
+
+      {/* The shared renewal flow — number allocation, UIN write-back and the
+          renewed_from link all live in it, so every surface mounts the same
+          component. It invalidates the certificate caches itself; a derived
+          UIN may also have been written back to the installation. */}
+      {slCertsOn && (
+        <RenewCertificateModal
+          certificateId={renewingId}
+          cert={currentCert}
+          onClose={() => setRenewingId(null)}
+          onRenewed={() => {
+            void qc.invalidateQueries({ queryKey: ["speed_limiter_installations"] });
+          }}
+        />
+      )}
 
       <Modal title={t("vehicles.edit")} open={editing} onClose={() => setEditing(false)} wide>
         <VehicleForm vehicle={vehicle} onDone={() => { setEditing(false); void qc.invalidateQueries({ queryKey: ["vehicles", id] }); }} />

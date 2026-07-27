@@ -48,6 +48,22 @@ export const arVehicles: Record<keyof typeof enVehicles, string> = {
   "vehicles.recentFuel": "سجلّات الوقود الأخيرة",
   "vehicles.noFuelLogs": "لا توجد سجلّات وقود بعد.",
 
+  // Speed limiter certificate. شهادة (certificate), سارية (valid/current),
+  // مسحوبة (revoked — إلغاء is "cancel"), مهمة (speed limiter job — أمر عمل is
+  // the maintenance work order), مراقبة الجودة (QC).
+  "vehicles.currentCertificate": "الشهادة الحالية",
+  "vehicles.certificateHistory": "الشهادات السابقة",
+  "vehicles.renewCertificate": "تجديد الشهادة",
+  "vehicles.noCertificate": "لم تُصدَر أي شهادة لهذه المركبة بعد.",
+  "vehicles.noCertificateHint":
+    "تُصدَر الشهادة من مهمة لمحدد السرعة بعد اعتماد مراقبة الجودة للعمل.",
+  "vehicles.noValidCertificate": "لا تحمل هذه المركبة شهادة سارية.",
+  "vehicles.noValidCertificateHint":
+    "تم سحب شهادتها الأخيرة. تُصدَر شهادة بديلة من مهمة جديدة لمحدد السرعة.",
+  "vehicles.createSlJob": "إنشاء مهمة لمحدد السرعة",
+  "vehicles.certificatesError":
+    "تعذّر تحميل الشهادات، لذا فإن حالة شهادة هذه المركبة غير معروفة. أعد تحميل الصفحة قبل إصدار شهادة جديدة.",
+
   // Modals
   "vehicles.edit": "تعديل المركبة",
   "vehicles.assignDriver": "تعيين سائق",

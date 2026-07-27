@@ -235,12 +235,23 @@ export function Modal({
   onClose,
   children,
   wide,
+  busy,
+  busyTitle,
 }: {
   title: string;
   open: boolean;
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  /**
+   * Work is in flight that must not be abandoned half-done — a sequential run
+   * of writes whose report only exists inside the dialog. While set, the close
+   * button is disabled, so the dialog cannot be dismissed out from under it.
+   * Optional: every Modal that omits it behaves exactly as before.
+   */
+  busy?: boolean;
+  /** Title/aria-label for the disabled close button — say why it will not close. */
+  busyTitle?: string;
 }) {
   const t = useT();
   if (!open) return null;
@@ -257,8 +268,10 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md p-1 text-ink-3 hover:bg-canvas hover:text-ink-2"
-            aria-label={t("action.close")}
+            disabled={busy}
+            className="rounded-md p-1 text-ink-3 hover:bg-canvas hover:text-ink-2 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-3"
+            aria-label={busy && busyTitle ? busyTitle : t("action.close")}
+            title={busy ? busyTitle : undefined}
           >
             <X className="h-5 w-5" />
           </button>

@@ -1,17 +1,11 @@
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { addDays, format } from "date-fns";
 import { Award, Building2, Cpu, Wrench } from "lucide-react";
-import { listRows } from "../../lib/db";
-import { daysUntil, formatDate } from "../../lib/format";
-import type {
-  Customer,
-  SlDevice,
-  SlJob,
-  SlJobStatus,
-  SlJobType,
-  SpeedLimiterCertificate,
-} from "../../lib/types";
+import { countRows, listPage, listRows } from "../../lib/db";
+import { formatDate } from "../../lib/format";
+import { certificateDaysLeft } from "../../lib/certificateStatus";
+import type { SlJob, SlJobStatus, SlJobType, SpeedLimiterCertificate } from "../../lib/types";
 import { useModules } from "../../context/ModulesContext";
 import { Badge, Card, EmptyState, ErrorState, LoadingState, StatCard } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
@@ -22,6 +16,14 @@ type CertRow = SpeedLimiterCertificate & {
   vehicles: { name: string } | null;
   customers: { name: string } | null;
 };
+
+/** Rows each expiry card lists. The count beside the title is the real total. */
+const BUCKET_ROWS = 5;
+/** Rows in the recent-jobs strip. */
+const RECENT_JOBS = 6;
+
+/** A date-only bound `offset` days from today, in the viewer's local calendar. */
+const day = (offset: number) => format(addDays(new Date(), offset), "yyyy-MM-dd");
 
 const jobTypeKey: Record<SlJobType, MessageKey> = {
   installation: "speedLimiters.jobType.installation",
@@ -41,68 +43,162 @@ const jobStatusMeta: Record<SlJobStatus, { labelKey: MessageKey; tone: BadgeTone
   canceled: { labelKey: "speedLimiters.jobStatus.canceled", tone: "slate" },
 };
 
-type BucketEntry = { cert: CertRow; days: number };
+/**
+ * The four columns of the expiry board. `id` doubles as the certificates list
+ * filter, so every card is a working queue: the link lands on exactly the rows
+ * the card counted (`/speed-limiters/certificates?filter=d30`).
+ */
+type BucketId = "expired" | "d30" | "d60" | "d90";
 
-const bucketStyles = {
-  expired: { border: "border-t-red-500", count: "bg-red-50 text-red-700" },
-  d30: { border: "border-t-orange-500", count: "bg-orange-50 text-orange-700" },
-  d60: { border: "border-t-amber-400", count: "bg-amber-50 text-amber-700" },
-  d90: { border: "border-t-blue-500", count: "bg-blue-50 text-blue-700" },
-} as const;
+/**
+ * The board reads as one urgency ramp, most urgent first, and every step is a
+ * token pair with a designed dark counterpart (src/index.css):
+ *
+ *   expired  serious  — red, act now
+ *   d30      warn     — amber, act this month
+ *   d60      brand    — accent blue, on the radar
+ *   d90      neutral  — ink/canvas, informational
+ *
+ * Amber is deliberately used ONCE. `--color-warn` is #d97706 and
+ * `--color-warn-soft` is #fffbeb, i.e. exactly amber-600/amber-50, so a d60
+ * card painted with the raw amber classes rendered an identical chip to d30
+ * and the two neighbours collapsed into one colour. Cooling d60 to the brand
+ * ramp and d90 to neutral restores four distinct steps in both themes.
+ */
+const BUCKETS: { id: BucketId; titleKey: MessageKey; border: string; chip: string }[] = [
+  {
+    id: "expired",
+    titleKey: "speedLimiters.overview.bucketExpired",
+    border: "border-t-serious",
+    chip: "bg-serious-soft text-serious",
+  },
+  {
+    id: "d30",
+    titleKey: "speedLimiters.overview.bucket30",
+    border: "border-t-warn",
+    chip: "bg-warn-soft text-warn",
+  },
+  {
+    id: "d60",
+    titleKey: "speedLimiters.overview.bucket60",
+    border: "border-t-brand-500",
+    chip: "bg-brand-50 text-brand-700",
+  },
+  {
+    id: "d90",
+    titleKey: "speedLimiters.overview.bucket90",
+    border: "border-t-ink-3",
+    chip: "bg-canvas text-ink-2",
+  },
+];
+
+/** Days-from-today window per bucket; `expired` is everything before today. */
+const BUCKET_DAYS: Record<Exclude<BucketId, "expired">, [number, number]> = {
+  d30: [0, 30],
+  d60: [31, 60],
+  d90: [61, 90],
+};
+
+/**
+ * One expiry bucket: the exact server-side total plus only the handful of rows
+ * the card shows. `listPage` asks PostgREST for `count=exact` alongside the
+ * range, so the badge is the real total (not "how many rows we happened to
+ * download") and the whole board costs four small requests instead of pulling
+ * every certificate in the tenant and bucketing it in the browser.
+ *
+ * The filters are the server-side equivalent of `certificateBucket`, and they
+ * match the certificates list chip of the same name exactly.
+ */
+function useBucket(id: BucketId, enabled: boolean) {
+  return useQuery({
+    queryKey: ["speed_limiter_certificates", "overview", id],
+    enabled,
+    queryFn: () =>
+      listPage<CertRow>("speed_limiter_certificates", 0, BUCKET_ROWS, (q) => {
+        // "Live" is the one certificate a vehicle currently carries:
+        // superseded_by IS NULL AND status = 'valid'. A predecessor that a
+        // renewal already replaced is history and is never work to do.
+        const live = q
+          .select("*, vehicles(name), customers(name)")
+          .is("superseded_by", null)
+          .eq("status", "valid");
+        if (id === "expired") {
+          // Most recently lapsed first — the front of the renewal backlog.
+          return live.lt("expires_at", day(0)).order("expires_at", { ascending: false });
+        }
+        const [from, to] = BUCKET_DAYS[id];
+        return live
+          .gte("expires_at", day(from))
+          .lte("expires_at", day(to))
+          .order("expires_at", { ascending: true });
+      }),
+  });
+}
 
 function BucketCard({
   titleKey,
-  tone,
+  border,
+  chip,
+  filter,
+  total,
   entries,
   t,
 }: {
   titleKey: MessageKey;
-  tone: keyof typeof bucketStyles;
-  entries: BucketEntry[];
+  border: string;
+  chip: string;
+  filter: BucketId;
+  total: number;
+  entries: CertRow[];
   t: Translate;
 }) {
-  const styles = bucketStyles[tone];
   return (
-    <Card className={`border-t-4 p-4 ${styles.border}`}>
+    <Card className={`border-t-4 p-4 ${border}`}>
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-slate-900">{t(titleKey)}</h3>
+        <h3 className="text-sm font-semibold text-ink">{t(titleKey)}</h3>
         <span
-          className={`inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${styles.count}`}
+          className={`inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ${chip}`}
         >
-          {entries.length}
+          {total}
         </span>
       </div>
       {entries.length === 0 ? (
-        <p className="mt-3 text-xs text-slate-400">{t("speedLimiters.overview.bucketEmpty")}</p>
+        <p className="mt-3 text-xs text-ink-3">{t("speedLimiters.overview.bucketEmpty")}</p>
       ) : (
-        <ul className="mt-3 divide-y divide-slate-100">
-          {entries.slice(0, 5).map(({ cert, days }) => (
-            <li key={cert.id} className="py-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate text-sm font-medium text-slate-800">
-                  {cert.certificate_number}
-                </span>
-                <span className="shrink-0 text-xs font-medium text-slate-500">
-                  {days < 0
-                    ? t("speedLimiters.overview.daysOverdue", { count: Math.abs(days) })
-                    : t("speedLimiters.overview.inDays", { count: days })}
-                </span>
-              </div>
-              <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-slate-500">
-                <span className="truncate">
-                  {[cert.customers?.name, cert.vehicles?.name].filter(Boolean).join(" · ") || "—"}
-                </span>
-                <span className="shrink-0">{formatDate(cert.expires_at)}</span>
-              </div>
-            </li>
-          ))}
+        <ul className="mt-3 divide-y divide-line">
+          {entries.map((cert) => {
+            const days = certificateDaysLeft(cert.expires_at);
+            return (
+              <li key={cert.id} className="py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-sm font-medium text-ink">
+                    {cert.certificate_number}
+                  </span>
+                  <span className="shrink-0 text-xs font-medium text-ink-3 tabular-nums">
+                    {days < 0
+                      ? t("speedLimiters.overview.daysOverdue", { count: Math.abs(days) })
+                      : t("speedLimiters.overview.inDays", { count: days })}
+                  </span>
+                </div>
+                <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-ink-3">
+                  <span className="truncate">
+                    {[cert.customers?.name, cert.vehicles?.name].filter(Boolean).join(" · ") ||
+                      t("common.dash")}
+                  </span>
+                  <span className="shrink-0">{formatDate(cert.expires_at)}</span>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
       <Link
-        to="/speed-limiters/certificates"
+        to={`/speed-limiters/certificates?filter=${filter}`}
         className="mt-2 inline-block text-xs font-medium text-brand-600 hover:text-brand-700"
       >
-        {t("speedLimiters.overview.viewAll")}
+        {total > entries.length
+          ? t("speedLimiters.overview.viewAllCount", { count: total })
+          : t("speedLimiters.overview.viewAll")}
       </Link>
     </Card>
   );
@@ -113,68 +209,78 @@ export default function OverviewPage() {
   const { isEnabled } = useModules();
   const certificatesEnabled = isEnabled("sl_certificates");
 
-  const customersQ = useQuery({
-    queryKey: ["customers"],
-    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
+  // Every KPI is a head-only count: the tile needs a number, not the rows.
+  const customersCountQ = useQuery({
+    queryKey: ["customers", "overview", "count"],
+    queryFn: () => countRows("customers"),
   });
 
-  const devicesQ = useQuery({
-    queryKey: ["sl_devices", "overview"],
-    queryFn: () => listRows<SlDevice>("sl_devices", (q) => q.order("serial")),
+  const deviceCountsQ = useQuery({
+    queryKey: ["sl_devices", "overview", "counts"],
+    queryFn: async () => {
+      const [installed, inStock] = await Promise.all([
+        countRows("sl_devices", (q) => q.eq("status", "installed")),
+        countRows("sl_devices", (q) => q.eq("status", "in_stock")),
+      ]);
+      return { installed, inStock };
+    },
   });
 
-  const jobsQ = useQuery({
-    queryKey: ["sl_jobs", "overview"],
+  const openJobsCountQ = useQuery({
+    queryKey: ["sl_jobs", "overview", "openCount"],
+    queryFn: () => countRows("sl_jobs", (q) => q.in("status", ["scheduled", "in_progress"])),
+  });
+
+  /** Valid = live and not yet expired; superseded predecessors never count. */
+  const validCertsCountQ = useQuery({
+    queryKey: ["speed_limiter_certificates", "overview", "validCount"],
+    enabled: certificatesEnabled,
+    queryFn: () =>
+      countRows("speed_limiter_certificates", (q) =>
+        q.is("superseded_by", null).eq("status", "valid").gte("expires_at", day(0)),
+      ),
+  });
+
+  const expiredQ = useBucket("expired", certificatesEnabled);
+  const d30Q = useBucket("d30", certificatesEnabled);
+  const d60Q = useBucket("d60", certificatesEnabled);
+  const d90Q = useBucket("d90", certificatesEnabled);
+  const bucketQueries: Record<BucketId, ReturnType<typeof useBucket>> = {
+    expired: expiredQ,
+    d30: d30Q,
+    d60: d60Q,
+    d90: d90Q,
+  };
+
+  const recentJobsQ = useQuery({
+    queryKey: ["sl_jobs", "overview", "recent"],
     queryFn: () =>
       listRows<JobRow>("sl_jobs", (q) =>
-        q.select("*, vehicles(name)").order("created_at", { ascending: false }),
+        q
+          .select("*, vehicles(name)")
+          .order("created_at", { ascending: false })
+          .limit(RECENT_JOBS),
       ),
   });
 
-  const certsQ = useQuery({
-    queryKey: ["speed_limiter_certificates", "overview"],
-    queryFn: () =>
-      listRows<CertRow>("speed_limiter_certificates", (q) =>
-        q.select("*, vehicles(name), customers(name)").order("expires_at"),
-      ),
-    enabled: certificatesEnabled,
-  });
+  const queries = [
+    customersCountQ,
+    deviceCountsQ,
+    openJobsCountQ,
+    validCertsCountQ,
+    recentJobsQ,
+    expiredQ,
+    d30Q,
+    d60Q,
+    d90Q,
+  ];
+  const isLoading = queries.some((q) => q.isLoading);
+  const error = queries.map((q) => q.error).find((e): e is Error => e != null);
 
-  const kpis = useMemo(() => {
-    const devices = devicesQ.data ?? [];
-    const jobs = jobsQ.data ?? [];
-    const certs = certsQ.data ?? [];
-    return {
-      customers: (customersQ.data ?? []).length,
-      devicesInstalled: devices.filter((d) => d.status === "installed").length,
-      devicesInStock: devices.filter((d) => d.status === "in_stock").length,
-      openJobs: jobs.filter((j) => j.status === "scheduled" || j.status === "in_progress").length,
-      validCertificates: certs.filter((c) => c.status === "valid" && daysUntil(c.expires_at) >= 0)
-        .length,
-    };
-  }, [customersQ.data, devicesQ.data, jobsQ.data, certsQ.data]);
-
-  const buckets = useMemo(() => {
-    const entries: BucketEntry[] = (certsQ.data ?? [])
-      .filter((c) => c.status === "valid")
-      .map((cert) => ({ cert, days: daysUntil(cert.expires_at) }));
-    const asc = (a: BucketEntry, b: BucketEntry) => a.days - b.days;
-    return {
-      expired: entries.filter((e) => e.days < 0).sort((a, b) => b.days - a.days),
-      d30: entries.filter((e) => e.days >= 0 && e.days <= 30).sort(asc),
-      d60: entries.filter((e) => e.days >= 31 && e.days <= 60).sort(asc),
-      d90: entries.filter((e) => e.days >= 61 && e.days <= 90).sort(asc),
-    };
-  }, [certsQ.data]);
-
-  const recentJobs = (jobsQ.data ?? []).slice(0, 6);
-
-  const isLoading =
-    customersQ.isLoading || devicesQ.isLoading || jobsQ.isLoading || certsQ.isLoading;
-  const error = customersQ.error ?? devicesQ.error ?? jobsQ.error ?? certsQ.error;
+  const recentJobs = recentJobsQ.data ?? [];
 
   if (isLoading) return <LoadingState />;
-  if (error) return <ErrorState message={(error as Error).message} />;
+  if (error) return <ErrorState message={error.message} />;
 
   return (
     <div className="space-y-6">
@@ -184,27 +290,29 @@ export default function OverviewPage() {
           icon={<Building2 className="h-5 w-5" />}
           tone="green"
           label={t("speedLimiters.overview.kpiCustomers")}
-          value={kpis.customers}
+          value={customersCountQ.data ?? 0}
         />
         <StatCard
           icon={<Cpu className="h-5 w-5" />}
           tone="blue"
           label={t("speedLimiters.overview.kpiDevicesInstalled")}
-          value={kpis.devicesInstalled}
-          sub={t("speedLimiters.overview.kpiInStock", { count: kpis.devicesInStock })}
+          value={deviceCountsQ.data?.installed ?? 0}
+          sub={t("speedLimiters.overview.kpiInStock", {
+            count: deviceCountsQ.data?.inStock ?? 0,
+          })}
         />
         <StatCard
           icon={<Wrench className="h-5 w-5" />}
           tone="violet"
           label={t("speedLimiters.overview.kpiOpenJobs")}
-          value={kpis.openJobs}
+          value={openJobsCountQ.data ?? 0}
         />
         {certificatesEnabled && (
           <StatCard
             icon={<Award className="h-5 w-5" />}
             tone="amber"
             label={t("speedLimiters.overview.kpiValidCertificates")}
-            value={kpis.validCertificates}
+            value={validCertsCountQ.data ?? 0}
           />
         )}
       </div>
@@ -212,34 +320,22 @@ export default function OverviewPage() {
       {/* Certificate expiry board */}
       {certificatesEnabled && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide rtl:tracking-normal text-slate-500">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide rtl:tracking-normal text-ink-3">
             {t("speedLimiters.overview.expiryBoard")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <BucketCard
-              titleKey="speedLimiters.overview.bucketExpired"
-              tone="expired"
-              entries={buckets.expired}
-              t={t}
-            />
-            <BucketCard
-              titleKey="speedLimiters.overview.bucket30"
-              tone="d30"
-              entries={buckets.d30}
-              t={t}
-            />
-            <BucketCard
-              titleKey="speedLimiters.overview.bucket60"
-              tone="d60"
-              entries={buckets.d60}
-              t={t}
-            />
-            <BucketCard
-              titleKey="speedLimiters.overview.bucket90"
-              tone="d90"
-              entries={buckets.d90}
-              t={t}
-            />
+            {BUCKETS.map((bucket) => (
+              <BucketCard
+                key={bucket.id}
+                titleKey={bucket.titleKey}
+                border={bucket.border}
+                chip={bucket.chip}
+                filter={bucket.id}
+                total={bucketQueries[bucket.id].data?.total ?? 0}
+                entries={bucketQueries[bucket.id].data?.rows ?? []}
+                t={t}
+              />
+            ))}
           </div>
         </section>
       )}
@@ -247,7 +343,7 @@ export default function OverviewPage() {
       {/* Recent jobs */}
       <section>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide rtl:tracking-normal text-slate-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide rtl:tracking-normal text-ink-3">
             {t("speedLimiters.overview.recentJobs")}
           </h2>
           <Link
@@ -264,22 +360,22 @@ export default function OverviewPage() {
             description={t("speedLimiters.overview.noJobsDesc")}
           />
         ) : (
-          <Card className="divide-y divide-slate-100">
+          <Card className="divide-y divide-line">
             {recentJobs.map((job) => (
               <Link
                 key={job.id}
                 to={`/speed-limiters/jobs/${job.id}`}
-                className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-50"
+                className="flex items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-canvas"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-slate-800">
+                    <span className="text-sm font-medium text-ink">
                       {t("speedLimiters.overview.jobNumber", { number: job.number })}
                     </span>
-                    <span className="text-sm text-slate-600">{t(jobTypeKey[job.job_type])}</span>
+                    <span className="text-sm text-ink-2">{t(jobTypeKey[job.job_type])}</span>
                   </div>
-                  <div className="mt-0.5 truncate text-xs text-slate-500">
-                    {job.vehicles?.name ?? "—"}
+                  <div className="mt-0.5 truncate text-xs text-ink-3">
+                    {job.vehicles?.name ?? t("common.dash")}
                   </div>
                 </div>
                 <Badge tone={jobStatusMeta[job.status].tone}>
