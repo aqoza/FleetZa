@@ -164,10 +164,17 @@ Four fields exist only for this document:
 
 | Field | Lives on | Why |
 |---|---|---|
-| `uin` | `sl_jobs` → `speed_limiter_installations` → `speed_limiter_certificates` | The Unique Identification Number is issued **once per installation** and reprinted unchanged on every renewal, so the installation carries it and the certificate snapshots it (same lifecycle as `tamper_seal_number`). A UIN typed during an inspection backfills the vehicle's active installation where it is still null, so a legacy install is captured once. |
+| `uin` | `sl_jobs` → `speed_limiter_installations` → `speed_limiter_certificates` | The number identifies the **fitted limiter**, so it is minted once and reprinted unchanged by every renewal. Format: `OM-<last 5 digits of the vehicle's chassis>-<document number>` — chassis `JHHLCK1F7PK026626` on certificate `GOM-WO-202601` gives `OM-26626-202601`. Letters in the chassis are skipped (the rule counts digits) and a short chassis is left-padded to five. Precedence at issuance: a number typed on the job wins, then the one the installation already carries, and only failing both is a new one derived — which is then **written back to the installation**, so the next renewal reprints it. A vehicle with no chassis has nothing to derive from and keeps whatever was recorded, rather than printing a malformed identifier. `app.build_uin` owns the format and `issue_certificate` the precedence; `buildUin` / `resolveUin` in `src/lib/certificate.ts` mirror both for the renewal modal, which inserts directly. The two must agree — certificates are issued through both paths. |
 | `set_speed_secondary_kmh` | same three tables | Omani limiters are programmed with two bands and the document prints the pair — `70/90 KMPH`. One band still prints as a single number. |
 | `limiter_type` | `sl_devices` → `speed_limiter_certificates` | "Electronic Pedal" is a property of the device, not of its brand/model. |
 | letterhead block | `tenants` | `name_ar`, `cr_number`, `po_box`, `postal_code`, `city`/`city_ar`, `email`, `phone_secondary`, `services_line`/`services_line_ar`, `signature_url`, `stamp_url` — edited under Settings → Organization → Document letterhead. The two mark URLs are constrained to `https:` / `data:image` in the database and validated in the form. |
+
+The **Installation / Renewal** heading comes from the job's `job_type`
+(`installation` and `replacement` print Installation, everything else prints
+Renewal), falling back to `renewed_from` only when a certificate has no job. A
+renewal of a limiter fitted before the tenant kept records here — every
+back-loaded register — has no predecessor certificate, and would otherwise
+print as an Installation.
 
 The footer registration line is **composed**, not stored: `src/lib/certificate.ts`
 builds it from the block above and prints it twice — Arabic with Arabic-Indic

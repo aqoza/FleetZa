@@ -34,7 +34,9 @@ type CertPrintRow = SpeedLimiterCertificate & {
   customers: Pick<Customer, "name"> | null;
   sl_devices: Pick<SlDevice, "serial" | "manufacturer" | "model" | "limiter_type"> | null;
   sl_jobs:
-    | (Pick<SlJob, "completed_at"> & { sl_technicians: Pick<SlTechnician, "name"> | null })
+    | (Pick<SlJob, "completed_at" | "job_type"> & {
+        sl_technicians: Pick<SlTechnician, "name"> | null;
+      })
     | null;
   speed_limiter_installations: Pick<
     SpeedLimiterInstallation,
@@ -56,8 +58,10 @@ const STRIP_COLS = ["35.5%", "36.2%", "28.3%"];
 function Cols({ widths }: { widths: string[] }) {
   return (
     <colgroup>
-      {widths.map((w) => (
-        <col key={w} style={{ width: w }} />
+      {widths.map((w, i) => (
+        // Widths repeat across a table, so the index is the only stable key.
+        // eslint-disable-next-line react/no-array-index-key
+        <col key={i} style={{ width: w }} />
       ))}
     </colgroup>
   );
@@ -126,7 +130,7 @@ export default function CertificatePrintPage() {
           .select(
             "*, vehicles(name, license_plate, chassis_number, engine_number, vin, make, model, year), " +
               "customers(name), sl_devices(serial, manufacturer, model, limiter_type), " +
-              "sl_jobs(completed_at, sl_technicians(name)), " +
+              "sl_jobs(completed_at, job_type, sl_technicians(name)), " +
               "speed_limiter_installations(installed_at, tamper_seal_number, uin)",
           )
           .eq("id", certId)
@@ -189,6 +193,14 @@ export default function CertificatePrintPage() {
     cert.speed_limiter_installations?.tamper_seal_number ??
     DASH;
   const uin = cert.uin ?? cert.speed_limiter_installations?.uin ?? cert.certificate_number;
+  // The heading states the work that was done, which the job knows directly.
+  // `renewed_from` is only a fallback: a renewal of a limiter fitted before the
+  // tenant kept records here has no predecessor row, and would otherwise print
+  // as an Installation.
+  const jobType = cert.sl_jobs?.job_type;
+  const isRenewal = jobType
+    ? jobType !== "installation" && jobType !== "replacement"
+    : Boolean(cert.renewed_from);
   const countryName = getCountry(tenant.country).name;
 
   // Phones and the verify URL stay LTR-isolated so digit groups don't
@@ -266,7 +278,7 @@ export default function CertificatePrintPage() {
 
         {/* Report type + reference row */}
         <p className="mt-5 text-center text-[13px] leading-4 text-ink">
-          {cert.renewed_from
+          {isRenewal
             ? t("slCertificates.report.typeRenewal")
             : t("slCertificates.report.typeInstallation")}
         </p>
@@ -408,7 +420,7 @@ export default function CertificatePrintPage() {
                   <img
                     src={tenant.signature_url}
                     alt={t("slCertificates.report.signature")}
-                    className="mx-auto max-h-[72px] object-contain"
+                    className="mx-auto max-h-[84px] object-contain"
                   />
                 )}
               </Cell>
@@ -417,7 +429,7 @@ export default function CertificatePrintPage() {
                   <img
                     src={tenant.stamp_url}
                     alt={t("slCertificates.report.stamp")}
-                    className="mx-auto max-h-[72px] object-contain"
+                    className="mx-auto max-h-[84px] object-contain"
                   />
                 )}
               </Cell>

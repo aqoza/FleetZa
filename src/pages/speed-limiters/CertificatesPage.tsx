@@ -6,7 +6,14 @@ import { Ban, Check, Copy, Printer, RefreshCw, Settings, ShieldCheck, Trash2 } f
 import { deleteRow, insertRow, listPage, listRows, updateRow, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
-import type { Customer, SlSettings, SpeedLimiterCertificate, Vehicle } from "../../lib/types";
+import { resolveUin } from "../../lib/certificate";
+import type {
+  Customer,
+  SlSettings,
+  SpeedLimiterCertificate,
+  SpeedLimiterInstallation,
+  Vehicle,
+} from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
@@ -16,7 +23,7 @@ import {
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type CertRow = SpeedLimiterCertificate & {
-  vehicles: Pick<Vehicle, "name" | "license_plate"> | null;
+  vehicles: Pick<Vehicle, "name" | "license_plate" | "chassis_number" | "vin"> | null;
   customers: Pick<Customer, "name"> | null;
 };
 
@@ -92,6 +99,21 @@ function RenewForm({
       // Atomic number allocation: call the RPC exactly once, at insert time.
       const { data: certNumber, error: rpcError } = await supabase.rpc("next_certificate_number");
       if (rpcError) throw wrapDbError(rpcError);
+      // The UIN identifies the fitted limiter, so a renewal reprints the one
+      // this installation already carries; it is only derived when the limiter
+      // has none yet, and then kept so later renewals reprint it too.
+      const uin = resolveUin(
+        cert.uin,
+        cert.vehicles?.chassis_number ?? cert.vehicles?.vin,
+        certNumber as string,
+      );
+      if (uin && !cert.uin && cert.installation_id) {
+        await updateRow<SpeedLimiterInstallation>(
+          "speed_limiter_installations",
+          cert.installation_id,
+          { uin },
+        );
+      }
       return insertRow<SpeedLimiterCertificate>("speed_limiter_certificates", {
         certificate_number: certNumber as string,
         vehicle_id: cert.vehicle_id,
@@ -105,9 +127,7 @@ function RenewForm({
             ? null
             : Number(form.set_speed_secondary_kmh),
         tamper_seal_number: cert.tamper_seal_number,
-        // The UIN and the certified limiter type belong to the installation,
-        // so a renewal reprints the ones the original certificate carried.
-        uin: cert.uin,
+        uin,
         limiter_type: cert.limiter_type,
         issued_at: form.issued_at,
         expires_at: form.expires_at,
@@ -324,7 +344,7 @@ export default function CertificatesPage() {
     queryFn: () =>
       listPage<CertRow>("speed_limiter_certificates", page, PAGE_SIZE, (q) => {
         let query = q
-          .select("*, vehicles(name, license_plate), customers(name)")
+          .select("*, vehicles(name, license_plate, chassis_number, vin), customers(name)")
           .order("expires_at");
         // Server-side equivalents of bucketOf/matchesFilter (daysUntil counts
         // whole days from today, so date-only boundaries line up).

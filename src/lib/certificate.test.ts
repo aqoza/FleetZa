@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildUin,
+  resolveUin,
   formatDocumentDate,
   formatSpeedBand,
   registrationLine,
@@ -65,6 +67,63 @@ describe("formatDocumentDate", () => {
     expect(formatDocumentDate(null)).toBeNull();
     expect(formatDocumentDate("")).toBeNull();
     expect(formatDocumentDate("not-a-date")).toBeNull();
+  });
+});
+
+describe("buildUin", () => {
+  it("builds OM-<last 5 chassis digits>-<document number>", () => {
+    expect(buildUin("JHHLCK1F7PK026626", "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("counts digits, not characters, so letters in the chassis are skipped", () => {
+    // ...1C5837 — the naive last five characters would be "C5837".
+    expect(buildUin("RA6PAEHD3RU1C5837", "GOM-WO-202602")).toBe("OM-15837-202602");
+  });
+
+  it("left-pads a chassis with fewer than five digits", () => {
+    expect(buildUin("AB12", "GOM-WO-202604")).toBe("OM-00012-202604");
+  });
+
+  it("takes the numeric tail of the document number", () => {
+    expect(buildUin("JHHLCK1F7PK026626", "SOM-WS-00486")).toBe("OM-26626-00486");
+    expect(buildUin("JHHLCK1F7PK026626", "202607")).toBe("OM-26626-202607");
+  });
+
+  it("returns null when there is nothing to derive from", () => {
+    expect(buildUin("ABCDEF", "GOM-WO-202605")).toBeNull();
+    expect(buildUin(null, "GOM-WO-202606")).toBeNull();
+    expect(buildUin("JHHLCK1F7PK026626", "")).toBeNull();
+    expect(buildUin(undefined, undefined)).toBeNull();
+  });
+});
+
+describe("resolveUin", () => {
+  const CHASSIS = "JHHLCK1F7PK026626";
+
+  it("mints a UIN for a limiter that has none yet", () => {
+    expect(resolveUin(null, CHASSIS, "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("reprints the recorded UIN on renewal instead of minting a new one", () => {
+    // The renewal allocates a fresh document number, but the limiter keeps its
+    // number for life — this is the whole point of the rule.
+    expect(resolveUin("OM-26626-202601", CHASSIS, "GOM-WO-202699")).toBe(
+      "OM-26626-202601",
+    );
+  });
+
+  it("never overwrites a real ROP-issued number with a derived one", () => {
+    expect(resolveUin("OM-8626-102013", CHASSIS, "GOM-WO-202601")).toBe(
+      "OM-8626-102013",
+    );
+  });
+
+  it("treats a blank recorded value as absent", () => {
+    expect(resolveUin("   ", CHASSIS, "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("stays null when nothing is recorded and nothing can be derived", () => {
+    expect(resolveUin(null, null, "GOM-WO-202601")).toBeNull();
   });
 });
 
