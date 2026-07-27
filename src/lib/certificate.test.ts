@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildUin,
+  resolveUin,
   formatDocumentDate,
   formatSpeedBand,
   registrationLine,
@@ -93,6 +94,36 @@ describe("buildUin", () => {
     expect(buildUin(null, "GOM-WO-202606")).toBeNull();
     expect(buildUin("JHHLCK1F7PK026626", "")).toBeNull();
     expect(buildUin(undefined, undefined)).toBeNull();
+  });
+});
+
+describe("resolveUin", () => {
+  const CHASSIS = "JHHLCK1F7PK026626";
+
+  it("mints a UIN for a limiter that has none yet", () => {
+    expect(resolveUin(null, CHASSIS, "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("reprints the recorded UIN on renewal instead of minting a new one", () => {
+    // The renewal allocates a fresh document number, but the limiter keeps its
+    // number for life — this is the whole point of the rule.
+    expect(resolveUin("OM-26626-202601", CHASSIS, "GOM-WO-202699")).toBe(
+      "OM-26626-202601",
+    );
+  });
+
+  it("never overwrites a real ROP-issued number with a derived one", () => {
+    expect(resolveUin("OM-8626-102013", CHASSIS, "GOM-WO-202601")).toBe(
+      "OM-8626-102013",
+    );
+  });
+
+  it("treats a blank recorded value as absent", () => {
+    expect(resolveUin("   ", CHASSIS, "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("stays null when nothing is recorded and nothing can be derived", () => {
+    expect(resolveUin(null, null, "GOM-WO-202601")).toBeNull();
   });
 });
 
