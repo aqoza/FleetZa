@@ -58,8 +58,10 @@ const STRIP_COLS = ["35.5%", "36.2%", "28.3%"];
 function Cols({ widths }: { widths: string[] }) {
   return (
     <colgroup>
-      {widths.map((w) => (
-        <col key={w} style={{ width: w }} />
+      {widths.map((w, i) => (
+        // Widths repeat across a table, so the index is the only stable key.
+        // eslint-disable-next-line react/no-array-index-key
+        <col key={i} style={{ width: w }} />
       ))}
     </colgroup>
   );
