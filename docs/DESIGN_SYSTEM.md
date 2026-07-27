@@ -116,7 +116,7 @@ System stack (`--font-sans`); no webfont (Arabic glyph coverage comes from the O
 | `StatCard` | KPI anatomy: label, big value, optional sub (`subTone` good/warn/serious/muted), `IconChip`. |
 | `IconChip` | Tinted square icon holder; tones blue/green/amber/violet/red/slate. One tone per concept, consistent across pages (vehicles=blue, customers=green, issues=amber, maintenance=violet, alerts=red). |
 | `PageHeader` | Every page starts with it. |
-| `Badge` | Enum/status labels; tone from the enum's `labels.ts` map. |
+| `Badge` | Enum/status labels; tone from the enum's `labels.ts` map. A *derived* status gets one shared bucket→(label, tone) map instead (e.g. `certificateBucketMeta` in `src/lib/certificateStatus.ts`), so every surface agrees. Red means "act now": a state that is merely historical — a superseded certificate — is slate, never red. |
 | `DataTable` | **The list-page table**: tokenized shell, sort on loaded rows (aria-sort), per-user column chooser persisted per `tableId`, CSV export, responsive column priorities (`minBreakpoint`), optional row selection + bulk-action slot. Pair with `Pagination` (as `footer`) + `listPage`. `Table` remains only for small embedded lists. |
 | `Table` | Small embedded lists inside cards/detail pages only. |
 | `Modal` | Create/quick-edit only; entities with detail routes navigate instead. |

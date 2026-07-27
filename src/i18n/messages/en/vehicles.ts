@@ -43,6 +43,24 @@ export const enVehicles = {
   "vehicles.recentFuel": "Recent fuel",
   "vehicles.noFuelLogs": "No fuel logs yet.",
 
+  // Speed limiter certificate (detail card + header action). "Current" is the
+  // certificate the vehicle legally carries — the head of its supersession
+  // chain — not merely the most recently issued row.
+  "vehicles.currentCertificate": "Current certificate",
+  "vehicles.certificateHistory": "Earlier certificates",
+  "vehicles.renewCertificate": "Renew certificate",
+  "vehicles.noCertificate": "No certificate has been issued for this vehicle yet.",
+  "vehicles.noCertificateHint":
+    "A certificate is issued from a speed limiter job once QC approves the work.",
+  "vehicles.noValidCertificate": "This vehicle holds no valid certificate.",
+  "vehicles.noValidCertificateHint":
+    "Its last certificate was revoked. A replacement is issued from a new speed limiter job.",
+  "vehicles.createSlJob": "Create a speed limiter job",
+  // Read failure, kept distinct from "none issued": an unknown certificate
+  // state must never be reported as an absent one.
+  "vehicles.certificatesError":
+    "Certificates could not be loaded, so this vehicle's certificate status is unknown. Reload before issuing a new certificate.",
+
   // Modals
   "vehicles.edit": "Edit vehicle",
   "vehicles.assignDriver": "Assign driver",

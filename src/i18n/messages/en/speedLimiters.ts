@@ -32,6 +32,11 @@ export const enSpeedLimiters = {
   "speedLimiters.certStatus.expiring": "Expiring",
   "speedLimiters.certStatus.expired": "Expired",
   "speedLimiters.certStatus.revoked": "Revoked",
+  // A later certificate replaced this one — history, not a compliance failure.
+  "speedLimiters.certStatus.superseded": "Superseded",
+  "speedLimiters.certStatus.supersededBy": "Renewed by {number}",
+  "speedLimiters.certStatus.expiresInDays": "Expires in {count} d",
+  "speedLimiters.certStatus.expiredDaysAgo": "Expired {count} d ago",
 
   "speedLimiters.kmhValue": "{value} km/h",
 
@@ -50,6 +55,9 @@ export const enSpeedLimiters = {
   "speedLimiters.overview.daysOverdue": "{count} d overdue",
   "speedLimiters.overview.inDays": "in {count} d",
   "speedLimiters.overview.viewAll": "View all",
+  // The board lists five rows per bucket; the link carries the real total so
+  // "View all 474" reads as a queue, not as everything the card showed.
+  "speedLimiters.overview.viewAllCount": "View all {count}",
   "speedLimiters.overview.recentJobs": "Recent jobs",
   "speedLimiters.overview.jobNumber": "#{number}",
   "speedLimiters.overview.noJobs": "No jobs yet",

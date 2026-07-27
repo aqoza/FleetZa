@@ -57,8 +57,9 @@ export const enCustomers = {
   "customers.kpiCertsIssued": "Certificates issued",
   "customers.kpiCertsExpiring": "Expiring within 60 days",
   "customers.kpiCertsExpired": "Expired",
+  "customers.expiredHint": "Not yet renewed",
   "customers.kpiCompliance": "Compliance",
-  "customers.complianceHint": "Vehicles holding a valid certificate",
+  "customers.complianceHint": "Vehicles holding a current, unexpired certificate ÷ vehicles attached",
 
   // Detail — contacts card
   "customers.contacts": "Contacts",
@@ -81,11 +82,29 @@ export const enCustomers = {
   "customers.noVehicles": "No vehicles attached yet.",
   "customers.selectVehicle": "Select a vehicle…",
   "customers.noUnassignedVehicles": "No unassigned vehicles available.",
+  "customers.noUnassignedMatches": "No unassigned vehicle matches that search.",
   "customers.attach": "Attach",
   "customers.attachExistingLabel": "Existing unassigned vehicle",
+  "customers.attachSearchPlaceholder": "Name, plate, fleet #, chassis or VIN…",
+  "customers.attachNarrowHint":
+    "Showing the first {count} of {total} unassigned vehicles — search to narrow the list.",
   "customers.createVehicleHint":
     "Need a brand-new vehicle? Create it on the Vehicles page first, then attach it here.",
   "customers.goToVehicles": "Go to vehicles",
+
+  // Detail — vehicles card: search, certificate status filter, renewal
+  "customers.vehicleSearchPlaceholder": "Name, plate, fleet #, chassis or VIN…",
+  "customers.vehicleFilterAll": "All",
+  "customers.vehicleFilterValid": "Valid",
+  "customers.vehicleFilterExpiring": "≤ 60 days",
+  "customers.vehicleFilterExpired": "Expired",
+  "customers.vehicleFilterNarrowHint":
+    "Only the first {count} matching vehicles are shown — search to narrow the list.",
+  "customers.vehicleCertificate": "Certificate",
+  "customers.vehicleNoCertificate": "No certificate",
+  "customers.renewCertificate": "Renew certificate",
+  "customers.noVehiclesFilteredTitle": "No vehicles match your filters",
+  "customers.noVehiclesFilteredDesc": "Try a different search or certificate status.",
 
   // Detail — jobs card
   "customers.jobs": "Jobs",
@@ -101,4 +120,5 @@ export const enCustomers = {
   "customers.certificateNumber": "Certificate #",
   "customers.expires": "Expires",
   "customers.viewAllCertificates": "View all certificates",
+  "customers.certsIncludeHistory": "Include superseded",
 } as const;

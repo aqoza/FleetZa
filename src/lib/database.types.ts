@@ -2049,6 +2049,7 @@ export type Database = {
           set_speed_kmh: number | null
           set_speed_secondary_kmh: number | null
           status: string
+          superseded_by: string | null
           tamper_seal_number: string | null
           tenant_id: string
           uin: string | null
@@ -2076,6 +2077,7 @@ export type Database = {
           set_speed_kmh?: number | null
           set_speed_secondary_kmh?: number | null
           status?: string
+          superseded_by?: string | null
           tamper_seal_number?: string | null
           tenant_id?: string
           uin?: string | null
@@ -2103,6 +2105,7 @@ export type Database = {
           set_speed_kmh?: number | null
           set_speed_secondary_kmh?: number | null
           status?: string
+          superseded_by?: string | null
           tamper_seal_number?: string | null
           tenant_id?: string
           uin?: string | null
@@ -2149,6 +2152,13 @@ export type Database = {
           {
             foreignKeyName: "speed_limiter_certificates_renewed_from_fkey"
             columns: ["renewed_from"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "speed_limiter_certificates_superseded_by_fkey"
+            columns: ["superseded_by"]
             isOneToOne: false
             referencedRelation: "speed_limiter_certificates"
             referencedColumns: ["id"]
@@ -2991,6 +3001,7 @@ export type Database = {
           set_speed_kmh: number | null
           set_speed_secondary_kmh: number | null
           status: string
+          superseded_by: string | null
           tamper_seal_number: string | null
           tenant_id: string
           uin: string | null

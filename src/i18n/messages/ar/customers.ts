@@ -55,8 +55,9 @@ export const arCustomers: Record<keyof typeof enCustomers, string> = {
   "customers.kpiCertsIssued": "الشهادات الصادرة",
   "customers.kpiCertsExpiring": "تنتهي خلال 60 يومًا",
   "customers.kpiCertsExpired": "منتهية",
+  "customers.expiredHint": "لم تُجدَّد بعد",
   "customers.kpiCompliance": "نسبة الامتثال",
-  "customers.complianceHint": "المركبات التي تحمل شهادة سارية",
+  "customers.complianceHint": "المركبات التي تحمل شهادة حالية غير منتهية ÷ المركبات المرتبطة",
 
   // Detail — contacts card
   "customers.contacts": "جهات الاتصال",
@@ -81,11 +82,29 @@ export const arCustomers: Record<keyof typeof enCustomers, string> = {
   "customers.noVehicles": "لا توجد مركبات مرتبطة بعد.",
   "customers.selectVehicle": "اختر مركبة…",
   "customers.noUnassignedVehicles": "لا توجد مركبات غير مرتبطة متاحة.",
+  "customers.noUnassignedMatches": "لا توجد مركبة غير مرتبطة مطابقة لهذا البحث.",
   "customers.attach": "ربط",
   "customers.attachExistingLabel": "مركبة قائمة غير مرتبطة",
+  "customers.attachSearchPlaceholder": "الاسم أو اللوحة أو رقم الأسطول أو الهيكل أو VIN…",
+  "customers.attachNarrowHint":
+    "يتم عرض أول {count} من {total} مركبة غير مرتبطة — استخدم البحث لتضييق القائمة.",
   "customers.createVehicleHint":
     "هل تحتاج إلى مركبة جديدة؟ أنشئها في صفحة المركبات أولًا ثم اربطها هنا.",
   "customers.goToVehicles": "الانتقال إلى المركبات",
+
+  // Detail — vehicles card: search, certificate status filter, renewal
+  "customers.vehicleSearchPlaceholder": "الاسم أو اللوحة أو رقم الأسطول أو الهيكل أو VIN…",
+  "customers.vehicleFilterAll": "الكل",
+  "customers.vehicleFilterValid": "سارية",
+  "customers.vehicleFilterExpiring": "خلال 60 يومًا",
+  "customers.vehicleFilterExpired": "منتهية",
+  "customers.vehicleFilterNarrowHint":
+    "يتم عرض أول {count} مركبة مطابقة فقط — استخدم البحث لتضييق القائمة.",
+  "customers.vehicleCertificate": "الشهادة",
+  "customers.vehicleNoCertificate": "لا توجد شهادة",
+  "customers.renewCertificate": "تجديد الشهادة",
+  "customers.noVehiclesFilteredTitle": "لا توجد مركبات مطابقة لعوامل التصفية",
+  "customers.noVehiclesFilteredDesc": "جرّب بحثًا مختلفًا أو حالة شهادة أخرى.",
 
   // Detail — jobs card
   "customers.jobs": "المهام",
@@ -101,4 +120,5 @@ export const arCustomers: Record<keyof typeof enCustomers, string> = {
   "customers.certificateNumber": "رقم الشهادة",
   "customers.expires": "تاريخ الانتهاء",
   "customers.viewAllCertificates": "عرض كل الشهادات",
+  "customers.certsIncludeHistory": "إظهار المُستبدَلة",
 };

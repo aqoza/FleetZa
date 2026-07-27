@@ -9,7 +9,12 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.title": "الشهادات",
   "slCertificates.description": "شهادات مطابقة محددات السرعة الصادرة لعملائك",
   "slCertificates.settings": "إعدادات الشهادات",
-  "slCertificates.searchPlaceholder": "ابحث برقم الشهادة…",
+  "slCertificates.searchPlaceholder": "رقم الشهادة أو UIN أو الختم أو المركبة أو اللوحة…",
+  "slCertificates.searchNarrowHint":
+    "أكثر من {count} مركبة تطابق هذا البحث، ولم تُدرَج سوى أول {count} منها. ضيّق نطاق البحث لعرض الباقي.",
+  "slCertificates.searchSupersededHint":
+    "توجد {count} شهادة مُستبدَلة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+  "slCertificates.searchSupersededLink": "عرضها",
 
   // Filter chips
   "slCertificates.filterAll": "الكل",
@@ -19,6 +24,7 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.filter90": "61–90 يومًا",
   "slCertificates.filterExpired": "منتهية الصلاحية",
   "slCertificates.filterRevoked": "مسحوبة",
+  "slCertificates.filterSuperseded": "مُستبدَلة",
 
   // Table
   "slCertificates.number": "رقم الشهادة",
@@ -33,6 +39,8 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.copyVerifyLink": "نسخ رابط التحقق",
   "slCertificates.linkCopied": "تم نسخ الرابط",
   "slCertificates.renew": "تجديد",
+  "slCertificates.renewBlockedRevoked": "لا يمكن تجديدها — هذه الشهادة مسحوبة",
+  "slCertificates.renewBlockedSuperseded": "لا يمكن تجديدها — حلّت محلها شهادة أحدث بالفعل",
   "slCertificates.revoke": "سحب",
 
   // Renew modal
@@ -49,6 +57,27 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.expiresAt": "تاريخ الانتهاء",
   "slCertificates.renewConfirm": "إصدار الشهادة",
   "slCertificates.renewFailed": "فشل التجديد",
+  "slCertificates.renewLoadFailed": "تعذّر تحميل هذه الشهادة، لذا لا يمكن تجديدها.",
+
+  // Bulk renew
+  "slCertificates.bulkRenew": "تجديد المحدد",
+  "slCertificates.bulkRenewTitle": "تجديد {count} شهادة",
+  "slCertificates.bulkRenewLead":
+    "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+  "slCertificates.bulkEligible": "سيتم تجديدها ({count})",
+  "slCertificates.bulkSkipped": "تم تخطيها ({count})",
+  "slCertificates.bulkSkipRevoked": "مسحوبة — لا يمكن تجديدها",
+  "slCertificates.bulkSkipSuperseded": "جُدِّدت من قبل",
+  "slCertificates.bulkNoneEligible": "لا يمكن تجديد أي من الشهادات المحددة.",
+  "slCertificates.bulkProgress": "جارٍ إصدار {done} من {total}…",
+  "slCertificates.bulkCloseBlocked":
+    "جارٍ إصدار الشهادات — تبقى هذه النافذة مفتوحة حتى انتهاء العملية ليصلك التقرير كاملًا.",
+  "slCertificates.bulkConfirm": "إصدار {count} شهادة",
+  "slCertificates.bulkDoneAll": "تم إصدار {count} شهادة.",
+  "slCertificates.bulkDonePartial":
+    "تم إصدار {done} من {total} شهادة، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+  "slCertificates.bulkSucceeded": "تم إصدارها",
+  "slCertificates.bulkFailed": "فشلت",
 
   // Revoke modal
   "slCertificates.revokeTitle": "سحب الشهادة",

@@ -296,6 +296,17 @@ export interface SpeedLimiterCertificate {
   issued_at: string;
   expires_at: string;
   renewed_from: string | null;
+  /**
+   * The certificate that IMMEDIATELY replaced this one, or null when this is
+   * the one the vehicle currently carries. Maintained by a database trigger
+   * keyed on vehicle_id, so a vehicle's certificates form a linked list
+   * (oldest → … → previous → newest/null) and exactly one row is ever live.
+   *
+   * Not the same thing as `renewed_from`: that only records the row an
+   * operator pressed Renew on, is null for all imported history, and its
+   * chains can cross installation_id. Read it through src/lib/certificateStatus.ts.
+   */
+  superseded_by: string | null;
   customer_id: string | null;
   job_id: string | null;
   device_id: string | null;
