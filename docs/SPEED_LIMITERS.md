@@ -169,6 +169,13 @@ Four fields exist only for this document:
 | `limiter_type` | `sl_devices` → `speed_limiter_certificates` | "Electronic Pedal" is a property of the device, not of its brand/model. |
 | letterhead block | `tenants` | `name_ar`, `cr_number`, `po_box`, `postal_code`, `city`/`city_ar`, `email`, `phone_secondary`, `services_line`/`services_line_ar`, `signature_url`, `stamp_url` — edited under Settings → Organization → Document letterhead. The two mark URLs are constrained to `https:` / `data:image` in the database and validated in the form. |
 
+The **Installation / Renewal** heading comes from the job's `job_type`
+(`installation` and `replacement` print Installation, everything else prints
+Renewal), falling back to `renewed_from` only when a certificate has no job. A
+renewal of a limiter fitted before the tenant kept records here — every
+back-loaded register — has no predecessor certificate, and would otherwise
+print as an Installation.
+
 The footer registration line is **composed**, not stored: `src/lib/certificate.ts`
 builds it from the block above and prints it twice — Arabic with Arabic-Indic
 digits above English — on every copy regardless of the UI language, which is why
