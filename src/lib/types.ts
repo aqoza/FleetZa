@@ -20,6 +20,25 @@ export interface Tenant {
   /** Dealer contact block printed on RSL certificates (and future letterheads). */
   address: string | null;
   phone: string | null;
+  /**
+   * Letterhead + footer of official documents (docs/SPEED_LIMITERS.md). The
+   * Omani RSL certificate prints a bilingual masthead, a services tagline on
+   * the flag-colored strip, and a registration line composed from the
+   * registration block below — in Arabic (Arabic-Indic digits) and English.
+   */
+  name_ar: string | null;
+  cr_number: string | null;
+  po_box: string | null;
+  postal_code: string | null;
+  city: string | null;
+  city_ar: string | null;
+  email: string | null;
+  phone_secondary: string | null;
+  services_line: string | null;
+  services_line_ar: string | null;
+  /** Scanned marks printed in the closing strip; https: or data:image only. */
+  signature_url: string | null;
+  stamp_url: string | null;
   created_at: string;
 }
 
@@ -250,7 +269,10 @@ export interface SpeedLimiterInstallation {
   brand: string | null;
   model: string | null;
   set_speed_kmh: number | null;
+  set_speed_secondary_kmh: number | null;
   tamper_seal_number: string | null;
+  /** Issued once for this installation and reprinted on every renewal. */
+  uin: string | null;
   installed_at: string;
   technician: string | null;
   status: SpeedLimiterStatus;
@@ -278,8 +300,15 @@ export interface SpeedLimiterCertificate {
   job_id: string | null;
   device_id: string | null;
   set_speed_kmh: number | null;
-  /** Snapshotted at issuance (from the job/installation), like set_speed_kmh. */
+  /**
+   * Snapshotted at issuance (from the job/installation/device), like
+   * set_speed_kmh — an issued document must reprint identically years later
+   * even after the device or installation has moved on.
+   */
+  set_speed_secondary_kmh: number | null;
   tamper_seal_number: string | null;
+  uin: string | null;
+  limiter_type: string | null;
   status: SlCertificateStatus;
   revoked_at: string | null;
   revoked_reason: string | null;
@@ -340,6 +369,8 @@ export interface SlDevice {
   purchase_price: number | null;
   supplier: string | null;
   warranty_until: string | null;
+  /** Certified type printed on the certificate, e.g. "Electronic Pedal". */
+  limiter_type: string | null;
   status: SlDeviceStatus;
   current_vehicle_id: string | null;
   notes: string | null;
@@ -381,7 +412,11 @@ export interface SlJob {
   status: SlJobStatus;
   scheduled_date: string | null;
   set_speed_kmh: number | null;
+  /** Second programmed band — Omani certificates print the pair "70/90 KMPH". */
+  set_speed_secondary_kmh: number | null;
   tamper_seal_number: string | null;
+  /** Unique identification number of the limiter installation (Oman: OM-…). */
+  uin: string | null;
   checklist: SlChecklistItem[];
   location: string | null;
   started_at: string | null;

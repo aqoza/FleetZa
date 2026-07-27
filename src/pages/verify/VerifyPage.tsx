@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { AlertTriangle, CheckCircle2, Loader2, SearchX, XCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { LANGUAGES, useI18n, type MessageKey } from "../../i18n";
+import { formatSpeedBand } from "../../lib/certificate";
 
 /**
  * Public certificate verification page (linked from the QR code printed on
@@ -15,9 +16,11 @@ type VerifyStatus = "valid" | "expired" | "revoked" | "not_found";
 interface VerifyResult {
   status: VerifyStatus;
   certificateNumber?: string | null;
+  uin?: string | null;
   issuedAt?: string | null;
   expiresAt?: string | null;
   setSpeedKmh?: number | null;
+  setSpeedSecondaryKmh?: number | null;
   issuingAuthority?: string | null;
   vehiclePlate?: string | null;
   vehicleName?: string | null;
@@ -122,15 +125,17 @@ export default function VerifyPage() {
   if (result) {
     if (result.certificateNumber)
       rows.push(["speedLimiters.verify.certificateNumber", result.certificateNumber]);
+    if (result.uin) rows.push(["speedLimiters.verify.uin", result.uin]);
     if (result.issuedBy) rows.push(["speedLimiters.verify.issuedBy", result.issuedBy]);
     if (result.customerName) rows.push(["speedLimiters.verify.customer", result.customerName]);
     if (result.vehicleName) rows.push(["speedLimiters.verify.vehicle", result.vehicleName]);
     if (result.vehiclePlate) rows.push(["speedLimiters.verify.plate", result.vehiclePlate]);
-    if (result.setSpeedKmh != null)
-      rows.push([
-        "speedLimiters.verify.setSpeed",
-        t("speedLimiters.kmhValue", { value: result.setSpeedKmh }),
-      ]);
+    const band = formatSpeedBand(
+      result.setSpeedKmh,
+      result.setSpeedSecondaryKmh,
+      t("slCertificates.report.speedUnit"),
+    );
+    if (band) rows.push(["speedLimiters.verify.setSpeed", band]);
     if (result.issuedAt)
       rows.push(["speedLimiters.verify.issuedAt", formatPlainDate(result.issuedAt)]);
     if (result.expiresAt)

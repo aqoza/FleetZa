@@ -38,6 +38,10 @@ export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
   "slJobs.scheduledDate": "تاريخ الجدولة",
   "slJobs.setSpeedKmh": "السرعة المضبوطة (كم/س)",
   "slJobs.tamperSealNumber": "رقم ختم الحماية",
+  "slJobs.setSpeedSecondaryKmh": "النطاق الثاني (كم/س)",
+  "slJobs.uin": "الرقم التعريفي الفريد",
+  "slJobs.uinHint":
+    "الرقم التعريفي الفريد لتركيب محدد السرعة. يُسجَّل مرة واحدة ويُعاد طبعه في كل شهادة تجديد.",
   "slJobs.location": "الموقع",
   "slJobs.createJob": "إنشاء المهمة",
   "slJobs.saveFailed": "فشل الحفظ",

@@ -93,7 +93,11 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
   const [setSpeed, setSetSpeed] = useState(
     job.set_speed_kmh != null ? String(job.set_speed_kmh) : "",
   );
+  const [setSpeedSecondary, setSetSpeedSecondary] = useState(
+    job.set_speed_secondary_kmh != null ? String(job.set_speed_secondary_kmh) : "",
+  );
   const [tamperSeal, setTamperSeal] = useState(job.tamper_seal_number ?? "");
+  const [uin, setUin] = useState(job.uin ?? "");
   const [customerSigned, setCustomerSigned] = useState(job.customer_signed);
   const [technicianSigned, setTechnicianSigned] = useState(job.technician_signed);
   const [overrideNote, setOverrideNote] = useState("");
@@ -112,6 +116,9 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
         p_customer_signed: customerSigned,
         p_technician_signed: technicianSigned,
         p_tamper_seal_number: tamperSeal.trim() || undefined,
+        p_set_speed_secondary_kmh:
+          setSpeedSecondary === "" ? undefined : Number(setSpeedSecondary),
+        p_uin: uin.trim() || undefined,
       });
       if (error) {
         if (error.message.includes("JOB_NOT_IN_PROGRESS")) {
@@ -172,12 +179,26 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
             onChange={(e) => setSetSpeed(e.target.value)}
           />
         </Field>
+        <Field label={t("slJobs.setSpeedSecondaryKmh")}>
+          <Input
+            type="number"
+            min={0}
+            step="1"
+            value={setSpeedSecondary}
+            onChange={(e) => setSetSpeedSecondary(e.target.value)}
+          />
+        </Field>
         {CERT_JOB_TYPES.includes(job.job_type) && (
           <Field label={t("slJobs.tamperSealNumber")}>
             <Input value={tamperSeal} onChange={(e) => setTamperSeal(e.target.value)} />
           </Field>
         )}
       </div>
+      {CERT_JOB_TYPES.includes(job.job_type) && (
+        <Field label={t("slJobs.uin")} hint={t("slJobs.uinHint")}>
+          <Input dir="ltr" value={uin} onChange={(e) => setUin(e.target.value)} />
+        </Field>
+      )}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm text-slate-700">
           <input
@@ -488,9 +509,16 @@ export default function JobDetailPage() {
                 : "—"
             }
           />
+          {job.set_speed_secondary_kmh != null && (
+            <InfoRow
+              label={t("slJobs.setSpeedSecondaryKmh")}
+              value={t("speedLimiters.kmhValue", { value: job.set_speed_secondary_kmh })}
+            />
+          )}
           {job.tamper_seal_number && (
             <InfoRow label={t("slJobs.tamperSealNumber")} value={job.tamper_seal_number} />
           )}
+          {job.uin && <InfoRow label={t("slJobs.uin")} value={job.uin} />}
           {job.notes && (
             <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{job.notes}</p>
           )}

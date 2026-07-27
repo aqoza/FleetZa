@@ -36,6 +36,30 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.liters": "لترات",
   "settings.gallons": "جالونات (أمريكي)",
   "settings.saved": "تم الحفظ.",
+
+  // ترويسة المستندات
+  "settings.letterhead": "ترويسة المستندات",
+  "settings.letterheadHint":
+    "تُطبع على شهادات محددات السرعة: الترويسة أعلى المستند وشريط التسجيل أسفله.",
+  "settings.nameAr": "الاسم التجاري (بالعربية)",
+  "settings.nameArHint": "يُطبع فوق الاسم الإنجليزي في الترويسة.",
+  "settings.crNumber": "رقم السجل التجاري",
+  "settings.poBox": "صندوق البريد",
+  "settings.postalCode": "الرمز البريدي",
+  "settings.city": "الموقع",
+  "settings.cityHint": "كما يظهر في ترويستك، مثل: Muscat, Sultanate of Oman.",
+  "settings.cityAr": "الموقع (بالعربية)",
+  "settings.email": "البريد الإلكتروني",
+  "settings.phoneSecondary": "هاتف إضافي",
+  "settings.servicesLine": "سطر الخدمات",
+  "settings.servicesLineHint":
+    "العبارة الظاهرة على الشريط الملوّن في التذييل، مثل: محدد سرعة الطريق | أنظمة الفحص الإلكتروني.",
+  "settings.servicesLineAr": "سطر الخدمات (بالعربية)",
+  "settings.signatureUrl": "رابط صورة التوقيع",
+  "settings.stampUrl": "رابط صورة الختم",
+  "settings.markUrlHint":
+    "اختياري: رابط https:// أو data:image. يُطبع في شريط الاعتماد؛ اتركه فارغًا للتوقيع والختم يدويًا.",
+  "settings.markUrlInvalid": "أدخل رابط https:// أو data:image.",
   "settings.saveFailed": "فشل الحفظ",
 
   // Organization read-only view

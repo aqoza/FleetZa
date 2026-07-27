@@ -45,6 +45,13 @@
   --color-serious: #dc2626;
   --color-serious-soft: #fef2f2;
 
+  /* Official documents — paper ink, identical in both themes. Certificates
+     always print on white, so these are not part of the light/dark pairing;
+     they are the letterhead colors of the Omani RSL format (docs/SPEED_LIMITERS.md). */
+  --color-doc-head: #213c81;    /* masthead trade name */
+  --color-doc-red: #ee1c27;     /* footer services band */
+  --color-doc-green: #46c085;   /* footer band under it */
+
   /* Chart series (CVD-validated pair — see docs/DESIGN_SYSTEM.md) */
   --color-chart-1: #1d67f1;     /* fuel / primary series */
   --color-chart-2: #0d9488;     /* maintenance / secondary series */
@@ -170,6 +177,7 @@
     --color-slate-900: #0f172a;
     color-scheme: light;
   }
+
 }
 
 html,
@@ -180,6 +188,15 @@ body,
 
 body {
   @apply bg-canvas text-ink antialiased;
+}
+
+/* Paper is white, not the app canvas tint — an official document printed with
+   "background graphics" enabled must not carry a gray page behind it. Declared
+   after the base `body` rule so it wins without !important. */
+@media print {
+  body {
+    @apply bg-surface;
+  }
 }
 
 /* Official documents keep their banner fills on paper (browsers strip

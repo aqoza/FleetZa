@@ -76,6 +76,8 @@ function RenewForm({
   const [form, setForm] = useState(() => ({
     issuing_authority: cert.issuing_authority ?? "",
     set_speed_kmh: cert.set_speed_kmh != null ? String(cert.set_speed_kmh) : "",
+    set_speed_secondary_kmh:
+      cert.set_speed_secondary_kmh != null ? String(cert.set_speed_secondary_kmh) : "",
     issued_at: format(new Date(), "yyyy-MM-dd"),
     expires_at: format(addMonths(new Date(), validityMonths), "yyyy-MM-dd"),
   }));
@@ -98,7 +100,15 @@ function RenewForm({
         installation_id: cert.installation_id,
         issuing_authority: form.issuing_authority.trim() || null,
         set_speed_kmh: form.set_speed_kmh === "" ? null : Number(form.set_speed_kmh),
+        set_speed_secondary_kmh:
+          form.set_speed_secondary_kmh === ""
+            ? null
+            : Number(form.set_speed_secondary_kmh),
         tamper_seal_number: cert.tamper_seal_number,
+        // The UIN and the certified limiter type belong to the installation,
+        // so a renewal reprints the ones the original certificate carried.
+        uin: cert.uin,
+        limiter_type: cert.limiter_type,
         issued_at: form.issued_at,
         expires_at: form.expires_at,
         renewed_from: cert.id,
@@ -150,6 +160,16 @@ function RenewForm({
             type="number" min={0} step="1"
             value={form.set_speed_kmh}
             onChange={(e) => set("set_speed_kmh", e.target.value)}
+          />
+        </Field>
+        <Field
+          label={t("slCertificates.setSpeedSecondary")}
+          hint={t("slCertificates.setSpeedSecondaryHint")}
+        >
+          <Input
+            type="number" min={0} step="1"
+            value={form.set_speed_secondary_kmh}
+            onChange={(e) => set("set_speed_secondary_kmh", e.target.value)}
           />
         </Field>
         <Field label={t("slCertificates.issuedAt")} required>

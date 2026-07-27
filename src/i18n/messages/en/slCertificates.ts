@@ -37,6 +37,9 @@ export const enSlCertificates = {
     "The new certificate number is assigned automatically when issued.",
   "slCertificates.issuingAuthority": "Issuing authority",
   "slCertificates.setSpeed": "Set speed (km/h)",
+  "slCertificates.setSpeedSecondary": "Second band (km/h)",
+  "slCertificates.setSpeedSecondaryHint":
+    "Optional. Certificates print both bands as a pair, e.g. 70/90 KMPH.",
   "slCertificates.issuedAt": "Issue date",
   "slCertificates.expiresAt": "Expiry date",
   "slCertificates.renewConfirm": "Issue certificate",
@@ -95,13 +98,14 @@ export const enSlCertificates = {
   "slCertificates.verifyAt": "Verify at:",
   "slCertificates.notFound": "Certificate not found",
 
-  // Official RSL report (Oman sample format)
+  // Official RSL report (Oman dealer format — wording matches the document
+  // dealers file with the ROP, so it is intentionally left verbatim).
   "slCertificates.report.typeInstallation": "Installation",
   "slCertificates.report.typeRenewal": "Renewal",
   "slCertificates.report.countryOfInstallation": "Country of installation",
   "slCertificates.report.declarationTitle": "DECLARATION",
   "slCertificates.report.declarationText":
-    "This is to certify that the vehicle with the below-mentioned details has been fitted with a Road Speed Limiter device, programmed for a top speed of maximum {speed}. The speed limiter fitted to the vehicle complies with the applicable standard. The device is calibrated and sealed.",
+    "This is to certify that the vehicle with below mentioned details has been fitted with Road Speed Limiter device, programmed for a top speed of maximum {speed}. The speed limiter fitted to the vehicle complies with the Applicable Standard. The device is Calibrated and sealed.",
   "slCertificates.report.vehicleDetails": "VEHICLE DETAILS",
   "slCertificates.report.vehicleOwner": "Vehicle Owner",
   "slCertificates.report.registrationNo": "Registration No.",
@@ -123,5 +127,16 @@ export const enSlCertificates = {
   "slCertificates.report.addressPhone": "Address & Phone",
   "slCertificates.report.uinLabel": "UIN (Unique identification number)",
   "slCertificates.report.validUpto": "Valid Upto",
-  "slCertificates.report.kmphPair": "{value}/{value} KMPH",
+  "slCertificates.report.speedUnit": "KMPH",
+
+  // Footer strip — the services band and the registration line, which the
+  // document prints twice (Arabic above English) on every copy.
+  "slCertificates.report.footerCr": "C.R.No.{value}",
+  "slCertificates.report.footerPoBox": "P.O. Box: {value}",
+  "slCertificates.report.footerPostalCode": "Postal Code: {value}",
+  "slCertificates.report.footerGsm": "GSM: {value}",
+  "slCertificates.report.footerSeparator": ", ",
+  "slCertificates.report.footerEmail": "E-mail: {value}",
+  "slCertificates.report.signature": "Authorized signature",
+  "slCertificates.report.stamp": "Company stamp",
 } as const;
