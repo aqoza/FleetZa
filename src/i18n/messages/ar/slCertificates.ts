@@ -42,6 +42,9 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
     "يُعيَّن رقم الشهادة الجديدة تلقائيًا عند الإصدار.",
   "slCertificates.issuingAuthority": "جهة الإصدار",
   "slCertificates.setSpeed": "السرعة المضبوطة (كم/س)",
+  "slCertificates.setSpeedSecondary": "النطاق الثاني (كم/س)",
+  "slCertificates.setSpeedSecondaryHint":
+    "اختياري. تطبع الشهادات النطاقين معًا، مثل ٧٠/٩٠ كم/س.",
   "slCertificates.issuedAt": "تاريخ الإصدار",
   "slCertificates.expiresAt": "تاريخ الانتهاء",
   "slCertificates.renewConfirm": "إصدار الشهادة",
@@ -125,5 +128,14 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.report.addressPhone": "العنوان والهاتف",
   "slCertificates.report.uinLabel": "الرقم التعريفي الفريد (UIN)",
   "slCertificates.report.validUpto": "صالحة حتى",
-  "slCertificates.report.kmphPair": "{value}/{value} كم/س",
+  "slCertificates.report.speedUnit": "كم/س",
+
+  "slCertificates.report.footerCr": "س.ت: {value}",
+  "slCertificates.report.footerPoBox": "ص.ب: {value}",
+  "slCertificates.report.footerPostalCode": "الرمز البريدي: {value}",
+  "slCertificates.report.footerGsm": "نقال: {value}",
+  "slCertificates.report.footerSeparator": "، ",
+  "slCertificates.report.footerEmail": "البريد الإلكتروني: {value}",
+  "slCertificates.report.signature": "التوقيع المعتمد",
+  "slCertificates.report.stamp": "ختم الشركة",
 };

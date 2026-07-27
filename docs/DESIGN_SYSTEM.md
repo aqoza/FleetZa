@@ -60,6 +60,16 @@ item is a `bg-brand-600 text-white` pill.
   `good #059669` / `warn #d97706` / `serious #dc2626`, each with a `-soft` background.
   Status is never conveyed by color alone — pair with a label (Badge) or icon.
 
+### Document ink
+
+`--color-doc-head #213c81` (letterhead trade name), `--color-doc-red #ee1c27`
+and `--color-doc-green #46c085` (the footer bands) are the **paper** colors of
+the official Road Speed Limiter certificate, sampled from the reference document
+(docs/SPEED_LIMITERS.md). They are the one group with no dark counterpart on
+purpose: a certificate prints on white in either theme. Use them only on printed
+documents — never for app chrome — and pair any filled band with `.print-exact`
+so the browser keeps the fill on paper.
+
 ### Chart series
 
 `--color-chart-1 #1d67f1` and `--color-chart-2 #0d9488` — a CVD-validated pair

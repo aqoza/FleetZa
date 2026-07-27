@@ -78,6 +78,7 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
     serial: device?.serial ?? "",
     manufacturer: device?.manufacturer ?? "",
     model: device?.model ?? "",
+    limiter_type: device?.limiter_type ?? "",
     firmware_version: device?.firmware_version ?? "",
     imei: device?.imei ?? "",
     purchase_date: device?.purchase_date ?? "",
@@ -99,6 +100,7 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
         serial: form.serial.trim(),
         manufacturer: form.manufacturer.trim() || null,
         model: form.model.trim() || null,
+        limiter_type: form.limiter_type.trim() || null,
         firmware_version: form.firmware_version.trim() || null,
         imei: form.imei.trim() || null,
         purchase_date: form.purchase_date || null,
@@ -151,6 +153,12 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
         </Field>
         <Field label={t("slDevices.model")}>
           <Input value={form.model} onChange={(e) => set("model", e.target.value)} />
+        </Field>
+        <Field label={t("slDevices.limiterType")} hint={t("slDevices.limiterTypeHint")}>
+          <Input
+            value={form.limiter_type}
+            onChange={(e) => set("limiter_type", e.target.value)}
+          />
         </Field>
         <Field label={t("slDevices.firmwareVersion")}>
           <Input

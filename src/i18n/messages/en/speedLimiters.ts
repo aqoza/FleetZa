@@ -73,6 +73,7 @@ export const enSpeedLimiters = {
   "speedLimiters.verify.noCode": "The verification link is missing its code.",
   "speedLimiters.verify.error": "Verification failed. Please check your connection and try again.",
   "speedLimiters.verify.certificateNumber": "Certificate number",
+  "speedLimiters.verify.uin": "UIN",
   "speedLimiters.verify.issuedBy": "Issued by",
   "speedLimiters.verify.customer": "Customer",
   "speedLimiters.verify.vehicle": "Vehicle",

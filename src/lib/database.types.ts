@@ -1740,6 +1740,7 @@ export type Database = {
           firmware_version: string | null
           id: string
           imei: string | null
+          limiter_type: string | null
           manufacturer: string | null
           model: string | null
           notes: string | null
@@ -1760,6 +1761,7 @@ export type Database = {
           firmware_version?: string | null
           id?: string
           imei?: string | null
+          limiter_type?: string | null
           manufacturer?: string | null
           model?: string | null
           notes?: string | null
@@ -1780,6 +1782,7 @@ export type Database = {
           firmware_version?: string | null
           id?: string
           imei?: string | null
+          limiter_type?: string | null
           manufacturer?: string | null
           model?: string | null
           notes?: string | null
@@ -1829,12 +1832,14 @@ export type Database = {
           qc_by: string | null
           scheduled_date: string | null
           set_speed_kmh: number | null
+          set_speed_secondary_kmh: number | null
           started_at: string | null
           status: string
           tamper_seal_number: string | null
           technician_id: string | null
           technician_signed: boolean
           tenant_id: string
+          uin: string | null
           updated_at: string
           updated_by: string | null
           vehicle_id: string
@@ -1857,12 +1862,14 @@ export type Database = {
           qc_by?: string | null
           scheduled_date?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           started_at?: string | null
           status?: string
           tamper_seal_number?: string | null
           technician_id?: string | null
           technician_signed?: boolean
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id: string
@@ -1885,12 +1892,14 @@ export type Database = {
           qc_by?: string | null
           scheduled_date?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           started_at?: string | null
           status?: string
           tamper_seal_number?: string | null
           technician_id?: string | null
           technician_signed?: boolean
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id?: string
@@ -2032,14 +2041,17 @@ export type Database = {
           issued_at: string
           issuing_authority: string | null
           job_id: string | null
+          limiter_type: string | null
           notes: string | null
           renewed_from: string | null
           revoked_at: string | null
           revoked_reason: string | null
           set_speed_kmh: number | null
+          set_speed_secondary_kmh: number | null
           status: string
           tamper_seal_number: string | null
           tenant_id: string
+          uin: string | null
           updated_at: string
           updated_by: string | null
           vehicle_id: string
@@ -2056,14 +2068,17 @@ export type Database = {
           issued_at?: string
           issuing_authority?: string | null
           job_id?: string | null
+          limiter_type?: string | null
           notes?: string | null
           renewed_from?: string | null
           revoked_at?: string | null
           revoked_reason?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           status?: string
           tamper_seal_number?: string | null
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id: string
@@ -2080,14 +2095,17 @@ export type Database = {
           issued_at?: string
           issuing_authority?: string | null
           job_id?: string | null
+          limiter_type?: string | null
           notes?: string | null
           renewed_from?: string | null
           revoked_at?: string | null
           revoked_reason?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           status?: string
           tamper_seal_number?: string | null
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id?: string
@@ -2165,10 +2183,12 @@ export type Database = {
           model: string | null
           notes: string | null
           set_speed_kmh: number | null
+          set_speed_secondary_kmh: number | null
           status: string
           tamper_seal_number: string | null
           technician: string | null
           tenant_id: string
+          uin: string | null
           updated_at: string
           updated_by: string | null
           vehicle_id: string
@@ -2186,10 +2206,12 @@ export type Database = {
           model?: string | null
           notes?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           status?: string
           tamper_seal_number?: string | null
           technician?: string | null
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id: string
@@ -2207,10 +2229,12 @@ export type Database = {
           model?: string | null
           notes?: string | null
           set_speed_kmh?: number | null
+          set_speed_secondary_kmh?: number | null
           status?: string
           tamper_seal_number?: string | null
           technician?: string | null
           tenant_id?: string
+          uin?: string | null
           updated_at?: string
           updated_by?: string | null
           vehicle_id?: string
@@ -2296,14 +2320,26 @@ export type Database = {
         Row: {
           address: string | null
           archetype: string
+          city: string | null
+          city_ar: string | null
           country: string
+          cr_number: string | null
           created_at: string
           currency: string
           currency_decimals: number
           distance_unit: string
+          email: string | null
           id: string
           name: string
+          name_ar: string | null
           phone: string | null
+          phone_secondary: string | null
+          po_box: string | null
+          postal_code: string | null
+          services_line: string | null
+          services_line_ar: string | null
+          signature_url: string | null
+          stamp_url: string | null
           tax_registration_number: string | null
           timezone: string
           updated_at: string
@@ -2312,14 +2348,26 @@ export type Database = {
         Insert: {
           address?: string | null
           archetype?: string
+          city?: string | null
+          city_ar?: string | null
           country?: string
+          cr_number?: string | null
           created_at?: string
           currency?: string
           currency_decimals?: number
           distance_unit?: string
+          email?: string | null
           id?: string
           name: string
+          name_ar?: string | null
           phone?: string | null
+          phone_secondary?: string | null
+          po_box?: string | null
+          postal_code?: string | null
+          services_line?: string | null
+          services_line_ar?: string | null
+          signature_url?: string | null
+          stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
@@ -2328,14 +2376,26 @@ export type Database = {
         Update: {
           address?: string | null
           archetype?: string
+          city?: string | null
+          city_ar?: string | null
           country?: string
+          cr_number?: string | null
           created_at?: string
           currency?: string
           currency_decimals?: number
           distance_unit?: string
+          email?: string | null
           id?: string
           name?: string
+          name_ar?: string | null
           phone?: string | null
+          phone_secondary?: string | null
+          po_box?: string | null
+          postal_code?: string | null
+          services_line?: string | null
+          services_line_ar?: string | null
+          signature_url?: string | null
+          stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
@@ -2807,8 +2867,10 @@ export type Database = {
           p_duration_minutes?: number
           p_job_id: string
           p_set_speed_kmh?: number
+          p_set_speed_secondary_kmh?: number
           p_tamper_seal_number?: string
           p_technician_signed?: boolean
+          p_uin?: string
         }
         Returns: undefined
       }
@@ -2921,14 +2983,17 @@ export type Database = {
           issued_at: string
           issuing_authority: string | null
           job_id: string | null
+          limiter_type: string | null
           notes: string | null
           renewed_from: string | null
           revoked_at: string | null
           revoked_reason: string | null
           set_speed_kmh: number | null
+          set_speed_secondary_kmh: number | null
           status: string
           tamper_seal_number: string | null
           tenant_id: string
+          uin: string | null
           updated_at: string
           updated_by: string | null
           vehicle_id: string

@@ -39,6 +39,10 @@ export const enSlJobs = {
   "slJobs.scheduledDate": "Scheduled date",
   "slJobs.setSpeedKmh": "Set speed (km/h)",
   "slJobs.tamperSealNumber": "Tamper seal no.",
+  "slJobs.setSpeedSecondaryKmh": "Second band (km/h)",
+  "slJobs.uin": "UIN",
+  "slJobs.uinHint":
+    "Unique identification number of this limiter installation. Recorded once and reprinted on every renewal certificate.",
   "slJobs.location": "Location",
   "slJobs.createJob": "Create job",
   "slJobs.saveFailed": "Save failed",

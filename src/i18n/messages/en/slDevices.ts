@@ -26,6 +26,9 @@ export const enSlDevices = {
   "slDevices.serialNumber": "Serial number",
   "slDevices.manufacturer": "Manufacturer",
   "slDevices.model": "Model",
+  "slDevices.limiterType": "Limiter type",
+  "slDevices.limiterTypeHint":
+    "Certified type printed on certificates, e.g. Electronic Pedal.",
   "slDevices.firmwareVersion": "Firmware version",
   "slDevices.purchaseDate": "Purchase date",
   "slDevices.purchasePrice": "Purchase price ({currency})",

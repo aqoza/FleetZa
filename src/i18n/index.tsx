@@ -150,15 +150,34 @@ function initialLanguage(): Language {
 // provider; same pattern as format.ts's activeLocale.
 let activeLanguage: Language = initialLanguage();
 
-/** Translate outside React components. Prefer useT() inside components. */
-export function translate(key: MessageKey, vars?: TranslateVars): string {
-  let str = DICTS[activeLanguage][key] ?? DICTS.en[key] ?? (key as string);
+function lookup(language: Language, key: MessageKey, vars?: TranslateVars): string {
+  let str = DICTS[language][key] ?? DICTS.en[key] ?? (key as string);
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       str = str.replaceAll(`{${k}}`, String(v));
     }
   }
   return str;
+}
+
+/** Translate outside React components. Prefer useT() inside components. */
+export function translate(key: MessageKey, vars?: TranslateVars): string {
+  return lookup(activeLanguage, key, vars);
+}
+
+/**
+ * Translate in an explicit language, ignoring the UI language. Official
+ * documents are bilingual by convention — the RSL certificate prints its
+ * Arabic and English registration lines on every copy, whichever language the
+ * issuing clerk is using — so those strings still live in the message bundles
+ * instead of being hardcoded; they just cannot both come from one dictionary.
+ */
+export function translateIn(
+  language: Language,
+  key: MessageKey,
+  vars?: TranslateVars,
+): string {
+  return lookup(language, key, vars);
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

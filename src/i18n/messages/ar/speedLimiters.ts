@@ -79,6 +79,7 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   "speedLimiters.verify.noCode": "رابط التحقق لا يحتوي على رمز.",
   "speedLimiters.verify.error": "فشل التحقق. يرجى التأكد من الاتصال والمحاولة مرة أخرى.",
   "speedLimiters.verify.certificateNumber": "رقم الشهادة",
+  "speedLimiters.verify.uin": "الرقم التعريفي الفريد",
   "speedLimiters.verify.issuedBy": "صادرة عن",
   "speedLimiters.verify.customer": "العميل",
   "speedLimiters.verify.vehicle": "المركبة",

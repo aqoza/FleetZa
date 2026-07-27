@@ -99,6 +99,18 @@ function OrganizationTab() {
     tax_registration_number: tenant.tax_registration_number ?? "",
     address: tenant.address ?? "",
     phone: tenant.phone ?? "",
+    name_ar: tenant.name_ar ?? "",
+    cr_number: tenant.cr_number ?? "",
+    po_box: tenant.po_box ?? "",
+    postal_code: tenant.postal_code ?? "",
+    city: tenant.city ?? "",
+    city_ar: tenant.city_ar ?? "",
+    email: tenant.email ?? "",
+    phone_secondary: tenant.phone_secondary ?? "",
+    services_line: tenant.services_line ?? "",
+    services_line_ar: tenant.services_line_ar ?? "",
+    signature_url: tenant.signature_url ?? "",
+    stamp_url: tenant.stamp_url ?? "",
   });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -121,6 +133,18 @@ function OrganizationTab() {
         tax_registration_number: form.tax_registration_number.trim() || null,
         address: form.address.trim() || null,
         phone: form.phone.trim() || null,
+        name_ar: form.name_ar.trim() || null,
+        cr_number: form.cr_number.trim() || null,
+        po_box: form.po_box.trim() || null,
+        postal_code: form.postal_code.trim() || null,
+        city: form.city.trim() || null,
+        city_ar: form.city_ar.trim() || null,
+        email: form.email.trim() || null,
+        phone_secondary: form.phone_secondary.trim() || null,
+        services_line: form.services_line.trim() || null,
+        services_line_ar: form.services_line_ar.trim() || null,
+        signature_url: form.signature_url.trim() || null,
+        stamp_url: form.stamp_url.trim() || null,
       });
       await refresh();
     },
@@ -130,6 +154,13 @@ function OrganizationTab() {
 
   function onSubmit(e: FormEvent) {
     e.preventDefault();
+    // Mirror the database's scheme allow-list so a bad paste is caught here
+    // rather than as a constraint violation.
+    const marks = [form.signature_url, form.stamp_url].map((u) => u.trim());
+    if (marks.some((u) => u && !/^(https:\/\/|data:image\/)/.test(u))) {
+      setError(t("settings.markUrlInvalid"));
+      return;
+    }
     setError("");
     save.mutate();
   }
@@ -283,6 +314,106 @@ function OrganizationTab() {
               />
             </Field>
           </div>
+
+          {/* Document letterhead — masthead + footer strip of printed
+              certificates (src/pages/speed-limiters/CertificatePrintPage.tsx). */}
+          <fieldset className="space-y-4 border-t border-line pt-4">
+            <legend className="sr-only">{t("settings.letterhead")}</legend>
+            <div>
+              <h3 className="text-sm font-semibold text-ink">{t("settings.letterhead")}</h3>
+              <p className="mt-0.5 text-xs text-ink-3">{t("settings.letterheadHint")}</p>
+            </div>
+
+            <Field label={t("settings.nameAr")} hint={t("settings.nameArHint")}>
+              <Input
+                dir="rtl"
+                value={form.name_ar}
+                onChange={(e) => set("name_ar", e.target.value)}
+              />
+            </Field>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <Field label={t("settings.crNumber")}>
+                <Input
+                  dir="ltr"
+                  value={form.cr_number}
+                  onChange={(e) => set("cr_number", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.poBox")}>
+                <Input
+                  dir="ltr"
+                  value={form.po_box}
+                  onChange={(e) => set("po_box", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.postalCode")}>
+                <Input
+                  dir="ltr"
+                  value={form.postal_code}
+                  onChange={(e) => set("postal_code", e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("settings.city")} hint={t("settings.cityHint")}>
+                <Input value={form.city} onChange={(e) => set("city", e.target.value)} />
+              </Field>
+              <Field label={t("settings.cityAr")}>
+                <Input
+                  dir="rtl"
+                  value={form.city_ar}
+                  onChange={(e) => set("city_ar", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.phoneSecondary")}>
+                <Input
+                  type="tel" dir="ltr"
+                  value={form.phone_secondary}
+                  onChange={(e) => set("phone_secondary", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.email")}>
+                <Input
+                  type="email" dir="ltr"
+                  value={form.email}
+                  onChange={(e) => set("email", e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <Field label={t("settings.servicesLine")} hint={t("settings.servicesLineHint")}>
+              <Input
+                value={form.services_line}
+                onChange={(e) => set("services_line", e.target.value)}
+              />
+            </Field>
+            <Field label={t("settings.servicesLineAr")}>
+              <Input
+                dir="rtl"
+                value={form.services_line_ar}
+                onChange={(e) => set("services_line_ar", e.target.value)}
+              />
+            </Field>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("settings.signatureUrl")} hint={t("settings.markUrlHint")}>
+                <Input
+                  dir="ltr"
+                  value={form.signature_url}
+                  onChange={(e) => set("signature_url", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.stampUrl")} hint={t("settings.markUrlHint")}>
+                <Input
+                  dir="ltr"
+                  value={form.stamp_url}
+                  onChange={(e) => set("stamp_url", e.target.value)}
+                />
+              </Field>
+            </div>
+          </fieldset>
 
           <div className="flex items-center justify-end gap-3">
             {saved && !save.isPending && (

@@ -30,6 +30,31 @@ export const enSettings = {
   "settings.liters": "Liters",
   "settings.gallons": "Gallons (US)",
   "settings.saved": "Saved.",
+
+  // Document letterhead — the masthead and footer strip of printed documents
+  // (see the RSL certificate in docs/SPEED_LIMITERS.md).
+  "settings.letterhead": "Document letterhead",
+  "settings.letterheadHint":
+    "Printed on speed limiter certificates: the masthead above the document and the registration strip below it.",
+  "settings.nameAr": "Trade name (Arabic)",
+  "settings.nameArHint": "Printed above the English name on the masthead.",
+  "settings.crNumber": "Commercial registration no.",
+  "settings.poBox": "P.O. Box",
+  "settings.postalCode": "Postal code",
+  "settings.city": "Locality",
+  "settings.cityHint": "As written on your letterhead, e.g. Muscat, Sultanate of Oman.",
+  "settings.cityAr": "Locality (Arabic)",
+  "settings.email": "E-mail",
+  "settings.phoneSecondary": "Second phone",
+  "settings.servicesLine": "Services line",
+  "settings.servicesLineHint":
+    "The tagline on the colored footer band, e.g. Road speed limiter | Automotive diagnostic system.",
+  "settings.servicesLineAr": "Services line (Arabic)",
+  "settings.signatureUrl": "Signature image URL",
+  "settings.stampUrl": "Stamp image URL",
+  "settings.markUrlHint":
+    "Optional https:// or data:image link. Printed in the closing strip; leave empty to sign and stamp by hand.",
+  "settings.markUrlInvalid": "Enter an https:// or data:image link.",
   "settings.saveFailed": "Save failed",
 
   // Organization read-only view

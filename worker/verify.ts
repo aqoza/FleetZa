@@ -19,7 +19,7 @@ verify.get("/:id", async (c) => {
   const { data: cert } = await admin
     .from("speed_limiter_certificates")
     .select(
-      "certificate_number, issued_at, expires_at, status, set_speed_kmh, issuing_authority, vehicles(name, license_plate), customers(name), tenants(name)",
+      "certificate_number, uin, issued_at, expires_at, status, set_speed_kmh, set_speed_secondary_kmh, issuing_authority, vehicles(name, license_plate), customers(name), tenants(name)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -36,9 +36,13 @@ verify.get("/:id", async (c) => {
   return c.json({
     status,
     certificateNumber: cert.certificate_number,
+    // The UIN is printed on the certificate, so an inspector scanning the QR
+    // can cross-check it against the paper in front of them.
+    uin: cert.uin,
     issuedAt: cert.issued_at,
     expiresAt: cert.expires_at,
     setSpeedKmh: cert.set_speed_kmh,
+    setSpeedSecondaryKmh: cert.set_speed_secondary_kmh,
     issuingAuthority: cert.issuing_authority,
     vehiclePlate: vehicle?.license_plate ?? null,
     vehicleName: vehicle?.name ?? null,

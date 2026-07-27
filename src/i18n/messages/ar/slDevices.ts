@@ -26,6 +26,9 @@ export const arSlDevices: Record<keyof typeof enSlDevices, string> = {
   "slDevices.serialNumber": "الرقم التسلسلي",
   "slDevices.manufacturer": "الشركة المصنّعة",
   "slDevices.model": "الطراز",
+  "slDevices.limiterType": "نوع المحدد",
+  "slDevices.limiterTypeHint":
+    "النوع المعتمد الذي يُطبع على الشهادات، مثل: دواسة إلكترونية.",
   "slDevices.firmwareVersion": "إصدار البرنامج الثابت",
   "slDevices.purchaseDate": "تاريخ الشراء",
   "slDevices.purchasePrice": "سعر الشراء ({currency})",
