@@ -38,6 +38,11 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   "speedLimiters.certStatus.expiring": "قاربت على الانتهاء",
   "speedLimiters.certStatus.expired": "منتهية الصلاحية",
   "speedLimiters.certStatus.revoked": "مسحوبة",
+  // حلّت محلها شهادة أحدث — سجل تاريخي وليس مخالفة.
+  "speedLimiters.certStatus.superseded": "مُستبدَلة",
+  "speedLimiters.certStatus.supersededBy": "جُدِّدت بالشهادة {number}",
+  "speedLimiters.certStatus.expiresInDays": "تنتهي خلال {count} يوم",
+  "speedLimiters.certStatus.expiredDaysAgo": "انتهت منذ {count} يوم",
 
   "speedLimiters.kmhValue": "{value} كم/س",
 
@@ -56,6 +61,7 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   "speedLimiters.overview.daysOverdue": "متأخرة {count} يوم",
   "speedLimiters.overview.inDays": "خلال {count} يوم",
   "speedLimiters.overview.viewAll": "عرض الكل",
+  "speedLimiters.overview.viewAllCount": "عرض الكل ({count})",
   "speedLimiters.overview.recentJobs": "أحدث المهام",
   "speedLimiters.overview.jobNumber": "#{number}",
   "speedLimiters.overview.noJobs": "لا توجد مهام بعد",
