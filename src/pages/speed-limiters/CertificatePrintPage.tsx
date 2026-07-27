@@ -420,7 +420,7 @@ export default function CertificatePrintPage() {
                   <img
                     src={tenant.signature_url}
                     alt={t("slCertificates.report.signature")}
-                    className="mx-auto max-h-[72px] object-contain"
+                    className="mx-auto max-h-[84px] object-contain"
                   />
                 )}
               </Cell>
@@ -429,7 +429,7 @@ export default function CertificatePrintPage() {
                   <img
                     src={tenant.stamp_url}
                     alt={t("slCertificates.report.stamp")}
-                    className="mx-auto max-h-[72px] object-contain"
+                    className="mx-auto max-h-[84px] object-contain"
                   />
                 )}
               </Cell>
