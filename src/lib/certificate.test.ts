@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildUin,
   formatDocumentDate,
   formatSpeedBand,
   registrationLine,
@@ -65,6 +66,33 @@ describe("formatDocumentDate", () => {
     expect(formatDocumentDate(null)).toBeNull();
     expect(formatDocumentDate("")).toBeNull();
     expect(formatDocumentDate("not-a-date")).toBeNull();
+  });
+});
+
+describe("buildUin", () => {
+  it("builds OM-<last 5 chassis digits>-<document number>", () => {
+    expect(buildUin("JHHLCK1F7PK026626", "GOM-WO-202601")).toBe("OM-26626-202601");
+  });
+
+  it("counts digits, not characters, so letters in the chassis are skipped", () => {
+    // ...1C5837 — the naive last five characters would be "C5837".
+    expect(buildUin("RA6PAEHD3RU1C5837", "GOM-WO-202602")).toBe("OM-15837-202602");
+  });
+
+  it("left-pads a chassis with fewer than five digits", () => {
+    expect(buildUin("AB12", "GOM-WO-202604")).toBe("OM-00012-202604");
+  });
+
+  it("takes the numeric tail of the document number", () => {
+    expect(buildUin("JHHLCK1F7PK026626", "SOM-WS-00486")).toBe("OM-26626-00486");
+    expect(buildUin("JHHLCK1F7PK026626", "202607")).toBe("OM-26626-202607");
+  });
+
+  it("returns null when there is nothing to derive from", () => {
+    expect(buildUin("ABCDEF", "GOM-WO-202605")).toBeNull();
+    expect(buildUin(null, "GOM-WO-202606")).toBeNull();
+    expect(buildUin("JHHLCK1F7PK026626", "")).toBeNull();
+    expect(buildUin(undefined, undefined)).toBeNull();
   });
 });
 

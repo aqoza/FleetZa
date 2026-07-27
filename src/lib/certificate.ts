@@ -46,6 +46,31 @@ export function formatDocumentDate(iso: string | null | undefined): string | nul
   return `${day}-${month}-${year}`;
 }
 
+/**
+ * The UIN printed on the certificate: `OM-<last 5 chassis digits>-<document
+ * number>`, e.g. chassis JHHLCK1F7PK026626 on certificate GOM-WO-202601 gives
+ * OM-26626-202601. Letters in the chassis are ignored — the rule counts digits
+ * — and a chassis with fewer than five is left-padded to keep the segment a
+ * fixed width.
+ *
+ * Returns null when there is nothing to derive from, so the caller keeps
+ * whatever UIN was recorded rather than printing a malformed identifier.
+ *
+ * Mirrors `app.build_uin` in the database (see the RSL migrations); the two
+ * must agree, because certificates are issued through both paths.
+ */
+export function buildUin(
+  chassis: string | null | undefined,
+  certificateNumber: string | null | undefined,
+): string | null {
+  const digits = (chassis ?? "").replace(/\D/g, "");
+  const number = (certificateNumber ?? "").trim();
+  if (!digits || !number) return null;
+  // The document number's numeric tail: "GOM-WO-202601" → "202601".
+  const tail = number.slice(number.lastIndexOf("-") + 1) || number;
+  return `OM-${digits.slice(-5).padStart(5, "0")}-${tail}`;
+}
+
 export interface RegistrationBlock {
   crNumber?: string | null;
   poBox?: string | null;
