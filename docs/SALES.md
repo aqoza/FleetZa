@@ -223,6 +223,7 @@ them up:
 | `sales_report_receivables()` | Per customer: open invoices, outstanding, and the aging buckets |
 | `sales_report_revenue(p_months)` | Per month: invoiced, collected, invoice count |
 | `sales_report_jobs_pending_invoice()` | The list behind the pending-invoice count, so it can be acted on |
+| `sales_report_payments(customer?, limit)` | Customer payment history — every receipt across invoices, filterable to one customer |
 
 Four rather than thirteen, because most of the requested reports are different
 readings of the same two questions — where a document is in its lifecycle, and
@@ -242,6 +243,10 @@ Definitions worth knowing, since they are judgement calls:
 - **Drafts and voids are excluded** from every money figure: a draft is not an
   invoice yet, and a void never happened.
 - **A "PO received"** is a non-canceled order carrying `customer_po_number`.
+- **The payment ledger is the one place voided invoices are NOT excluded.**
+  Money that changed hands stays in the history even if the invoice it was
+  applied to was later voided — hiding it would make the ledger disagree with
+  the bank statement.
 - **"Jobs pending invoice"** matches on `invoices.job_id`, which the whole
   chain carries — so a job billed through a quote and an order still counts as
   billed.
@@ -254,12 +259,11 @@ Deliberately out of scope for this wave, in rough priority order:
   manual status change. Wire both into the Phase-4 email service.
 - **No credit notes.** A `paid` invoice is terminal by design; correcting one
   needs a credit note, which does not exist yet.
-- **No customer payment-history report yet.** Payments are visible per invoice;
-  a per-customer ledger across invoices is the one report from the Stage-3 list
-  still outstanding.
-- **The reports are read-only and unpaged.** Receivables and revenue are
-  naturally bounded (one row per customer, per month); the jobs-pending-invoice
-  list is capped at 50 rows in the UI with the true total shown beside it.
+- **The reports are read-only, and only bounded where they must be.**
+  Receivables and revenue are naturally bounded (one row per customer, per
+  month); the jobs-pending-invoice list is capped at 50 rows in the UI with the
+  true total beside it, and the payment ledger at 200 receipts. Neither is an
+  export — CSV/statement output is not built.
 - **Native `<select>` pickers** capped at 200 rows for customers, vehicles and
   catalog items — they inherit the platform-wide async-combobox debt
   (ARCHITECTURE_REVIEW §7.6), not a new one.

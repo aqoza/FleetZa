@@ -7,10 +7,11 @@
  * into the browser — the same rule the overview KPIs follow. A tenant with
  * tens of thousands of invoices pays for one row, not for the table.
  */
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  AlertTriangle, ClipboardList, FileText, Receipt, Wallet,
+  AlertTriangle, Banknote, ClipboardList, FileText, Receipt, Wallet,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { wrapDbError } from "../../lib/db";
@@ -18,9 +19,11 @@ import { formatDate, formatMoney } from "../../lib/format";
 import { useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Card, EmptyState, ErrorState, LoadingState, StatCard, Table,
+  Card, EmptyState, ErrorState, Field, LoadingState, Select, StatCard, Table,
 } from "../../components/ui";
-import { SectionCard } from "./shared";
+import { paymentMethods } from "../../lib/labels";
+import type { PaymentMethod } from "../../lib/types";
+import { SectionCard, useCustomers } from "./shared";
 
 interface PipelineRow {
   pending_quotes: number; pending_quote_value: number;
@@ -55,6 +58,18 @@ interface RevenueRow {
   invoice_count: number;
 }
 
+interface PaymentRow {
+  payment_id: string;
+  paid_at: string;
+  amount: number;
+  method: string;
+  reference: string | null;
+  invoice_id: string;
+  invoice_number: string | null;
+  customer_id: string;
+  customer_name: string;
+}
+
 interface PendingJobRow {
   job_id: string;
   job_number: number;
@@ -72,7 +87,8 @@ type ReportFn =
   | "sales_report_pipeline"
   | "sales_report_receivables"
   | "sales_report_revenue"
-  | "sales_report_jobs_pending_invoice";
+  | "sales_report_jobs_pending_invoice"
+  | "sales_report_payments";
 
 /** Every report is one RPC; the generic keeps the row shape at the call site. */
 function useReport<T>(fn: ReportFn, args?: Record<string, unknown>) {
@@ -89,6 +105,14 @@ function useReport<T>(fn: ReportFn, args?: Record<string, unknown>) {
 
 /** How many months of history the revenue table shows. */
 const REVENUE_MONTHS = 12;
+/** Receipts shown in the ledger. A statement, not an export. */
+const PAYMENT_ROWS = 200;
+
+/** The RPC returns `method` as plain text; fall back rather than crash if a
+ *  method is ever added in SQL before it is added to the label map. */
+function paymentMethodKey(method: string) {
+  return paymentMethods[method as PaymentMethod] ?? "enum.paymentMethod.other";
+}
 
 export default function ReportsPage() {
   const t = useT();
@@ -100,6 +124,15 @@ export default function ReportsPage() {
     p_months: REVENUE_MONTHS,
   });
   const pendingJobsQ = useReport<PendingJobRow>("sales_report_jobs_pending_invoice");
+
+  // Payment history is the one report with a filter: "what has THIS customer
+  // paid us" is the question asked when a balance is disputed.
+  const [payerId, setPayerId] = useState("");
+  const customersQ = useCustomers();
+  const paymentsQ = useReport<PaymentRow>("sales_report_payments", {
+    p_customer_id: payerId || null,
+    p_limit: PAYMENT_ROWS,
+  });
 
   const p = pipelineQ.data?.[0] ?? null;
   const money = (n: number) => formatMoney(n, currency);
@@ -332,6 +365,84 @@ export default function ReportsPage() {
                 })}
               </p>
             )}
+          </>
+        )}
+      </SectionCard>
+
+      {/* Customer payment history — every receipt, across invoices */}
+      <SectionCard
+        title={t("sales.reports.paymentHistory")}
+        actions={
+          <div className="w-56">
+            <Field label="">
+              <Select value={payerId} onChange={(e) => setPayerId(e.target.value)}>
+                <option value="">{t("sales.reports.allCustomers")}</option>
+                {(customersQ.data ?? []).map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </div>
+        }
+      >
+        {paymentsQ.isLoading ? (
+          <LoadingState />
+        ) : paymentsQ.error ? (
+          <ErrorState message={(paymentsQ.error as Error).message} />
+        ) : (paymentsQ.data ?? []).length === 0 ? (
+          <EmptyState
+            icon={<Banknote className="h-6 w-6" />}
+            title={t("sales.reports.noPayments")}
+            description={t("sales.reports.noPaymentsDesc")}
+          />
+        ) : (
+          <>
+            <Table
+              headers={[
+                t("sales.reports.paidOn"),
+                t("sales.doc.customer"),
+                t("sales.invoices.title"),
+                t("sales.reports.method"),
+                t("sales.reports.reference"),
+                t("sales.reports.amount"),
+              ]}
+            >
+              {(paymentsQ.data ?? []).map((pmt) => (
+                <tr key={pmt.payment_id} className="border-t border-line">
+                  <td className="px-4 py-2">{formatDate(pmt.paid_at)}</td>
+                  <td className="px-4 py-2">
+                    <Link
+                      to={`/customers/${pmt.customer_id}`}
+                      className="text-brand-700 hover:underline"
+                    >
+                      {pmt.customer_name}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2">
+                    <Link
+                      to={`/sales/invoices/${pmt.invoice_id}`}
+                      className="text-brand-700 hover:underline"
+                    >
+                      {pmt.invoice_number ?? "—"}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2">{t(paymentMethodKey(pmt.method))}</td>
+                  <td className="px-4 py-2 text-ink-2">{pmt.reference ?? "—"}</td>
+                  <td className="px-4 py-2 text-end font-medium tabular-nums">
+                    {money(Number(pmt.amount))}
+                  </td>
+                </tr>
+              ))}
+            </Table>
+            <p className="mt-3 text-end text-sm text-ink-2">
+              {t("sales.reports.paymentsTotal", {
+                amount: money(
+                  (paymentsQ.data ?? []).reduce((sum, x) => sum + Number(x.amount), 0),
+                ),
+              })}
+            </p>
           </>
         )}
       </SectionCard>

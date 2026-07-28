@@ -3276,6 +3276,22 @@ export type Database = {
           vehicle_name: string
         }[]
       }
+      sales_report_payments: {
+        Args: { p_customer_id?: string; p_limit?: number }
+        Returns: {
+          amount: number
+          customer_id: string
+          customer_name: string
+          invoice_id: string
+          invoice_number: string
+          invoice_status: string
+          invoice_total: number
+          method: string
+          paid_at: string
+          payment_id: string
+          reference: string
+        }[]
+      }
       sales_report_pipeline: {
         Args: never
         Returns: {
