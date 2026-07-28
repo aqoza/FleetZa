@@ -43,6 +43,10 @@ export const enErrors = {
   "errors.quoteNotRevisable": "A draft quote can be edited directly — no revision needed.",
   "errors.orderNotFound": "Sales order not found.",
   "errors.orderNotInvoiceable": "Confirm the sales order before invoicing it.",
+  "errors.invoiceExceedsOrder":
+    "That is more than the order has left to invoice. Reduce the quantity and try again.",
+  "errors.nothingToInvoice":
+    "This order is fully invoiced — there is nothing left to bill.",
   "errors.invoiceNotFound": "Invoice not found.",
   "errors.invoiceNotPayable": "Issue the invoice before recording a payment against it.",
   "errors.paymentExceedsBalance": "That payment is larger than the invoice's outstanding balance.",

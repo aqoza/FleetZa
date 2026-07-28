@@ -56,6 +56,8 @@ export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
   "slJobs.reactivate": "إعادة التفعيل",
 
   // Detail page
+  "slJobs.createInvoice": "إنشاء فاتورة",
+  "slJobs.createQuote": "إنشاء عرض سعر",
   "slJobs.backToJobs": "المهام",
   "slJobs.jobNotFound": "المهمة غير موجودة",
   "slJobs.details": "التفاصيل",

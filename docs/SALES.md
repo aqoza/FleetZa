@@ -33,8 +33,47 @@ lines with a dozen round trips is how half-converted documents get created:
 | RPC | Guard | Result |
 |---|---|---|
 | `convert_quote_to_order(quote)` | quote must be `accepted` and unconverted (also a partial unique index on `sales_orders.quote_id`) | draft order + copied lines, `quotes.sales_order_id` linked |
-| `create_invoice_from_order(order)` | order must be `confirmed` or `fulfilled` | draft invoice + copied lines, due date from `payment_terms_days` |
+| `create_invoice_from_order(order, lines?)` | order must be `confirmed` or `fulfilled`; requested quantities must not exceed what is left | draft invoice + the requested quantities, due date from `payment_terms_days` |
 | `revise_quote(quote)` | quote must not be `draft` | new draft at `revision + 1`, `revision_of` lineage kept |
+
+## Four customer processes, one chain
+
+Customers do not all buy the same way, so the chain is entered at whichever
+point their process starts. `sales_orders.quote_id` and `invoices.sales_order_id`
+are both nullable, which is what makes this possible without a second chain:
+
+| # | Process | How it maps |
+|---|---|---|
+| 1 | Quote → PO → Invoice → Payment | quote accepted → `convert_quote_to_order` → record the customer's PO on the order → `create_invoice_from_order` |
+| 2 | PO → Job → Invoice → Payment | order created directly (no quote), PO recorded on it, job done, invoice from the order |
+| 3 | Job → Certificate → Quote → PO → Invoice | invoice/quote raised **from the job page**, which links the job and its certificate; the quote then converts as in 1 |
+| 4 | Job → Invoice → Payment | invoice raised from the job page with no order at all |
+
+### The customer's purchase order
+
+Captured on the **sales order** (`customer_po_number`, `customer_po_date`,
+`customer_po_url`), not in a table of its own: the order already is "the agreed
+work" — lines, totals, tax, a state machine, `invoiced_total` — so several
+invoices against one PO is partial invoicing of that order rather than a second
+order-shaped entity kept in step with the first. An order carrying a PO number
+is what "PO received" means.
+
+The invoice **snapshots** `customer_po_number` rather than joining through the
+order: an issued invoice must keep printing the PO it was raised against, and a
+scenario-4 invoice has no order to join to.
+
+### Linking documents to the work
+
+`quotes`, `sales_orders` and `invoices` each carry nullable `job_id` and
+`certificate_id`, and both conversion RPCs copy them forward — so a quote
+raised from a job still knows that job after it becomes an order and then an
+invoice. The job page raises a quote or an invoice directly, prefilled with the
+customer and vehicle and linked at creation rather than after the fact.
+
+One job per document, not a link table: here a job is one vehicle and one
+certificate, which is what these four processes describe. A consolidated
+invoice spanning several jobs is the case that would promote this to a link
+table.
 
 ## Where the numbers come from
 
@@ -143,6 +182,75 @@ token, whitelisted fields only.
 KPI tiles never pull document tables into the browser — `sales_summary()` is one
 RLS-scoped row computed in SQL.
 
+## Progress billing — several invoices per order
+
+One PO often becomes several invoices: a fleet order is "50 × installation"
+and the dealer bills 20 vehicles this month and 30 next. The unit is therefore
+**quantity per order line**, not whole lines — a whole line is just its full
+quantity.
+
+`invoice_lines.sales_order_line_id` records which order line each invoice line
+bills, and `sales_order_line_balance(order)` derives ordered / invoiced /
+remaining from those rows. **Derived, never stored**: a stored counter would
+have to be corrected on every invoice insert, void, un-void and line delete,
+and any missed path silently bills a customer twice. Voided invoices are
+excluded (a void never happened); drafts *are* counted, so two people preparing
+drafts cannot both claim the same quantity.
+
+`create_invoice_from_order(order, lines?)` takes
+`[{"line_id": …, "quantity": …}, …]`. **Passing nothing invoices everything
+still uninvoiced** — which is what the single-argument call always meant; the
+old behaviour of copying every line unconditionally was the defect, because
+calling it twice produced two full invoices for the same work.
+
+Guards, all checked before anything is written so a rejection leaves no
+half-built invoice and no consumed document number:
+
+- `INVOICE_EXCEEDS_ORDER` — asking for more than a line has left. Duplicate
+  entries for one line are summed first, so two half-sized claims cannot slip
+  past the check and together overdraw it.
+- `NOTHING_TO_INVOICE` — the order is fully invoiced.
+
+## Reporting
+
+`/sales/reports` (billing-gated). Four RLS-scoped SQL functions, same posture
+as `sales_summary()` — the browser never pulls the document tables down to add
+them up:
+
+| Function | Answers |
+|---|---|
+| `sales_report_pipeline()` | One row of counts + values: pending / approved / rejected quotations, POs received, jobs pending invoice, invoices generated, partially paid, fully paid, outstanding, overdue |
+| `sales_report_receivables()` | Per customer: open invoices, outstanding, and the aging buckets |
+| `sales_report_revenue(p_months)` | Per month: invoiced, collected, invoice count |
+| `sales_report_jobs_pending_invoice()` | The list behind the pending-invoice count, so it can be acted on |
+| `sales_report_payments(customer?, limit)` | Customer payment history — every receipt across invoices, filterable to one customer |
+
+Four rather than thirteen, because most of the requested reports are different
+readings of the same two questions — where a document is in its lifecycle, and
+who owes what — and thirteen functions would be thirteen chances for the
+definitions to drift. **Invoice aging and outstanding-balance-by-customer are
+the same query**: the page sums the receivable columns for the aging totals
+rather than asking twice, so the two can never disagree about what "31–60
+days" means.
+
+Definitions worth knowing, since they are judgement calls:
+
+- **Aging is measured from the due date**, not the issue date. An invoice on
+  60-day terms issued 45 days ago is not overdue.
+- **Pending quotations include sent-but-lapsed ones.** `expired` is derived at
+  render from `valid_until`, and a lapsed quote is still work someone has to
+  chase, not a closed case.
+- **Drafts and voids are excluded** from every money figure: a draft is not an
+  invoice yet, and a void never happened.
+- **A "PO received"** is a non-canceled order carrying `customer_po_number`.
+- **The payment ledger is the one place voided invoices are NOT excluded.**
+  Money that changed hands stays in the history even if the invoice it was
+  applied to was later voided — hiding it would make the ledger disagree with
+  the bank statement.
+- **"Jobs pending invoice"** matches on `invoices.job_id`, which the whole
+  chain carries — so a job billed through a quote and an order still counts as
+  billed.
+
 ## Known gaps
 
 Deliberately out of scope for this wave, in rough priority order:
@@ -151,9 +259,11 @@ Deliberately out of scope for this wave, in rough priority order:
   manual status change. Wire both into the Phase-4 email service.
 - **No credit notes.** A `paid` invoice is terminal by design; correcting one
   needs a credit note, which does not exist yet.
-- **No partial invoicing of an order.** `create_invoice_from_order` copies every
-  line; `invoiced_total` already tracks the running sum, so progress billing is
-  an additive change.
+- **The reports are read-only, and only bounded where they must be.**
+  Receivables and revenue are naturally bounded (one row per customer, per
+  month); the jobs-pending-invoice list is capped at 50 rows in the UI with the
+  true total beside it, and the payment ledger at 200 receipts. Neither is an
+  export — CSV/statement output is not built.
 - **Native `<select>` pickers** capped at 200 rows for customers, vehicles and
   catalog items — they inherit the platform-wide async-combobox debt
   (ARCHITECTURE_REVIEW §7.6), not a new one.

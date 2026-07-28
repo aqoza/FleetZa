@@ -42,6 +42,10 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.quoteNotRevisable": "يمكن تعديل عرض السعر المسودة مباشرة — لا حاجة إلى مراجعة جديدة.",
   "errors.orderNotFound": "لم يتم العثور على أمر البيع.",
   "errors.orderNotInvoiceable": "قم بتأكيد أمر البيع قبل إصدار فاتورة له.",
+  "errors.invoiceExceedsOrder":
+    "الكمية أكبر من المتبقي في أمر البيع. قلّل الكمية ثم حاول مرة أخرى.",
+  "errors.nothingToInvoice":
+    "تمت فوترة هذا الأمر بالكامل — لا يوجد ما يمكن فوترته.",
   "errors.invoiceNotFound": "لم يتم العثور على الفاتورة.",
   "errors.invoiceNotPayable": "قم بإصدار الفاتورة قبل تسجيل دفعة عليها.",
   "errors.paymentExceedsBalance": "قيمة الدفعة أكبر من الرصيد المستحق على الفاتورة.",

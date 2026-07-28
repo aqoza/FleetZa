@@ -57,6 +57,8 @@ export const enSlJobs = {
   "slJobs.reactivate": "Reactivate",
 
   // Detail page
+  "slJobs.createInvoice": "Create invoice",
+  "slJobs.createQuote": "Create quote",
   "slJobs.backToJobs": "Jobs",
   "slJobs.jobNotFound": "Job not found",
   "slJobs.details": "Details",

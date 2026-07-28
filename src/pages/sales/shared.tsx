@@ -154,6 +154,14 @@ export interface DocumentFormValues {
   customer_reference: string;
   /** Quote: valid_until · Order: expected_date · Invoice: due_date. */
   secondary_date: string;
+  /**
+   * The customer's purchase order. Orders capture all three; invoices capture
+   * only the number, as a snapshot of the PO they were raised against. Quotes
+   * predate the PO, so they show none of it.
+   */
+  customer_po_number: string;
+  customer_po_date: string;
+  customer_po_url: string;
   terms: string;
   notes: string;
   internal_notes: string;
@@ -167,6 +175,9 @@ export function emptyDocumentForm(): DocumentFormValues {
     title: "",
     customer_reference: "",
     secondary_date: "",
+    customer_po_number: "",
+    customer_po_date: "",
+    customer_po_url: "",
     terms: "",
     notes: "",
     internal_notes: "",
@@ -182,11 +193,19 @@ export function DocumentFormFields({
   set,
   secondaryDateLabel,
   lockCustomer,
+  purchaseOrder,
 }: {
   form: DocumentFormValues;
   set: <K extends keyof DocumentFormValues>(key: K, value: string) => void;
   secondaryDateLabel: string;
   lockCustomer?: boolean;
+  /**
+   * How much of the customer's PO this document captures. "full" is the sales
+   * order, which is where a PO is received; "number" is the invoice, which
+   * only snapshots the reference it bills against. Omitted on quotes, which
+   * come before the PO exists.
+   */
+  purchaseOrder?: "full" | "number";
 }) {
   const t = useT();
   const customersQ = useCustomers();
@@ -251,6 +270,34 @@ export function DocumentFormFields({
           </Select>
         </Field>
       </div>
+      {purchaseOrder && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t("sales.doc.poNumber")} hint={t("sales.doc.poNumberHint")}>
+            <Input
+              value={form.customer_po_number}
+              onChange={(e) => set("customer_po_number", e.target.value)}
+            />
+          </Field>
+          {purchaseOrder === "full" && (
+            <>
+              <Field label={t("sales.doc.poDate")}>
+                <Input
+                  type="date"
+                  value={form.customer_po_date}
+                  onChange={(e) => set("customer_po_date", e.target.value)}
+                />
+              </Field>
+              <Field label={t("sales.doc.poUrl")} hint={t("sales.doc.poUrlHint")}>
+                <Input
+                  dir="ltr"
+                  value={form.customer_po_url}
+                  onChange={(e) => set("customer_po_url", e.target.value)}
+                />
+              </Field>
+            </>
+          )}
+        </div>
+      )}
       <Field label={t("sales.doc.terms")}>
         <Textarea value={form.terms} onChange={(e) => set("terms", e.target.value)} />
       </Field>
@@ -271,8 +318,22 @@ export function DocumentFormFields({
 export function documentPayload(
   form: DocumentFormValues,
   dateColumn: "valid_until" | "expected_date" | "due_date",
+  purchaseOrder?: "full" | "number",
 ): Record<string, unknown> {
+  // Only send the PO columns the document actually has: quotes carry none, and
+  // invoices carry the number alone.
+  const po =
+    purchaseOrder === "full"
+      ? {
+          customer_po_number: form.customer_po_number.trim() || null,
+          customer_po_date: form.customer_po_date || null,
+          customer_po_url: form.customer_po_url.trim() || null,
+        }
+      : purchaseOrder === "number"
+        ? { customer_po_number: form.customer_po_number.trim() || null }
+        : {};
   return {
+    ...po,
     customer_id: form.customer_id,
     contact_id: form.contact_id || null,
     vehicle_id: form.vehicle_id || null,

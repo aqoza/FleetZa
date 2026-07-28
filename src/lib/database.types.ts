@@ -544,6 +544,7 @@ export type Database = {
           line_total: number
           product_id: string | null
           quantity: number
+          sales_order_line_id: string | null
           sort_order: number
           tax_rate: number
           tenant_id: string
@@ -567,6 +568,7 @@ export type Database = {
           line_total?: number
           product_id?: string | null
           quantity?: number
+          sales_order_line_id?: string | null
           sort_order?: number
           tax_rate?: number
           tenant_id?: string
@@ -590,6 +592,7 @@ export type Database = {
           line_total?: number
           product_id?: string | null
           quantity?: number
+          sales_order_line_id?: string | null
           sort_order?: number
           tax_rate?: number
           tenant_id?: string
@@ -615,6 +618,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "invoice_lines_sales_order_line_id_fkey"
+            columns: ["sales_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "sales_order_lines"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoice_lines_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
@@ -633,12 +643,14 @@ export type Database = {
       invoices: {
         Row: {
           amount_paid: number
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_number: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -647,6 +659,7 @@ export type Database = {
           internal_notes: string | null
           issue_date: string
           issued_at: string | null
+          job_id: string | null
           notes: string | null
           number: number | null
           sales_order_id: string | null
@@ -665,12 +678,14 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_number?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -679,6 +694,7 @@ export type Database = {
           internal_notes?: string | null
           issue_date?: string
           issued_at?: string | null
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           sales_order_id?: string | null
@@ -697,12 +713,14 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           currency_decimals?: number
           customer_id?: string
+          customer_po_number?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -711,6 +729,7 @@ export type Database = {
           internal_notes?: string | null
           issue_date?: string
           issued_at?: string | null
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           sales_order_id?: string | null
@@ -728,6 +747,13 @@ export type Database = {
           voided_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_contact_id_fkey"
             columns: ["contact_id"]
@@ -754,6 +780,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -1133,6 +1166,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           accepted_by_name: string | null
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
@@ -1147,6 +1181,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           issue_date: string
+          job_id: string | null
           notes: string | null
           number: number | null
           public_token: string
@@ -1169,6 +1204,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           accepted_by_name?: string | null
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1183,6 +1219,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           issue_date?: string
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           public_token?: string
@@ -1205,6 +1242,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           accepted_by_name?: string | null
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1219,6 +1257,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           issue_date?: string
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           public_token?: string
@@ -1239,6 +1278,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quotes_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quotes_contact_id_fkey"
             columns: ["contact_id"]
@@ -1265,6 +1311,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -1466,6 +1519,7 @@ export type Database = {
       }
       sales_orders: {
         Row: {
+          certificate_id: string | null
           closed_at: string | null
           confirmed_at: string | null
           contact_id: string | null
@@ -1474,6 +1528,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date: string | null
+          customer_po_number: string | null
+          customer_po_url: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -1482,6 +1539,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           invoiced_total: number
+          job_id: string | null
           notes: string | null
           number: number | null
           order_date: string
@@ -1498,6 +1556,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           closed_at?: string | null
           confirmed_at?: string | null
           contact_id?: string | null
@@ -1506,6 +1565,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date?: string | null
+          customer_po_number?: string | null
+          customer_po_url?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -1514,6 +1576,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           invoiced_total?: number
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           order_date?: string
@@ -1530,6 +1593,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           closed_at?: string | null
           confirmed_at?: string | null
           contact_id?: string | null
@@ -1538,6 +1602,9 @@ export type Database = {
           currency?: string
           currency_decimals?: number
           customer_id?: string
+          customer_po_date?: string | null
+          customer_po_number?: string | null
+          customer_po_url?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -1546,6 +1613,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           invoiced_total?: number
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           order_date?: string
@@ -1562,6 +1630,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_orders_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_orders_contact_id_fkey"
             columns: ["contact_id"]
@@ -1588,6 +1663,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -2915,6 +2997,7 @@ export type Database = {
       convert_quote_to_order: {
         Args: { p_quote_id: string }
         Returns: {
+          certificate_id: string | null
           closed_at: string | null
           confirmed_at: string | null
           contact_id: string | null
@@ -2923,6 +3006,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date: string | null
+          customer_po_number: string | null
+          customer_po_url: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -2931,6 +3017,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           invoiced_total: number
+          job_id: string | null
           notes: string | null
           number: number | null
           order_date: string
@@ -2953,47 +3040,95 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      create_invoice_from_order: {
-        Args: { p_order_id: string }
-        Returns: {
-          amount_paid: number
-          contact_id: string | null
-          created_at: string
-          created_by: string | null
-          currency: string
-          currency_decimals: number
-          customer_id: string
-          customer_reference: string | null
-          discount_total: number
-          doc_number: string | null
-          due_date: string | null
-          id: string
-          internal_notes: string | null
-          issue_date: string
-          issued_at: string | null
-          notes: string | null
-          number: number | null
-          sales_order_id: string | null
-          status: string
-          subtotal: number
-          tax_total: number
-          tenant_id: string
-          terms: string | null
-          title: string | null
-          total: number
-          updated_at: string
-          updated_by: string | null
-          vehicle_id: string | null
-          void_reason: string | null
-          voided_at: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "invoices"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      create_invoice_from_order:
+        | {
+            Args: { p_order_id: string }
+            Returns: {
+              amount_paid: number
+              certificate_id: string | null
+              contact_id: string | null
+              created_at: string
+              created_by: string | null
+              currency: string
+              currency_decimals: number
+              customer_id: string
+              customer_po_number: string | null
+              customer_reference: string | null
+              discount_total: number
+              doc_number: string | null
+              due_date: string | null
+              id: string
+              internal_notes: string | null
+              issue_date: string
+              issued_at: string | null
+              job_id: string | null
+              notes: string | null
+              number: number | null
+              sales_order_id: string | null
+              status: string
+              subtotal: number
+              tax_total: number
+              tenant_id: string
+              terms: string | null
+              title: string | null
+              total: number
+              updated_at: string
+              updated_by: string | null
+              vehicle_id: string | null
+              void_reason: string | null
+              voided_at: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "invoices"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { p_lines?: Json; p_order_id: string }
+            Returns: {
+              amount_paid: number
+              certificate_id: string | null
+              contact_id: string | null
+              created_at: string
+              created_by: string | null
+              currency: string
+              currency_decimals: number
+              customer_id: string
+              customer_po_number: string | null
+              customer_reference: string | null
+              discount_total: number
+              doc_number: string | null
+              due_date: string | null
+              id: string
+              internal_notes: string | null
+              issue_date: string
+              issued_at: string | null
+              job_id: string | null
+              notes: string | null
+              number: number | null
+              sales_order_id: string | null
+              status: string
+              subtotal: number
+              tax_total: number
+              tenant_id: string
+              terms: string | null
+              title: string | null
+              total: number
+              updated_at: string
+              updated_by: string | null
+              vehicle_id: string | null
+              void_reason: string | null
+              voided_at: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "invoices"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -3073,6 +3208,7 @@ export type Database = {
         Returns: {
           accepted_at: string | null
           accepted_by_name: string | null
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
@@ -3087,6 +3223,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           issue_date: string
+          job_id: string | null
           notes: string | null
           number: number | null
           public_token: string
@@ -3112,6 +3249,94 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      sales_order_line_balance: {
+        Args: { p_order_id: string }
+        Returns: {
+          description: string
+          invoiced_quantity: number
+          line_id: string
+          quantity: number
+          remaining_quantity: number
+          sort_order: number
+          unit: string
+          unit_price: number
+        }[]
+      }
+      sales_report_jobs_pending_invoice: {
+        Args: never
+        Returns: {
+          completed_at: string
+          customer_id: string
+          customer_name: string
+          job_id: string
+          job_number: number
+          job_type: string
+          status: string
+          vehicle_name: string
+        }[]
+      }
+      sales_report_payments: {
+        Args: { p_customer_id?: string; p_limit?: number }
+        Returns: {
+          amount: number
+          customer_id: string
+          customer_name: string
+          invoice_id: string
+          invoice_number: string
+          invoice_status: string
+          invoice_total: number
+          method: string
+          paid_at: string
+          payment_id: string
+          reference: string
+        }[]
+      }
+      sales_report_pipeline: {
+        Args: never
+        Returns: {
+          accepted_quote_value: number
+          accepted_quotes: number
+          declined_quotes: number
+          invoiced_value: number
+          invoices_generated: number
+          jobs_pending_invoice: number
+          outstanding_amount: number
+          overdue_amount: number
+          overdue_invoices: number
+          paid_invoices: number
+          paid_value: number
+          partially_paid_invoices: number
+          partially_paid_outstanding: number
+          pending_quote_value: number
+          pending_quotes: number
+          pos_received: number
+          pos_received_value: number
+        }[]
+      }
+      sales_report_receivables: {
+        Args: never
+        Returns: {
+          customer_id: string
+          customer_name: string
+          not_yet_due: number
+          oldest_due_date: string
+          open_invoices: number
+          outstanding: number
+          overdue_1_30: number
+          overdue_31_60: number
+          overdue_61_90: number
+          overdue_90_plus: number
+        }[]
+      }
+      sales_report_revenue: {
+        Args: { p_months?: number }
+        Returns: {
+          collected: number
+          invoice_count: number
+          invoiced: number
+          month: string
+        }[]
       }
       sales_summary: {
         Args: never
