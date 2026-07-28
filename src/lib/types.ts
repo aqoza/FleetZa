@@ -42,9 +42,21 @@ export interface Tenant {
   website: string | null;
   services_line: string | null;
   services_line_ar: string | null;
+  /**
+   * Standard the fitted limiter is certified against, printed in the
+   * certificate header (e.g. GSO-1026/2002). Per tenant, not per certificate:
+   * it applies to every vehicle a dealer certifies. Print-only text.
+   */
+  applicable_standard: string | null;
   /** Scanned marks printed in the closing strip; https: or data:image only. */
   signature_url: string | null;
   stamp_url: string | null;
+  /**
+   * Stamp box height as a percent of the default (50-200, DB-constrained).
+   * Seals are scanned at different crops, so one fixed height renders some
+   * large and others tiny.
+   */
+  stamp_scale: number;
   /**
    * Authorized signatory, printed under the signature in the closing strip
    * beneath the "For <trade name>" line. The Arabic form is optional and falls
@@ -333,6 +345,11 @@ export interface SpeedLimiterCertificate {
   tamper_seal_number: string | null;
   uin: string | null;
   limiter_type: string | null;
+  /**
+   * Technician named on the issued document. Snapshot for the same reason as
+   * the fields above, and the only route for a certificate with no job row.
+   */
+  technician_name: string | null;
   status: SlCertificateStatus;
   revoked_at: string | null;
   revoked_reason: string | null;

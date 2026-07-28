@@ -132,6 +132,8 @@ export const enSlCertificates = {
   // dealers file with the ROP, so it is intentionally left verbatim).
   "slCertificates.report.typeInstallation": "Installation",
   "slCertificates.report.typeRenewal": "Renewal",
+  "slCertificates.report.applicableStandard": "Applicable Standard",
+  "slCertificates.report.certificateNo": "Certificate No.",
   "slCertificates.report.countryOfInstallation": "Country of installation",
   "slCertificates.report.declarationTitle": "DECLARATION",
   "slCertificates.report.declarationText":

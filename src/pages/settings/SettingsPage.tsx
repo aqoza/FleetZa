@@ -71,6 +71,12 @@ const roleTone: Record<Role, BadgeTone> = {
 
 // --- Signature / stamp upload ---
 
+// Stamp box heights offered in Settings, as a percent of the default. Bounded
+// to match the tenants_stamp_scale_range check constraint: the mark sits in
+// the closing strip of a one-page A4 document, so an unbounded value would
+// silently push the certificate onto a second page.
+const STAMP_SCALES = [75, 100, 125, 150, 175, 200] as const;
+
 /**
  * A signature or stamp never prints larger than 84px tall on the certificate
  * (CertificatePrintPage.tsx), so a photo straight off a phone is far more
@@ -255,10 +261,12 @@ function OrganizationTab() {
     email: tenant.email ?? "",
     phone_secondary: tenant.phone_secondary ?? "",
     website: tenant.website ?? "",
+    applicable_standard: tenant.applicable_standard ?? "",
     services_line: tenant.services_line ?? "",
     services_line_ar: tenant.services_line_ar ?? "",
     signature_url: tenant.signature_url ?? "",
     stamp_url: tenant.stamp_url ?? "",
+    stamp_scale: String(tenant.stamp_scale ?? 100),
     signatory_name: tenant.signatory_name ?? "",
     signatory_name_ar: tenant.signatory_name_ar ?? "",
   });
@@ -292,10 +300,12 @@ function OrganizationTab() {
         email: form.email.trim() || null,
         phone_secondary: form.phone_secondary.trim() || null,
         website: form.website.trim() || null,
+        applicable_standard: form.applicable_standard.trim() || null,
         services_line: form.services_line.trim() || null,
         services_line_ar: form.services_line_ar.trim() || null,
         signature_url: form.signature_url.trim() || null,
         stamp_url: form.stamp_url.trim() || null,
+        stamp_scale: Number(form.stamp_scale),
         signatory_name: form.signatory_name.trim() || null,
         signatory_name_ar: form.signatory_name_ar.trim() || null,
       });
@@ -552,6 +562,18 @@ function OrganizationTab() {
               </Field>
             </div>
 
+            <Field
+              label={t("settings.applicableStandard")}
+              hint={t("settings.applicableStandardHint")}
+            >
+              <Input
+                dir="ltr"
+                placeholder="GSO-1026/2002"
+                value={form.applicable_standard}
+                onChange={(e) => set("applicable_standard", e.target.value)}
+              />
+            </Field>
+
             <Field label={t("settings.servicesLine")} hint={t("settings.servicesLineHint")}>
               <Input
                 value={form.services_line}
@@ -579,6 +601,27 @@ function OrganizationTab() {
                 value={form.stamp_url}
                 onChange={(value) => set("stamp_url", value)}
               />
+            </div>
+
+            {/* Seals are scanned at wildly different crops, so one fixed box
+                height renders some large and others tiny. Discrete steps
+                rather than a free number: the mark sits in the closing strip
+                of a one-page document, and the range is what keeps it there. */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("settings.stampScale")} hint={t("settings.stampScaleHint")}>
+                <Select
+                  value={form.stamp_scale}
+                  onChange={(e) => set("stamp_scale", e.target.value)}
+                >
+                  {STAMP_SCALES.map((scale) => (
+                    <option key={scale} value={String(scale)}>
+                      {scale === 100
+                        ? t("settings.stampScaleDefault", { value: String(scale) })
+                        : `${scale}%`}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

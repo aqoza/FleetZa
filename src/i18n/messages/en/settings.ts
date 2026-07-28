@@ -51,6 +51,9 @@ export const enSettings = {
   "settings.phoneHint": "Prints on certificates as the service and support number.",
   "settings.phoneSecondary": "Second phone",
   "settings.phoneSecondaryHint": "Prints on certificates as the alternative contact.",
+  "settings.applicableStandard": "Applicable standard",
+  "settings.applicableStandardHint":
+    "Printed in the certificate header, e.g. GSO-1026/2002. It applies to every vehicle you certify; leave empty to print nothing.",
   "settings.servicesLine": "Services line",
   "settings.servicesLineHint":
     "The tagline on the colored footer band, e.g. Road speed limiter | Automotive diagnostic system.",
@@ -60,6 +63,10 @@ export const enSettings = {
   "settings.markUrlHint":
     "Upload an image, or paste an https:// link if it's hosted elsewhere. Printed in the closing strip; leave empty to sign and stamp by hand.",
   "settings.markUrlInvalid": "Enter an https:// or data:image link.",
+  "settings.stampScale": "Stamp size",
+  "settings.stampScaleHint":
+    "How large the stamp prints in the closing strip. Raise it if your seal scan looks small on the certificate.",
+  "settings.stampScaleDefault": "{value}% (default)",
   "settings.markUrlPlaceholder": "https://… or upload above",
   "settings.uploadMark": "Upload",
   "settings.markUploadInvalidType": "Choose an image file.",
