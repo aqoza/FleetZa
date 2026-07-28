@@ -91,11 +91,41 @@ export default function InvoiceDetailPage() {
       isEditable={(i) => i.status === "draft"}
       isDeletable={(i) => i.status === "draft"}
       totalsExtra={(i) => ({ paid: i.amount_paid, balance: balanceDue(i) })}
+      purchaseOrder="number"
       detailRows={(i) => {
         const days = i.due_date ? daysUntil(i.due_date) : null;
         return (
           <>
             <InfoRow label={t("sales.doc.issueDate")} value={formatDate(i.issue_date)} />
+            {i.customer_po_number && (
+              <InfoRow label={t("sales.doc.poNumber")} value={i.customer_po_number} />
+            )}
+            {i.job_id && (
+              <InfoRow
+                label={t("sales.doc.linkedJob")}
+                value={
+                  <Link
+                    to={`/speed-limiters/jobs/${i.job_id}`}
+                    className="text-brand-700 hover:underline"
+                  >
+                    {t("sales.doc.linkedJob")}
+                  </Link>
+                }
+              />
+            )}
+            {i.certificate_id && (
+              <InfoRow
+                label={t("sales.doc.linkedCertificate")}
+                value={
+                  <Link
+                    to={`/speed-limiters/certificates/${i.certificate_id}/print`}
+                    className="text-brand-700 hover:underline"
+                  >
+                    {t("sales.doc.linkedCertificate")}
+                  </Link>
+                }
+              />
+            )}
             <InfoRow
               label={t("sales.doc.dueDate")}
               value={

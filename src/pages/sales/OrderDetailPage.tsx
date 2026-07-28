@@ -110,9 +110,45 @@ export default function OrderDetailPage() {
       deleteConfirm={(o) => t("sales.orders.deleteConfirm", { number: o.doc_number })}
       isEditable={(o) => o.status === "draft"}
       isDeletable={(o) => o.status === "draft" || o.status === "canceled"}
+      purchaseOrder="full"
       detailRows={(o) => (
         <>
           <InfoRow label={t("sales.doc.orderDate")} value={formatDate(o.order_date)} />
+          {o.customer_po_number && (
+            <InfoRow
+              label={t("sales.doc.poNumber")}
+              value={
+                o.customer_po_url ? (
+                  <a
+                    href={o.customer_po_url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="text-brand-700 hover:underline"
+                  >
+                    {o.customer_po_number}
+                  </a>
+                ) : (
+                  o.customer_po_number
+                )
+              }
+            />
+          )}
+          {o.customer_po_date && (
+            <InfoRow label={t("sales.doc.poDate")} value={formatDate(o.customer_po_date)} />
+          )}
+          {o.job_id && (
+            <InfoRow
+              label={t("sales.doc.linkedJob")}
+              value={
+                <Link
+                  to={`/speed-limiters/jobs/${o.job_id}`}
+                  className="text-brand-700 hover:underline"
+                >
+                  {t("sales.doc.linkedJob")}
+                </Link>
+              }
+            />
+          )}
           {o.expected_date && (
             <InfoRow label={t("sales.doc.expectedDate")} value={formatDate(o.expected_date)} />
           )}

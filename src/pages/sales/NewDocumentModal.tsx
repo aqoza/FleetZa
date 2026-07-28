@@ -38,6 +38,9 @@ export function NewDocumentModal({
   dateLabel,
   /** Which settings field seeds the date (quotes: validity, invoices: terms). */
   defaultDays,
+  prefill,
+  extraPayload,
+  purchaseOrder,
 }: {
   open: boolean;
   onClose: () => void;
@@ -47,12 +50,27 @@ export function NewDocumentModal({
   dateColumn: DateColumn;
   dateLabel: string;
   defaultDays?: "quote_valid_days" | "payment_terms_days";
+  /**
+   * Header values to start from — used when a document is raised from
+   * somewhere that already knows them, e.g. a speed-limiter job that knows its
+   * customer and vehicle. Still editable before saving.
+   */
+  prefill?: Partial<DocumentFormValues>;
+  /**
+   * Columns the form does not own, written with the document. This is how the
+   * job/certificate link is attached at creation rather than bolted on after.
+   */
+  extraPayload?: Record<string, unknown>;
+  purchaseOrder?: "full" | "number";
 }) {
   const t = useT();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { data: settings } = useSalesSettings();
-  const [form, setForm] = useState<DocumentFormValues>(emptyDocumentForm);
+  const [form, setForm] = useState<DocumentFormValues>(() => ({
+    ...emptyDocumentForm(),
+    ...prefill,
+  }));
   const [error, setError] = useState("");
   const [seeded, setSeeded] = useState(false);
 
@@ -75,7 +93,7 @@ export function NewDocumentModal({
   }
 
   function close() {
-    setForm(emptyDocumentForm());
+    setForm({ ...emptyDocumentForm(), ...prefill });
     setSeeded(false);
     setError("");
     onClose();
@@ -83,7 +101,10 @@ export function NewDocumentModal({
 
   const create = useMutation({
     mutationFn: () =>
-      insertRow<{ id: string }>(table, documentPayload(form, dateColumn)),
+      insertRow<{ id: string }>(table, {
+        ...documentPayload(form, dateColumn, purchaseOrder),
+        ...extraPayload,
+      }),
     onSuccess: (doc) => {
       void qc.invalidateQueries({ queryKey: [table] });
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
@@ -103,7 +124,12 @@ export function NewDocumentModal({
     <Modal title={title} open={open} onClose={close} wide>
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <ErrorState message={error} />}
-        <DocumentFormFields form={form} set={set} secondaryDateLabel={dateLabel} />
+        <DocumentFormFields
+          form={form}
+          set={set}
+          secondaryDateLabel={dateLabel}
+          purchaseOrder={purchaseOrder}
+        />
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={close}>
             {t("action.cancel")}

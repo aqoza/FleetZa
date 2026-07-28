@@ -633,12 +633,14 @@ export type Database = {
       invoices: {
         Row: {
           amount_paid: number
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_number: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -647,6 +649,7 @@ export type Database = {
           internal_notes: string | null
           issue_date: string
           issued_at: string | null
+          job_id: string | null
           notes: string | null
           number: number | null
           sales_order_id: string | null
@@ -665,12 +668,14 @@ export type Database = {
         }
         Insert: {
           amount_paid?: number
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_number?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -679,6 +684,7 @@ export type Database = {
           internal_notes?: string | null
           issue_date?: string
           issued_at?: string | null
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           sales_order_id?: string | null
@@ -697,12 +703,14 @@ export type Database = {
         }
         Update: {
           amount_paid?: number
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
           currency?: string
           currency_decimals?: number
           customer_id?: string
+          customer_po_number?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -711,6 +719,7 @@ export type Database = {
           internal_notes?: string | null
           issue_date?: string
           issued_at?: string | null
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           sales_order_id?: string | null
@@ -728,6 +737,13 @@ export type Database = {
           voided_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_contact_id_fkey"
             columns: ["contact_id"]
@@ -754,6 +770,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -1133,6 +1156,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           accepted_by_name: string | null
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
@@ -1147,6 +1171,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           issue_date: string
+          job_id: string | null
           notes: string | null
           number: number | null
           public_token: string
@@ -1169,6 +1194,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           accepted_by_name?: string | null
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1183,6 +1209,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           issue_date?: string
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           public_token?: string
@@ -1205,6 +1232,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           accepted_by_name?: string | null
+          certificate_id?: string | null
           contact_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -1219,6 +1247,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           issue_date?: string
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           public_token?: string
@@ -1239,6 +1268,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quotes_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quotes_contact_id_fkey"
             columns: ["contact_id"]
@@ -1265,6 +1301,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -1466,6 +1509,7 @@ export type Database = {
       }
       sales_orders: {
         Row: {
+          certificate_id: string | null
           closed_at: string | null
           confirmed_at: string | null
           contact_id: string | null
@@ -1474,6 +1518,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date: string | null
+          customer_po_number: string | null
+          customer_po_url: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -1482,6 +1529,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           invoiced_total: number
+          job_id: string | null
           notes: string | null
           number: number | null
           order_date: string
@@ -1498,6 +1546,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           closed_at?: string | null
           confirmed_at?: string | null
           contact_id?: string | null
@@ -1506,6 +1555,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date?: string | null
+          customer_po_number?: string | null
+          customer_po_url?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -1514,6 +1566,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           invoiced_total?: number
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           order_date?: string
@@ -1530,6 +1583,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           closed_at?: string | null
           confirmed_at?: string | null
           contact_id?: string | null
@@ -1538,6 +1592,9 @@ export type Database = {
           currency?: string
           currency_decimals?: number
           customer_id?: string
+          customer_po_date?: string | null
+          customer_po_number?: string | null
+          customer_po_url?: string | null
           customer_reference?: string | null
           discount_total?: number
           doc_number?: string | null
@@ -1546,6 +1603,7 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           invoiced_total?: number
+          job_id?: string | null
           notes?: string | null
           number?: number | null
           order_date?: string
@@ -1562,6 +1620,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_orders_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_orders_contact_id_fkey"
             columns: ["contact_id"]
@@ -1588,6 +1653,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "sl_customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_orders_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "sl_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -2915,6 +2987,7 @@ export type Database = {
       convert_quote_to_order: {
         Args: { p_quote_id: string }
         Returns: {
+          certificate_id: string | null
           closed_at: string | null
           confirmed_at: string | null
           contact_id: string | null
@@ -2923,6 +2996,9 @@ export type Database = {
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_date: string | null
+          customer_po_number: string | null
+          customer_po_url: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -2931,6 +3007,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           invoiced_total: number
+          job_id: string | null
           notes: string | null
           number: number | null
           order_date: string
@@ -2957,12 +3034,14 @@ export type Database = {
         Args: { p_order_id: string }
         Returns: {
           amount_paid: number
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
           currency: string
           currency_decimals: number
           customer_id: string
+          customer_po_number: string | null
           customer_reference: string | null
           discount_total: number
           doc_number: string | null
@@ -2971,6 +3050,7 @@ export type Database = {
           internal_notes: string | null
           issue_date: string
           issued_at: string | null
+          job_id: string | null
           notes: string | null
           number: number | null
           sales_order_id: string | null
@@ -3073,6 +3153,7 @@ export type Database = {
         Returns: {
           accepted_at: string | null
           accepted_by_name: string | null
+          certificate_id: string | null
           contact_id: string | null
           created_at: string
           created_by: string | null
@@ -3087,6 +3168,7 @@ export type Database = {
           id: string
           internal_notes: string | null
           issue_date: string
+          job_id: string | null
           notes: string | null
           number: number | null
           public_token: string

@@ -36,6 +36,45 @@ lines with a dozen round trips is how half-converted documents get created:
 | `create_invoice_from_order(order)` | order must be `confirmed` or `fulfilled` | draft invoice + copied lines, due date from `payment_terms_days` |
 | `revise_quote(quote)` | quote must not be `draft` | new draft at `revision + 1`, `revision_of` lineage kept |
 
+## Four customer processes, one chain
+
+Customers do not all buy the same way, so the chain is entered at whichever
+point their process starts. `sales_orders.quote_id` and `invoices.sales_order_id`
+are both nullable, which is what makes this possible without a second chain:
+
+| # | Process | How it maps |
+|---|---|---|
+| 1 | Quote → PO → Invoice → Payment | quote accepted → `convert_quote_to_order` → record the customer's PO on the order → `create_invoice_from_order` |
+| 2 | PO → Job → Invoice → Payment | order created directly (no quote), PO recorded on it, job done, invoice from the order |
+| 3 | Job → Certificate → Quote → PO → Invoice | invoice/quote raised **from the job page**, which links the job and its certificate; the quote then converts as in 1 |
+| 4 | Job → Invoice → Payment | invoice raised from the job page with no order at all |
+
+### The customer's purchase order
+
+Captured on the **sales order** (`customer_po_number`, `customer_po_date`,
+`customer_po_url`), not in a table of its own: the order already is "the agreed
+work" — lines, totals, tax, a state machine, `invoiced_total` — so several
+invoices against one PO is partial invoicing of that order rather than a second
+order-shaped entity kept in step with the first. An order carrying a PO number
+is what "PO received" means.
+
+The invoice **snapshots** `customer_po_number` rather than joining through the
+order: an issued invoice must keep printing the PO it was raised against, and a
+scenario-4 invoice has no order to join to.
+
+### Linking documents to the work
+
+`quotes`, `sales_orders` and `invoices` each carry nullable `job_id` and
+`certificate_id`, and both conversion RPCs copy them forward — so a quote
+raised from a job still knows that job after it becomes an order and then an
+invoice. The job page raises a quote or an invoice directly, prefilled with the
+customer and vehicle and linked at creation rather than after the fact.
+
+One job per document, not a link table: here a job is one vehicle and one
+certificate, which is what these four processes describe. A consolidated
+invoice spanning several jobs is the case that would promote this to a link
+table.
+
 ## Where the numbers come from
 
 **The database owns every amount.** The client never writes `subtotal`, `total`,
@@ -151,9 +190,13 @@ Deliberately out of scope for this wave, in rough priority order:
   manual status change. Wire both into the Phase-4 email service.
 - **No credit notes.** A `paid` invoice is terminal by design; correcting one
   needs a credit note, which does not exist yet.
-- **No partial invoicing of an order.** `create_invoice_from_order` copies every
-  line; `invoiced_total` already tracks the running sum, so progress billing is
-  an additive change.
+- **No partial invoicing of an order** — the next stage. `create_invoice_from_order`
+  copies every line, so "several invoices against one PO" is not possible yet;
+  `invoiced_total` already tracks the running sum, so it stays an additive change.
+- **Reporting is still the Stage-1 set.** Invoice aging (30/60/90), outstanding
+  balance by customer, customer payment history, jobs pending invoice, POs
+  received and revenue reports are designed but not built; the columns they
+  need (`job_id`, `customer_po_number`, `amount_paid`, `due_date`) now exist.
 - **Native `<select>` pickers** capped at 200 rows for customers, vehicles and
   catalog items — they inherit the platform-wide async-combobox debt
   (ARCHITECTURE_REVIEW §7.6), not a new one.

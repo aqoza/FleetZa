@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
-import { Archive, ArrowLeft, Award, Ban, Check, Play, ShieldCheck } from "lucide-react";
+import { Archive, ArrowLeft, Award, Ban, Check, FileText, Play, ShieldCheck } from "lucide-react";
 import { listRows, updateRow, wrapDbError } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDateTime } from "../../lib/format";
@@ -17,6 +17,7 @@ import type {
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
+import { NewDocumentModal } from "../sales/NewDocumentModal";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge,
@@ -337,9 +338,13 @@ export default function JobDetailPage() {
   const { isEnabled } = useModules();
   const qc = useQueryClient();
   const certificatesEnabled = isEnabled("sl_certificates");
+  const salesOn = isEnabled("sales");
+  const billingOn = isEnabled("billing");
   const [completing, setCompleting] = useState(false);
   const [issuing, setIssuing] = useState(false);
   const [actionError, setActionError] = useState("");
+  /** Which "raise a document" dialog is open, if any. */
+  const [raising, setRaising] = useState<"invoices" | "quotes" | null>(null);
 
   const { data: job, isLoading, error } = useQuery({
     queryKey: ["sl_jobs", jobId],
@@ -425,6 +430,9 @@ export default function JobDetailPage() {
   const checklist: SlChecklistItem[] = job.checklist ?? [];
   const doneCount = checklist.filter((c) => c.done).length;
   const statusMeta = jobStatusMeta[job.status];
+  // The certificate this job produced, if it has one — carried onto any
+  // document raised here so the chain job → certificate → invoice is complete.
+  const jobCertificateId = existingCert?.id ?? null;
   const canEditChecklist = isManager && job.status === "in_progress";
   const showChecklist =
     checklist.length > 0 && job.status !== "scheduled" && job.status !== "canceled";
@@ -455,10 +463,60 @@ export default function JobDetailPage() {
         description={job.vehicles?.name}
         actions={
           <>
+            {/* Billing a job is a separate decision from doing it, and the
+                four supported customer processes disagree about when it
+                happens: straight to an invoice, or via a quote the customer
+                turns into a PO first. Both start here so the document is
+                linked to the work from the moment it exists. */}
+            {billingOn && isManager && (
+              <Button variant="secondary" onClick={() => setRaising("invoices")}>
+                <FileText className="h-4 w-4" /> {t("slJobs.createInvoice")}
+              </Button>
+            )}
+            {salesOn && isManager && (
+              <Button variant="secondary" onClick={() => setRaising("quotes")}>
+                <FileText className="h-4 w-4" /> {t("slJobs.createQuote")}
+              </Button>
+            )}
             <Badge tone="slate">{t(jobTypeKeys[job.job_type])}</Badge>
             <Badge tone={statusMeta.tone}>{t(statusMeta.labelKey)}</Badge>
           </>
         }
+      />
+
+      {/* One modal per target table; `raising` names which is open. The job's
+          customer and vehicle are prefilled and the link is written with the
+          document, so a document raised here can never lose the job. */}
+      <NewDocumentModal
+        open={raising === "invoices"}
+        onClose={() => setRaising(null)}
+        table="invoices"
+        routeBase="/sales/invoices"
+        title={t("slJobs.createInvoice")}
+        dateColumn="due_date"
+        dateLabel={t("sales.doc.dueDate")}
+        defaultDays="payment_terms_days"
+        purchaseOrder="number"
+        prefill={{
+          customer_id: job.customer_id ?? "",
+          vehicle_id: job.vehicle_id ?? "",
+        }}
+        extraPayload={{ job_id: job.id, certificate_id: jobCertificateId }}
+      />
+      <NewDocumentModal
+        open={raising === "quotes"}
+        onClose={() => setRaising(null)}
+        table="quotes"
+        routeBase="/sales/quotes"
+        title={t("slJobs.createQuote")}
+        dateColumn="valid_until"
+        dateLabel={t("sales.doc.validUntil")}
+        defaultDays="quote_valid_days"
+        prefill={{
+          customer_id: job.customer_id ?? "",
+          vehicle_id: job.vehicle_id ?? "",
+        }}
+        extraPayload={{ job_id: job.id, certificate_id: jobCertificateId }}
       />
 
       {actionError && (

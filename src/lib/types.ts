@@ -551,6 +551,22 @@ interface SalesDocument {
   updated_at: string;
 }
 
+/**
+ * What operational work a sales document bills for. Present on quotes, orders
+ * and invoices so the link survives the whole chain (the conversion RPCs copy
+ * it forward) and "which job produced this invoice" is answerable from either
+ * end.
+ *
+ * One job per document: in this domain a job is one vehicle and one
+ * certificate. A consolidated invoice spanning several jobs is a real case and
+ * is the reason this would become a link table, but it is not needed for the
+ * four supported flows.
+ */
+export interface SalesDocumentLinks {
+  job_id: string | null;
+  certificate_id: string | null;
+}
+
 /** Line shape shared by quote_lines / sales_order_lines / invoice_lines. */
 interface SalesDocumentLine {
   id: string;
@@ -576,7 +592,7 @@ interface SalesDocumentLine {
 export type QuoteStatus =
   | "draft" | "sent" | "accepted" | "declined" | "expired" | "canceled";
 
-export interface Quote extends SalesDocument {
+export interface Quote extends SalesDocument, SalesDocumentLinks {
   status: QuoteStatus;
   issue_date: string;
   valid_until: string | null;
@@ -598,8 +614,16 @@ export interface QuoteLine extends SalesDocumentLine {
 
 export type SalesOrderStatus = "draft" | "confirmed" | "fulfilled" | "closed" | "canceled";
 
-export interface SalesOrder extends SalesDocument {
+export interface SalesOrder extends SalesDocument, SalesDocumentLinks {
   quote_id: string | null;
+  /**
+   * The customer's own purchase order, as they issued it. Its presence is what
+   * makes this order a "PO received"; the scanned document is what an auditor
+   * asks for.
+   */
+  customer_po_number: string | null;
+  customer_po_date: string | null;
+  customer_po_url: string | null;
   status: SalesOrderStatus;
   order_date: string;
   expected_date: string | null;
@@ -617,8 +641,14 @@ export interface SalesOrderLine extends SalesDocumentLine {
 /** `void` is stored; "overdue" is derived from due_date + balance at render. */
 export type InvoiceStatus = "draft" | "issued" | "partially_paid" | "paid" | "void";
 
-export interface Invoice extends SalesDocument {
+export interface Invoice extends SalesDocument, SalesDocumentLinks {
   sales_order_id: string | null;
+  /**
+   * Snapshot of the PO this invoice was raised against — not joined through
+   * the order, because an issued invoice must keep printing it and a direct
+   * invoice has no order to join to.
+   */
+  customer_po_number: string | null;
   status: InvoiceStatus;
   issue_date: string;
   due_date: string | null;

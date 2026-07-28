@@ -89,6 +89,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
   isEditable,
   isDeletable,
   detailRows,
+  purchaseOrder,
   totalsExtra,
   panels,
   afterLines,
@@ -106,6 +107,8 @@ export function DocumentDetailShell<T extends ShellDocument>({
   dateColumn: "valid_until" | "expected_date" | "due_date";
   dateLabel: string;
   editTitle: string;
+  /** Which PO fields this document type captures; see DocumentFormFields. */
+  purchaseOrder?: "full" | "number";
   deleteTitle: string;
   deleteConfirm: (doc: T) => string;
   headerMeta?: (doc: T) => ReactNode;
@@ -322,6 +325,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
             table={table}
             dateColumn={dateColumn}
             dateLabel={dateLabel}
+            purchaseOrder={purchaseOrder}
             onDone={() => {
               setEditing(false);
               refresh();
@@ -345,17 +349,25 @@ export function DocumentDetailShell<T extends ShellDocument>({
   );
 }
 
+/** Reads an optional column the shared shape does not declare (quotes have no
+ *  PO columns at all, invoices only the number). */
+function docField(doc: unknown, column: string): string {
+  return (doc as Record<string, string | null | undefined>)[column] ?? "";
+}
+
 function EditDocumentForm<T extends ShellDocument>({
   doc,
   table,
   dateColumn,
   dateLabel,
+  purchaseOrder,
   onDone,
 }: {
   doc: T;
   table: TableName;
   dateColumn: "valid_until" | "expected_date" | "due_date";
   dateLabel: string;
+  purchaseOrder?: "full" | "number";
   onDone: () => void;
 }) {
   const t = useT();
@@ -366,6 +378,9 @@ function EditDocumentForm<T extends ShellDocument>({
     title: doc.title ?? "",
     customer_reference: doc.customer_reference ?? "",
     secondary_date: (doc as unknown as Record<string, string | null>)[dateColumn] ?? "",
+    customer_po_number: docField(doc, "customer_po_number"),
+    customer_po_date: docField(doc, "customer_po_date"),
+    customer_po_url: docField(doc, "customer_po_url"),
     terms: doc.terms ?? "",
     notes: doc.notes ?? "",
     internal_notes: doc.internal_notes ?? "",
@@ -377,7 +392,7 @@ function EditDocumentForm<T extends ShellDocument>({
   }
 
   const save = useMutation({
-    mutationFn: () => updateRow(table, doc.id, documentPayload(form, dateColumn)),
+    mutationFn: () => updateRow(table, doc.id, documentPayload(form, dateColumn, purchaseOrder)),
     onSuccess: onDone,
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.saveFailed")),
   });
@@ -391,7 +406,12 @@ function EditDocumentForm<T extends ShellDocument>({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      <DocumentFormFields form={form} set={set} secondaryDateLabel={dateLabel} />
+      <DocumentFormFields
+        form={form}
+        set={set}
+        secondaryDateLabel={dateLabel}
+        purchaseOrder={purchaseOrder}
+      />
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>
           {t("action.cancel")}
