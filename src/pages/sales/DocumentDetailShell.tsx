@@ -24,6 +24,7 @@ import {
   PageHeader,
   type BadgeTone,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import {
   BackLink,
   DocumentFormFields,
@@ -126,6 +127,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
   const { isManager } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
   const [editing, setEditing] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -166,6 +168,9 @@ export function DocumentDetailShell<T extends ShellDocument>({
     onSuccess: () => {
       setActionError("");
       refresh();
+      // Status transitions are the main thing that happens on these pages and
+      // they change nothing the eye catches — the badge is one word.
+      toast.success(t("toast.saved"));
     },
     onError: (err) =>
       setActionError(err instanceof Error ? err.message : t("sales.actionFailed")),
@@ -178,6 +183,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
       setConfirmDelete(false);
       onDeleted?.();
       navigate(routeBase);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("sales.deleteFailed"));

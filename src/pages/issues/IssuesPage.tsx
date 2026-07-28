@@ -5,12 +5,15 @@ import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import { issueStatus, priority } from "../../lib/labels";
+import { useVehiclePicker } from "../../lib/pickers";
 import type { Issue, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 
 type IssueRow = Issue & { vehicles: Pick<Vehicle, "name"> | null };
 
@@ -34,7 +37,7 @@ function RowAction({
   );
 }
 
-function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: () => void }) {
+function ReportIssueForm({ onDone }: { onDone: () => void }) {
   const t = useT();
   const qc = useQueryClient();
   const [form, setForm] = useState({
@@ -44,6 +47,8 @@ function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: ()
     priority: "normal",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -60,6 +65,7 @@ function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: ()
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["issues"] });
       onDone();
+      toast.success(t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("issues.saveFailed")),
   });
@@ -73,12 +79,14 @@ function ReportIssueForm({ vehicles, onDone }: { vehicles: Vehicle[]; onDone: ()
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <Field label={t("field.vehicle")} required>
-        <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-          <option value="">{t("issues.selectVehicle")}</option>
-          {vehicles.map((v) => (
-            <option key={v.id} value={v.id}>{v.name}</option>
-          ))}
-        </Select>
+        <Combobox
+          {...vehiclePicker}
+          value={form.vehicle_id}
+          onChange={(v) => set("vehicle_id", v)}
+          required
+          clearable={false}
+          placeholder={t("issues.selectVehicle")}
+        />
       </Field>
       <Field label={t("issues.fieldTitle")} required>
         <Input value={form.title} onChange={(e) => set("title", e.target.value)} required />
@@ -111,6 +119,7 @@ export default function IssuesPage() {
   const [reporting, setReporting] = useState(false);
   const [deleting, setDeleting] = useState<IssueRow | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   const { data: issues, isLoading, error } = useQuery({
     queryKey: ["issues"],
@@ -120,10 +129,7 @@ export default function IssuesPage() {
       ),
   });
 
-  const { data: vehicles } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
+  const vehicleFilterPicker = useVehiclePicker(vehicleId === "all" ? "" : vehicleId);
 
   const transition = useMutation({
     mutationFn: ({ id, values }: { id: string; values: Record<string, unknown> }) =>
@@ -131,6 +137,7 @@ export default function IssuesPage() {
     onSuccess: () => {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["issues"] });
+      toast.success(t("toast.saved"));
     },
     onError: (err) =>
       setActionError(err instanceof Error ? err.message : t("issues.updateFailed")),
@@ -172,6 +179,7 @@ export default function IssuesPage() {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["issues"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("issues.deleteFailed"));
@@ -212,12 +220,13 @@ export default function IssuesPage() {
             <option key={v} value={v}>{t(s.labelKey)}</option>
           ))}
         </Select>
-        <Select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} className="max-w-52">
-          <option value="all">{t("issues.allVehicles")}</option>
-          {vehicles?.map((v) => (
-            <option key={v.id} value={v.id}>{v.name}</option>
-          ))}
-        </Select>
+        <Combobox
+          {...vehicleFilterPicker}
+          value={vehicleId === "all" ? "" : vehicleId}
+          onChange={(v) => setVehicleId(v || "all")}
+          placeholder={t("issues.allVehicles")}
+          className="w-full max-w-52"
+        />
       </div>
 
       {isLoading && <LoadingState />}
@@ -332,7 +341,7 @@ export default function IssuesPage() {
       )}
 
       <Modal title={t("issues.report")} open={reporting} onClose={() => setReporting(false)} wide>
-        <ReportIssueForm vehicles={vehicles ?? []} onDone={() => setReporting(false)} />
+        <ReportIssueForm onDone={() => setReporting(false)} />
       </Modal>
 
       <Modal title={t("issues.deleteTitle")} open={!!deleting} onClose={() => setDeleting(null)}>

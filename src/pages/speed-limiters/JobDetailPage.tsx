@@ -32,6 +32,7 @@ import {
   Textarea,
   type BadgeTone,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 
 type JobDetail = SlJob & {
   vehicles: { name: string } | null;
@@ -250,6 +251,7 @@ function IssueCertificateForm({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const navigate = useNavigate();
   const [authority, setAuthority] = useState("");
   const [expiresAt, setExpiresAt] = useState(() =>
@@ -277,6 +279,7 @@ function IssueCertificateForm({
       setError("");
       setIssued(num);
       void qc.invalidateQueries({ queryKey: ["speed_limiter_certificates"] });
+      toast.success(t("slCertificates.toast.issued", { number: num }));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("slJobs.issueFailed")),
   });

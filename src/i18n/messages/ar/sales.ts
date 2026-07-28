@@ -326,6 +326,12 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.customer.noInvoices": "لا توجد فواتير لهذا العميل بعد.",
   "sales.customer.newQuote": "عرض سعر جديد",
 
+  // الإشعارات
+  "sales.toast.converted": "تم التحويل إلى أمر البيع {number}.",
+  "sales.toast.revised": "تم إنشاء المراجعة {number}.",
+  "sales.toast.invoiced": "تم إنشاء الفاتورة {number}.",
+  "sales.toast.paymentRecorded": "تم تسجيل الدفعة.",
+
   // رسائل الفشل المشتركة
   "sales.saveFailed": "تعذر الحفظ. يرجى المحاولة مرة أخرى.",
   "sales.deleteFailed": "تعذر الحذف. يرجى المحاولة مرة أخرى.",

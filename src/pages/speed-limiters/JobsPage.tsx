@@ -4,10 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, Pencil, Plus, Wrench } from "lucide-react";
 import { insertRow, listPage, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
+import {
+  useCustomerPicker,
+  useDevicePicker,
+  useTechnicianPicker,
+  useVehiclePicker,
+} from "../../lib/pickers";
 import type {
   SlChecklistItem,
-  Customer,
-  SlDevice,
   SlJob,
   SlJobStatus,
   SlJobType,
@@ -31,6 +35,8 @@ import {
   Textarea,
   type BadgeTone,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type JobRow = SlJob & {
@@ -71,25 +77,10 @@ const DEFAULT_CHECKLIST: SlChecklistItem[] = [
   { id: "docs", label: "Photos & documents captured", done: false },
 ];
 
-function NewJobForm({
-  customers,
-  vehicles,
-  devices,
-  technicians,
-  loadError,
-  vehiclesLoading,
-  onDone,
-}: {
-  customers: Customer[];
-  vehicles: Vehicle[];
-  devices: SlDevice[];
-  technicians: SlTechnician[];
-  loadError: Error | null;
-  vehiclesLoading: boolean;
-  onDone: () => void;
-}) {
+function NewJobForm({ onDone }: { onDone: () => void }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const [form, setForm] = useState({
     job_type: "installation" as SlJobType,
     customer_id: "",
@@ -104,11 +95,16 @@ function NewJobForm({
   const [error, setError] = useState("");
 
   const isInstallLike = form.job_type === "installation" || form.job_type === "replacement";
-  const vehicleOptions = form.customer_id
-    ? vehicles.filter((v) => v.customer_id === form.customer_id || v.customer_id === null)
-    : vehicles;
-  const deviceOptions = isInstallLike ? devices.filter((d) => d.status === "in_stock") : devices;
-  const activeTechnicians = technicians.filter((tech) => tech.active);
+
+  const customerPicker = useCustomerPicker(form.customer_id);
+  // Scoped to the customer once one is chosen, but a vehicle nobody owns yet is
+  // still offered: a walk-in truck is registered at the job, not before it.
+  const vehiclePicker = useVehiclePicker(form.vehicle_id, {
+    customerId: form.customer_id || null,
+    includeUnassigned: true,
+  });
+  const devicePicker = useDevicePicker(form.device_id, { inStockOnly: isInstallLike });
+  const technicianPicker = useTechnicianPicker(form.technician_id);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -117,29 +113,25 @@ function NewJobForm({
   function onTypeChange(value: string) {
     const type = value as SlJobType;
     const installLike = type === "installation" || type === "replacement";
-    setForm((f) => ({
-      ...f,
-      job_type: type,
-      set_speed_kmh:
-        type === "installation" && f.set_speed_kmh === "" ? "100" : f.set_speed_kmh,
-      device_id:
-        installLike &&
-        f.device_id &&
-        !devices.some((d) => d.id === f.device_id && d.status === "in_stock")
-          ? ""
-          : f.device_id,
-    }));
+    setForm((f) => {
+      const wasInstallLike = f.job_type === "installation" || f.job_type === "replacement";
+      return {
+        ...f,
+        job_type: type,
+        set_speed_kmh:
+          type === "installation" && f.set_speed_kmh === "" ? "100" : f.set_speed_kmh,
+        // Crossing into or out of install-like changes which devices are
+        // offered — in-stock only, or any — so a stale pick is dropped rather
+        // than left standing against a list it is no longer part of.
+        device_id: installLike === wasInstallLike ? f.device_id : "",
+      };
+    });
   }
 
   function onCustomerChange(value: string) {
-    setForm((f) => {
-      const keepVehicle =
-        !value ||
-        vehicles.some(
-          (v) => v.id === f.vehicle_id && (v.customer_id === value || v.customer_id === null),
-        );
-      return { ...f, customer_id: value, vehicle_id: keepVehicle ? f.vehicle_id : "" };
-    });
+    // The vehicle list is now scoped server-side, so a vehicle chosen for the
+    // previous customer is cleared instead of silently surviving the switch.
+    setForm((f) => ({ ...f, customer_id: value, vehicle_id: value ? "" : f.vehicle_id }));
   }
 
   const mutation = useMutation({
@@ -161,6 +153,7 @@ function NewJobForm({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["sl_jobs"] });
       onDone();
+      toast.success(t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("slJobs.saveFailed")),
   });
@@ -173,7 +166,6 @@ function NewJobForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {loadError && <ErrorState message={loadError.message} />}
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("slJobs.jobType")} required>
@@ -184,45 +176,45 @@ function NewJobForm({
           </Select>
         </Field>
         <Field label={t("slJobs.customer")}>
-          <Select value={form.customer_id} onChange={(e) => onCustomerChange(e.target.value)}>
-            <option value="">{t("slJobs.noCustomer")}</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...customerPicker}
+            value={form.customer_id}
+            onChange={onCustomerChange}
+            placeholder={t("slJobs.noCustomer")}
+          />
         </Field>
         <Field
           label={t("field.vehicle")}
           required
           hint={form.customer_id ? t("slJobs.vehicleFilterHint") : undefined}
         >
-          <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">{t("slJobs.selectVehicle")}</option>
-            {vehicleOptions.map((v) => (
-              <option key={v.id} value={v.id}>{v.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...vehiclePicker}
+            value={form.vehicle_id}
+            onChange={(v) => set("vehicle_id", v)}
+            required
+            clearable={false}
+            placeholder={t("slJobs.selectVehicle")}
+          />
         </Field>
         <Field
           label={t("slJobs.device")}
           hint={isInstallLike ? t("slJobs.deviceInStockHint") : undefined}
         >
-          <Select value={form.device_id} onChange={(e) => set("device_id", e.target.value)}>
-            <option value="">{t("slJobs.noDevice")}</option>
-            {deviceOptions.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.serial}{d.model ? ` · ${d.model}` : ""}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            {...devicePicker}
+            value={form.device_id}
+            onChange={(v) => set("device_id", v)}
+            placeholder={t("slJobs.noDevice")}
+          />
         </Field>
         <Field label={t("slJobs.technician")}>
-          <Select value={form.technician_id} onChange={(e) => set("technician_id", e.target.value)}>
-            <option value="">{t("slJobs.unassigned")}</option>
-            {activeTechnicians.map((tech) => (
-              <option key={tech.id} value={tech.id}>{tech.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...technicianPicker}
+            value={form.technician_id}
+            onChange={(v) => set("technician_id", v)}
+            placeholder={t("slJobs.unassigned")}
+          />
         </Field>
         <Field label={t("slJobs.scheduledDate")}>
           <Input
@@ -249,7 +241,7 @@ function NewJobForm({
       </Field>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
-        <Button type="submit" loading={mutation.isPending} disabled={vehiclesLoading}>
+        <Button type="submit" loading={mutation.isPending}>
           {t("slJobs.createJob")}
         </Button>
       </div>
@@ -468,24 +460,16 @@ export default function JobsPage() {
     queryFn: () => listRows<SlTechnician>("sl_technicians", (q) => q.order("name")),
   });
 
-  const { data: customers, error: customersError } = useQuery({
-    queryKey: ["customers"],
-    queryFn: () => listRows<Customer>("customers", (q) => q.order("name")),
-  });
-
-  const {
-    data: vehicles,
-    isLoading: vehiclesLoading,
-    error: vehiclesError,
-  } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
-
-  const { data: devices, error: devicesError } = useQuery({
-    queryKey: ["sl_devices", "picker"],
-    queryFn: () => listRows<SlDevice>("sl_devices", (q) => q.order("serial")),
-  });
+  // Customers, vehicles and devices used to be pulled in whole here to fill
+  // the form's dropdowns — 477 vehicles on every visit to this page. The
+  // pickers fetch what a search asks for instead.
+  const technicianFilterPicker = useTechnicianPicker(
+    technicianFilter === "all" ? "" : technicianFilter,
+    { activeOnly: false },
+  );
+  const customerFilterPicker = useCustomerPicker(
+    customerFilter === "all" ? "" : customerFilter,
+  );
 
   const hasFilters =
     typeFilter !== "all" ||
@@ -598,26 +582,22 @@ export default function JobsPage() {
             <option key={value} value={value}>{t(meta.labelKey)}</option>
           ))}
         </Select>
-        <Select
-          value={technicianFilter}
-          onChange={(e) => setFilter(setTechnicianFilter, e.target.value)}
-          className="max-w-44"
-        >
-          <option value="all">{t("slJobs.allTechnicians")}</option>
-          {technicians?.map((tech) => (
-            <option key={tech.id} value={tech.id}>{tech.name}</option>
-          ))}
-        </Select>
-        <Select
-          value={customerFilter}
-          onChange={(e) => setFilter(setCustomerFilter, e.target.value)}
-          className="max-w-44"
-        >
-          <option value="all">{t("slJobs.allCustomers")}</option>
-          {customers?.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </Select>
+        {/* "all" is the sentinel the query uses; the combobox speaks "" for
+            "nothing chosen", so the two are mapped at the boundary. */}
+        <Combobox
+          {...technicianFilterPicker}
+          value={technicianFilter === "all" ? "" : technicianFilter}
+          onChange={(v) => setFilter(setTechnicianFilter, v || "all")}
+          placeholder={t("slJobs.allTechnicians")}
+          className="w-full max-w-44"
+        />
+        <Combobox
+          {...customerFilterPicker}
+          value={customerFilter === "all" ? "" : customerFilter}
+          onChange={(v) => setFilter(setCustomerFilter, v || "all")}
+          placeholder={t("slJobs.allCustomers")}
+          className="w-full max-w-44"
+        />
       </div>
 
       {isLoading && <LoadingState />}
@@ -654,15 +634,7 @@ export default function JobsPage() {
       )}
 
       <Modal title={t("slJobs.newJob")} open={creating} onClose={() => setCreating(false)} wide>
-        <NewJobForm
-          customers={customers ?? []}
-          vehicles={vehicles ?? []}
-          devices={devices ?? []}
-          technicians={technicians ?? []}
-          loadError={customersError ?? vehiclesError ?? devicesError ?? techniciansError ?? null}
-          vehiclesLoading={vehiclesLoading}
-          onDone={() => setCreating(false)}
-        />
+        <NewJobForm onDone={() => setCreating(false)} />
       </Modal>
 
       <Modal

@@ -23,7 +23,7 @@
  * it needs itself. `renewCertificate` is exported separately so the list page's
  * bulk action runs the identical write without the chrome.
  */
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { insertRow, listRows, updateRow, wrapDbError } from "../../lib/db";
@@ -38,7 +38,9 @@ import type {
   Vehicle,
 } from "../../lib/types";
 import { useT } from "../../i18n";
-import { Button, ErrorState, Field, Input, LoadingState, Modal, Select } from "../../components/ui";
+import { Button, ErrorState, Field, Input, LoadingState, Modal } from "../../components/ui";
+import { Combobox, type ComboboxOption } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 
 /** The joined shape the renewal write needs: the certificate plus the vehicle's
  *  chassis/VIN (for a derived UIN) and the customer's name (for the summary).
@@ -191,6 +193,7 @@ function RenewForm({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const [form, setForm] = useState(() => ({
     issuing_authority: cert.issuing_authority ?? "",
     set_speed_kmh: cert.set_speed_kmh != null ? String(cert.set_speed_kmh) : "",
@@ -207,6 +210,18 @@ function RenewForm({
     ...defaultRenewalDates(validityMonths),
   }));
   const [error, setError] = useState("");
+
+  // A name carried over from the previous certificate that is no longer on the
+  // active roster still has to be offered, or reopening the dialog would blank
+  // a technician who did the work.
+  const technicianOptions = useMemo<ComboboxOption[]>(() => {
+    const out = technicians.map((tech) => ({ value: tech.name, label: tech.name }));
+    const carried = form.technician_name;
+    if (carried && !out.some((o) => o.value === carried)) {
+      out.unshift({ value: carried, label: carried });
+    }
+    return out;
+  }, [technicians, form.technician_name]);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -229,6 +244,9 @@ function RenewForm({
       void qc.invalidateQueries({ queryKey: ["sl_settings"] });
       onRenewed?.(created);
       onDone();
+      toast.success(
+        t("slCertificates.toast.renewed", { number: created.certificate_number }),
+      );
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("slCertificates.renewFailed")),
   });
@@ -287,24 +305,16 @@ function RenewForm({
           />
         </Field>
         <Field label={t("slCertificates.technician")} hint={t("slCertificates.technicianHint")}>
-          <Select
+          {/* Unlike the other pickers this one stores a NAME, not an id — the
+              certificate snapshots what was printed on it. The active roster is
+              short, so the combobox filters the options it is handed instead of
+              searching the server. */}
+          <Combobox
             value={form.technician_name}
-            onChange={(e) => set("technician_name", e.target.value)}
-          >
-            <option value="">{t("slCertificates.technicianNone")}</option>
-            {/* A name carried over from the previous certificate that is not on
-                the active list still needs to be selectable, or opening the
-                dialog would silently blank it. */}
-            {form.technician_name !== "" &&
-              !technicians.some((tech) => tech.name === form.technician_name) && (
-                <option value={form.technician_name}>{form.technician_name}</option>
-              )}
-            {technicians.map((tech) => (
-              <option key={tech.id} value={tech.name}>
-                {tech.name}
-              </option>
-            ))}
-          </Select>
+            onChange={(v) => set("technician_name", v)}
+            options={technicianOptions}
+            placeholder={t("slCertificates.technicianNone")}
+          />
         </Field>
         <Field label={t("slCertificates.issuedAt")} required>
           <Input

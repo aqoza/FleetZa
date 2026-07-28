@@ -19,11 +19,13 @@ import { formatDate, formatMoney } from "../../lib/format";
 import { useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Card, EmptyState, ErrorState, Field, LoadingState, Select, StatCard, Table,
+  Card, EmptyState, ErrorState, Field, LoadingState, StatCard, Table,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useCustomerPicker } from "../../lib/pickers";
 import { paymentMethods } from "../../lib/labels";
 import type { PaymentMethod } from "../../lib/types";
-import { SectionCard, useCustomers } from "./shared";
+import { SectionCard } from "./shared";
 
 interface PipelineRow {
   pending_quotes: number; pending_quote_value: number;
@@ -128,7 +130,7 @@ export default function ReportsPage() {
   // Payment history is the one report with a filter: "what has THIS customer
   // paid us" is the question asked when a balance is disputed.
   const [payerId, setPayerId] = useState("");
-  const customersQ = useCustomers();
+  const payerPicker = useCustomerPicker(payerId);
   const paymentsQ = useReport<PaymentRow>("sales_report_payments", {
     p_customer_id: payerId || null,
     p_limit: PAYMENT_ROWS,
@@ -375,14 +377,12 @@ export default function ReportsPage() {
         actions={
           <div className="w-56">
             <Field label="">
-              <Select value={payerId} onChange={(e) => setPayerId(e.target.value)}>
-                <option value="">{t("sales.reports.allCustomers")}</option>
-                {(customersQ.data ?? []).map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </Select>
+              <Combobox
+                {...payerPicker}
+                value={payerId}
+                onChange={setPayerId}
+                placeholder={t("sales.reports.allCustomers")}
+              />
             </Field>
           </div>
         }

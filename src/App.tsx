@@ -1,12 +1,13 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState, type ReactNode } from "react";
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useParams } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nProvider, useI18n } from "./i18n";
 import { ThemeProvider } from "./lib/theme";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ModulesProvider, useModules } from "./context/ModulesContext";
 import AppLayout from "./components/AppLayout";
 import { ModuleGate } from "./components/ModuleGate";
+import { ToastProvider, useToast } from "./components/Toast";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
 import AcceptInvitePage from "./pages/auth/AcceptInvitePage";
@@ -37,11 +38,32 @@ const PublicQuotePage = lazy(() => import("./pages/sales/PublicQuotePage"));
 const CustomersPage = lazy(() => import("./pages/customers/CustomersPage"));
 const CustomerDetailPage = lazy(() => import("./pages/customers/CustomerDetailPage"));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false },
-  },
-});
+/**
+ * The query client is built inside the tree so it can reach the toast API.
+ *
+ * Its one job beyond configuration: a mutation that does NOT handle its own
+ * error gets a toast. That is the whole site-wide safety net — it catches the
+ * silent failures without double-reporting on the forms that already render an
+ * inline <ErrorState>, because those declare an `onError` of their own.
+ */
+function QueryHost({ children }: { children: ReactNode }) {
+  const toast = useToast();
+  const [client] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: 1, staleTime: 30_000, refetchOnWindowFocus: false },
+        },
+        mutationCache: new MutationCache({
+          onError: (error, _vars, _ctx, mutation) => {
+            if (mutation.options.onError) return;
+            toast.error(error instanceof Error ? error : String(error));
+          },
+        }),
+      }),
+  );
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+}
 
 function Protected() {
   const { session, tenant, loading } = useAuth();
@@ -71,7 +93,10 @@ export default function App() {
   return (
     <I18nProvider>
       <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
+      {/* Above the router so the public quote and verify pages can report
+          failures too, and so a toast survives a route change. */}
+      <ToastProvider>
+      <QueryHost>
         <AuthProvider>
           <ModulesProvider>
           <BrowserRouter>
@@ -206,7 +231,8 @@ export default function App() {
           </BrowserRouter>
           </ModulesProvider>
         </AuthProvider>
-      </QueryClientProvider>
+      </QueryHost>
+      </ToastProvider>
       </ThemeProvider>
     </I18nProvider>
   );

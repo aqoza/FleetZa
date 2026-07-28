@@ -13,6 +13,7 @@ import {
   Button, ErrorState, Field, Input, LoadingState, Modal, Select, Textarea,
   type BadgeTone,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import { DocumentDetailShell, type ShellRenderArgs } from "./DocumentDetailShell";
 import { InfoRow, SectionCard } from "./shared";
 
@@ -218,6 +219,7 @@ function PaymentsList({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const [deleting, setDeleting] = useState<Payment | null>(null);
   const [failure, setFailure] = useState("");
 
@@ -228,6 +230,7 @@ function PaymentsList({
       void qc.invalidateQueries({ queryKey: ["payments", invoice.id] });
       setDeleting(null);
       onChanged();
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setFailure(err instanceof Error ? err.message : t("sales.deleteFailed"));
@@ -322,6 +325,7 @@ function PaymentModal({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const balance = balanceDue(invoice);
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState<Payment["method"]>("bank_transfer");
@@ -345,6 +349,7 @@ function PaymentModal({
       setError("");
       onSaved();
       onClose();
+      toast.success(t("sales.toast.paymentRecorded"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.saveFailed")),
   });
@@ -422,6 +427,7 @@ function VoidModal({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
 
@@ -438,6 +444,7 @@ function VoidModal({
       setError("");
       onSaved();
       onClose();
+      toast.success(t("toast.saved"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.actionFailed")),
   });

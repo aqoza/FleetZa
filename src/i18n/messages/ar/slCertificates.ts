@@ -66,6 +66,8 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.expiresAt": "تاريخ الانتهاء",
   "slCertificates.renewConfirm": "إصدار الشهادة",
   "slCertificates.renewFailed": "فشل التجديد",
+  "slCertificates.toast.issued": "تم إصدار الشهادة {number}.",
+  "slCertificates.toast.renewed": "تم التجديد بالشهادة {number}.",
   "slCertificates.renewLoadFailed": "تعذّر تحميل هذه الشهادة، لذا لا يمكن تجديدها.",
 
   // Bulk renew

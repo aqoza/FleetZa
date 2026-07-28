@@ -70,6 +70,13 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "action.signOut": "تسجيل الخروج",
   "action.openMenu": "فتح القائمة",
   "action.closeMenu": "إغلاق القائمة",
+  "action.clear": "مسح",
+
+  "combobox.refine": "تابع الكتابة لتضييق القائمة.",
+
+  "toast.saved": "تم حفظ التغييرات.",
+  "toast.created": "تم الإنشاء.",
+  "toast.deleted": "تم الحذف.",
 
   "common.loading": "جارٍ التحميل…",
   "common.loadingWorkspace": "جارٍ تحميل مساحة العمل…",

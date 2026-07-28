@@ -14,6 +14,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import { Button, ErrorState, Field, Modal, Textarea } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import { DocumentDetailShell, type ShellRenderArgs } from "./DocumentDetailShell";
 import { InfoRow, SectionCard } from "./shared";
 
@@ -24,6 +25,7 @@ export default function QuoteDetailPage() {
   const { isEnabled } = useModules();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
   const [declining, setDeclining] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [copied, setCopied] = useState(false);
@@ -39,6 +41,7 @@ export default function QuoteDetailPage() {
       void qc.invalidateQueries({ queryKey: ["sales_orders"] });
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
       navigate(`/sales/orders/${order.id}`);
+      toast.success(t("sales.toast.converted", { number: order.doc_number }));
     },
   });
 
@@ -51,6 +54,7 @@ export default function QuoteDetailPage() {
     onSuccess: (quote) => {
       void qc.invalidateQueries({ queryKey: ["quotes"] });
       navigate(`/sales/quotes/${quote.id}`);
+      toast.success(t("sales.toast.revised", { number: quote.doc_number }));
     },
   });
 
@@ -247,6 +251,7 @@ function DeclineModal({
 }) {
   const t = useT();
   const qc = useQueryClient();
+  const toast = useToast();
   const [error, setError] = useState("");
 
   const decline = useMutation({
@@ -262,6 +267,7 @@ function DeclineModal({
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
       setReason("");
       onClose();
+      toast.success(t("toast.saved"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.actionFailed")),
   });

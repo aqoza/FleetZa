@@ -6,12 +6,15 @@ import { getCountry } from "../../../shared/countries";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { daysUntil, formatDate, formatMoney } from "../../lib/format";
 import { renewalTypes } from "../../lib/labels";
+import { useVehiclePicker } from "../../lib/pickers";
 import type { Renewal, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 
 type RenewalRow = Renewal & { vehicles: Pick<Vehicle, "name"> | null };
 
@@ -37,15 +40,7 @@ function dueDateCell(r: RenewalRow, t: Translate) {
   return <span className="text-slate-600">{formatDate(r.due_date)}</span>;
 }
 
-function RenewalForm({
-  renewal,
-  vehicles,
-  onDone,
-}: {
-  renewal?: Renewal;
-  vehicles: Vehicle[];
-  onDone: () => void;
-}) {
+function RenewalForm({ renewal, onDone }: { renewal?: Renewal; onDone: () => void }) {
   const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
@@ -59,6 +54,8 @@ function RenewalForm({
     notes: renewal?.notes ?? "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -82,6 +79,7 @@ function RenewalForm({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["renewals"] });
       onDone();
+      toast.success(renewal ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("renewals.saveFailed")),
   });
@@ -96,12 +94,14 @@ function RenewalForm({
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("field.vehicle")} required>
-          <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">{t("renewals.selectVehicle")}</option>
-            {vehicles.map((v) => (
-              <option key={v.id} value={v.id}>{v.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...vehiclePicker}
+            value={form.vehicle_id}
+            onChange={(v) => set("vehicle_id", v)}
+            required
+            clearable={false}
+            placeholder={t("renewals.selectVehicle")}
+          />
         </Field>
         <Field label={t("renewals.type")}>
           <Select value={form.renewal_type} onChange={(e) => set("renewal_type", e.target.value)}>
@@ -148,13 +148,7 @@ function RenewalForm({
   );
 }
 
-function CountryDefaultsForm({
-  vehicles,
-  onDone,
-}: {
-  vehicles: Vehicle[];
-  onDone: () => void;
-}) {
+function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
   const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
@@ -162,6 +156,7 @@ function CountryDefaultsForm({
   const catalog = country.regulations.renewals;
   const notes = country.regulations.notes;
   const [vehicleId, setVehicleId] = useState("");
+  const vehiclePicker = useVehiclePicker(vehicleId);
   const [result, setResult] = useState<{ added: number } | null>(null);
   const [error, setError] = useState("");
 
@@ -208,19 +203,17 @@ function CountryDefaultsForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <Field label={t("field.vehicle")} required>
-        <Select
+        <Combobox
+          {...vehiclePicker}
           value={vehicleId}
-          onChange={(e) => {
-            setVehicleId(e.target.value);
+          onChange={(v) => {
+            setVehicleId(v);
             setResult(null);
           }}
           required
-        >
-          <option value="">{t("renewals.selectVehicle")}</option>
-          {vehicles.map((v) => (
-            <option key={v.id} value={v.id}>{v.name}</option>
-          ))}
-        </Select>
+          clearable={false}
+          placeholder={t("renewals.selectVehicle")}
+        />
       </Field>
       <div>
         <span className="mb-1 block text-sm font-medium text-slate-700">
@@ -271,6 +264,7 @@ export default function RenewalsPage() {
   const [editing, setEditing] = useState<RenewalRow | null>(null);
   const [deleting, setDeleting] = useState<RenewalRow | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   const { data: renewals, isLoading, error } = useQuery({
     queryKey: ["renewals"],
@@ -278,10 +272,9 @@ export default function RenewalsPage() {
       listRows<RenewalRow>("renewals", (q) => q.select("*, vehicles(name)").order("due_date")),
   });
 
-  const { data: vehicles } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
+  const vehicleFilterPicker = useVehiclePicker(
+    vehicleFilter === "all" ? "" : vehicleFilter,
+  );
 
   const complete = useMutation({
     mutationFn: async (r: RenewalRow) => {
@@ -320,6 +313,7 @@ export default function RenewalsPage() {
     onSuccess: () => {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["renewals"] });
+      toast.success(t("toast.saved"));
     },
     onError: (err) =>
       setActionError(err instanceof Error ? err.message : t("renewals.completeFailed")),
@@ -331,6 +325,7 @@ export default function RenewalsPage() {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["renewals"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("renewals.deleteFailed"));
@@ -374,12 +369,13 @@ export default function RenewalsPage() {
           <option value="completed">{t("renewals.statusCompleted")}</option>
           <option value="all">{t("common.all")}</option>
         </Select>
-        <Select value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value)} className="max-w-44">
-          <option value="all">{t("renewals.allVehicles")}</option>
-          {vehicles?.map((v) => (
-            <option key={v.id} value={v.id}>{v.name}</option>
-          ))}
-        </Select>
+        <Combobox
+          {...vehicleFilterPicker}
+          value={vehicleFilter === "all" ? "" : vehicleFilter}
+          onChange={(v) => setVehicleFilter(v || "all")}
+          placeholder={t("renewals.allVehicles")}
+          className="w-full max-w-44"
+        />
       </div>
 
       {isLoading && <LoadingState />}
@@ -487,7 +483,7 @@ export default function RenewalsPage() {
       )}
 
       <Modal title={t("renewals.addRenewal")} open={adding} onClose={() => setAdding(false)} wide>
-        <RenewalForm vehicles={vehicles ?? []} onDone={() => setAdding(false)} />
+        <RenewalForm onDone={() => setAdding(false)} />
       </Modal>
 
       <Modal
@@ -496,14 +492,13 @@ export default function RenewalsPage() {
         onClose={() => setAddingDefaults(false)}
       >
         <CountryDefaultsForm
-          vehicles={vehicles ?? []}
           onDone={() => setAddingDefaults(false)}
         />
       </Modal>
 
       <Modal title={t("renewals.editRenewal")} open={!!editing} onClose={() => setEditing(null)} wide>
         {editing && (
-          <RenewalForm renewal={editing} vehicles={vehicles ?? []} onDone={() => setEditing(null)} />
+          <RenewalForm renewal={editing} onDone={() => setEditing(null)} />
         )}
       </Modal>
 

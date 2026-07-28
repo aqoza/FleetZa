@@ -62,6 +62,9 @@ export const enSlCertificates = {
   "slCertificates.expiresAt": "Expiry date",
   "slCertificates.renewConfirm": "Issue certificate",
   "slCertificates.renewFailed": "Renewal failed",
+  // Toasts — the new certificate number is what gets printed and filed.
+  "slCertificates.toast.issued": "Certificate {number} issued.",
+  "slCertificates.toast.renewed": "Renewed as certificate {number}.",
   "slCertificates.renewLoadFailed": "This certificate could not be loaded, so it cannot be renewed.",
 
   // Bulk renew — one customer, several vehicles, one operation

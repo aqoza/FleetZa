@@ -121,6 +121,20 @@ System stack (`--font-sans`); no webfont (Arabic glyph coverage comes from the O
 | `Table` | Small embedded lists inside cards/detail pages only. |
 | `Modal` | Create/quick-edit only; entities with detail routes navigate instead. |
 | `EmptyState / LoadingState / ErrorState` | Every list renders all three paths. |
+| `Combobox` (`components/Combobox.tsx`) | **Every reference picker.** A native `<Select>` is only for fixed enums (status, priority, unit) — anything backed by a table, and any fixed list past ~20 entries (country, timezone), uses the combobox. Feed it a picker hook from `lib/pickers.ts` so the search runs on the server; pass plain `options` (no `onSearch`) only when the caller already holds the whole list. |
+| `Toast` (`components/Toast.tsx`) | Outcome of an action the user has moved on from. `useToast().success(…)` after a mutation that changes something off-screen; errors come free from the global net (below). A field-level problem stays inline next to the field. |
+
+**Pickers.** `PICKER_LIMIT`-style capped `<Select>`s are a bug, not a style: a page of
+200 rows silently hides row 201, and this tenant has 482 vehicles. Add a hook to
+`src/lib/pickers.ts` rather than a bespoke query — it debounces, searches the columns a
+human would type (plate, serial, CR number), and merges the *selected* row in by id so an
+old document never shows an empty box over a good foreign key.
+
+**Toasts.** `ToastProvider` wraps the app in `App.tsx`; the `QueryHost` there toasts any
+mutation error whose mutation declares no `onError` of its own. That is the site-wide
+safety net for silent failures — it deliberately stays quiet for forms that already render
+an inline `<ErrorState>`. Successes are never global: they are added per action, because
+"Invoice INV-0042 created" is worth showing and "Saved" usually is not.
 
 ## 5. Charts (the dataviz contract)
 
@@ -168,7 +182,8 @@ parallax, no attention-seeking loops.
 
 Before a page ships: uses `PageHeader` · cards/tables from primitives · tokens only (no
 raw `bg-white`/`text-slate-*`/`border-slate-*` in new code) · lists use
-`listPage` + `Pagination` + server-side filters · loading/empty/error paths ·
+`listPage` + `Pagination` + server-side filters · reference dropdowns use `Combobox` +
+a `lib/pickers.ts` hook (never a capped `<Select>`) · loading/empty/error paths ·
 role-gated actions · en+ar · RTL-safe · charts per §5 · numbers `tabular-nums`.
 
 > Migration note: pages written before this system still carry raw slate classes; they

@@ -80,14 +80,9 @@ export const arCustomers: Record<keyof typeof enCustomers, string> = {
   "customers.fleetNumber": "رقم الأسطول",
   "customers.chassisNumber": "رقم الهيكل",
   "customers.noVehicles": "لا توجد مركبات مرتبطة بعد.",
-  "customers.selectVehicle": "اختر مركبة…",
-  "customers.noUnassignedVehicles": "لا توجد مركبات غير مرتبطة متاحة.",
-  "customers.noUnassignedMatches": "لا توجد مركبة غير مرتبطة مطابقة لهذا البحث.",
   "customers.attach": "ربط",
   "customers.attachExistingLabel": "مركبة قائمة غير مرتبطة",
   "customers.attachSearchPlaceholder": "الاسم أو اللوحة أو رقم الأسطول أو الهيكل أو VIN…",
-  "customers.attachNarrowHint":
-    "يتم عرض أول {count} من {total} مركبة غير مرتبطة — استخدم البحث لتضييق القائمة.",
   "customers.createVehicleHint":
     "هل تحتاج إلى مركبة جديدة؟ أنشئها في صفحة المركبات أولًا ثم اربطها هنا.",
   "customers.goToVehicles": "الانتقال إلى المركبات",

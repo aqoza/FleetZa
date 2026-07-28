@@ -9,13 +9,16 @@ import {
   daysUntil, displayToKm, formatDate, formatDistance, formatMoney, kmToDisplay,
 } from "../../lib/format";
 import { priority, workOrderStatus } from "../../lib/labels";
-import type { ServiceReminder, Vehicle, WorkOrder } from "../../lib/types";
+import { useVehiclePicker } from "../../lib/pickers";
+import type { ServiceReminder, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Table, Textarea,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 import { useT, type MessageKey } from "../../i18n";
 
 const PAGE_SIZE = 25;
@@ -48,11 +51,6 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
   const qc = useQueryClient();
   const unit = tenant.distance_unit;
 
-  const { data: vehicles } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
-
   const [form, setForm] = useState({
     vehicle_id: reminder?.vehicle_id ?? "",
     task: reminder?.task ?? "",
@@ -67,6 +65,8 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
       reminder?.due_km != null ? String(Math.round(kmToDisplay(reminder.due_km, unit))) : "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -94,6 +94,7 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
+      toast.success(reminder ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("maintenance.saveFailed")),
   });
@@ -108,12 +109,14 @@ function ReminderForm({ reminder, onDone }: { reminder?: ServiceReminder; onDone
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("field.vehicle")} required>
-          <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">{t("maintenance.selectVehicle")}</option>
-            {vehicles?.map((v) => (
-              <option key={v.id} value={v.id}>{v.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...vehiclePicker}
+            value={form.vehicle_id}
+            onChange={(v) => set("vehicle_id", v)}
+            required
+            clearable={false}
+            placeholder={t("maintenance.selectVehicle")}
+          />
         </Field>
         <Field label={t("maintenance.task")} required>
           <Input
@@ -182,6 +185,7 @@ function RemindersTab({
   const [editing, setEditing] = useState<ReminderRow | null>(null);
   const [deleting, setDeleting] = useState<ReminderRow | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   const { data: reminders, isLoading, error } = useQuery({
     queryKey: ["service_reminders"],
@@ -212,6 +216,7 @@ function RemindersTab({
     onSuccess: () => {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
+      toast.success(t("toast.saved"));
     },
     onError: (err) => setActionError(err instanceof Error ? err.message : t("maintenance.updateFailed")),
   });
@@ -222,6 +227,7 @@ function RemindersTab({
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => setActionError(err instanceof Error ? err.message : t("maintenance.deleteFailed")),
   });
@@ -399,11 +405,6 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
   const unit = tenant.distance_unit;
 
-  const { data: vehicles } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
-
   const [form, setForm] = useState({
     vehicle_id: "",
     title: "",
@@ -414,6 +415,8 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
     odometer: "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -437,6 +440,7 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
+      toast.success(t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("maintenance.saveFailed")),
   });
@@ -459,12 +463,14 @@ function WorkOrderForm({ onDone }: { onDone: () => void }) {
       </Field>
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("field.vehicle")} required>
-          <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)} required>
-            <option value="">{t("maintenance.selectVehicle")}</option>
-            {vehicles?.map((v) => (
-              <option key={v.id} value={v.id}>{v.name}</option>
-            ))}
-          </Select>
+          <Combobox
+            {...vehiclePicker}
+            value={form.vehicle_id}
+            onChange={(v) => set("vehicle_id", v)}
+            required
+            clearable={false}
+            placeholder={t("maintenance.selectVehicle")}
+          />
         </Field>
         <Field label={t("field.priority")}>
           <Select value={form.priority} onChange={(e) => set("priority", e.target.value)}>
