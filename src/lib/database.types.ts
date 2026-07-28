@@ -3195,6 +3195,65 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      sales_report_jobs_pending_invoice: {
+        Args: never
+        Returns: {
+          completed_at: string
+          customer_id: string
+          customer_name: string
+          job_id: string
+          job_number: number
+          job_type: string
+          status: string
+          vehicle_name: string
+        }[]
+      }
+      sales_report_pipeline: {
+        Args: never
+        Returns: {
+          accepted_quote_value: number
+          accepted_quotes: number
+          declined_quotes: number
+          invoiced_value: number
+          invoices_generated: number
+          jobs_pending_invoice: number
+          outstanding_amount: number
+          overdue_amount: number
+          overdue_invoices: number
+          paid_invoices: number
+          paid_value: number
+          partially_paid_invoices: number
+          partially_paid_outstanding: number
+          pending_quote_value: number
+          pending_quotes: number
+          pos_received: number
+          pos_received_value: number
+        }[]
+      }
+      sales_report_receivables: {
+        Args: never
+        Returns: {
+          customer_id: string
+          customer_name: string
+          not_yet_due: number
+          oldest_due_date: string
+          open_invoices: number
+          outstanding: number
+          overdue_1_30: number
+          overdue_31_60: number
+          overdue_61_90: number
+          overdue_90_plus: number
+        }[]
+      }
+      sales_report_revenue: {
+        Args: { p_months?: number }
+        Returns: {
+          collected: number
+          invoice_count: number
+          invoiced: number
+          month: string
+        }[]
+      }
       sales_summary: {
         Args: never
         Returns: {

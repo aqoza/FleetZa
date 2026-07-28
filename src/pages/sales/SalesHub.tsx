@@ -20,6 +20,7 @@ const InvoicesPage = lazy(() => import("./InvoicesPage"));
 const InvoiceDetailPage = lazy(() => import("./InvoiceDetailPage"));
 const CatalogPage = lazy(() => import("./CatalogPage"));
 const SalesSettingsPage = lazy(() => import("./SalesSettingsPage"));
+const ReportsPage = lazy(() => import("./ReportsPage"));
 const DocumentPrintPage = lazy(() => import("./DocumentPrintPage"));
 
 const TABS: Array<{
@@ -32,6 +33,8 @@ const TABS: Array<{
   { to: "/sales/quotes", labelKey: "sales.tab.quotes" },
   { to: "/sales/orders", labelKey: "sales.tab.orders" },
   { to: "/sales/invoices", labelKey: "sales.tab.invoices", billingOnly: true },
+  // Reporting is about money owed and collected, so it follows billing.
+  { to: "/sales/reports", labelKey: "sales.tab.reports", billingOnly: true },
   { to: "/sales/catalog", labelKey: "sales.tab.catalog" },
   { to: "/sales/settings", labelKey: "sales.tab.settings" },
 ];
@@ -94,6 +97,14 @@ export default function SalesHub() {
             element={
               <ModuleGate module="billing">
                 <DocumentPrintPage kind="invoice" />
+              </ModuleGate>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <ModuleGate module="billing">
+                <ReportsPage />
               </ModuleGate>
             }
           />

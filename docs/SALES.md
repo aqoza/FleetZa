@@ -182,6 +182,41 @@ token, whitelisted fields only.
 KPI tiles never pull document tables into the browser — `sales_summary()` is one
 RLS-scoped row computed in SQL.
 
+## Reporting
+
+`/sales/reports` (billing-gated). Four RLS-scoped SQL functions, same posture
+as `sales_summary()` — the browser never pulls the document tables down to add
+them up:
+
+| Function | Answers |
+|---|---|
+| `sales_report_pipeline()` | One row of counts + values: pending / approved / rejected quotations, POs received, jobs pending invoice, invoices generated, partially paid, fully paid, outstanding, overdue |
+| `sales_report_receivables()` | Per customer: open invoices, outstanding, and the aging buckets |
+| `sales_report_revenue(p_months)` | Per month: invoiced, collected, invoice count |
+| `sales_report_jobs_pending_invoice()` | The list behind the pending-invoice count, so it can be acted on |
+
+Four rather than thirteen, because most of the requested reports are different
+readings of the same two questions — where a document is in its lifecycle, and
+who owes what — and thirteen functions would be thirteen chances for the
+definitions to drift. **Invoice aging and outstanding-balance-by-customer are
+the same query**: the page sums the receivable columns for the aging totals
+rather than asking twice, so the two can never disagree about what "31–60
+days" means.
+
+Definitions worth knowing, since they are judgement calls:
+
+- **Aging is measured from the due date**, not the issue date. An invoice on
+  60-day terms issued 45 days ago is not overdue.
+- **Pending quotations include sent-but-lapsed ones.** `expired` is derived at
+  render from `valid_until`, and a lapsed quote is still work someone has to
+  chase, not a closed case.
+- **Drafts and voids are excluded** from every money figure: a draft is not an
+  invoice yet, and a void never happened.
+- **A "PO received"** is a non-canceled order carrying `customer_po_number`.
+- **"Jobs pending invoice"** matches on `invoices.job_id`, which the whole
+  chain carries — so a job billed through a quote and an order still counts as
+  billed.
+
 ## Known gaps
 
 Deliberately out of scope for this wave, in rough priority order:
@@ -193,10 +228,12 @@ Deliberately out of scope for this wave, in rough priority order:
 - **No partial invoicing of an order** — the next stage. `create_invoice_from_order`
   copies every line, so "several invoices against one PO" is not possible yet;
   `invoiced_total` already tracks the running sum, so it stays an additive change.
-- **Reporting is still the Stage-1 set.** Invoice aging (30/60/90), outstanding
-  balance by customer, customer payment history, jobs pending invoice, POs
-  received and revenue reports are designed but not built; the columns they
-  need (`job_id`, `customer_po_number`, `amount_paid`, `due_date`) now exist.
+- **No customer payment-history report yet.** Payments are visible per invoice;
+  a per-customer ledger across invoices is the one report from the Stage-3 list
+  still outstanding.
+- **The reports are read-only and unpaged.** Receivables and revenue are
+  naturally bounded (one row per customer, per month); the jobs-pending-invoice
+  list is capped at 50 rows in the UI with the true total shown beside it.
 - **Native `<select>` pickers** capped at 200 rows for customers, vehicles and
   catalog items — they inherit the platform-wide async-combobox debt
   (ARCHITECTURE_REVIEW §7.6), not a new one.
