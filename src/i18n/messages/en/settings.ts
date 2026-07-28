@@ -58,8 +58,12 @@ export const enSettings = {
   "settings.signatureUrl": "Signature image URL",
   "settings.stampUrl": "Stamp image URL",
   "settings.markUrlHint":
-    "Optional https:// or data:image link. Printed in the closing strip; leave empty to sign and stamp by hand.",
+    "Upload an image, or paste an https:// link if it's hosted elsewhere. Printed in the closing strip; leave empty to sign and stamp by hand.",
   "settings.markUrlInvalid": "Enter an https:// or data:image link.",
+  "settings.markUrlPlaceholder": "https://… or upload above",
+  "settings.uploadMark": "Upload",
+  "settings.markUploadInvalidType": "Choose an image file.",
+  "settings.markUploadFailed": "Couldn't read that image — try a different file.",
   "settings.signatoryName": "Authorized signatory",
   "settings.signatoryNameHint":
     "Printed under the signature, below “For <trade name>”. Leave empty to print the signature alone.",

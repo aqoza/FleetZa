@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Mail, Plus, Users } from "lucide-react";
+import { ImageOff, Mail, Plus, Upload, Users } from "lucide-react";
 import {
   COUNTRIES,
   getCountry,
@@ -68,6 +68,153 @@ const roleTone: Record<Role, BadgeTone> = {
   manager: "green",
   viewer: "slate",
 };
+
+// --- Signature / stamp upload ---
+
+/**
+ * A signature or stamp never prints larger than 84px tall on the certificate
+ * (CertificatePrintPage.tsx), so a photo straight off a phone is far more
+ * data than the document needs — this downscales to a generous retina cap
+ * and re-encodes as PNG (keeping any transparency) before it ever becomes a
+ * `data:` URL. The browser does the encoding; nothing here hand-builds or
+ * retypes the resulting base64.
+ */
+const MARK_MAX_DIMENSION = 320;
+
+function downscaleImageToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error ?? new Error("read failed"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("decode failed"));
+      img.onload = () => {
+        const scale = Math.min(1, MARK_MAX_DIMENSION / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("no 2d context"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * The signature/stamp field: a preview, an upload button that reads a local
+ * file through the browser's own canvas (see downscaleImageToDataUrl above),
+ * and the original paste-a-link input for a tenant that hosts the mark
+ * elsewhere. Either path lands in the same `data:`/`https:` string the save
+ * mutation already sends.
+ */
+function MarkUploadField({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const t = useT();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  async function handleFile(file: File) {
+    setUploadError("");
+    if (!file.type.startsWith("image/")) {
+      setUploadError(t("settings.markUploadInvalidType"));
+      return;
+    }
+    setBusy(true);
+    try {
+      onChange(await downscaleImageToDataUrl(file));
+    } catch {
+      setUploadError(t("settings.markUploadFailed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Field label={label} hint={hint} error={uploadError}>
+      {/* Field wraps children in a bare <label>: with no `for`, a click
+          anywhere inside — the Remove button, the text input — forwards to
+          the first labelable descendant, which would be the hidden file
+          input, popping a file picker on an unrelated click. One
+          stopPropagation here keeps every control's own handler as the only
+          thing that runs. */}
+      <div className="flex items-start gap-3" onClick={(e) => e.stopPropagation()}>
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-line bg-canvas">
+          {value ? (
+            <img src={value} alt="" className="max-h-full max-w-full object-contain" />
+          ) : (
+            <ImageOff className="h-5 w-5 text-ink-3" aria-hidden />
+          )}
+        </div>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="flex flex-wrap gap-1.5">
+            <Button
+              type="button"
+              variant="secondary"
+              className="px-2.5 py-1.5 text-xs"
+              loading={busy}
+              onClick={(e) => {
+                e.preventDefault();
+                fileInput.current?.click();
+              }}
+            >
+              <Upload className="h-3.5 w-3.5" /> {t("settings.uploadMark")}
+            </Button>
+            {value && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="px-2.5 py-1.5 text-xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onChange("");
+                }}
+              >
+                {t("action.remove")}
+              </Button>
+            )}
+          </div>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = "";
+              if (file) void handleFile(file);
+            }}
+          />
+          <Input
+            dir="ltr"
+            placeholder={t("settings.markUrlPlaceholder")}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="text-xs"
+          />
+        </div>
+      </div>
+    </Field>
+  );
+}
 
 // --- Organization tab ---
 
@@ -420,20 +567,18 @@ function OrganizationTab() {
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("settings.signatureUrl")} hint={t("settings.markUrlHint")}>
-                <Input
-                  dir="ltr"
-                  value={form.signature_url}
-                  onChange={(e) => set("signature_url", e.target.value)}
-                />
-              </Field>
-              <Field label={t("settings.stampUrl")} hint={t("settings.markUrlHint")}>
-                <Input
-                  dir="ltr"
-                  value={form.stamp_url}
-                  onChange={(e) => set("stamp_url", e.target.value)}
-                />
-              </Field>
+              <MarkUploadField
+                label={t("settings.signatureUrl")}
+                hint={t("settings.markUrlHint")}
+                value={form.signature_url}
+                onChange={(value) => set("signature_url", value)}
+              />
+              <MarkUploadField
+                label={t("settings.stampUrl")}
+                hint={t("settings.markUrlHint")}
+                value={form.stamp_url}
+                onChange={(value) => set("stamp_url", value)}
+              />
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

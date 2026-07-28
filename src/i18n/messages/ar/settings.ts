@@ -63,8 +63,12 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.signatureUrl": "رابط صورة التوقيع",
   "settings.stampUrl": "رابط صورة الختم",
   "settings.markUrlHint":
-    "اختياري: رابط https:// أو data:image. يُطبع في شريط الاعتماد؛ اتركه فارغًا للتوقيع والختم يدويًا.",
+    "ارفع صورة، أو الصق رابط https:// إذا كانت مستضافة في مكان آخر. تُطبع في شريط الاعتماد؛ اتركه فارغًا للتوقيع والختم يدويًا.",
   "settings.markUrlInvalid": "أدخل رابط https:// أو data:image.",
+  "settings.markUrlPlaceholder": "‏https:// أو ارفع صورة أعلاه",
+  "settings.uploadMark": "رفع",
+  "settings.markUploadInvalidType": "اختر ملف صورة.",
+  "settings.markUploadFailed": "تعذّرت قراءة هذه الصورة — جرّب ملفًا آخر.",
   "settings.signatoryName": "المفوَّض بالتوقيع",
   "settings.signatoryNameHint":
     "يُطبع أسفل التوقيع، تحت عبارة «عن <الاسم التجاري>». اتركه فارغًا لطباعة التوقيع وحده.",
