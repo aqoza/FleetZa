@@ -10,6 +10,7 @@ import { apiFetch } from "../../lib/api";
 import type { TenantArchetype } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, Select } from "../../components/ui";
+import { Combobox, type ComboboxOption } from "../../components/Combobox";
 import { useT } from "../../i18n";
 import { AuthShell } from "./AuthShell";
 
@@ -52,10 +53,28 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const timezones = useMemo(() => {
+  const timezoneOptions = useMemo<ComboboxOption[]>(() => {
     const list = browserTimezones();
-    return list.includes(form.timezone) ? list : [form.timezone, ...list];
+    const all = list.includes(form.timezone) ? list : [form.timezone, ...list];
+    return all.map((tz) => ({ value: tz, label: tz }));
   }, [form.timezone]);
+
+  const countryOptions = useMemo<ComboboxOption[]>(
+    () => [
+      ...MIDDLE_EAST_OPTIONS.map((c) => ({
+        value: c.code, label: c.name, meta: t("auth.middleEast"),
+      })),
+      ...OTHER_OPTIONS.map((c) => ({
+        value: c.code, label: c.name, meta: t("auth.otherCountries"),
+      })),
+    ],
+    [t],
+  );
+
+  const currencyOptions = useMemo<ComboboxOption[]>(
+    () => CURRENCIES.map((c) => ({ value: c, label: c })),
+    [],
+  );
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -192,40 +211,35 @@ export default function SignupPage() {
                 : undefined
             }
           >
-            <Select value={form.country} onChange={(e) => pickCountry(e.target.value)}>
-              <optgroup label={t("auth.middleEast")}>
-                {MIDDLE_EAST_OPTIONS.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label={t("auth.otherCountries")}>
-                {OTHER_OPTIONS.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name}
-                  </option>
-                ))}
-              </optgroup>
-            </Select>
+            {/* Two hundred countries and four hundred timezones are the two
+                lists nobody can scroll. The combobox filters what it is handed,
+                so these stay client-side — the optgroup split survives as the
+                row's trailing label. */}
+            <Combobox
+              value={form.country}
+              onChange={pickCountry}
+              options={countryOptions}
+              clearable={false}
+              required
+            />
           </Field>
           <Field label={t("auth.currency")} required>
-            <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
-              {CURRENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </Select>
+            <Combobox
+              value={form.currency}
+              onChange={(v) => set("currency", v)}
+              options={currencyOptions}
+              clearable={false}
+              required
+            />
           </Field>
           <Field label={t("auth.timezone")} required>
-            <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
-              {timezones.map((tz) => (
-                <option key={tz} value={tz}>
-                  {tz}
-                </option>
-              ))}
-            </Select>
+            <Combobox
+              value={form.timezone}
+              onChange={(v) => set("timezone", v)}
+              options={timezoneOptions}
+              clearable={false}
+              required
+            />
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label={t("auth.distance")}>

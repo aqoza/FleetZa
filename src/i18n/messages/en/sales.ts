@@ -328,6 +328,13 @@ export const enSales = {
   "sales.customer.noInvoices": "No invoices for this customer yet.",
   "sales.customer.newQuote": "New quote",
 
+  // Toasts. The document number is the point of each one — it is what the
+  // user writes down or searches for next.
+  "sales.toast.converted": "Converted to order {number}.",
+  "sales.toast.revised": "Revision {number} created.",
+  "sales.toast.invoiced": "Invoice {number} created.",
+  "sales.toast.paymentRecorded": "Payment recorded.",
+
   // Shared failures
   "sales.saveFailed": "Couldn't save. Please try again.",
   "sales.deleteFailed": "Couldn't delete. Please try again.",

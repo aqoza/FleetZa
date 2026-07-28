@@ -7,6 +7,7 @@ import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDistance, formatMoney } from "../../lib/format";
 import { certificateStatusMeta } from "../../lib/certificateStatus";
 import { fuelTypes, vehicleStatus, vehicleTypes, workOrderStatus, issueStatus } from "../../lib/labels";
+import { useDriverPicker } from "../../lib/pickers";
 import type {
   Customer, Driver, FuelLog, Issue, SlJob, SlJobStatus, SlJobType,
   SpeedLimiterCertificate, SpeedLimiterInstallation, Vehicle, VehicleAssignment, WorkOrder,
@@ -15,9 +16,10 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
-  Badge, Button, Card, ErrorState, Field, LoadingState, Modal, PageHeader, Select,
+  Badge, Button, Card, ErrorState, Field, LoadingState, Modal, PageHeader,
   type BadgeTone,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
 import { VehicleForm } from "./VehicleForm";
 import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
 
@@ -87,10 +89,7 @@ export default function VehicleDetailPage() {
     },
   });
 
-  const { data: drivers } = useQuery({
-    queryKey: ["drivers"],
-    queryFn: () => listRows<Driver>("drivers", (q) => q.eq("status", "active").order("first_name")),
-  });
+  const driverPicker = useDriverPicker(selectedDriver, { activeOnly: true });
 
   const { data: recentFuel } = useQuery({
     queryKey: ["fuel_logs", "vehicle", id],
@@ -597,14 +596,12 @@ export default function VehicleDetailPage() {
       <Modal title={t("vehicles.assignDriver")} open={assigning} onClose={() => setAssigning(false)}>
         <div className="space-y-4">
           <Field label={t("field.driver")} hint={t("vehicles.unassignHint")}>
-            <Select value={selectedDriver} onChange={(e) => setSelectedDriver(e.target.value)}>
-              <option value="">{t("vehicles.unassigned")}</option>
-              {drivers?.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.first_name} {d.last_name}
-                </option>
-              ))}
-            </Select>
+            <Combobox
+              {...driverPicker}
+              value={selectedDriver}
+              onChange={setSelectedDriver}
+              placeholder={t("vehicles.unassigned")}
+            />
           </Field>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setAssigning(false)}>{t("action.cancel")}</Button>

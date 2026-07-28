@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Fuel, Plus, Trash2 } from "lucide-react";
-import { deleteRow, insertRow, listPage, listRows, wrapDbError } from "../../lib/db";
+import { deleteRow, insertRow, listPage, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import {
   computeEfficiency,
@@ -14,12 +14,15 @@ import {
   formatVolume,
   litersToDisplay,
 } from "../../lib/format";
-import type { Driver, FuelLog, Vehicle } from "../../lib/types";
+import { useDriverPicker, useVehiclePicker } from "../../lib/pickers";
+import type { FuelLog } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Textarea,
+  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Textarea,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 type FuelLogRow = FuelLog & { vehicles: { name: string } | null };
@@ -33,15 +36,7 @@ function nowForInput(): string {
   return d.toISOString().slice(0, 16);
 }
 
-function FuelForm({
-  vehicles,
-  drivers,
-  onDone,
-}: {
-  vehicles: Vehicle[];
-  drivers: Driver[];
-  onDone: () => void;
-}) {
+function FuelForm({ onDone }: { onDone: () => void }) {
   const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
@@ -56,6 +51,9 @@ function FuelForm({
     vendor: "",
     notes: "",
   });
+  const toast = useToast();
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
+  const driverPicker = useDriverPicker(form.driver_id);
   const [error, setError] = useState("");
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
@@ -86,6 +84,7 @@ function FuelForm({
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       void qc.invalidateQueries({ queryKey: ["service_reminders"] });
       onDone();
+      toast.success(t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("fuel.saveFailed")),
   });
@@ -100,26 +99,22 @@ function FuelForm({
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("field.vehicle")} required>
-          <Select
+          <Combobox
+            {...vehiclePicker}
             value={form.vehicle_id}
-            onChange={(e) => set("vehicle_id", e.target.value)}
+            onChange={(v) => set("vehicle_id", v)}
             required
-          >
-            <option value="">{t("fuel.selectVehicle")}</option>
-            {vehicles.map((v) => (
-              <option key={v.id} value={v.id}>{v.name}</option>
-            ))}
-          </Select>
+            clearable={false}
+            placeholder={t("fuel.selectVehicle")}
+          />
         </Field>
         <Field label={t("field.driver")}>
-          <Select value={form.driver_id} onChange={(e) => set("driver_id", e.target.value)}>
-            <option value="">{t("fuel.noDriver")}</option>
-            {drivers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.first_name} {d.last_name}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            {...driverPicker}
+            value={form.driver_id}
+            onChange={(v) => set("driver_id", v)}
+            placeholder={t("fuel.noDriver")}
+          />
         </Field>
         <Field label={t("fuel.filledAt")} required>
           <Input
@@ -221,21 +216,17 @@ export default function FuelPage() {
     },
   });
 
-  const { data: vehicles } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.order("name")),
-  });
-
-  const { data: drivers } = useQuery({
-    queryKey: ["drivers"],
-    queryFn: () => listRows<Driver>("drivers", (q) => q.order("first_name")),
-  });
+  const toast = useToast();
+  const vehicleFilterPicker = useVehiclePicker(
+    vehicleFilter === "all" ? "" : vehicleFilter,
+  );
 
   const remove = useMutation({
     mutationFn: (id: string) => deleteRow("fuel_logs", id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["fuel_logs"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) =>
       setDeleteError(err instanceof Error ? err.message : t("fuel.deleteFailed")),
@@ -417,19 +408,16 @@ export default function FuelPage() {
       />
 
       <div className="mb-4">
-        <Select
-          value={vehicleFilter}
-          onChange={(e) => {
-            setVehicleFilter(e.target.value);
+        <Combobox
+          {...vehicleFilterPicker}
+          value={vehicleFilter === "all" ? "" : vehicleFilter}
+          onChange={(v) => {
+            setVehicleFilter(v || "all");
             setPage(0);
           }}
+          placeholder={t("fuel.allVehicles")}
           className="max-w-xs"
-        >
-          <option value="all">{t("fuel.allVehicles")}</option>
-          {vehicles?.map((v) => (
-            <option key={v.id} value={v.id}>{v.name}</option>
-          ))}
-        </Select>
+        />
       </div>
 
       {isLoading && <LoadingState />}
@@ -502,11 +490,7 @@ export default function FuelPage() {
 
       <Modal title={t("fuel.logFuel")} open={adding} onClose={() => setAdding(false)} wide>
         {adding && (
-          <FuelForm
-            vehicles={vehicles ?? []}
-            drivers={drivers ?? []}
-            onDone={() => setAdding(false)}
-          />
+          <FuelForm onDone={() => setAdding(false)} />
         )}
       </Modal>
 

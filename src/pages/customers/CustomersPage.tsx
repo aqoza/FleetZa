@@ -11,6 +11,7 @@ import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
   Pagination, Select, Textarea, type BadgeTone,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 
 const PAGE_SIZE = 25;
@@ -49,6 +50,7 @@ export function CustomerForm({
     notes: customer?.notes ?? "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -78,6 +80,7 @@ export function CustomerForm({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["customers"] });
       onDone();
+      toast.success(customer ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("customers.saveFailed")),
   });
@@ -168,6 +171,7 @@ export default function CustomersPage() {
   const [editing, setEditing] = useState<Customer | null>(null);
   const [deleting, setDeleting] = useState<Customer | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   // Server-side search term; % and , would break the .or(...) ilike pattern.
   const term = sanitizeSearch(search);
@@ -218,6 +222,7 @@ export default function CustomersPage() {
       // Deleting a customer unlinks its vehicles.
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("customers.deleteFailed"));

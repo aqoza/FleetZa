@@ -1,13 +1,16 @@
 import { useState, type FormEvent } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { insertRow, listRows, updateRow } from "../../lib/db";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { insertRow, updateRow } from "../../lib/db";
 import { displayToKm, kmToDisplay } from "../../lib/format";
 import { fuelTypes, vehicleStatus, vehicleTypes } from "../../lib/labels";
-import type { Customer, Vehicle } from "../../lib/types";
+import { useCustomerPicker } from "../../lib/pickers";
+import type { Vehicle } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import { Button, ErrorState, Field, Input, Select, Textarea } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 
 export function VehicleForm({
   vehicle,
@@ -21,22 +24,6 @@ export function VehicleForm({
   const qc = useQueryClient();
   const { isEnabled } = useModules();
   const customersEnabled = isEnabled("customers");
-
-  // Picker lists active customers, plus the vehicle's current customer even if
-  // since deactivated — otherwise editing such a vehicle is blocked by the
-  // required select (and switching away would silently detach it).
-  const currentCustomerId = vehicle?.customer_id ?? null;
-  const { data: customers } = useQuery({
-    queryKey: ["customers", "picker", currentCustomerId],
-    queryFn: () =>
-      listRows<Customer>("customers", (q) =>
-        (currentCustomerId
-          ? q.or(`status.eq.active,id.eq.${currentCustomerId}`)
-          : q.eq("status", "active")
-        ).order("name"),
-      ),
-    enabled: customersEnabled,
-  });
 
   const [form, setForm] = useState({
     ownership: vehicle?.ownership ?? "company",
@@ -61,6 +48,11 @@ export function VehicleForm({
     notes: vehicle?.notes ?? "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
+  const customerPicker = useCustomerPicker(form.customer_id, {
+    activeOnly: true,
+    enabled: customersEnabled,
+  });
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -100,6 +92,7 @@ export function VehicleForm({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["vehicles"] });
       onDone();
+      toast.success(vehicle ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("vehicles.saveFailed")),
   });
@@ -172,16 +165,17 @@ export function VehicleForm({
         )}
         {customersEnabled && form.ownership === "customer" && (
           <Field label={t("vehicles.ownerCustomer")} required>
-            <Select
+            {/* The picker searches active customers but always merges in the
+                one already on this vehicle, so a since-deactivated owner does
+                not block editing (or get silently detached). */}
+            <Combobox
+              {...customerPicker}
               value={form.customer_id}
-              onChange={(e) => set("customer_id", e.target.value)}
+              onChange={(v) => set("customer_id", v)}
               required
-            >
-              <option value="">{t("vehicles.selectCustomer")}</option>
-              {(customers ?? []).map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </Select>
+              clearable={false}
+              placeholder={t("vehicles.selectCustomer")}
+            />
           </Field>
         )}
         <Field label={t("vehicles.chassisNumber")}>

@@ -13,6 +13,7 @@ import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
   Pagination, Select, Textarea,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import { useDefaultTaxRate } from "./shared";
 
@@ -34,6 +35,7 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
     active: product?.active ?? true,
   });
   const [error, setError] = useState("");
+  const toast = useToast();
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -58,6 +60,7 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["products"] });
       onDone();
+      toast.success(product ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.saveFailed")),
   });
@@ -146,6 +149,7 @@ export default function CatalogPage() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState<Product | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   const term = sanitizeSearch(search);
 
@@ -167,6 +171,7 @@ export default function CatalogPage() {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["products"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("sales.deleteFailed"));

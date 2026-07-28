@@ -11,6 +11,7 @@ import { ArrowDown, ArrowUp, Check, Plus, RotateCcw, Trash2 } from "lucide-react
 import { getCountry } from "../../../shared/countries";
 import {
   deleteRow,
+  getRow,
   insertRow,
   listRows,
   updateRow,
@@ -18,16 +19,17 @@ import {
 } from "../../lib/db";
 import { formatMoney } from "../../lib/format";
 import { computeLine } from "../../lib/sales";
-import { productKinds } from "../../lib/labels";
-import type {
-  Contact,
-  Customer,
-  Product,
-  SalesSettings,
-  Vehicle,
-} from "../../lib/types";
+import {
+  useContactPicker,
+  useCustomerPicker,
+  useProductPicker,
+  useVehiclePicker,
+} from "../../lib/pickers";
+import type { Product, SalesSettings } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type Translate } from "../../i18n";
+import { Combobox } from "../../components/Combobox";
+import { useToast } from "../../components/Toast";
 import {
   Button,
   Card,
@@ -35,12 +37,8 @@ import {
   Field,
   Input,
   LoadingState,
-  Select,
   Textarea,
 } from "../../components/ui";
-
-/** Picker ceiling — combobox-with-server-search is a Phase-3 platform item. */
-const PICKER_LIMIT = 200;
 
 // --- Tenant-level sales policy ------------------------------------------
 
@@ -99,50 +97,9 @@ export function SectionCard({
   );
 }
 
-// --- Reference pickers ---------------------------------------------------
-
-export function useCustomers() {
-  return useQuery({
-    queryKey: ["customers", "picker"],
-    queryFn: () =>
-      listRows<Customer>("customers", (q) =>
-        q.eq("status", "active").order("name").limit(PICKER_LIMIT),
-      ),
-    staleTime: 60_000,
-  });
-}
-
-export function useContacts(customerId: string) {
-  return useQuery({
-    queryKey: ["contacts", "picker", customerId],
-    queryFn: () =>
-      listRows<Contact>("contacts", (q) =>
-        q.eq("customer_id", customerId).order("name").limit(PICKER_LIMIT),
-      ),
-    enabled: Boolean(customerId),
-    staleTime: 60_000,
-  });
-}
-
-export function useVehicles() {
-  return useQuery({
-    queryKey: ["vehicles", "picker"],
-    queryFn: () =>
-      listRows<Vehicle>("vehicles", (q) => q.order("name").limit(PICKER_LIMIT)),
-    staleTime: 60_000,
-  });
-}
-
-export function useCatalog() {
-  return useQuery({
-    queryKey: ["products", "picker"],
-    queryFn: () =>
-      listRows<Product>("products", (q) =>
-        q.eq("active", true).order("name").limit(PICKER_LIMIT),
-      ),
-    staleTime: 60_000,
-  });
-}
+// Reference pickers now live in src/lib/pickers.ts — they search the server
+// instead of rendering a capped page, which is the only way a 477-vehicle
+// fleet fits in a dropdown.
 
 // --- Document header form ------------------------------------------------
 
@@ -208,40 +165,35 @@ export function DocumentFormFields({
   purchaseOrder?: "full" | "number";
 }) {
   const t = useT();
-  const customersQ = useCustomers();
-  const contactsQ = useContacts(form.customer_id);
-  const vehiclesQ = useVehicles();
+  const customerPicker = useCustomerPicker(form.customer_id, { activeOnly: true });
+  const contactPicker = useContactPicker(form.contact_id, form.customer_id);
+  const vehiclePicker = useVehiclePicker(form.vehicle_id);
 
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("sales.doc.customer")} required>
-          <Select
+          <Combobox
+            {...customerPicker}
             value={form.customer_id}
-            onChange={(e) => {
-              set("customer_id", e.target.value);
+            onChange={(v) => {
+              set("customer_id", v);
               set("contact_id", ""); // contacts belong to the previous customer
             }}
             required
-            disabled={lockCustomer || customersQ.isLoading}
-          >
-            <option value="">{t("sales.doc.selectCustomer")}</option>
-            {(customersQ.data ?? []).map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </Select>
+            clearable={false}
+            disabled={lockCustomer}
+            placeholder={t("sales.doc.selectCustomer")}
+          />
         </Field>
         <Field label={t("sales.doc.contact")}>
-          <Select
+          <Combobox
+            {...contactPicker}
             value={form.contact_id}
-            onChange={(e) => set("contact_id", e.target.value)}
+            onChange={(v) => set("contact_id", v)}
             disabled={!form.customer_id}
-          >
-            <option value="">{t("sales.doc.noContact")}</option>
-            {(contactsQ.data ?? []).map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </Select>
+            placeholder={t("sales.doc.noContact")}
+          />
         </Field>
         <Field label={t("sales.doc.title")}>
           <Input value={form.title} onChange={(e) => set("title", e.target.value)} />
@@ -260,14 +212,12 @@ export function DocumentFormFields({
           />
         </Field>
         <Field label={t("sales.doc.vehicle")}>
-          <Select value={form.vehicle_id} onChange={(e) => set("vehicle_id", e.target.value)}>
-            <option value="">{t("sales.doc.noVehicle")}</option>
-            {(vehiclesQ.data ?? []).map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}{v.license_plate ? ` — ${v.license_plate}` : ""}
-              </option>
-            ))}
-          </Select>
+          <Combobox
+            {...vehiclePicker}
+            value={form.vehicle_id}
+            onChange={(v) => set("vehicle_id", v)}
+            placeholder={t("sales.doc.noVehicle")}
+          />
         </Field>
       </div>
       {purchaseOrder && (
@@ -487,7 +437,7 @@ export function LineEditor({
   const t = useT();
   const { isManager } = useAuth();
   const qc = useQueryClient();
-  const catalogQ = useCatalog();
+  const toast = useToast();
   const defaultTax = useDefaultTaxRate();
 
   const [drafts, setDrafts] = useState<Record<string, LineDraft>>({});
@@ -502,6 +452,7 @@ export function LineEditor({
     tax_rate: String(defaultTax),
   }));
   const [addProductId, setAddProductId] = useState("");
+  const catalogPicker = useProductPicker(addProductId);
 
   const editable = !readOnly && isManager;
 
@@ -570,17 +521,27 @@ export function LineEditor({
     onError: (err) => setError(err instanceof Error ? err.message : t("sales.saveFailed")),
   });
 
-  function pickProduct(productId: string) {
+  /**
+   * The catalog list is a search result now, not the whole table, so the
+   * chosen row is fetched on pick rather than looked up in memory — the
+   * prefilled price and tax have to come from the record itself.
+   */
+  async function pickProduct(productId: string) {
     setAddProductId(productId);
-    const product = (catalogQ.data ?? []).find((p) => p.id === productId);
-    if (!product) return;
-    setAdding((a) => ({
-      ...a,
-      description: product.name,
-      unit: product.unit,
-      unit_price: String(product.unit_price),
-      tax_rate: String(product.tax_rate),
-    }));
+    if (!productId) return;
+    try {
+      const product = await getRow<Product>("products", productId);
+      if (!product) return;
+      setAdding((a) => ({
+        ...a,
+        description: product.name,
+        unit: product.unit,
+        unit_price: String(product.unit_price),
+        tax_rate: String(product.tax_rate),
+      }));
+    } catch (err) {
+      toast.error(err instanceof Error ? err : t("common.error"));
+    }
   }
 
   function onAdd(e: FormEvent) {
@@ -818,14 +779,12 @@ export function LineEditor({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-12">
             <div className="lg:col-span-3">
               <Field label={t("sales.lines.fromCatalog")}>
-                <Select value={addProductId} onChange={(e) => pickProduct(e.target.value)}>
-                  <option value="">{t("sales.lines.customLine")}</option>
-                  {(catalogQ.data ?? []).map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} · {t(productKinds[p.kind])}
-                    </option>
-                  ))}
-                </Select>
+                <Combobox
+                  {...catalogPicker}
+                  value={addProductId}
+                  onChange={pickProduct}
+                  placeholder={t("sales.lines.customLine")}
+                />
               </Field>
             </div>
             <div className="lg:col-span-3">

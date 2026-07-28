@@ -9,6 +9,7 @@ import type { SlDevice, SlDeviceStatus, SlJob, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import type { BadgeTone } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
   Pagination, Select, StatCard, Table, Textarea,
@@ -74,6 +75,7 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
   const t = useT();
   const tenant = useTenant();
   const qc = useQueryClient();
+  const toast = useToast();
   const [form, setForm] = useState({
     serial: device?.serial ?? "",
     manufacturer: device?.manufacturer ?? "",
@@ -117,6 +119,7 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["sl_devices"] });
       onDone();
+      toast.success(device ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => {
       const msg = err instanceof Error ? err.message : "";
@@ -269,6 +272,7 @@ export default function DevicesPage() {
   const [historyFor, setHistoryFor] = useState<DeviceRow | null>(null);
   const [deleting, setDeleting] = useState<DeviceRow | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   // The raw term goes inside an .or(...) pattern, so strip ilike wildcards
   // and the comma that separates or-branches.
@@ -318,6 +322,7 @@ export default function DevicesPage() {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["sl_devices"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setActionError(err instanceof Error ? err.message : t("slDevices.deleteFailed"));

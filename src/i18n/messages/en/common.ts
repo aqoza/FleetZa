@@ -73,6 +73,17 @@ export const enCommon = {
   "action.signOut": "Sign out",
   "action.openMenu": "Open menu",
   "action.closeMenu": "Close menu",
+  "action.clear": "Clear",
+
+  // Searchable dropdowns. The list is capped server-side, so a term that is
+  // still too broad has to say that more matches exist off-screen.
+  "combobox.refine": "Keep typing to narrow the list.",
+
+  // Toasts. Anything specific to one screen lives in that screen's namespace;
+  // these are the outcomes every module reports the same way.
+  "toast.saved": "Changes saved.",
+  "toast.created": "Created.",
+  "toast.deleted": "Deleted.",
 
   // Generic state / words
   "common.loading": "Loading…",

@@ -2,16 +2,18 @@ import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
-import { insertRow, listRows } from "../../lib/db";
+import { getRow, insertRow, listRows } from "../../lib/db";
 import { displayToKm, kmToDisplay } from "../../lib/format";
+import { useDriverPicker, useVehiclePicker } from "../../lib/pickers";
 import type {
-  Driver, Inspection, InspectionItem, InspectionResult, InspectionTemplate, Issue, Vehicle,
+  Inspection, InspectionItem, InspectionResult, InspectionTemplate, Issue, Vehicle,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Button, Card, ErrorState, Field, Input, LoadingState, PageHeader, Select, Textarea,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
 
 type ResultValue = InspectionResult["result"];
 
@@ -41,19 +43,12 @@ export default function NewInspectionPage() {
   const createdInspectionId = useRef<string | null>(null);
   const insertedIssueItemIds = useRef<Set<string>>(new Set());
 
-  const { data: vehicles, isLoading: vehiclesLoading } = useQuery({
-    queryKey: ["vehicles", { status: "active" }],
-    queryFn: () => listRows<Vehicle>("vehicles", (q) => q.eq("status", "active").order("name")),
-  });
+  const vehiclePicker = useVehiclePicker(vehicleId);
+  const driverPicker = useDriverPicker(driverId, { activeOnly: true });
 
   const { data: templates, isLoading: templatesLoading } = useQuery({
     queryKey: ["inspection_templates"],
     queryFn: () => listRows<InspectionTemplate>("inspection_templates", (q) => q.eq("active", true)),
-  });
-
-  const { data: drivers } = useQuery({
-    queryKey: ["drivers", { status: "active" }],
-    queryFn: () => listRows<Driver>("drivers", (q) => q.eq("status", "active").order("first_name")),
   });
 
   const effectiveTemplateId = templateId || templates?.[0]?.id || "";
@@ -73,12 +68,22 @@ export default function NewInspectionPage() {
   const failCount =
     template?.items.filter((it) => (answers[it.id]?.result ?? "pass") === "fail").length ?? 0;
 
-  function onVehicleChange(id: string) {
+  async function onVehicleChange(id: string) {
     setVehicleId(id);
     createdInspectionId.current = null;
     insertedIssueItemIds.current = new Set();
-    const v = vehicles?.find((x) => x.id === id);
-    setOdometer(v ? Math.round(kmToDisplay(v.odometer, tenant.distance_unit)).toString() : "");
+    // The odometer seed comes from the chosen vehicle's own row now that the
+    // page no longer holds the whole fleet in memory.
+    if (!id) {
+      setOdometer("");
+      return;
+    }
+    try {
+      const v = await getRow<Vehicle>("vehicles", id);
+      setOdometer(v ? Math.round(kmToDisplay(v.odometer, tenant.distance_unit)).toString() : "");
+    } catch {
+      setOdometer("");
+    }
   }
 
   function onTemplateChange(id: string) {
@@ -162,7 +167,7 @@ export default function NewInspectionPage() {
     mutation.mutate();
   }
 
-  const loading = vehiclesLoading || templatesLoading;
+  const loading = templatesLoading;
 
   return (
     <>
@@ -188,16 +193,14 @@ export default function NewInspectionPage() {
           <Card className="p-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("field.vehicle")} required>
-                <Select
+                <Combobox
+                  {...vehiclePicker}
                   value={vehicleId}
-                  onChange={(e) => onVehicleChange(e.target.value)}
+                  onChange={(v) => void onVehicleChange(v)}
                   required
-                >
-                  <option value="">{t("inspections.selectVehicle")}</option>
-                  {vehicles?.map((v) => (
-                    <option key={v.id} value={v.id}>{v.name}</option>
-                  ))}
-                </Select>
+                  clearable={false}
+                  placeholder={t("inspections.selectVehicle")}
+                />
               </Field>
               <Field label={t("inspections.template")}>
                 <Select
@@ -210,14 +213,12 @@ export default function NewInspectionPage() {
                 </Select>
               </Field>
               <Field label={t("field.driver")}>
-                <Select value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-                  <option value="">{t("inspections.noDriver")}</option>
-                  {drivers?.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.first_name} {d.last_name}
-                    </option>
-                  ))}
-                </Select>
+                <Combobox
+                  {...driverPicker}
+                  value={driverId}
+                  onChange={setDriverId}
+                  placeholder={t("inspections.noDriver")}
+                />
               </Field>
               <Field label={`${t("field.odometer")} (${tenant.distance_unit})`}>
                 <Input

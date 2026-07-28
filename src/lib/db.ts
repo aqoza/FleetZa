@@ -8,6 +8,10 @@ export type TableName = keyof Database["public"]["Tables"];
 
 type AnyFilter = PostgrestFilterBuilder<any, any, any, any[], any>;
 
+/** The builder handed to every `build` callback — exported for shared helpers
+ *  that compose filters (e.g. the picker hooks) rather than inlining them. */
+export type DbFilter = AnyFilter;
+
 /**
  * Maps raised exceptions (our triggers/RPCs) and common Postgres error codes
  * to localized messages. Raw driver text goes to the console only.

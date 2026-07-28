@@ -8,6 +8,7 @@ import {
 } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate } from "../../lib/format";
+import { useVehiclePicker } from "../../lib/pickers";
 import {
   certificateBucket, certificateStatusMeta, fleetCompliancePercent,
   type CertificateStatusFields,
@@ -20,8 +21,9 @@ import { useModules } from "../../context/ModulesContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Pagination, Select, Table, Textarea, type BadgeTone,
+  Pagination, Table, Textarea, type BadgeTone,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
 import { CustomerForm, customerStatusMeta } from "./CustomersPage";
@@ -57,9 +59,6 @@ const JOB_PAGE_SIZE = 8;
  * surfaced rather than silently dropping vehicles.
  */
 const STATUS_MATCH_CAP = 200;
-
-/** Unassigned vehicles offered by the attach picker (a <select>, not a list). */
-const ATTACH_LIMIT = 50;
 
 /** Today + offset as a date-only string — the boundary the server filters on. */
 function day(offset: number): string {
@@ -230,26 +229,11 @@ function AttachVehicleForm({
   const t = useT();
   const qc = useQueryClient();
   const [vehicleId, setVehicleId] = useState("");
-  const [search, setSearch] = useState("");
   const [error, setError] = useState("");
 
-  const term = sanitizeSearch(search);
-
-  const { data, isLoading, error: loadError } = useQuery({
-    queryKey: ["vehicles", "unassigned", term],
-    placeholderData: keepPreviousData,
-    queryFn: () =>
-      listPage<Vehicle>("vehicles", 0, ATTACH_LIMIT, (q) => {
-        let query = q.is("customer_id", null).order("name");
-        if (term) {
-          query = query.or(
-            `name.ilike.%${term}%,license_plate.ilike.%${term}%,` +
-              `fleet_number.ilike.%${term}%,chassis_number.ilike.%${term}%,vin.ilike.%${term}%`,
-          );
-        }
-        return query;
-      }),
-  });
+  // Only vehicles nobody owns yet — attaching one that already belongs to
+  // another customer would silently move it.
+  const vehiclePicker = useVehiclePicker(vehicleId, { unassignedOnly: true });
 
   const mutation = useMutation({
     mutationFn: () => updateRow<Vehicle>("vehicles", vehicleId, { customer_id: customerId }),
@@ -266,48 +250,19 @@ function AttachVehicleForm({
     mutation.mutate();
   }
 
-  const options = data?.rows ?? [];
-  const total = data?.total ?? 0;
-
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
-      {loadError && <ErrorState message={(loadError as Error).message} />}
-      <Field label={t("action.search")}>
-        <Input
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setVehicleId("");
-          }}
+      <Field label={t("customers.attachExistingLabel")} required>
+        <Combobox
+          {...vehiclePicker}
+          value={vehicleId}
+          onChange={setVehicleId}
+          required
+          clearable={false}
           placeholder={t("customers.attachSearchPlaceholder")}
         />
       </Field>
-      {isLoading ? (
-        <LoadingState />
-      ) : options.length === 0 ? (
-        <p className="text-sm text-ink-2">
-          {term ? t("customers.noUnassignedMatches") : t("customers.noUnassignedVehicles")}
-        </p>
-      ) : (
-        <>
-          <Field label={t("customers.attachExistingLabel")} required>
-            <Select value={vehicleId} onChange={(e) => setVehicleId(e.target.value)} required>
-              <option value="">{t("customers.selectVehicle")}</option>
-              {options.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.name}{v.license_plate ? ` — ${v.license_plate}` : ""}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          {total > options.length && (
-            <p className="text-xs text-warn">
-              {t("customers.attachNarrowHint", { count: options.length, total })}
-            </p>
-          )}
-        </>
-      )}
       <p className="text-xs text-ink-3">
         {t("customers.createVehicleHint")}{" "}
         <Link to="/vehicles" className="font-medium text-brand-700 hover:underline">
@@ -316,9 +271,9 @@ function AttachVehicleForm({
       </p>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
-        {options.length > 0 && (
-          <Button type="submit" loading={mutation.isPending}>{t("customers.attach")}</Button>
-        )}
+        <Button type="submit" loading={mutation.isPending} disabled={!vehicleId}>
+          {t("customers.attach")}
+        </Button>
       </div>
     </form>
   );

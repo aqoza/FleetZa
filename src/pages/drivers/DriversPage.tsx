@@ -10,6 +10,7 @@ import { useT, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 
 function licenseBadge(expiry: string | null, t: Translate) {
   if (!expiry) return <span className="text-slate-400">—</span>;
@@ -37,6 +38,7 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
     notes: driver?.notes ?? "",
   });
   const [error, setError] = useState("");
+  const toast = useToast();
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -63,6 +65,7 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["drivers"] });
       onDone();
+      toast.success(driver ? t("toast.saved") : t("toast.created"));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("drivers.saveFailed")),
   });
@@ -130,6 +133,7 @@ export default function DriversPage() {
   const [editing, setEditing] = useState<Driver | null>(null);
   const [deleting, setDeleting] = useState<Driver | null>(null);
   const [actionError, setActionError] = useState("");
+  const toast = useToast();
 
   const { data: drivers, isLoading, error } = useQuery({
     queryKey: ["drivers"],
@@ -142,6 +146,7 @@ export default function DriversPage() {
       setActionError("");
       void qc.invalidateQueries({ queryKey: ["drivers"] });
       setDeleting(null);
+      toast.success(t("toast.deleted"));
     },
     onError: (err) => {
       setDeleting(null);

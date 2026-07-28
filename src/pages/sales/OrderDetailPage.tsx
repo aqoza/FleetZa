@@ -11,6 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import { Badge, Button, ErrorState, Field, Input, LoadingState, Modal } from "../../components/ui";
+import { useToast } from "../../components/Toast";
 import { DocumentDetailShell, type ShellRenderArgs } from "./DocumentDetailShell";
 import { InfoRow, SectionCard } from "./shared";
 
@@ -21,6 +22,7 @@ export default function OrderDetailPage() {
   const { isEnabled } = useModules();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const toast = useToast();
   const billingOn = isEnabled("billing");
 
   const invoicesQ = useQuery({
@@ -212,6 +214,7 @@ export default function OrderDetailPage() {
               void qc.invalidateQueries({ queryKey: ["sales_summary"] });
               void qc.invalidateQueries({ queryKey: ["sales_order_line_balance"] });
               navigate(`/sales/invoices/${invoice.id}`);
+              toast.success(t("sales.toast.invoiced", { number: invoice.doc_number }));
             }}
           />
         )}

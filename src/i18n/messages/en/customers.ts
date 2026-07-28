@@ -80,14 +80,11 @@ export const enCustomers = {
   "customers.fleetNumber": "Fleet number",
   "customers.chassisNumber": "Chassis number",
   "customers.noVehicles": "No vehicles attached yet.",
-  "customers.selectVehicle": "Select a vehicle…",
-  "customers.noUnassignedVehicles": "No unassigned vehicles available.",
-  "customers.noUnassignedMatches": "No unassigned vehicle matches that search.",
   "customers.attach": "Attach",
   "customers.attachExistingLabel": "Existing unassigned vehicle",
+  // The attach control is a searchable combobox, so this is its resting text:
+  // it has to say what can be typed, not just what will be picked.
   "customers.attachSearchPlaceholder": "Name, plate, fleet #, chassis or VIN…",
-  "customers.attachNarrowHint":
-    "Showing the first {count} of {total} unassigned vehicles — search to narrow the list.",
   "customers.createVehicleHint":
     "Need a brand-new vehicle? Create it on the Vehicles page first, then attach it here.",
   "customers.goToVehicles": "Go to vehicles",

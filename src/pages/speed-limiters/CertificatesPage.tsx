@@ -22,8 +22,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination,
-  Select, Textarea,
+  Textarea,
 } from "../../components/ui";
+import { Combobox } from "../../components/Combobox";
+import { useTechnicianPicker } from "../../lib/pickers";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import {
   RenewCertificateModal, defaultRenewalDates, renewCertificate,
@@ -461,12 +463,12 @@ function RevokeForm({ cert, onDone }: { cert: CertRow; onDone: () => void }) {
 function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () => void }) {
   const t = useT();
   const qc = useQueryClient();
-  const technicians = useActiveTechnicians();
   const [form, setForm] = useState({
     cert_prefix: settings.cert_prefix,
     cert_validity_months: String(settings.cert_validity_months),
     default_technician_id: settings.default_technician_id ?? "",
   });
+  const technicianPicker = useTechnicianPicker(form.default_technician_id);
   const [error, setError] = useState("");
 
   const mutation = useMutation({
@@ -518,17 +520,12 @@ function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () =
         label={t("slCertificates.defaultTechnician")}
         hint={t("slCertificates.defaultTechnicianHint")}
       >
-        <Select
+        <Combobox
+          {...technicianPicker}
           value={form.default_technician_id}
-          onChange={(e) => setForm((f) => ({ ...f, default_technician_id: e.target.value }))}
-        >
-          <option value="">{t("slCertificates.defaultTechnicianNone")}</option>
-          {(technicians.data ?? []).map((tech) => (
-            <option key={tech.id} value={tech.id}>
-              {tech.name}
-            </option>
-          ))}
-        </Select>
+          onChange={(v) => setForm((f) => ({ ...f, default_technician_id: v }))}
+          placeholder={t("slCertificates.defaultTechnicianNone")}
+        />
       </Field>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>

@@ -36,6 +36,7 @@ import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
+import { Combobox, type ComboboxOption } from "../../components/Combobox";
 
 // --- shared helpers (option lists mirror SignupPage) ---
 
@@ -229,17 +230,36 @@ function OrganizationTab() {
   const tenant = useTenant();
   const { isAdmin, refresh } = useAuth();
 
-  const timezones = useMemo(() => {
+  // Country, currency and timezone are long fixed lists, so they get the
+  // searchable combobox with its local filter — no server round trip.
+  const timezoneOptions = useMemo<ComboboxOption[]>(() => {
     const list = browserTimezones();
-    return list.includes(tenant.timezone) ? list : [tenant.timezone, ...list];
+    const all = list.includes(tenant.timezone) ? list : [tenant.timezone, ...list];
+    return all.map((tz) => ({ value: tz, label: tz }));
   }, [tenant.timezone]);
-  const currencies = useMemo(
-    () =>
-      CURRENCIES.includes(tenant.currency)
-        ? CURRENCIES
-        : [tenant.currency, ...CURRENCIES],
-    [tenant.currency],
-  );
+
+  const currencyOptions = useMemo<ComboboxOption[]>(() => {
+    const all = CURRENCIES.includes(tenant.currency)
+      ? CURRENCIES
+      : [tenant.currency, ...CURRENCIES];
+    return all.map((c) => ({ value: c, label: c }));
+  }, [tenant.currency]);
+
+  const countryOptions = useMemo<ComboboxOption[]>(() => {
+    const out: ComboboxOption[] = [];
+    // A tenant sitting on a country we do not carry defaults for still has to
+    // see its own value, or saving the form would move the business.
+    if (!isSupportedCountry(tenant.country)) {
+      out.push({ value: tenant.country, label: countryName(tenant.country) });
+    }
+    for (const c of MIDDLE_EAST_OPTIONS) {
+      out.push({ value: c.code, label: c.name, meta: t("settings.middleEast") });
+    }
+    for (const c of OTHER_OPTIONS) {
+      out.push({ value: c.code, label: c.name, meta: t("settings.otherCountries") });
+    }
+    return out;
+  }, [tenant.country, t]);
 
   const [form, setForm] = useState({
     name: tenant.name,
@@ -404,43 +424,31 @@ function OrganizationTab() {
                   : undefined
               }
             >
-              <Select value={form.country} onChange={(e) => set("country", e.target.value)}>
-                {!isSupportedCountry(tenant.country) && (
-                  <option value={tenant.country}>{countryName(tenant.country)}</option>
-                )}
-                <optgroup label={t("settings.middleEast")}>
-                  {MIDDLE_EAST_OPTIONS.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
-                  ))}
-                </optgroup>
-                <optgroup label={t("settings.otherCountries")}>
-                  {OTHER_OPTIONS.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
-                  ))}
-                </optgroup>
-              </Select>
+              <Combobox
+                value={form.country}
+                onChange={(v) => set("country", v)}
+                options={countryOptions}
+                clearable={false}
+                required
+              />
             </Field>
             <Field label={t("settings.currency")} required>
-              <Select value={form.currency} onChange={(e) => set("currency", e.target.value)}>
-                {currencies.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </Select>
+              <Combobox
+                value={form.currency}
+                onChange={(v) => set("currency", v)}
+                options={currencyOptions}
+                clearable={false}
+                required
+              />
             </Field>
             <Field label={t("settings.timezone")} required>
-              <Select value={form.timezone} onChange={(e) => set("timezone", e.target.value)}>
-                {timezones.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </Select>
+              <Combobox
+                value={form.timezone}
+                onChange={(v) => set("timezone", v)}
+                options={timezoneOptions}
+                clearable={false}
+                required
+              />
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label={t("settings.distance")}>
