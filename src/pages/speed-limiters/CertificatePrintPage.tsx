@@ -1,8 +1,8 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer } from "lucide-react";
 // Self-hosted, loaded only by this chunk — the rest of the app deliberately
 // carries no webfont (docs/DESIGN_SYSTEM.md). A printed legal document is a
 // scoped, explicit exception; the family is applied inline below rather than
@@ -129,6 +129,9 @@ export default function CertificatePrintPage() {
   const tenant = useTenant();
   const [qr, setQr] = useState("");
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
+  const docRef = useRef<HTMLDivElement>(null);
 
   const { data: cert, isLoading, error } = useQuery({
     queryKey: ["speed_limiter_certificates", certId],
@@ -178,6 +181,10 @@ export default function CertificatePrintPage() {
 
   const vehicle = cert.vehicles;
   const device = cert.sl_devices;
+  // Captured as a local so the async downloadPdf closure below doesn't need
+  // its own narrowing of `cert` (TS doesn't carry the guard above into a
+  // nested function body).
+  const certificateNumber = cert.certificate_number;
   const speedBand =
     formatSpeedBand(
       cert.set_speed_kmh,
@@ -262,6 +269,54 @@ export default function CertificatePrintPage() {
     servicesLine || registrationEn || registrationAr || tenant.email,
   );
 
+  // A downloaded file can't depend on the OS print dialog's own "background
+  // graphics" toggle — off by default in most browsers, and the one thing
+  // `print-exact` (src/index.css) cannot force. html2canvas rasterizes the
+  // live DOM instead, so the flag-colored footer band always survives.
+  // Dynamically imported: neither library is needed until this is clicked.
+  async function downloadPdf() {
+    if (!docRef.current) return;
+    setDownloading(true);
+    setDownloadError("");
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const canvas = await html2canvas(docRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        // The clone is a separate, offscreen document — flipping its theme
+        // doesn't touch what the user is actually looking at. Paper is
+        // always light (same rule `@media print` already applies), so a
+        // dark-mode viewer's download must not come out inverted.
+        onclone: (clonedDoc) => {
+          clonedDoc.documentElement.setAttribute("data-theme", "light");
+        },
+      });
+      const pdf = new jsPDF({ unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const fitScale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+      const imgWidth = canvas.width * fitScale;
+      const imgHeight = canvas.height * fitScale;
+      pdf.addImage(
+        canvas.toDataURL("image/png"),
+        "PNG",
+        (pageWidth - imgWidth) / 2,
+        0,
+        imgWidth,
+        imgHeight,
+      );
+      pdf.save(`${certificateNumber.replace(/[/\\]/g, "-")}.pdf`);
+    } catch {
+      setDownloadError(t("slCertificates.downloadFailed"));
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
@@ -275,11 +330,17 @@ export default function CertificatePrintPage() {
           <Button variant="secondary" onClick={copyVerifyLink}>
             {copied ? t("slCertificates.linkCopied") : t("slCertificates.copyVerifyLink")}
           </Button>
+          <Button variant="secondary" loading={downloading} onClick={() => void downloadPdf()}>
+            {!downloading && <Download className="h-4 w-4" />} {t("slCertificates.download")}
+          </Button>
           <Button onClick={() => window.print()}>
             <Printer className="h-4 w-4" /> {t("slCertificates.print")}
           </Button>
         </div>
       </div>
+      {downloadError && (
+        <p className="-mt-2 mb-4 text-end text-sm text-serious print:hidden">{downloadError}</p>
+      )}
 
       <Card className="mx-auto max-w-3xl print:rounded-none print:border-0 print:shadow-none">
         {/*
@@ -295,6 +356,7 @@ export default function CertificatePrintPage() {
           app's no-webfont rule can't leak past this one page.
         */}
         <div
+          ref={docRef}
           className="flex min-h-[250mm] flex-col px-10 py-8 print:px-8 print:py-4"
           style={{ fontFamily: '"IBM Plex Sans Arabic", "Inter", ui-sans-serif, system-ui, sans-serif' }}
         >
