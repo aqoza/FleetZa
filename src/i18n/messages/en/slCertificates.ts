@@ -51,6 +51,13 @@ export const enSlCertificates = {
   "slCertificates.setSpeedSecondary": "Second band (km/h)",
   "slCertificates.setSpeedSecondaryHint":
     "Optional. Certificates print both bands as a pair, e.g. 70/90 KMPH.",
+  "slCertificates.technician": "Technician",
+  "slCertificates.technicianHint": "Printed on the certificate. Defaults to the technician set in certificate settings.",
+  "slCertificates.technicianNone": "— none —",
+  "slCertificates.defaultTechnician": "Default technician",
+  "slCertificates.defaultTechnicianHint":
+    "Preselected when issuing a certificate. The name is copied onto each certificate as it is issued, so renaming or removing a technician never changes a document already issued.",
+  "slCertificates.defaultTechnicianNone": "— no default —",
   "slCertificates.issuedAt": "Issue date",
   "slCertificates.expiresAt": "Expiry date",
   "slCertificates.renewConfirm": "Issue certificate",

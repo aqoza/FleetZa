@@ -1954,6 +1954,7 @@ export type Database = {
           cert_next_number: number
           cert_prefix: string
           cert_validity_months: number
+          default_technician_id: string | null
           tenant_id: string
           updated_at: string
         }
@@ -1961,6 +1962,7 @@ export type Database = {
           cert_next_number?: number
           cert_prefix?: string
           cert_validity_months?: number
+          default_technician_id?: string | null
           tenant_id?: string
           updated_at?: string
         }
@@ -1968,10 +1970,18 @@ export type Database = {
           cert_next_number?: number
           cert_prefix?: string
           cert_validity_months?: number
+          default_technician_id?: string | null
           tenant_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "sl_settings_default_technician_id_fkey"
+            columns: ["default_technician_id"]
+            isOneToOne: false
+            referencedRelation: "sl_technicians"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sl_settings_tenant_id_fkey"
             columns: ["tenant_id"]

@@ -269,6 +269,27 @@ export default function VehicleDetailPage() {
       <PageHeader
         title={vehicle.name}
         description={[vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") || undefined}
+        /*
+         * Compliance state at the top of the page: whether this vehicle's
+         * certificate is valid, close to expiry, or lapsed is the reason most
+         * people open a vehicle, and it otherwise only appears further down.
+         * Same certBadge as the cards below, so the colours and thresholds
+         * cannot drift apart.
+         *
+         * Deliberately absent while a certificate read is loading or failing:
+         * a missing badge reads as "not shown", but a wrong one reads as a
+         * confirmed fact — and "valid" on a vehicle whose certificate lapsed
+         * is exactly the mistake that keeps a truck on the road uncertified.
+         */
+        badge={
+          slCertsOn && !certsError && !certsLoading
+            ? currentCert
+              ? certBadge(currentCert)
+              : hasRevokedHead
+                ? <Badge tone="slate">{t("speedLimiters.certStatus.revoked")}</Badge>
+                : undefined
+            : undefined
+        }
         actions={
           isManager && (
             <>

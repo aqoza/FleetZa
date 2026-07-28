@@ -477,6 +477,12 @@ export interface SlSettings {
   cert_prefix: string;
   cert_next_number: number;
   cert_validity_months: number;
+  /**
+   * Technician preselected when issuing a certificate. A reference, so the
+   * picker and this default resolve from the same list; the certificate still
+   * snapshots the name at issuance.
+   */
+  default_technician_id: string | null;
   updated_at: string;
 }
 

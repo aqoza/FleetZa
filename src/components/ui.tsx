@@ -210,16 +210,28 @@ export function StatCard({
 export function PageHeader({
   title,
   description,
+  badge,
   actions,
 }: {
   title: string;
   description?: string;
+  /**
+   * Status shown beside the title — the record's headline state, readable
+   * without scrolling to the card that owns it. Optional, so every existing
+   * header renders byte-identically.
+   */
+  badge?: ReactNode;
   actions?: ReactNode;
 }) {
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+        {/* Baseline-aligned rather than centred: the badge is small text next
+            to a 2xl heading, and centring leaves it visibly floating. */}
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+          {badge}
+        </div>
         {description && <p className="mt-1 text-sm text-ink-2">{description}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
