@@ -50,7 +50,12 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.cityHint": "كما يظهر في ترويستك، مثل: Muscat, Sultanate of Oman.",
   "settings.cityAr": "الموقع (بالعربية)",
   "settings.email": "البريد الإلكتروني",
+  "settings.website": "الموقع الإلكتروني",
+  "settings.websiteHint": "النطاق كما يظهر في ترويستك، مثل: gawhrat.com.",
+  "settings.websiteInvalid": "أدخل النطاق فقط، مثل gawhrat.com، بدون ‎https://‎ أو مسار.",
+  "settings.phoneHint": "يُطبع في الشهادات بوصفه رقم الخدمة والدعم.",
   "settings.phoneSecondary": "هاتف إضافي",
+  "settings.phoneSecondaryHint": "يُطبع في الشهادات بوصفه الرقم البديل.",
   "settings.servicesLine": "سطر الخدمات",
   "settings.servicesLineHint":
     "العبارة الظاهرة على الشريط الملوّن في التذييل، مثل: محدد سرعة الطريق | أنظمة الفحص الإلكتروني.",
@@ -60,6 +65,11 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.markUrlHint":
     "اختياري: رابط https:// أو data:image. يُطبع في شريط الاعتماد؛ اتركه فارغًا للتوقيع والختم يدويًا.",
   "settings.markUrlInvalid": "أدخل رابط https:// أو data:image.",
+  "settings.signatoryName": "المفوَّض بالتوقيع",
+  "settings.signatoryNameHint":
+    "يُطبع أسفل التوقيع، تحت عبارة «عن <الاسم التجاري>». اتركه فارغًا لطباعة التوقيع وحده.",
+  "settings.signatoryNameAr": "المفوَّض بالتوقيع (بالعربية)",
+  "settings.signatoryNameArHint": "يُستخدم في الشهادات العربية، وإن تُرك فارغًا يُستخدم الاسم أعلاه.",
   "settings.saveFailed": "فشل الحفظ",
 
   // Organization read-only view

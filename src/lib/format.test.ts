@@ -33,10 +33,13 @@ const tenant = (over: Partial<Tenant> = {}): Tenant => ({
   city_ar: null,
   email: null,
   phone_secondary: null,
+  website: null,
   services_line: null,
   services_line_ar: null,
   signature_url: null,
   stamp_url: null,
+  signatory_name: null,
+  signatory_name_ar: null,
   created_at: "2026-01-01T00:00:00Z",
   ...over,
 });

@@ -126,8 +126,6 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.companyStamp": "ختم الشركة",
   "slCertificates.revokedBanner": "شهادة مسحوبة",
   "slCertificates.revokedOn": "سُحبت بتاريخ {date}",
-  "slCertificates.generatedBy": "أُنشئت بواسطة FleetManage",
-  "slCertificates.verifyAt": "رابط التحقق:",
   "slCertificates.notFound": "الشهادة غير موجودة",
 
   "slCertificates.report.typeInstallation": "تركيب",
@@ -162,9 +160,12 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.report.footerCr": "س.ت: {value}",
   "slCertificates.report.footerPoBox": "ص.ب: {value}",
   "slCertificates.report.footerPostalCode": "الرمز البريدي: {value}",
-  "slCertificates.report.footerGsm": "نقال: {value}",
+  "slCertificates.report.footerWebsite": "الموقع الإلكتروني: {value}",
+  "slCertificates.report.footerPhone": "نقال الخدمة والدعم: {value}",
+  "slCertificates.report.footerPhoneSecondary": "نقال بديل: {value}",
   "slCertificates.report.footerSeparator": "، ",
   "slCertificates.report.footerEmail": "البريد الإلكتروني: {value}",
   "slCertificates.report.signature": "التوقيع المعتمد",
   "slCertificates.report.stamp": "ختم الشركة",
+  "slCertificates.report.forCompany": "عن {name}",
 };

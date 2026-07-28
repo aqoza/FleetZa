@@ -34,11 +34,24 @@ export interface Tenant {
   city_ar: string | null;
   email: string | null;
   phone_secondary: string | null;
+  /**
+   * Dealer website as written on the letterhead, normally a bare domain
+   * ("gawhrat.com"). Printed as text in the registration line of both passes —
+   * never fetched or linked, hence no scheme constraint in the database.
+   */
+  website: string | null;
   services_line: string | null;
   services_line_ar: string | null;
   /** Scanned marks printed in the closing strip; https: or data:image only. */
   signature_url: string | null;
   stamp_url: string | null;
+  /**
+   * Authorized signatory, printed under the signature in the closing strip
+   * beneath the "For <trade name>" line. The Arabic form is optional and falls
+   * back to `signatory_name` when null.
+   */
+  signatory_name: string | null;
+  signatory_name_ar: string | null;
   created_at: string;
 }
 

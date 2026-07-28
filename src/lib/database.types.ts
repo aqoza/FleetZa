@@ -2348,12 +2348,15 @@ export type Database = {
           postal_code: string | null
           services_line: string | null
           services_line_ar: string | null
+          signatory_name: string | null
+          signatory_name_ar: string | null
           signature_url: string | null
           stamp_url: string | null
           tax_registration_number: string | null
           timezone: string
           updated_at: string
           volume_unit: string
+          website: string | null
         }
         Insert: {
           address?: string | null
@@ -2376,12 +2379,15 @@ export type Database = {
           postal_code?: string | null
           services_line?: string | null
           services_line_ar?: string | null
+          signatory_name?: string | null
+          signatory_name_ar?: string | null
           signature_url?: string | null
           stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
           volume_unit?: string
+          website?: string | null
         }
         Update: {
           address?: string | null
@@ -2404,12 +2410,15 @@ export type Database = {
           postal_code?: string | null
           services_line?: string | null
           services_line_ar?: string | null
+          signatory_name?: string | null
+          signatory_name_ar?: string | null
           signature_url?: string | null
           stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string
           updated_at?: string
           volume_unit?: string
+          website?: string | null
         }
         Relationships: []
       }

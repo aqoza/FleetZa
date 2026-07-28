@@ -11,6 +11,7 @@ import {
   registrationLine,
   toArabicDigits,
   type RegistrationBlock,
+  type RegistrationLabels,
 } from "../../lib/certificate";
 import type {
   Customer,
@@ -222,13 +223,17 @@ export default function CertificatePrintPage() {
     poBox: tenant.po_box,
     postalCode: tenant.postal_code,
     locality: tenant.city,
-    phones: [tenant.phone, tenant.phone_secondary],
+    website: tenant.website,
+    phone: tenant.phone,
+    phoneSecondary: tenant.phone_secondary,
   };
-  const labelsFor = (lang: "en" | "ar") => ({
+  const labelsFor = (lang: "en" | "ar"): RegistrationLabels => ({
     cr: translateIn(lang, "slCertificates.report.footerCr"),
     poBox: translateIn(lang, "slCertificates.report.footerPoBox"),
     postalCode: translateIn(lang, "slCertificates.report.footerPostalCode"),
-    gsm: translateIn(lang, "slCertificates.report.footerGsm"),
+    website: translateIn(lang, "slCertificates.report.footerWebsite"),
+    phone: translateIn(lang, "slCertificates.report.footerPhone"),
+    phoneSecondary: translateIn(lang, "slCertificates.report.footerPhoneSecondary"),
     separator: translateIn(lang, "slCertificates.report.footerSeparator"),
   });
   const registrationEn = registrationLine(registration, labelsFor("en"));
@@ -239,6 +244,13 @@ export default function CertificatePrintPage() {
   );
   const servicesLine =
     (language === "ar" ? tenant.services_line_ar : null) ?? tenant.services_line;
+  // Authorized-signatory block. Like the services line, the strip carries one
+  // language rather than both, so it follows the document's own half: the
+  // Arabic forms when the certificate is being issued in Arabic, with the
+  // Latin ones as the fallback a tenant that set neither still gets.
+  const signatoryName =
+    (language === "ar" ? tenant.signatory_name_ar : null) ?? tenant.signatory_name;
+  const signatoryCompany = (language === "ar" ? tenant.name_ar : null) ?? tenant.name;
   const hasFooter = Boolean(
     servicesLine || registrationEn || registrationAr || tenant.email,
   );
@@ -398,8 +410,8 @@ export default function CertificatePrintPage() {
           </tbody>
         </table>
 
-        {/* QR + signature + stamp strip. The reference leaves the middle cell
-            empty and carries the signature and stamp together on the right. */}
+        {/* QR + signature + stamp strip. The middle cell carries the
+            authorized-signatory block, the right one the company stamp. */}
         <table className="mt-4 w-full table-fixed border-collapse break-inside-avoid">
           <Cols widths={STRIP_COLS} />
           <tbody>
@@ -416,12 +428,39 @@ export default function CertificatePrintPage() {
                 )}
               </Cell>
               <Cell className="text-center">
-                {tenant.signature_url && (
-                  <img
-                    src={tenant.signature_url}
-                    alt={t("slCertificates.report.signature")}
-                    className="mx-auto max-h-[84px] object-contain"
-                  />
+                {/* With a signatory configured the cell carries the block the
+                    dealer signs under: "For <trade name>", the mark, the
+                    signatory's name. It has to stay inside the strip's 92px
+                    row so the certificate keeps to one A4 page, so the two
+                    11px/14px lines are paid for out of the image's cap
+                    (14 + 2 + 52 + 2 + 14 = 84 ≤ the 86px of content the row
+                    leaves). A tenant with no signatory prints exactly what it
+                    printed before: the mark alone, at its full height. */}
+                {signatoryName ? (
+                  <span className="block text-[11px] leading-[14px]">
+                    <span className="block">
+                      {t("slCertificates.report.forCompany", { name: signatoryCompany })}
+                    </span>
+                    {tenant.signature_url ? (
+                      <img
+                        src={tenant.signature_url}
+                        alt={t("slCertificates.report.signature")}
+                        className="mx-auto my-0.5 max-h-[52px] max-w-full object-contain"
+                      />
+                    ) : (
+                      // Room to sign by hand, as on the scanned original.
+                      <span className="my-0.5 block h-[52px]" />
+                    )}
+                    <span className="block font-semibold">{signatoryName}</span>
+                  </span>
+                ) : (
+                  tenant.signature_url && (
+                    <img
+                      src={tenant.signature_url}
+                      alt={t("slCertificates.report.signature")}
+                      className="mx-auto max-h-[84px] object-contain"
+                    />
+                  )
                 )}
               </Cell>
               <Cell className="text-center">
@@ -449,7 +488,11 @@ export default function CertificatePrintPage() {
                 <div className="print-exact h-5 bg-doc-green" />
               </>
             )}
-            <div className="px-10 pt-1.5 text-center text-[11.5px] leading-[16px] text-ink print:px-8">
+            {/* Website + two labelled contact numbers made this line longer
+                than the reference's single "GSM: a / b" segment, so it now
+                wraps to two lines in each language pass. Sized down from the
+                document's original 11.5px/16px to keep that bounded. */}
+            <div className="px-10 pt-1.5 text-center text-[10.5px] leading-[14px] text-ink print:px-8">
               {registrationAr && <p dir="rtl">{registrationAr}</p>}
               {registrationEn && <p dir="ltr">{registrationEn}</p>}
               {tenant.email && (
@@ -461,12 +504,6 @@ export default function CertificatePrintPage() {
           </div>
         )}
 
-        <div className="mt-6 border-t border-line pt-3 text-center text-[11px] text-ink-3 print:hidden">
-          <p>{t("slCertificates.generatedBy")}</p>
-          <p className="mt-0.5">
-            {t("slCertificates.verifyAt")} <span dir="ltr">{verifyUrl}</span>
-          </p>
-        </div>
       </Card>
     </>
   );
