@@ -55,6 +55,13 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.setSpeedSecondary": "النطاق الثاني (كم/س)",
   "slCertificates.setSpeedSecondaryHint":
     "اختياري. تطبع الشهادات النطاقين معًا، مثل ٧٠/٩٠ كم/س.",
+  "slCertificates.technician": "الفني",
+  "slCertificates.technicianHint": "يُطبع على الشهادة. القيمة الافتراضية من إعدادات الشهادات.",
+  "slCertificates.technicianNone": "— بدون —",
+  "slCertificates.defaultTechnician": "الفني الافتراضي",
+  "slCertificates.defaultTechnicianHint":
+    "يُحدَّد مسبقًا عند إصدار الشهادة. يُنسخ الاسم إلى كل شهادة عند إصدارها، لذا لا يؤدي تغيير اسم الفني أو حذفه إلى تغيير شهادة صادرة.",
+  "slCertificates.defaultTechnicianNone": "— بدون افتراضي —",
   "slCertificates.issuedAt": "تاريخ الإصدار",
   "slCertificates.expiresAt": "تاريخ الانتهاء",
   "slCertificates.renewConfirm": "إصدار الشهادة",

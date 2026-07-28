@@ -14,6 +14,7 @@ import {
 import type {
   Customer,
   SlSettings,
+  SlTechnician,
   SpeedLimiterCertificate,
   Vehicle,
 } from "../../lib/types";
@@ -21,11 +22,12 @@ import { useAuth } from "../../context/AuthContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination,
-  Textarea,
+  Select, Textarea,
 } from "../../components/ui";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import {
   RenewCertificateModal, defaultRenewalDates, renewCertificate,
+  resolveDefaultTechnicianName, useActiveTechnicians,
 } from "./RenewCertificateModal";
 
 type CertRow = SpeedLimiterCertificate & {
@@ -192,11 +194,15 @@ function RenewRowAction({
 function BulkRenewForm({
   certs,
   validityMonths,
+  technicians,
+  defaultTechnicianId,
   onDone,
   onBusyChange,
 }: {
   certs: CertRow[];
   validityMonths: number;
+  technicians: SlTechnician[];
+  defaultTechnicianId: string | null;
   onDone: () => void;
   /** Reports the in-flight run upward so the dialog can refuse to close. */
   onBusyChange: (busy: boolean) => void;
@@ -227,6 +233,14 @@ function BulkRenewForm({
             set_speed_secondary_kmh: cert.set_speed_secondary_kmh,
             issued_at: dates.issued_at,
             expires_at: dates.expires_at,
+            // Bulk has no per-row picker, so each renewal keeps the name its
+            // predecessor carried and falls back to the configured default.
+            technician_name:
+              resolveDefaultTechnicianName(
+                technicians,
+                defaultTechnicianId,
+                cert.technician_name,
+              ) || null,
           });
           ok.push({ from: cert.certificate_number, to: created.certificate_number });
         } catch (err) {
@@ -447,9 +461,11 @@ function RevokeForm({ cert, onDone }: { cert: CertRow; onDone: () => void }) {
 function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () => void }) {
   const t = useT();
   const qc = useQueryClient();
+  const technicians = useActiveTechnicians();
   const [form, setForm] = useState({
     cert_prefix: settings.cert_prefix,
     cert_validity_months: String(settings.cert_validity_months),
+    default_technician_id: settings.default_technician_id ?? "",
   });
   const [error, setError] = useState("");
 
@@ -462,6 +478,7 @@ function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () =
         .update({
           cert_prefix: form.cert_prefix.trim(),
           cert_validity_months: Number(form.cert_validity_months),
+          default_technician_id: form.default_technician_id || null,
         })
         .eq("tenant_id", settings.tenant_id);
       if (updateError) throw wrapDbError(updateError);
@@ -496,6 +513,22 @@ function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () =
           value={form.cert_validity_months}
           onChange={(e) => setForm((f) => ({ ...f, cert_validity_months: e.target.value }))}
         />
+      </Field>
+      <Field
+        label={t("slCertificates.defaultTechnician")}
+        hint={t("slCertificates.defaultTechnicianHint")}
+      >
+        <Select
+          value={form.default_technician_id}
+          onChange={(e) => setForm((f) => ({ ...f, default_technician_id: e.target.value }))}
+        >
+          <option value="">{t("slCertificates.defaultTechnicianNone")}</option>
+          {(technicians.data ?? []).map((tech) => (
+            <option key={tech.id} value={tech.id}>
+              {tech.name}
+            </option>
+          ))}
+        </Select>
       </Field>
       <div className="flex justify-end gap-2">
         <Button type="button" variant="secondary" onClick={onDone}>{t("action.cancel")}</Button>
@@ -650,6 +683,8 @@ export default function CertificatesPage() {
   });
   const settings = settingsRows?.[0] ?? null;
   const validityMonths = settings?.cert_validity_months ?? 12;
+  // Offered in the bulk dialog; the single-certificate modal loads its own.
+  const technicians = useActiveTechnicians();
 
   const remove = useMutation({
     mutationFn: (id: string) => deleteRow("speed_limiter_certificates", id),
@@ -947,6 +982,8 @@ export default function CertificatesPage() {
           <BulkRenewForm
             certs={bulkRenewing}
             validityMonths={validityMonths}
+            technicians={technicians.data ?? []}
+            defaultTechnicianId={settings?.default_technician_id ?? null}
             onDone={() => setBulkRenewing(null)}
             onBusyChange={setBulkBusy}
           />
