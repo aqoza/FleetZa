@@ -132,6 +132,8 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
 
   "slCertificates.report.typeInstallation": "تركيب",
   "slCertificates.report.typeRenewal": "تجديد",
+  "slCertificates.report.applicableStandard": "المواصفة المعتمدة",
+  "slCertificates.report.certificateNo": "رقم الشهادة",
   "slCertificates.report.countryOfInstallation": "بلد التركيب",
   "slCertificates.report.declarationTitle": "إقرار",
   "slCertificates.report.declarationText":

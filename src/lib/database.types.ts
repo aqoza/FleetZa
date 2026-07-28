@@ -2051,6 +2051,7 @@ export type Database = {
           status: string
           superseded_by: string | null
           tamper_seal_number: string | null
+          technician_name: string | null
           tenant_id: string
           uin: string | null
           updated_at: string
@@ -2079,6 +2080,7 @@ export type Database = {
           status?: string
           superseded_by?: string | null
           tamper_seal_number?: string | null
+          technician_name?: string | null
           tenant_id?: string
           uin?: string | null
           updated_at?: string
@@ -2107,6 +2109,7 @@ export type Database = {
           status?: string
           superseded_by?: string | null
           tamper_seal_number?: string | null
+          technician_name?: string | null
           tenant_id?: string
           uin?: string | null
           updated_at?: string
@@ -2329,6 +2332,7 @@ export type Database = {
       tenants: {
         Row: {
           address: string | null
+          applicable_standard: string | null
           archetype: string
           city: string | null
           city_ar: string | null
@@ -2361,6 +2365,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          applicable_standard?: string | null
           archetype?: string
           city?: string | null
           city_ar?: string | null
@@ -2393,6 +2398,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          applicable_standard?: string | null
           archetype?: string
           city?: string | null
           city_ar?: string | null
@@ -3015,6 +3021,7 @@ export type Database = {
           status: string
           superseded_by: string | null
           tamper_seal_number: string | null
+          technician_name: string | null
           tenant_id: string
           uin: string | null
           updated_at: string

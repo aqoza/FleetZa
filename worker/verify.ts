@@ -23,6 +23,7 @@ type CertVerifyRow = {
   issuing_authority: string | null;
   limiter_type: string | null;
   tamper_seal_number: string | null;
+  technician_name: string | null;
   vehicles: {
     name: string;
     license_plate: string | null;
@@ -40,7 +41,10 @@ type CertVerifyRow = {
     model: string | null;
     limiter_type: string | null;
   } | null;
-  sl_jobs: { completed_at: string | null } | null;
+  sl_jobs: {
+    completed_at: string | null;
+    sl_technicians: { name: string } | null;
+  } | null;
   speed_limiter_installations: {
     installed_at: string | null;
     tamper_seal_number: string | null;
@@ -65,10 +69,10 @@ verify.get("/:id", async (c) => {
   const { data: cert } = await admin
     .from("speed_limiter_certificates")
     .select(
-      "certificate_number, uin, issued_at, expires_at, status, set_speed_kmh, set_speed_secondary_kmh, issuing_authority, limiter_type, tamper_seal_number, " +
+      "certificate_number, uin, issued_at, expires_at, status, set_speed_kmh, set_speed_secondary_kmh, issuing_authority, limiter_type, tamper_seal_number, technician_name, " +
         "vehicles(name, license_plate, chassis_number, engine_number, make, model, year), " +
         "customers(name), tenants(name), sl_devices(serial, manufacturer, model, limiter_type), " +
-        "sl_jobs(completed_at), speed_limiter_installations(installed_at, tamper_seal_number)",
+        "sl_jobs(completed_at, sl_technicians(name)), speed_limiter_installations(installed_at, tamper_seal_number)",
     )
     .eq("id", id)
     .maybeSingle<CertVerifyRow>();
@@ -125,5 +129,7 @@ verify.get("/:id", async (c) => {
     deviceSerial: device?.serial ?? null,
     tamperSealNumber: tamperSeal,
     installedAt,
+    technicianName:
+      cert.technician_name ?? cert.sl_jobs?.sl_technicians?.name ?? null,
   });
 });

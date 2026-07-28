@@ -206,7 +206,12 @@ export default function CertificatePrintPage() {
   const revokedAt = cert.revoked_at;
   const revokedReason = cert.revoked_reason;
   const customerName = cert.customers?.name ?? null;
-  const technicianName = cert.sl_jobs?.sl_technicians?.name ?? null;
+  // Snapshot first, exactly like limiterType and tamperSeal below: the
+  // certificate records who it was issued by, and the job relation is only
+  // the fallback for rows issued before the column existed. A certificate
+  // with no job at all has no other route to a name.
+  const technicianName =
+    cert.technician_name ?? cert.sl_jobs?.sl_technicians?.name ?? null;
   const expiresAt = cert.expires_at;
   const speedBand =
     formatSpeedBand(
@@ -334,7 +339,8 @@ export default function CertificatePrintPage() {
               : t("slCertificates.report.typeInstallation")
           }
           head={{
-            certificateNumber,
+            standardLabel: t("slCertificates.report.applicableStandard"),
+            standard: tenant.applicable_standard ?? "",
             countryLabel: t("slCertificates.report.countryOfInstallation"),
             countryName,
           }}
@@ -422,6 +428,8 @@ export default function CertificatePrintPage() {
             value: uin,
             validLabel: t("slCertificates.report.validUpto"),
             validValue: formatDocumentDate(expiresAt) ?? DASH,
+            certificateNoLabel: t("slCertificates.report.certificateNo"),
+            certificateNumber,
           }}
           strip={{
             qr: qr || null,
@@ -526,8 +534,12 @@ export default function CertificatePrintPage() {
           <Cols widths={HEAD_COLS} />
           <tbody>
             <tr>
-              <Cell>{cert.certificate_number}</Cell>
-              <Cell />
+              {/* The standard the fitted limiter is certified against. Per
+                  tenant, not per certificate: it applies to every vehicle a
+                  dealer certifies. A tenant that has not set one prints the
+                  pair blank, as this cell was before. */}
+              <Cell>{t("slCertificates.report.applicableStandard")}</Cell>
+              <Cell>{tenant.applicable_standard ?? ""}</Cell>
               <Cell>{t("slCertificates.report.countryOfInstallation")}</Cell>
               <Cell>{countryName}</Cell>
             </tr>
@@ -606,7 +618,7 @@ export default function CertificatePrintPage() {
               <span dir="ltr">{formatDocumentDate(installedOn) ?? DASH}</span>
             </Cell>
             <Cell>{t("slCertificates.report.technicianName")}</Cell>
-            <Cell>{cert.sl_jobs?.sl_technicians?.name ?? DASH}</Cell>
+            <Cell>{technicianName ?? DASH}</Cell>
           </tr>
         </DocTable>
 
@@ -634,6 +646,13 @@ export default function CertificatePrintPage() {
               <Cell>
                 <span dir="ltr">{formatDocumentDate(cert.expires_at) ?? DASH}</span>
               </Cell>
+            </tr>
+            {/* The certificate's own reference, unique per record. It used to
+                sit unlabelled in the header row; it lives here now, beside
+                the other identifiers, so the header can carry the standard. */}
+            <tr>
+              <Cell>{t("slCertificates.report.certificateNo")}</Cell>
+              <Cell span={3}>{certificateNumber}</Cell>
             </tr>
           </tbody>
         </table>

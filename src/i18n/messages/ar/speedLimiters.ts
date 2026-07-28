@@ -95,6 +95,7 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   "speedLimiters.verify.serialNo": "الرقم التسلسلي",
   "speedLimiters.verify.tamperSeal": "رقم الختم الأمني",
   "speedLimiters.verify.installedAt": "تاريخ التركيب",
+  "speedLimiters.verify.technician": "الفني",
   "speedLimiters.verify.certificateNumber": "رقم الشهادة",
   "speedLimiters.verify.uin": "الرقم التعريفي الفريد",
   "speedLimiters.verify.issuedBy": "صادرة عن",

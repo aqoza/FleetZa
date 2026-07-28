@@ -91,6 +91,7 @@ export const enSpeedLimiters = {
   "speedLimiters.verify.serialNo": "Serial no.",
   "speedLimiters.verify.tamperSeal": "Tamper seal no.",
   "speedLimiters.verify.installedAt": "Date of installation",
+  "speedLimiters.verify.technician": "Technician",
   "speedLimiters.verify.certificateNumber": "Certificate number",
   "speedLimiters.verify.uin": "UIN",
   "speedLimiters.verify.issuedBy": "Issued by",

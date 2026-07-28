@@ -35,6 +35,7 @@ interface VerifyResult {
   deviceSerial?: string | null;
   tamperSealNumber?: string | null;
   installedAt?: string | null;
+  technicianName?: string | null;
 }
 
 const banners: Record<
@@ -179,6 +180,7 @@ export default function VerifyPage() {
       ["speedLimiters.verify.setSpeed", band],
       ["speedLimiters.verify.serialNo", result.deviceSerial],
       ["speedLimiters.verify.tamperSeal", result.tamperSealNumber],
+      ["speedLimiters.verify.technician", result.technicianName],
       [
         "speedLimiters.verify.installedAt",
         result.installedAt ? formatPlainDate(result.installedAt) : null,

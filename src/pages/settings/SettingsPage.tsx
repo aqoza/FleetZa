@@ -261,6 +261,7 @@ function OrganizationTab() {
     email: tenant.email ?? "",
     phone_secondary: tenant.phone_secondary ?? "",
     website: tenant.website ?? "",
+    applicable_standard: tenant.applicable_standard ?? "",
     services_line: tenant.services_line ?? "",
     services_line_ar: tenant.services_line_ar ?? "",
     signature_url: tenant.signature_url ?? "",
@@ -299,6 +300,7 @@ function OrganizationTab() {
         email: form.email.trim() || null,
         phone_secondary: form.phone_secondary.trim() || null,
         website: form.website.trim() || null,
+        applicable_standard: form.applicable_standard.trim() || null,
         services_line: form.services_line.trim() || null,
         services_line_ar: form.services_line_ar.trim() || null,
         signature_url: form.signature_url.trim() || null,
@@ -559,6 +561,18 @@ function OrganizationTab() {
                 />
               </Field>
             </div>
+
+            <Field
+              label={t("settings.applicableStandard")}
+              hint={t("settings.applicableStandardHint")}
+            >
+              <Input
+                dir="ltr"
+                placeholder="GSO-1026/2002"
+                value={form.applicable_standard}
+                onChange={(e) => set("applicable_standard", e.target.value)}
+              />
+            </Field>
 
             <Field label={t("settings.servicesLine")} hint={t("settings.servicesLineHint")}>
               <Input

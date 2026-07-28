@@ -170,11 +170,24 @@ export type PdfSection = { title: string; rows: PdfRow[] };
 export type CertificatePdfProps = {
   masthead: { ar: string | null; en: string };
   typeLabel: string;
-  head: { certificateNumber: string; countryLabel: string; countryName: string };
+  head: {
+    standardLabel: string;
+    standard: string;
+    countryLabel: string;
+    countryName: string;
+  };
   revoked: { title: string; on: string | null; reason: string | null } | null;
   declaration: { title: string; body: string };
   sections: PdfSection[];
-  uin: { label: string; value: string; validLabel: string; validValue: string };
+  uin: {
+    label: string;
+    value: string;
+    validLabel: string;
+    validValue: string;
+    /** The certificate's own reference, unique per record. */
+    certificateNoLabel: string;
+    certificateNumber: string;
+  };
   strip: {
     qr: string | null;
     signatureUrl: string | null;
@@ -281,7 +294,7 @@ export default function CertificatePdfDocument(props: CertificatePdfProps) {
     props;
 
   return (
-    <Document title={head.certificateNumber}>
+    <Document title={uin.certificateNumber}>
       <Page size="A4" style={styles.page}>
         {/* Masthead. Arabic above the Latin name, as on the dealer letterhead. */}
         {masthead.ar ? <Text style={styles.mastheadAr}>{masthead.ar}</Text> : null}
@@ -291,8 +304,8 @@ export default function CertificatePdfDocument(props: CertificatePdfProps) {
 
         <View style={styles.table}>
           <View style={styles.row}>
-            <Cell width={HEAD_COLS[0]}>{head.certificateNumber}</Cell>
-            <Cell width={HEAD_COLS[1]} />
+            <Cell width={HEAD_COLS[0]}>{head.standardLabel}</Cell>
+            <Cell width={HEAD_COLS[1]}>{head.standard}</Cell>
             <Cell width={HEAD_COLS[2]}>{head.countryLabel}</Cell>
             <Cell width={HEAD_COLS[3]}>{head.countryName}</Cell>
           </View>
@@ -330,6 +343,10 @@ export default function CertificatePdfDocument(props: CertificatePdfProps) {
             <Cell width={UIN_COLS[1]}>{uin.value}</Cell>
             <Cell width={UIN_COLS[2]}>{uin.validLabel}</Cell>
             <Cell width={UIN_COLS[3]}>{uin.validValue}</Cell>
+          </View>
+          <View style={styles.row}>
+            <Cell width={UIN_COLS[0]}>{uin.certificateNoLabel}</Cell>
+            <Cell width="75.3%">{uin.certificateNumber}</Cell>
           </View>
         </View>
 

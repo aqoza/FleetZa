@@ -51,6 +51,9 @@ export const enSettings = {
   "settings.phoneHint": "Prints on certificates as the service and support number.",
   "settings.phoneSecondary": "Second phone",
   "settings.phoneSecondaryHint": "Prints on certificates as the alternative contact.",
+  "settings.applicableStandard": "Applicable standard",
+  "settings.applicableStandardHint":
+    "Printed in the certificate header, e.g. GSO-1026/2002. It applies to every vehicle you certify; leave empty to print nothing.",
   "settings.servicesLine": "Services line",
   "settings.servicesLineHint":
     "The tagline on the colored footer band, e.g. Road speed limiter | Automotive diagnostic system.",

@@ -56,6 +56,9 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.phoneHint": "يُطبع في الشهادات بوصفه رقم الخدمة والدعم.",
   "settings.phoneSecondary": "هاتف إضافي",
   "settings.phoneSecondaryHint": "يُطبع في الشهادات بوصفه الرقم البديل.",
+  "settings.applicableStandard": "المواصفة المعتمدة",
+  "settings.applicableStandardHint":
+    "تُطبع في ترويسة الشهادة، مثل ‎GSO-1026/2002‎. تنطبق على كل مركبة تصدر لها شهادة؛ اتركه فارغًا لعدم الطباعة.",
   "settings.servicesLine": "سطر الخدمات",
   "settings.servicesLineHint":
     "العبارة الظاهرة على الشريط الملوّن في التذييل، مثل: محدد سرعة الطريق | أنظمة الفحص الإلكتروني.",
