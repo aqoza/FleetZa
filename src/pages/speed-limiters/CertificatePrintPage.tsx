@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
@@ -98,11 +98,28 @@ function Cell({
   );
 }
 
-/** Black section banner in the official document style — fills survive print. */
+/**
+ * Black section banner in the official document style.
+ *
+ * The fill is an SVG rect rather than a CSS background for the same reason as
+ * the footer bands: a browser drops background fills from print unless
+ * "Background graphics" is ticked, which is off by default and cannot be set
+ * from the page. Here it matters more than colour — the label is white, so a
+ * dropped fill prints white-on-white and the section heading disappears
+ * entirely. An SVG rect is content and always prints.
+ */
 function SectionBanner({ children }: { children: ReactNode }) {
   return (
-    <div className="print-exact mt-4 bg-ink px-1.5 py-1 text-[13px] leading-4 text-surface">
-      {children}
+    <div className="mt-4">
+      <svg
+        aria-hidden="true"
+        className="block h-6 w-full"
+        preserveAspectRatio="none"
+        viewBox="0 0 100 24"
+      >
+        <rect x="0" y="0" width="100" height="24" fill="var(--color-ink)" />
+      </svg>
+      <div className="-mt-6 h-6 px-1.5 text-[13px] leading-6 text-surface">{children}</div>
     </div>
   );
 }
@@ -131,7 +148,6 @@ export default function CertificatePrintPage() {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState("");
-  const docRef = useRef<HTMLDivElement>(null);
 
   const { data: cert, isLoading, error } = useQuery({
     queryKey: ["speed_limiter_certificates", certId],
@@ -181,10 +197,17 @@ export default function CertificatePrintPage() {
 
   const vehicle = cert.vehicles;
   const device = cert.sl_devices;
-  // Captured as a local so the async downloadPdf closure below doesn't need
-  // its own narrowing of `cert` (TS doesn't carry the guard above into a
-  // nested function body).
+  // Captured as locals so the async downloadPdf closure below doesn't need its
+  // own narrowing of `cert` (TS doesn't carry the guard above into a nested
+  // function body). These are the same values the JSX renders — the PDF is
+  // built from them rather than from the DOM.
   const certificateNumber = cert.certificate_number;
+  const certStatus = cert.status;
+  const revokedAt = cert.revoked_at;
+  const revokedReason = cert.revoked_reason;
+  const customerName = cert.customers?.name ?? null;
+  const technicianName = cert.sl_jobs?.sl_technicians?.name ?? null;
+  const expiresAt = cert.expires_at;
   const speedBand =
     formatSpeedBand(
       cert.set_speed_kmh,
@@ -229,6 +252,12 @@ export default function CertificatePrintPage() {
     ) : (
       tenant.address ?? phoneNode ?? countryName
     );
+  // Same value as `dealerContact`, flattened for the PDF (which takes strings,
+  // and runs bidi itself rather than needing the dir="ltr" wrapper).
+  const dealerContactText =
+    tenant.address && tenant.phone
+      ? `${tenant.address} · ${tenant.phone}`
+      : tenant.address ?? tenant.phone ?? countryName;
 
   // The registration strip prints in both languages on every copy, so its
   // labels are pulled per-language rather than from the active dictionary.
@@ -269,47 +298,156 @@ export default function CertificatePrintPage() {
     servicesLine || registrationEn || registrationAr || tenant.email,
   );
 
-  // A downloaded file can't depend on the OS print dialog's own "background
-  // graphics" toggle — off by default in most browsers, and the one thing
-  // `print-exact` (src/index.css) cannot force. html2canvas rasterizes the
-  // live DOM instead, so the flag-colored footer band always survives.
-  // Dynamically imported: neither library is needed until this is clicked.
+  /**
+   * The download is a real vector PDF, not a screenshot of this page.
+   *
+   * It is built from the values computed above rather than from the DOM, so
+   * the two renderings can not disagree about content; only the layout is
+   * expressed twice (see CertificatePdfDocument). Everything is imported on
+   * click — the renderer is a large dependency and no one who merely views a
+   * certificate should pay for it.
+   */
   async function downloadPdf() {
-    if (!docRef.current) return;
     setDownloading(true);
     setDownloadError("");
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
-      const canvas = await html2canvas(docRef.current, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        // The clone is a separate, offscreen document — flipping its theme
-        // doesn't touch what the user is actually looking at. Paper is
-        // always light (same rule `@media print` already applies), so a
-        // dark-mode viewer's download must not come out inverted.
-        onclone: (clonedDoc) => {
-          clonedDoc.documentElement.setAttribute("data-theme", "light");
-        },
-      });
-      const pdf = new jsPDF({ unit: "mm", format: "a4" });
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const fitScale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-      const imgWidth = canvas.width * fitScale;
-      const imgHeight = canvas.height * fitScale;
-      pdf.addImage(
-        canvas.toDataURL("image/png"),
-        "PNG",
-        (pageWidth - imgWidth) / 2,
-        0,
-        imgWidth,
-        imgHeight,
-      );
-      pdf.save(`${certificateNumber.replace(/[/\\]/g, "-")}.pdf`);
+      const [{ pdf }, { registerCertificateFonts }, { default: PdfDocument }] =
+        await Promise.all([
+          import("@react-pdf/renderer"),
+          import("./certificatePdfFonts"),
+          import("./CertificatePdfDocument"),
+        ]);
+      registerCertificateFonts();
+
+      const r = t("slCertificates.report.registrationNo");
+      const blob = await pdf(
+        <PdfDocument
+          masthead={{ ar: tenant.name_ar, en: tenant.name }}
+          typeLabel={
+            isRenewal
+              ? t("slCertificates.report.typeRenewal")
+              : t("slCertificates.report.typeInstallation")
+          }
+          head={{
+            certificateNumber,
+            countryLabel: t("slCertificates.report.countryOfInstallation"),
+            countryName,
+          }}
+          revoked={
+            certStatus === "revoked"
+              ? {
+                  title: t("slCertificates.revokedBanner"),
+                  on: revokedAt
+                    ? t("slCertificates.revokedOn", {
+                        date: formatDocumentDate(revokedAt) ?? DASH,
+                      })
+                    : null,
+                  reason: revokedReason,
+                }
+              : null
+          }
+          declaration={{
+            title: t("slCertificates.report.declarationTitle"),
+            body: t("slCertificates.report.declarationText", { speed: speedBand }),
+          }}
+          sections={[
+            {
+              title: t("slCertificates.report.vehicleDetails"),
+              rows: [
+                {
+                  label: t("slCertificates.report.vehicleOwner"),
+                  value: customerName ?? tenant.name,
+                },
+                {
+                  label: r,
+                  value: vehicle?.license_plate ?? vehicle?.name ?? DASH,
+                  label2: t("slCertificates.report.chassisNo"),
+                  value2: vehicle?.chassis_number ?? vehicle?.vin ?? DASH,
+                },
+                {
+                  label: t("slCertificates.report.engineNo"),
+                  value: vehicle?.engine_number ?? DASH,
+                  label2: t("slCertificates.report.makeOfVehicle"),
+                  value2: vehicle?.make ?? DASH,
+                },
+                {
+                  label: t("slCertificates.report.modelOfVehicle"),
+                  value: vehicle?.model ?? DASH,
+                  label2: t("slCertificates.report.yearOfManufacture"),
+                  value2: vehicle?.year != null ? String(vehicle.year) : DASH,
+                },
+              ],
+            },
+            {
+              title: t("slCertificates.report.slDetails"),
+              rows: [
+                {
+                  label: t("slCertificates.report.limiterType"),
+                  value: limiterType,
+                  label2: t("slCertificates.report.setSpeedLimit"),
+                  value2: speedBand,
+                },
+                {
+                  label: t("slCertificates.report.serialNo"),
+                  value: device?.serial ?? DASH,
+                  label2: t("slCertificates.report.tamperSealNo"),
+                  value2: tamperSeal,
+                },
+                {
+                  label: t("slCertificates.report.dateOfInstallation"),
+                  value: formatDocumentDate(installedOn) ?? DASH,
+                  label2: t("slCertificates.report.technicianName"),
+                  value2: technicianName ?? DASH,
+                },
+              ],
+            },
+            {
+              title: t("slCertificates.report.dealerDetails"),
+              rows: [
+                { label: t("slCertificates.report.dealerName"), value: tenant.name },
+                {
+                  label: t("slCertificates.report.addressPhone"),
+                  value: dealerContactText,
+                },
+              ],
+            },
+          ]}
+          uin={{
+            label: t("slCertificates.report.uinLabel"),
+            value: uin,
+            validLabel: t("slCertificates.report.validUpto"),
+            validValue: formatDocumentDate(expiresAt) ?? DASH,
+          }}
+          strip={{
+            qr: qr || null,
+            signatureUrl: tenant.signature_url,
+            stampUrl: tenant.stamp_url,
+            forCompany: signatoryName
+              ? t("slCertificates.report.forCompany", { name: signatoryCompany })
+              : null,
+            signatoryName,
+          }}
+          footer={
+            hasFooter
+              ? {
+                  servicesLine,
+                  registrationAr,
+                  registrationEn,
+                  email: tenant.email
+                    ? t("slCertificates.report.footerEmail", { value: tenant.email })
+                    : null,
+                }
+              : null
+          }
+        />,
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${certificateNumber.replace(/[/\\]/g, "-")}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
     } catch {
       setDownloadError(t("slCertificates.downloadFailed"));
     } finally {
@@ -356,7 +494,6 @@ export default function CertificatePrintPage() {
           app's no-webfont rule can't leak past this one page.
         */}
         <div
-          ref={docRef}
           className="flex min-h-[250mm] flex-col px-10 py-8 print:px-8 print:py-4"
           style={{ fontFamily: '"IBM Plex Sans Arabic", "Inter", ui-sans-serif, system-ui, sans-serif' }}
         >
@@ -569,10 +706,36 @@ export default function CertificatePrintPage() {
           <div className="mt-auto -mx-10 break-inside-avoid pt-6 print:-mx-8">
             {servicesLine && (
               <>
-                <div className="print-exact bg-doc-red px-4 py-1 text-center text-[11px] font-bold uppercase tracking-wide text-surface rtl:tracking-normal">
+                {/*
+                  The flag bands are drawn as SVG rather than as a CSS
+                  background. A browser strips background fills from print
+                  unless the user has ticked "Background graphics" — off by
+                  default, and nothing on the page can turn it on, so
+                  `print-color-adjust: exact` alone does not save it. An SVG
+                  rect is content, not a background, so it prints either way.
+                  Verified by rendering this page with printBackground:false.
+                  The band sits behind the text via a negative margin so the
+                  two stay one visual unit.
+                */}
+                <svg
+                  aria-hidden="true"
+                  className="block h-6 w-full"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 100 24"
+                >
+                  <rect x="0" y="0" width="100" height="24" fill="var(--color-doc-red)" />
+                </svg>
+                <div className="-mt-6 h-6 px-4 text-center text-[11px] font-bold uppercase leading-6 tracking-wide text-surface rtl:tracking-normal">
                   {servicesLine}
                 </div>
-                <div className="print-exact h-5 bg-doc-green" />
+                <svg
+                  aria-hidden="true"
+                  className="block h-5 w-full"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 100 20"
+                >
+                  <rect x="0" y="0" width="100" height="20" fill="var(--color-doc-green)" />
+                </svg>
               </>
             )}
             {/* Website + two labelled contact numbers made this line longer

@@ -147,17 +147,41 @@ stateDiagram-v2
 - **Print + QR** — `/speed-limiters/certificates/:id/print` renders the printable
   certificate with a QR code (via the `qrcode` package) encoding
   `<origin>/verify?c=<certUuid>`. See **The printed certificate** below.
-- **Download** — the same page's Download button rasterizes the certificate
-  with `html2canvas` and embeds it in a single-page A4 PDF with `jsPDF`,
-  dynamically imported so neither library reaches the app's main bundle. This
-  exists because the OS print dialog's own "background graphics" toggle —
-  off by default in most browsers — silently strips the footer's flag-colored
-  bands no matter what CSS says (`print-color-adjust: exact` only wins if
-  that toggle is already on; nothing in page content can turn it on). Capture
-  bypasses the print pipeline entirely, so the bands always survive. The
-  capture also forces `data-theme="light"` on the (offscreen) cloned
-  document via `onclone`, the same "paper is always light" rule `@media
-  print` already applies, so a dark-mode viewer's download doesn't invert.
+- **Coloured fills must be SVG, not CSS backgrounds.** A browser drops
+  `background-color` from print unless the user has ticked "Background
+  graphics" — off by default in Chrome/Edge, and nothing on the page can turn
+  it on (`print-color-adjust: exact` only wins once that toggle is already on).
+  The footer's flag bands and the dark section banners are therefore drawn as
+  inline `<svg><rect fill="var(--color-…)">` with the label overlaid via a
+  negative margin. SVG is content, not a background, so it always prints. This
+  matters most for the banners: the label is white, so a dropped fill printed
+  the section headings white-on-white — invisible. Verified by rendering the
+  page with `printBackground:false`, which is exactly that setting.
+- **Download** — the Download button builds a real **vector** PDF with
+  `@react-pdf/renderer` (`CertificatePdfDocument.tsx`), imported on click so
+  the renderer never reaches the main bundle. It is not a screenshot: the text
+  stays selectable, the file is ~30 KB rather than several MB, and nothing
+  depends on print settings or on the viewer's light/dark theme. The document
+  is built from the values `CertificatePrintPage` already computed rather than
+  from the DOM, so the two renderings cannot disagree about content; only the
+  layout is expressed twice.
+  - **Fonts**: it registers the *complete* `@ibm/plex-sans-arabic` family, not
+    the `@fontsource` subsets the screen uses — a PDF embeds one font per
+    family and the registration line mixes Arabic, Latin and NBSPs, so a
+    single-script subset prints notdef boxes for everything else. `pako@1` is
+    a required transitive dependency of the PDF engine's browser build (v2's
+    `exports` field blocks the deep imports it makes).
+  - **Bidi**: react-pdf runs the bidi algorithm and an Arabic shaper, so
+    Arabic is passed in logical order and comes out correctly ordered and
+    joined. (`pdfmake`/PDFKit were evaluated and rejected: they shape Arabic
+    but do not reorder it, printing the dealer's trade name backwards.) The
+    isolate characters `registrationLine` embeds are stripped for the PDF —
+    this font has no glyph for U+2068/U+2069 or LRM/RLM, so they would print
+    as literal boxes. **Known limitation:** without them the leading `+` of a
+    phone settles at the trailing edge of its number in the Arabic footer line
+    (`٩٦٨ ٧٥٢١ ٧٦٧٥+`). Segment order and the digit groups themselves are
+    correct — the groups are held together by NBSPs, which the font does have
+    — and the HTML/print pass is unaffected.
 - **Public verification** — the SPA page `/verify?c=<uuid>` calls the Worker's
   public `GET /api/verify/:certUuid`, which returns
   `{ status: "valid" | "expired" | "revoked" | "not_found", certificateNumber, uin, issuedAt, expiresAt, setSpeedKmh, setSpeedSecondaryKmh, issuingAuthority, vehiclePlate, vehicleName, customerName, issuedBy }`.
