@@ -94,13 +94,53 @@ export function resolveUin(
   return buildUin(chassis, certificateNumber);
 }
 
+/**
+ * U+2068 FIRST STRONG ISOLATE / U+2069 POP DIRECTIONAL ISOLATE — the text-level
+ * equivalent of `<bdi>`, for values embedded in a string that has no markup.
+ */
+const FIRST_STRONG_ISOLATE = String.fromCodePoint(0x2068);
+const POP_DIRECTIONAL_ISOLATE = String.fromCodePoint(0x2069);
+
+/** U+00A0 NO-BREAK SPACE. */
+const NO_BREAK_SPACE = String.fromCodePoint(0x00a0);
+
+/**
+ * A phone number, pinned so the bidi algorithm cannot rearrange it inside the
+ * `dir="rtl"` Arabic footer. A number written in full — "+968 7521 7675" — is
+ * entirely weak or neutral to the algorithm, and it takes **two** fixes, both
+ * verified against the Unicode bidi algorithm rather than assumed:
+ *
+ * 1. Isolates around the value. The leading "+" is neutral, so unisolated it
+ *    resolves against the surrounding Arabic and migrates to the far end of the
+ *    number, printing "٩٦٨+".
+ * 2. No-break spaces *between the digit groups*. Arabic-Indic digits are bidi
+ *    class AN, and an ordinary space between two AN runs resolves to R (rule
+ *    N1), which splits the number into chunks that are then laid out
+ *    right-to-left: "+968 7521 7675" prints as "+٧٦٧٥ ٧٥٢١ ٩٦٨". U+00A0 is a
+ *    common separator, which rule W4 folds *into* the number, keeping it one
+ *    unbroken left-to-right run. It also stops a certificate line-breaking in
+ *    the middle of a phone number, which is worth having on its own.
+ *
+ * Neither fix is sufficient alone; the isolate corrects the "+" and the
+ * no-break spaces correct the groups. See the bidi cases in the test file.
+ */
+function isolatePhone(value: string): string {
+  const bound = value.replace(/\s+/g, NO_BREAK_SPACE);
+  return `${FIRST_STRONG_ISOLATE}${bound}${POP_DIRECTIONAL_ISOLATE}`;
+}
+
 export interface RegistrationBlock {
   crNumber?: string | null;
   poBox?: string | null;
   postalCode?: string | null;
   /** Locality as the dealer writes it, e.g. "Muscat, Sultanate of Oman". */
   locality?: string | null;
-  phones?: (string | null | undefined)[];
+  /** Bare domain as the dealer writes it, e.g. "gawhrat.com". */
+  website?: string | null;
+  /** The number customers call for service — labelled in its own right. */
+  phone?: string | null;
+  /** The dealer's second line, labelled separately from `phone`. */
+  phoneSecondary?: string | null;
 }
 
 /** Label templates for one language; each carries its own `{value}` slot. */
@@ -108,36 +148,64 @@ export interface RegistrationLabels {
   cr: string;
   poBox: string;
   postalCode: string;
-  gsm: string;
+  website: string;
+  /** e.g. "Service & Support: {value}". */
+  phone: string;
+  /** e.g. "Alternative Contact: {value}". */
+  phoneSecondary: string;
   /** ", " in English, "، " in Arabic. */
   separator: string;
 }
 
 /**
  * The footer registration line: "C.R.No.1170010, P.O. Box: 2087, Postal Code:
- * 131, Muscat, Sultanate of Oman, GSM: 77227939 / 90407893". Empty fields drop
- * out with their label, so a partially configured tenant still prints a clean
- * line. `digits` converts numerals for the Arabic pass.
+ * 131, Muscat, Sultanate of Oman, Website: gawhrat.com, Service & Support:
+ * +968 7521 7675, Alternative Contact: +968 9040 7893".
+ *
+ * Order follows the printed document: the legal registration identifiers, then
+ * the locality, then the website, then each contact number under its own label
+ * (the dealer names them differently, so they are no longer slash-joined into
+ * one "GSM:" segment). Empty fields drop out **with** their label, so a
+ * partially configured tenant still prints a clean line.
+ *
+ * The e-mail address is deliberately *not* a segment here: the certificate
+ * prints it on its own line below the registration line, matching the dealer's
+ * scanned original, so the print page renders it separately.
+ *
+ * `digits` converts numerals for the Arabic pass. It is applied to the
+ * registration identifiers and the phone numbers — those read as prose on an
+ * Arabic document — but **never** to the website, which is a machine-readable
+ * address: "24auto.om" rewritten as "٢٤auto.om" is not reachable. The same
+ * reasoning applies to the e-mail the print page renders separately.
  */
 export function registrationLine(
   block: RegistrationBlock,
   labels: RegistrationLabels,
   digits: (value: string) => string = (value) => value,
 ): string {
+  const clean = (value: string | null | undefined) => value?.trim() || null;
   const fill = (template: string, value: string) =>
-    template.replaceAll("{value}", digits(value));
+    template.replaceAll("{value}", value);
+  /** A phone: numerals localised, then pinned against bidi reordering. */
+  const contact = (template: string, value: string) =>
+    fill(template, isolatePhone(digits(value)));
 
-  const phones = (block.phones ?? [])
-    .map((p) => p?.trim())
-    .filter((p): p is string => Boolean(p))
-    .join(" / ");
+  const crNumber = clean(block.crNumber);
+  const poBox = clean(block.poBox);
+  const postalCode = clean(block.postalCode);
+  const locality = clean(block.locality);
+  const website = clean(block.website);
+  const phone = clean(block.phone);
+  const phoneSecondary = clean(block.phoneSecondary);
 
   const segments = [
-    block.crNumber?.trim() && fill(labels.cr, block.crNumber.trim()),
-    block.poBox?.trim() && fill(labels.poBox, block.poBox.trim()),
-    block.postalCode?.trim() && fill(labels.postalCode, block.postalCode.trim()),
-    block.locality?.trim() && digits(block.locality.trim()),
-    phones && fill(labels.gsm, phones),
+    crNumber && fill(labels.cr, digits(crNumber)),
+    poBox && fill(labels.poBox, digits(poBox)),
+    postalCode && fill(labels.postalCode, digits(postalCode)),
+    locality && digits(locality),
+    website && fill(labels.website, website),
+    phone && contact(labels.phone, phone),
+    phoneSecondary && contact(labels.phoneSecondary, phoneSecondary),
   ].filter((s): s is string => Boolean(s));
 
   return segments.join(labels.separator);

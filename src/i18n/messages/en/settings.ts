@@ -45,7 +45,12 @@ export const enSettings = {
   "settings.cityHint": "As written on your letterhead, e.g. Muscat, Sultanate of Oman.",
   "settings.cityAr": "Locality (Arabic)",
   "settings.email": "E-mail",
+  "settings.website": "Website",
+  "settings.websiteHint": "The domain as written on your letterhead, e.g. gawhrat.com.",
+  "settings.websiteInvalid": "Enter a bare domain, e.g. gawhrat.com — no https:// or path.",
+  "settings.phoneHint": "Prints on certificates as the service and support number.",
   "settings.phoneSecondary": "Second phone",
+  "settings.phoneSecondaryHint": "Prints on certificates as the alternative contact.",
   "settings.servicesLine": "Services line",
   "settings.servicesLineHint":
     "The tagline on the colored footer band, e.g. Road speed limiter | Automotive diagnostic system.",
@@ -55,6 +60,11 @@ export const enSettings = {
   "settings.markUrlHint":
     "Optional https:// or data:image link. Printed in the closing strip; leave empty to sign and stamp by hand.",
   "settings.markUrlInvalid": "Enter an https:// or data:image link.",
+  "settings.signatoryName": "Authorized signatory",
+  "settings.signatoryNameHint":
+    "Printed under the signature, below “For <trade name>”. Leave empty to print the signature alone.",
+  "settings.signatoryNameAr": "Authorized signatory (Arabic)",
+  "settings.signatoryNameArHint": "Used on Arabic certificates; falls back to the name above.",
   "settings.saveFailed": "Save failed",
 
   // Organization read-only view

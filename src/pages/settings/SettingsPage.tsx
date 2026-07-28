@@ -107,10 +107,13 @@ function OrganizationTab() {
     city_ar: tenant.city_ar ?? "",
     email: tenant.email ?? "",
     phone_secondary: tenant.phone_secondary ?? "",
+    website: tenant.website ?? "",
     services_line: tenant.services_line ?? "",
     services_line_ar: tenant.services_line_ar ?? "",
     signature_url: tenant.signature_url ?? "",
     stamp_url: tenant.stamp_url ?? "",
+    signatory_name: tenant.signatory_name ?? "",
+    signatory_name_ar: tenant.signatory_name_ar ?? "",
   });
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -141,10 +144,13 @@ function OrganizationTab() {
         city_ar: form.city_ar.trim() || null,
         email: form.email.trim() || null,
         phone_secondary: form.phone_secondary.trim() || null,
+        website: form.website.trim() || null,
         services_line: form.services_line.trim() || null,
         services_line_ar: form.services_line_ar.trim() || null,
         signature_url: form.signature_url.trim() || null,
         stamp_url: form.stamp_url.trim() || null,
+        signatory_name: form.signatory_name.trim() || null,
+        signatory_name_ar: form.signatory_name_ar.trim() || null,
       });
       await refresh();
     },
@@ -159,6 +165,14 @@ function OrganizationTab() {
     const marks = [form.signature_url, form.stamp_url].map((u) => u.trim());
     if (marks.some((u) => u && !/^(https:\/\/|data:image\/)/.test(u))) {
       setError(t("settings.markUrlInvalid"));
+      return;
+    }
+    // The website prints as plain text in the certificate footer, so it is
+    // stored the way the dealer writes it on the letterhead — a bare domain.
+    // A pasted "https://…/path" would print the whole URL, so it is caught here.
+    const website = form.website.trim();
+    if (website && !/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(website)) {
+      setError(t("settings.websiteInvalid"));
       return;
     }
     setError("");
@@ -306,7 +320,7 @@ function OrganizationTab() {
             <Field label={t("settings.address")} hint={t("settings.addressHint")}>
               <Input value={form.address} onChange={(e) => set("address", e.target.value)} />
             </Field>
-            <Field label={t("field.phone")}>
+            <Field label={t("field.phone")} hint={t("settings.phoneHint")}>
               <Input
                 type="tel" dir="ltr"
                 value={form.phone}
@@ -367,7 +381,15 @@ function OrganizationTab() {
                   onChange={(e) => set("city_ar", e.target.value)}
                 />
               </Field>
-              <Field label={t("settings.phoneSecondary")}>
+              <Field label={t("settings.website")} hint={t("settings.websiteHint")}>
+                <Input
+                  dir="ltr"
+                  inputMode="url"
+                  value={form.website}
+                  onChange={(e) => set("website", e.target.value)}
+                />
+              </Field>
+              <Field label={t("settings.phoneSecondary")} hint={t("settings.phoneSecondaryHint")}>
                 <Input
                   type="tel" dir="ltr"
                   value={form.phone_secondary}
@@ -410,6 +432,25 @@ function OrganizationTab() {
                   dir="ltr"
                   value={form.stamp_url}
                   onChange={(e) => set("stamp_url", e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t("settings.signatoryName")} hint={t("settings.signatoryNameHint")}>
+                <Input
+                  value={form.signatory_name}
+                  onChange={(e) => set("signatory_name", e.target.value)}
+                />
+              </Field>
+              <Field
+                label={t("settings.signatoryNameAr")}
+                hint={t("settings.signatoryNameArHint")}
+              >
+                <Input
+                  dir="rtl"
+                  value={form.signatory_name_ar}
+                  onChange={(e) => set("signatory_name_ar", e.target.value)}
                 />
               </Field>
             </div>
