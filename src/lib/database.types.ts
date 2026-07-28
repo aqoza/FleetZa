@@ -544,6 +544,7 @@ export type Database = {
           line_total: number
           product_id: string | null
           quantity: number
+          sales_order_line_id: string | null
           sort_order: number
           tax_rate: number
           tenant_id: string
@@ -567,6 +568,7 @@ export type Database = {
           line_total?: number
           product_id?: string | null
           quantity?: number
+          sales_order_line_id?: string | null
           sort_order?: number
           tax_rate?: number
           tenant_id?: string
@@ -590,6 +592,7 @@ export type Database = {
           line_total?: number
           product_id?: string | null
           quantity?: number
+          sales_order_line_id?: string | null
           sort_order?: number
           tax_rate?: number
           tenant_id?: string
@@ -612,6 +615,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_lines_sales_order_line_id_fkey"
+            columns: ["sales_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "sales_order_lines"
             referencedColumns: ["id"]
           },
           {
@@ -3030,50 +3040,95 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      create_invoice_from_order: {
-        Args: { p_order_id: string }
-        Returns: {
-          amount_paid: number
-          certificate_id: string | null
-          contact_id: string | null
-          created_at: string
-          created_by: string | null
-          currency: string
-          currency_decimals: number
-          customer_id: string
-          customer_po_number: string | null
-          customer_reference: string | null
-          discount_total: number
-          doc_number: string | null
-          due_date: string | null
-          id: string
-          internal_notes: string | null
-          issue_date: string
-          issued_at: string | null
-          job_id: string | null
-          notes: string | null
-          number: number | null
-          sales_order_id: string | null
-          status: string
-          subtotal: number
-          tax_total: number
-          tenant_id: string
-          terms: string | null
-          title: string | null
-          total: number
-          updated_at: string
-          updated_by: string | null
-          vehicle_id: string | null
-          void_reason: string | null
-          voided_at: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "invoices"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      create_invoice_from_order:
+        | {
+            Args: { p_order_id: string }
+            Returns: {
+              amount_paid: number
+              certificate_id: string | null
+              contact_id: string | null
+              created_at: string
+              created_by: string | null
+              currency: string
+              currency_decimals: number
+              customer_id: string
+              customer_po_number: string | null
+              customer_reference: string | null
+              discount_total: number
+              doc_number: string | null
+              due_date: string | null
+              id: string
+              internal_notes: string | null
+              issue_date: string
+              issued_at: string | null
+              job_id: string | null
+              notes: string | null
+              number: number | null
+              sales_order_id: string | null
+              status: string
+              subtotal: number
+              tax_total: number
+              tenant_id: string
+              terms: string | null
+              title: string | null
+              total: number
+              updated_at: string
+              updated_by: string | null
+              vehicle_id: string | null
+              void_reason: string | null
+              voided_at: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "invoices"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: { p_lines?: Json; p_order_id: string }
+            Returns: {
+              amount_paid: number
+              certificate_id: string | null
+              contact_id: string | null
+              created_at: string
+              created_by: string | null
+              currency: string
+              currency_decimals: number
+              customer_id: string
+              customer_po_number: string | null
+              customer_reference: string | null
+              discount_total: number
+              doc_number: string | null
+              due_date: string | null
+              id: string
+              internal_notes: string | null
+              issue_date: string
+              issued_at: string | null
+              job_id: string | null
+              notes: string | null
+              number: number | null
+              sales_order_id: string | null
+              status: string
+              subtotal: number
+              tax_total: number
+              tenant_id: string
+              terms: string | null
+              title: string | null
+              total: number
+              updated_at: string
+              updated_by: string | null
+              vehicle_id: string | null
+              void_reason: string | null
+              voided_at: string | null
+            }
+            SetofOptions: {
+              from: "*"
+              to: "invoices"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -3194,6 +3249,19 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      sales_order_line_balance: {
+        Args: { p_order_id: string }
+        Returns: {
+          description: string
+          invoiced_quantity: number
+          line_id: string
+          quantity: number
+          remaining_quantity: number
+          sort_order: number
+          unit: string
+          unit_price: number
+        }[]
       }
       sales_report_jobs_pending_invoice: {
         Args: never

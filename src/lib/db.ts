@@ -40,6 +40,8 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   INVOICE_NOT_FOUND: "errors.invoiceNotFound",
   INVOICE_NOT_PAYABLE: "errors.invoiceNotPayable",
   PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
+  INVOICE_EXCEEDS_ORDER: "errors.invoiceExceedsOrder",
+  NOTHING_TO_INVOICE: "errors.nothingToInvoice",
 };
 
 /**

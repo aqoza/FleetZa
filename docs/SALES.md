@@ -33,7 +33,7 @@ lines with a dozen round trips is how half-converted documents get created:
 | RPC | Guard | Result |
 |---|---|---|
 | `convert_quote_to_order(quote)` | quote must be `accepted` and unconverted (also a partial unique index on `sales_orders.quote_id`) | draft order + copied lines, `quotes.sales_order_id` linked |
-| `create_invoice_from_order(order)` | order must be `confirmed` or `fulfilled` | draft invoice + copied lines, due date from `payment_terms_days` |
+| `create_invoice_from_order(order, lines?)` | order must be `confirmed` or `fulfilled`; requested quantities must not exceed what is left | draft invoice + the requested quantities, due date from `payment_terms_days` |
 | `revise_quote(quote)` | quote must not be `draft` | new draft at `revision + 1`, `revision_of` lineage kept |
 
 ## Four customer processes, one chain
@@ -182,6 +182,35 @@ token, whitelisted fields only.
 KPI tiles never pull document tables into the browser — `sales_summary()` is one
 RLS-scoped row computed in SQL.
 
+## Progress billing — several invoices per order
+
+One PO often becomes several invoices: a fleet order is "50 × installation"
+and the dealer bills 20 vehicles this month and 30 next. The unit is therefore
+**quantity per order line**, not whole lines — a whole line is just its full
+quantity.
+
+`invoice_lines.sales_order_line_id` records which order line each invoice line
+bills, and `sales_order_line_balance(order)` derives ordered / invoiced /
+remaining from those rows. **Derived, never stored**: a stored counter would
+have to be corrected on every invoice insert, void, un-void and line delete,
+and any missed path silently bills a customer twice. Voided invoices are
+excluded (a void never happened); drafts *are* counted, so two people preparing
+drafts cannot both claim the same quantity.
+
+`create_invoice_from_order(order, lines?)` takes
+`[{"line_id": …, "quantity": …}, …]`. **Passing nothing invoices everything
+still uninvoiced** — which is what the single-argument call always meant; the
+old behaviour of copying every line unconditionally was the defect, because
+calling it twice produced two full invoices for the same work.
+
+Guards, all checked before anything is written so a rejection leaves no
+half-built invoice and no consumed document number:
+
+- `INVOICE_EXCEEDS_ORDER` — asking for more than a line has left. Duplicate
+  entries for one line are summed first, so two half-sized claims cannot slip
+  past the check and together overdraw it.
+- `NOTHING_TO_INVOICE` — the order is fully invoiced.
+
 ## Reporting
 
 `/sales/reports` (billing-gated). Four RLS-scoped SQL functions, same posture
@@ -225,9 +254,6 @@ Deliberately out of scope for this wave, in rough priority order:
   manual status change. Wire both into the Phase-4 email service.
 - **No credit notes.** A `paid` invoice is terminal by design; correcting one
   needs a credit note, which does not exist yet.
-- **No partial invoicing of an order** — the next stage. `create_invoice_from_order`
-  copies every line, so "several invoices against one PO" is not possible yet;
-  `invoiced_total` already tracks the running sum, so it stays an additive change.
 - **No customer payment-history report yet.** Payments are visible per invoice;
   a per-customer ledger across invoices is the one report from the Stage-3 list
   still outstanding.
