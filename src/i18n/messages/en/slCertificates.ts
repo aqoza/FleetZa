@@ -31,6 +31,8 @@ export const enSlCertificates = {
 
   // Row actions
   "slCertificates.print": "Print",
+  "slCertificates.download": "Download",
+  "slCertificates.downloadFailed": "Couldn't create the PDF — try again",
   "slCertificates.copyVerifyLink": "Copy verify link",
   "slCertificates.linkCopied": "Link copied",
   "slCertificates.renew": "Renew",

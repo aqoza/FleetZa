@@ -36,6 +36,8 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
 
   // Row actions
   "slCertificates.print": "طباعة",
+  "slCertificates.download": "تنزيل",
+  "slCertificates.downloadFailed": "تعذّر إنشاء ملف PDF — حاول مرة أخرى",
   "slCertificates.copyVerifyLink": "نسخ رابط التحقق",
   "slCertificates.linkCopied": "تم نسخ الرابط",
   "slCertificates.renew": "تجديد",
