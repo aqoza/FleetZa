@@ -3,6 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import QRCode from "qrcode";
 import { ArrowLeft, Printer } from "lucide-react";
+// Self-hosted, loaded only by this chunk — the rest of the app deliberately
+// carries no webfont (docs/DESIGN_SYSTEM.md). A printed legal document is a
+// scoped, explicit exception; the family is applied inline below rather than
+// as a Tailwind token so the exception can't leak into other pages.
+import "@fontsource/ibm-plex-sans-arabic/400.css";
+import "@fontsource/ibm-plex-sans-arabic/600.css";
+import "@fontsource/ibm-plex-sans-arabic/700.css";
 import { getCountry } from "../../../shared/countries";
 import { listRows } from "../../lib/db";
 import {
@@ -81,7 +88,7 @@ function Cell({
   return (
     <td
       colSpan={span}
-      className={`border border-ink px-1 py-[2px] align-top text-[13px] leading-4 text-ink ${className}`}
+      className={`border border-ink px-1.5 py-1.5 align-top text-[13px] leading-4 text-ink ${className}`}
     >
       {/* Values are identifiers in mixed scripts (plates, chassis, VINs). <bdi>
           orders each one on its own so "5637 RA" doesn't become "RA 5637" on an
@@ -94,7 +101,7 @@ function Cell({
 /** Black section banner in the official document style — fills survive print. */
 function SectionBanner({ children }: { children: ReactNode }) {
   return (
-    <div className="print-exact mt-3 bg-ink px-1 py-[2px] text-[13px] leading-4 text-surface">
+    <div className="print-exact mt-4 bg-ink px-1.5 py-1 text-[13px] leading-4 text-surface">
       {children}
     </div>
   );
@@ -102,7 +109,7 @@ function SectionBanner({ children }: { children: ReactNode }) {
 
 function DocTable({ cols, children }: { cols: string[]; children: ReactNode }) {
   return (
-    <table className="mt-1.5 w-full table-fixed border-collapse break-inside-avoid">
+    <table className="mt-2 w-full table-fixed border-collapse break-inside-avoid">
       <Cols widths={cols} />
       <tbody>{children}</tbody>
     </table>
@@ -274,7 +281,23 @@ export default function CertificatePrintPage() {
         </div>
       </div>
 
-      <Card className="mx-auto max-w-3xl px-10 py-8 print:rounded-none print:border-0 print:px-8 print:py-4 print:shadow-none">
+      <Card className="mx-auto max-w-3xl print:rounded-none print:border-0 print:shadow-none">
+        {/*
+          `flex flex-col` + a page-height floor is what lets the footer pin
+          to the bottom (below, via `mt-auto`) instead of sitting wherever
+          the content happens to end. min-h-[250mm] is deliberately short of
+          a full 297mm A4 sheet: it has to clear this padding AND whatever
+          margin the browser's print dialog adds on top (that second part
+          isn't knowable from here), so the number leans conservative rather
+          than exact — print-preview a certificate after this change to
+          confirm. IBM Plex Sans Arabic is applied inline here rather than as
+          a Tailwind token or on the shared `Card`, so the exception to the
+          app's no-webfont rule can't leak past this one page.
+        */}
+        <div
+          className="flex min-h-[250mm] flex-col px-10 py-8 print:px-8 print:py-4"
+          style={{ fontFamily: '"IBM Plex Sans Arabic", "Inter", ui-sans-serif, system-ui, sans-serif' }}
+        >
         {/* Masthead — Arabic trade name above the English one, both in the
             letterhead blue. Tenants that never set an Arabic name print one line. */}
         <div className="text-center text-doc-head">
@@ -477,9 +500,11 @@ export default function CertificatePrintPage() {
         </table>
 
         {/* Footer strip — the services band in the flag colors, then the
-            registration line in Arabic and English, then the e-mail. */}
+            registration line in Arabic and English, then the e-mail.
+            `mt-auto` pushes it to the bottom of the flex-column Card above
+            rather than leaving it wherever the content happens to end. */}
         {hasFooter && (
-          <div className="mt-6 -mx-10 break-inside-avoid print:-mx-8">
+          <div className="mt-auto -mx-10 break-inside-avoid pt-6 print:-mx-8">
             {servicesLine && (
               <>
                 <div className="print-exact bg-doc-red px-4 py-1 text-center text-[11px] font-bold uppercase tracking-wide text-surface rtl:tracking-normal">
@@ -503,7 +528,7 @@ export default function CertificatePrintPage() {
             </div>
           </div>
         )}
-
+        </div>
       </Card>
     </>
   );
