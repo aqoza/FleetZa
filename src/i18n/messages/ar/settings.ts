@@ -65,6 +65,10 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.markUrlHint":
     "ارفع صورة، أو الصق رابط https:// إذا كانت مستضافة في مكان آخر. تُطبع في شريط الاعتماد؛ اتركه فارغًا للتوقيع والختم يدويًا.",
   "settings.markUrlInvalid": "أدخل رابط https:// أو data:image.",
+  "settings.stampScale": "حجم الختم",
+  "settings.stampScaleHint":
+    "حجم طباعة الختم في شريط الاعتماد. ارفع القيمة إذا ظهر ختمك صغيرًا على الشهادة.",
+  "settings.stampScaleDefault": "{value}٪ (افتراضي)",
   "settings.markUrlPlaceholder": "‏https:// أو ارفع صورة أعلاه",
   "settings.uploadMark": "رفع",
   "settings.markUploadInvalidType": "اختر ملف صورة.",

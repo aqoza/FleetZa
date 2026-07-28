@@ -60,6 +60,10 @@ export const enSettings = {
   "settings.markUrlHint":
     "Upload an image, or paste an https:// link if it's hosted elsewhere. Printed in the closing strip; leave empty to sign and stamp by hand.",
   "settings.markUrlInvalid": "Enter an https:// or data:image link.",
+  "settings.stampScale": "Stamp size",
+  "settings.stampScaleHint":
+    "How large the stamp prints in the closing strip. Raise it if your seal scan looks small on the certificate.",
+  "settings.stampScaleDefault": "{value}% (default)",
   "settings.markUrlPlaceholder": "https://… or upload above",
   "settings.uploadMark": "Upload",
   "settings.markUploadInvalidType": "Choose an image file.",

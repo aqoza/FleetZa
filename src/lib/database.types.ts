@@ -2351,6 +2351,7 @@ export type Database = {
           signatory_name: string | null
           signatory_name_ar: string | null
           signature_url: string | null
+          stamp_scale: number
           stamp_url: string | null
           tax_registration_number: string | null
           timezone: string
@@ -2382,6 +2383,7 @@ export type Database = {
           signatory_name?: string | null
           signatory_name_ar?: string | null
           signature_url?: string | null
+          stamp_scale?: number
           stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string
@@ -2413,6 +2415,7 @@ export type Database = {
           signatory_name?: string | null
           signatory_name_ar?: string | null
           signature_url?: string | null
+          stamp_scale?: number
           stamp_url?: string | null
           tax_registration_number?: string | null
           timezone?: string

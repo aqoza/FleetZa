@@ -181,6 +181,8 @@ export type CertificatePdfProps = {
     stampUrl: string | null;
     forCompany: string | null;
     signatoryName: string | null;
+    /** Stamp box height in pt, already scaled by the tenant's setting. */
+    stampMaxHeight: number;
   };
   footer: {
     servicesLine: string | null;
@@ -349,7 +351,12 @@ export default function CertificatePdfDocument(props: CertificatePdfProps) {
               ) : null}
             </View>
             <View style={[styles.stripCell, { width: STRIP_COLS[2] }]}>
-              {strip.stampUrl ? <Image src={strip.stampUrl} style={styles.mark} /> : null}
+              {strip.stampUrl ? (
+                <Image
+                  src={strip.stampUrl}
+                  style={[styles.mark, { maxHeight: strip.stampMaxHeight }]}
+                />
+              ) : null}
             </View>
           </View>
         </View>

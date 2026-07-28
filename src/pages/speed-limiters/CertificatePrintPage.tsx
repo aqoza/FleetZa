@@ -252,6 +252,11 @@ export default function CertificatePrintPage() {
     ) : (
       tenant.address ?? phoneNode ?? countryName
     );
+  // The stamp's box height, scaled by the tenant's setting. The 84px default
+  // is the strip row's own budget (see the signature cell below); the scale
+  // is DB-constrained to 50-200 so this stays a sane number.
+  const stampMaxHeight = Math.round((84 * (tenant.stamp_scale ?? 100)) / 100);
+
   // Same value as `dealerContact`, flattened for the PDF (which takes strings,
   // and runs bidi itself rather than needing the dir="ltr" wrapper).
   const dealerContactText =
@@ -422,6 +427,7 @@ export default function CertificatePrintPage() {
             qr: qr || null,
             signatureUrl: tenant.signature_url,
             stampUrl: tenant.stamp_url,
+            stampMaxHeight: (46 * (tenant.stamp_scale ?? 100)) / 100,
             forCompany: signatoryName
               ? t("slCertificates.report.forCompany", { name: signatoryCompany })
               : null,
@@ -690,7 +696,8 @@ export default function CertificatePrintPage() {
                   <img
                     src={tenant.stamp_url}
                     alt={t("slCertificates.report.stamp")}
-                    className="mx-auto max-h-[84px] object-contain"
+                    className="mx-auto object-contain"
+                    style={{ maxHeight: `${stampMaxHeight}px` }}
                   />
                 )}
               </Cell>

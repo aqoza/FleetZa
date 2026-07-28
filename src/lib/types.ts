@@ -46,6 +46,12 @@ export interface Tenant {
   signature_url: string | null;
   stamp_url: string | null;
   /**
+   * Stamp box height as a percent of the default (50-200, DB-constrained).
+   * Seals are scanned at different crops, so one fixed height renders some
+   * large and others tiny.
+   */
+  stamp_scale: number;
+  /**
    * Authorized signatory, printed under the signature in the closing strip
    * beneath the "For <trade name>" line. The Arabic form is optional and falls
    * back to `signatory_name` when null.

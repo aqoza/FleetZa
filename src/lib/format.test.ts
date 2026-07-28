@@ -38,6 +38,7 @@ const tenant = (over: Partial<Tenant> = {}): Tenant => ({
   services_line_ar: null,
   signature_url: null,
   stamp_url: null,
+  stamp_scale: 100,
   signatory_name: null,
   signatory_name_ar: null,
   created_at: "2026-01-01T00:00:00Z",

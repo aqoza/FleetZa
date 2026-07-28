@@ -184,9 +184,22 @@ stateDiagram-v2
     — and the HTML/print pass is unaffected.
 - **Public verification** — the SPA page `/verify?c=<uuid>` calls the Worker's
   public `GET /api/verify/:certUuid`, which returns
-  `{ status: "valid" | "expired" | "revoked" | "not_found", certificateNumber, uin, issuedAt, expiresAt, setSpeedKmh, setSpeedSecondaryKmh, issuingAuthority, vehiclePlate, vehicleName, customerName, issuedBy }`.
+  `{ status: "valid" | "expired" | "revoked" | "not_found", certificateNumber, uin, issuedAt, expiresAt, setSpeedKmh, setSpeedSecondaryKmh, issuingAuthority, vehiclePlate, vehicleName, customerName, issuedBy, chassisNumber, engineNumber, vehicleMake, vehicleModel, vehicleYear, limiterType, deviceSerial, tamperSealNumber, installedAt }`.
   No authentication required; the certificate UUID is the capability. Nothing
-  beyond that response is exposed. It deliberately does **not** consult
+  beyond that response is exposed. **The response is additive-only** — printed
+  certificates already in circulation link here, so fields may be added but
+  never removed or renamed. The vehicle and limiter fields exist so a roadside
+  inspector can check the document against the vehicle rather than just its
+  number; every one of them is already printed on the certificate that carries
+  the QR code, so the link exposes nothing its holder does not have on paper.
+  `limiterType`, `tamperSealNumber` and `installedAt` follow the same
+  snapshot-first precedence the printed document uses, so a verified
+  certificate keeps reporting what it was issued with even after the device
+  record moves. The page groups them under Vehicle details / Speed limiter
+  details / Certificate validity, mirroring the document's own layout, and
+  formats dates with `formatDocumentDate` (DD-MM-YYYY) rather than the browser
+  locale — the point is cross-checking against the paper, and `7/11/2024`
+  would read as 7 November to an Omani inspector. It deliberately does **not** consult
   `superseded_by`: it answers about the document in the inspector's hand, from
   that document's own dates and status. A superseded certificate still verifies
   as `expired` (or `valid`, if a renewal was issued early) — printed certificates
@@ -356,7 +369,7 @@ Four fields exist only for this document:
 | `uin` | `sl_jobs` → `speed_limiter_installations` → `speed_limiter_certificates` | The number identifies the **fitted limiter**, so it is minted once and reprinted unchanged by every renewal. Format: `OM-<last 5 digits of the vehicle's chassis>-<document number>` — chassis `JHHLCK1F7PK026626` on certificate `GOM-WO-202601` gives `OM-26626-202601`. Letters in the chassis are skipped (the rule counts digits) and a short chassis is left-padded to five. Precedence at issuance: a number typed on the job wins, then the one the installation already carries, and only failing both is a new one derived — which is then **written back to the installation**, so the next renewal reprints it. A vehicle with no chassis has nothing to derive from and keeps whatever was recorded, rather than printing a malformed identifier. `app.build_uin` owns the format and `issue_certificate` the precedence; `buildUin` / `resolveUin` in `src/lib/certificate.ts` mirror both for the renewal modal, which inserts directly. The two must agree — certificates are issued through both paths. |
 | `set_speed_secondary_kmh` | same three tables | Omani limiters are programmed with two bands and the document prints the pair — `70/90 KMPH`. One band still prints as a single number. |
 | `limiter_type` | `sl_devices` → `speed_limiter_certificates` | "Electronic Pedal" is a property of the device, not of its brand/model. |
-| letterhead block | `tenants` | `name_ar`, `cr_number`, `po_box`, `postal_code`, `city`/`city_ar`, `email`, `website`, `phone_secondary`, `services_line`/`services_line_ar`, `signature_url`, `stamp_url`, `signatory_name`/`signatory_name_ar` — edited under Settings → Organization → Document letterhead. The two mark URLs are constrained to `https:` / `data:image` in the database and validated in the form. `website` is deliberately unconstrained in the database — it is only ever printed as text, never dereferenced — but the form asks for the bare domain the dealer writes on the letterhead (`gawhrat.com`), since a pasted `https://…/path` would print in full. |
+| letterhead block | `tenants` | `name_ar`, `cr_number`, `po_box`, `postal_code`, `city`/`city_ar`, `email`, `website`, `phone_secondary`, `services_line`/`services_line_ar`, `signature_url`, `stamp_url`, `stamp_scale`, `signatory_name`/`signatory_name_ar` — edited under Settings → Organization → Document letterhead. The two mark URLs are constrained to `https:` / `data:image` in the database and validated in the form. `stamp_scale` is the stamp's box height as a percent of the default (50-200, DB-constrained), offered in Settings as discrete steps: seals are scanned at different crops, so one fixed height renders some large and others tiny, and the bound is what keeps the closing strip on a single page. `website` is deliberately unconstrained in the database — it is only ever printed as text, never dereferenced — but the form asks for the bare domain the dealer writes on the letterhead (`gawhrat.com`), since a pasted `https://…/path` would print in full. |
 
 The **Installation / Renewal** heading comes from the job's `job_type`
 (`installation` and `replacement` print Installation, everything else prints
