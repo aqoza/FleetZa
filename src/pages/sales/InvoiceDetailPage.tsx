@@ -162,8 +162,45 @@ export default function InvoiceDetailPage() {
         );
       }}
       actions={actions}
-      afterLines={({ doc, refresh }) => (
+      afterLines={({ doc, lines, refresh }) => (
         <>
+          {/* The consolidated renewal invoice: a line per certificate. Each
+              line's description already prints the plate and number; this
+              panel is the way back to the documents it bills. */}
+          {lines.some((l) => l.certificate_id) && (
+            <SectionCard title={t("sales.invoices.certificates")}>
+              <p className="mb-2 text-xs text-ink-3">{t("sales.invoices.certificatesHint")}</p>
+              <ul className="divide-y divide-line">
+                {lines
+                  .filter((l) => l.certificate_id)
+                  .map((l) => (
+                    <li
+                      key={l.id}
+                      className="flex items-center justify-between gap-3 py-2 text-sm"
+                    >
+                      <span className="min-w-0 truncate text-ink-2">{l.description}</span>
+                      <span className="flex shrink-0 gap-3">
+                        {l.vehicle_id && (
+                          <Link
+                            to={`/vehicles/${l.vehicle_id}`}
+                            className="text-xs font-medium text-brand-700 hover:underline"
+                          >
+                            {t("sales.doc.vehicle")}
+                          </Link>
+                        )}
+                        <Link
+                          to={`/speed-limiters/certificates/${l.certificate_id}/print`}
+                          className="text-xs font-medium text-brand-700 hover:underline"
+                        >
+                          {t("sales.doc.linkedCertificate")}
+                        </Link>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </SectionCard>
+          )}
+
           <SectionCard
             title={t("sales.payments.title")}
             actions={

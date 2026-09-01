@@ -531,6 +531,7 @@ export type Database = {
       }
       invoice_lines: {
         Row: {
+          certificate_id: string | null
           created_at: string
           created_by: string | null
           description: string
@@ -555,6 +556,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description: string
@@ -579,6 +581,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
@@ -603,6 +606,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoice_lines_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoice_lines_invoice_id_fkey"
             columns: ["invoice_id"]
@@ -2981,6 +2991,25 @@ export type Database = {
       }
     }
     Functions: {
+      billing_state: {
+        Args: {
+          c: Database["public"]["Tables"]["speed_limiter_certificates"]["Row"]
+        }
+        Returns: string
+      }
+      certificate_billing_status: {
+        Args: { p_certificate_ids: string[] }
+        Returns: {
+          amount_paid: number
+          certificate_id: string
+          currency: string
+          doc_number: string
+          due_date: string
+          invoice_id: string
+          status: string
+          total: number
+        }[]
+      }
       complete_sl_job: {
         Args: {
           p_customer_signed?: boolean
@@ -3036,6 +3065,56 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "sales_orders"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_invoice_from_certificates: {
+        Args: {
+          p_certificate_ids: string[]
+          p_description?: string
+          p_product_id?: string
+          p_tax_rate?: number
+          p_unit_price?: number
+        }
+        Returns: {
+          amount_paid: number
+          certificate_id: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_po_number: string | null
+          customer_reference: string | null
+          discount_total: number
+          doc_number: string | null
+          due_date: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          issued_at: string | null
+          job_id: string | null
+          notes: string | null
+          number: number | null
+          sales_order_id: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "invoices"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -3263,6 +3342,20 @@ export type Database = {
           unit_price: number
         }[]
       }
+      sales_report_certificates_pending_invoice: {
+        Args: { p_customer_id?: string }
+        Returns: {
+          certificate_id: string
+          certificate_number: string
+          customer_id: string
+          customer_name: string
+          expires_at: string
+          issued_at: string
+          license_plate: string
+          vehicle_id: string
+          vehicle_name: string
+        }[]
+      }
       sales_report_jobs_pending_invoice: {
         Args: never
         Returns: {
@@ -3297,6 +3390,7 @@ export type Database = {
         Returns: {
           accepted_quote_value: number
           accepted_quotes: number
+          certificates_pending_invoice: number
           declined_quotes: number
           invoiced_value: number
           invoices_generated: number
@@ -3351,6 +3445,7 @@ export type Database = {
           outstanding_amount: number
           overdue_amount: number
           overdue_invoices: number
+          unbilled_certificates: number
           unbilled_order_value: number
         }[]
       }

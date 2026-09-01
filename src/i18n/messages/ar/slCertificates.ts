@@ -90,6 +90,50 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.bulkSucceeded": "تم إصدارها",
   "slCertificates.bulkFailed": "فشلت",
 
+  // الفوترة
+  "slCertificates.billing": "الفوترة",
+  "slCertificates.billing.unbilled": "غير مفوترة",
+  "slCertificates.billing.draft": "فاتورة مسودة",
+  "slCertificates.billing.invoiced": "مفوترة",
+  "slCertificates.billing.overdue": "متأخرة السداد",
+  "slCertificates.billing.paid": "مدفوعة",
+  "slCertificates.billingFilterAll": "كل حالات الفوترة",
+  "slCertificates.billingFilterUnbilled": "غير مفوترة",
+  "slCertificates.billingFilterInvoiced": "مفوترة",
+  "slCertificates.billingFilterPaid": "مدفوعة",
+  "slCertificates.openInvoice": "فتح الفاتورة {number}",
+
+  // نافذة الفوترة
+  "slCertificates.createInvoice": "إنشاء فاتورة",
+  "slCertificates.invoiceTitle": "فوترة {count} شهادة",
+  "slCertificates.invoiceLead":
+    "فاتورة مسودة واحدة للعميل {customer}، ببند لكل مركبة يحمل رقم لوحتها ورقم شهادتها. يمكن تعديل البنود والأسعار قبل إصدار الفاتورة.",
+  "slCertificates.invoiceEligible": "ستتم فوترتها ({count})",
+  "slCertificates.invoiceSkipped": "تم تخطيها ({count})",
+  "slCertificates.invoiceSkipInvoiced": "مدرجة بالفعل في {number}",
+  "slCertificates.invoiceSkipOtherCustomer": "عميل مختلف — {name}",
+  "slCertificates.invoiceSkipNoCustomer": "لا يوجد عميل لفوترته",
+  "slCertificates.invoiceNoneEligible": "لا يمكن فوترة أي من الشهادات المحددة.",
+  "slCertificates.invoiceOthersPending":
+    "لدى العميل {name} {count} شهادة أخرى لم تُفوتر بعد.",
+  "slCertificates.invoiceAddOthers": "إضافتها إلى هذه الفاتورة",
+  "slCertificates.invoiceOnlySelected": "المحددة فقط",
+  "slCertificates.invoiceCatalogItem": "بند من الكتالوج",
+  "slCertificates.invoiceCatalogHint": "اختياري — يعبّئ الوصف والسعر والضريبة مسبقًا.",
+  "slCertificates.invoiceDescription": "الوصف",
+  "slCertificates.invoiceDescriptionHint":
+    "يُطبع في كل بند، متبوعًا برقم اللوحة ورقم الشهادة.",
+  "slCertificates.invoiceDefaultDescription": "تجديد شهادة محدد السرعة",
+  "slCertificates.invoiceUnitPrice": "السعر لكل مركبة",
+  "slCertificates.invoiceTaxRate": "الضريبة %",
+  "slCertificates.invoicePreview": "{count} بند · {total} شاملة الضريبة",
+  "slCertificates.invoiceConfirm": "إنشاء فاتورة مسودة",
+  "slCertificates.invoiceCreated": "تم إنشاء الفاتورة المسودة {number} بعدد {count} بند.",
+  "slCertificates.invoiceFailed": "تعذّر إنشاء الفاتورة",
+  "slCertificates.invoiceCloseBlocked":
+    "جارٍ إنشاء الفاتورة — تبقى هذه النافذة مفتوحة حتى الانتهاء.",
+  "slCertificates.invoiceAfterRenew": "إنشاء فاتورة لهذه الشهادات الـ{count}",
+
   // Revoke modal
   "slCertificates.revokeTitle": "سحب الشهادة",
   "slCertificates.revokeLead":

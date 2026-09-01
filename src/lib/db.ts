@@ -46,6 +46,12 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
   INVOICE_EXCEEDS_ORDER: "errors.invoiceExceedsOrder",
   NOTHING_TO_INVOICE: "errors.nothingToInvoice",
+  // Certificate billing (…_certificate_billing.sql)
+  CERT_ALREADY_INVOICED: "errors.certAlreadyInvoiced",
+  CERTS_MULTIPLE_CUSTOMERS: "errors.certsMultipleCustomers",
+  CERT_NO_CUSTOMER: "errors.certNoCustomer",
+  CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
+  NO_CERTIFICATES: "errors.noCertificates",
 };
 
 /**

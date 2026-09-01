@@ -7,24 +7,27 @@
  * into the browser — the same rule the overview KPIs follow. A tenant with
  * tens of thousands of invoices pays for one row, not for the table.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  AlertTriangle, Banknote, ClipboardList, FileText, Receipt, Wallet,
+  AlertTriangle, Banknote, ClipboardList, FileText, Receipt, ShieldCheck, Wallet,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { wrapDbError } from "../../lib/db";
 import { formatDate, formatMoney } from "../../lib/format";
-import { useTenant } from "../../context/AuthContext";
+import { useAuth, useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import {
-  Card, EmptyState, ErrorState, Field, LoadingState, StatCard, Table,
+  Button, Card, EmptyState, ErrorState, Field, LoadingState, StatCard, Table,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useCustomerPicker } from "../../lib/pickers";
 import { paymentMethods } from "../../lib/labels";
 import type { PaymentMethod } from "../../lib/types";
+import type { InvoiceableCertificate } from "../../lib/certificateBilling";
+import { InvoiceCertificatesModal } from "../speed-limiters/InvoiceCertificatesModal";
 import { SectionCard } from "./shared";
 
 interface PipelineRow {
@@ -38,6 +41,7 @@ interface PipelineRow {
   paid_invoices: number; paid_value: number;
   outstanding_amount: number;
   overdue_invoices: number; overdue_amount: number;
+  certificates_pending_invoice: number;
 }
 
 interface ReceivableRow {
@@ -83,6 +87,27 @@ interface PendingJobRow {
   vehicle_name: string | null;
 }
 
+interface PendingCertificateRow {
+  certificate_id: string;
+  certificate_number: string;
+  issued_at: string;
+  expires_at: string;
+  customer_id: string | null;
+  customer_name: string | null;
+  vehicle_id: string | null;
+  vehicle_name: string | null;
+  license_plate: string | null;
+}
+
+/** Pending certificates folded per customer — the unit an invoice is raised for. */
+interface PendingCustomerGroup {
+  customerId: string | null;
+  customerName: string | null;
+  certs: PendingCertificateRow[];
+  oldestIssued: string;
+  newestIssued: string;
+}
+
 /** The report functions this page reads; named so the client keeps its typed
  *  RPC surface rather than falling back to a bare string. */
 type ReportFn =
@@ -90,6 +115,7 @@ type ReportFn =
   | "sales_report_receivables"
   | "sales_report_revenue"
   | "sales_report_jobs_pending_invoice"
+  | "sales_report_certificates_pending_invoice"
   | "sales_report_payments";
 
 /** Every report is one RPC; the generic keeps the row shape at the call site. */
@@ -107,6 +133,8 @@ function useReport<T>(fn: ReportFn, args?: Record<string, unknown>) {
 
 /** How many months of history the revenue table shows. */
 const REVENUE_MONTHS = 12;
+/** Customers listed under "certificates pending invoice". A worklist, not an export. */
+const PENDING_CUSTOMER_ROWS = 50;
 /** Receipts shown in the ledger. A statement, not an export. */
 const PAYMENT_ROWS = 200;
 
@@ -119,6 +147,9 @@ function paymentMethodKey(method: string) {
 export default function ReportsPage() {
   const t = useT();
   const { currency } = useTenant();
+  const { isManager } = useAuth();
+  const { isEnabled } = useModules();
+  const certificatesOn = isEnabled("sl_certificates");
 
   const pipelineQ = useReport<PipelineRow>("sales_report_pipeline");
   const receivablesQ = useReport<ReceivableRow>("sales_report_receivables");
@@ -126,6 +157,34 @@ export default function ReportsPage() {
     p_months: REVENUE_MONTHS,
   });
   const pendingJobsQ = useReport<PendingJobRow>("sales_report_jobs_pending_invoice");
+  const pendingCertsQ = useReport<PendingCertificateRow>(
+    "sales_report_certificates_pending_invoice",
+  );
+  const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+
+  // One row per customer: an invoice bills one customer, so that is the unit
+  // to act on. The RPC orders by customer, so grouping is a single pass.
+  const pendingByCustomer = useMemo<PendingCustomerGroup[]>(() => {
+    const groups = new Map<string, PendingCustomerGroup>();
+    for (const row of pendingCertsQ.data ?? []) {
+      const key = row.customer_id ?? "";
+      let g = groups.get(key);
+      if (!g) {
+        g = {
+          customerId: row.customer_id,
+          customerName: row.customer_name,
+          certs: [],
+          oldestIssued: row.issued_at,
+          newestIssued: row.issued_at,
+        };
+        groups.set(key, g);
+      }
+      g.certs.push(row);
+      if (row.issued_at < g.oldestIssued) g.oldestIssued = row.issued_at;
+      if (row.issued_at > g.newestIssued) g.newestIssued = row.issued_at;
+    }
+    return [...groups.values()].sort((a, b) => b.certs.length - a.certs.length);
+  }, [pendingCertsQ.data]);
 
   // Payment history is the one report with a filter: "what has THIS customer
   // paid us" is the question asked when a balance is disputed.
@@ -199,7 +258,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Where the work is */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className={`grid gap-4 sm:grid-cols-2 ${certificatesOn ? "xl:grid-cols-5" : "xl:grid-cols-4"}`}>
         <StatCard
           icon={<ClipboardList className="h-5 w-5" />}
           tone="amber"
@@ -227,6 +286,15 @@ export default function ReportsPage() {
           value={String(p?.pos_received ?? 0)}
           sub={money(Number(p?.pos_received_value ?? 0))}
         />
+        {certificatesOn && (
+          <StatCard
+            icon={<ShieldCheck className="h-5 w-5" />}
+            tone={Number(p?.certificates_pending_invoice ?? 0) > 0 ? "amber" : "green"}
+            label={t("sales.kpi.unbilledCertificates")}
+            value={String(p?.certificates_pending_invoice ?? 0)}
+            sub={t("sales.kpi.unbilledCertificatesSub")}
+          />
+        )}
       </div>
 
       {/* Aging — the receivables columns, summed */}
@@ -319,6 +387,92 @@ export default function ReportsPage() {
           </Table>
         )}
       </SectionCard>
+
+      {/* Certificates issued but never billed — per customer, because an
+          invoice is per customer, and with the invoice one click away: the
+          whole point of the count is that someone raises the invoice. */}
+      {certificatesOn && (
+        <SectionCard title={t("sales.reports.certificatesPendingInvoice")}>
+          <p className="mb-3 text-xs text-ink-3">
+            {t("sales.reports.certificatesPendingInvoiceHint")}
+          </p>
+          {pendingCertsQ.isLoading ? (
+            <LoadingState />
+          ) : pendingCertsQ.error ? (
+            <ErrorState message={(pendingCertsQ.error as Error).message} />
+          ) : pendingByCustomer.length === 0 ? (
+            <EmptyState
+              icon={<ShieldCheck className="h-5 w-5" />}
+              title={t("sales.reports.noPendingCertificates")}
+              description={t("sales.reports.noPendingCertificatesDesc")}
+            />
+          ) : (
+            <>
+              <Table
+                headers={[
+                  t("sales.doc.customer"),
+                  t("sales.reports.invoiceCountShort"),
+                  t("sales.reports.oldestIssued"),
+                  t("sales.reports.newestIssued"),
+                  "",
+                ]}
+              >
+                {pendingByCustomer.slice(0, PENDING_CUSTOMER_ROWS).map((g) => (
+                  <tr key={g.customerId ?? "none"} className="border-t border-line">
+                    <td className="px-4 py-2">
+                      {g.customerId ? (
+                        <Link
+                          to={`/customers/${g.customerId}`}
+                          className="text-brand-700 hover:underline"
+                        >
+                          {g.customerName ?? "—"}
+                        </Link>
+                      ) : (
+                        <span className="text-ink-3">{t("common.dash")}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-end tabular-nums">
+                      {t("sales.reports.certificateCount", { count: g.certs.length })}
+                    </td>
+                    <td className="px-4 py-2">{formatDate(g.oldestIssued)}</td>
+                    <td className="px-4 py-2">{formatDate(g.newestIssued)}</td>
+                    <td className="px-4 py-2 text-end">
+                      {isManager && g.customerId && (
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            setInvoicing(
+                              g.certs.map((r) => ({
+                                id: r.certificate_id,
+                                certificate_number: r.certificate_number,
+                                customer_id: r.customer_id,
+                                customer_name: r.customer_name,
+                                vehicle_id: r.vehicle_id,
+                                vehicle_name: r.vehicle_name,
+                                license_plate: r.license_plate,
+                              })),
+                            )
+                          }
+                        >
+                          <Receipt className="h-4 w-4" /> {t("sales.reports.createInvoice")}
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </Table>
+              {pendingByCustomer.length > PENDING_CUSTOMER_ROWS && (
+                <p className="mt-3 text-center text-xs text-ink-3">
+                  {t("sales.reports.showingFirst", {
+                    shown: String(PENDING_CUSTOMER_ROWS),
+                    total: String(pendingByCustomer.length),
+                  })}
+                </p>
+              )}
+            </>
+          )}
+        </SectionCard>
+      )}
 
       {/* Work done but not billed — the list behind the count, so it is actionable */}
       <SectionCard
@@ -450,6 +604,8 @@ export default function ReportsPage() {
       <Card className="p-4">
         <p className="text-xs text-ink-3">{t("sales.reports.footnote")}</p>
       </Card>
+
+      <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
     </div>
   );
 }

@@ -50,4 +50,14 @@ export const enErrors = {
   "errors.invoiceNotFound": "Invoice not found.",
   "errors.invoiceNotPayable": "Issue the invoice before recording a payment against it.",
   "errors.paymentExceedsBalance": "That payment is larger than the invoice's outstanding balance.",
+
+  // Certificate billing (see supabase/migrations/…_certificate_billing.sql)
+  "errors.certAlreadyInvoiced":
+    "One of these certificates is already on an invoice. Void that invoice first if it was raised in error.",
+  "errors.certsMultipleCustomers":
+    "An invoice bills one customer — select certificates that belong to a single customer.",
+  "errors.certNoCustomer":
+    "This certificate has no customer to bill. Set the vehicle's owner first.",
+  "errors.certificateNotFound": "Certificate not found.",
+  "errors.noCertificates": "Select at least one certificate to invoice.",
 } as const;

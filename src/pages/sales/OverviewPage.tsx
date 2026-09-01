@@ -25,6 +25,7 @@ export default function OverviewPage() {
   const tenant = useTenant();
   const { isEnabled } = useModules();
   const billingOn = isEnabled("billing");
+  const certificatesOn = isEnabled("sl_certificates");
 
   // One aggregate row, computed in SQL — KPI tiles never pull document tables
   // into the browser (docs/ARCHITECTURE_REVIEW.md §6.2).
@@ -149,6 +150,31 @@ export default function OverviewPage() {
           <span className="text-2xl font-bold tracking-tight text-ink tabular-nums">
             {money(s.collected_30d)}
           </span>
+        </Card>
+      )}
+
+      {/* Certificates issued but never billed. Shown only while there are
+          some: the count is a to-do, and the certificates list already
+          filtered to them is where the invoice gets raised. */}
+      {billingOn && certificatesOn && s.unbilled_certificates > 0 && (
+        <Card className="mb-5 flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <div className="text-sm font-medium text-ink-2">
+              {t("sales.kpi.unbilledCertificates")}
+            </div>
+            <div className="mt-0.5 text-xs text-ink-3">{t("sales.kpi.unbilledCertificatesSub")}</div>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-2xl font-bold tracking-tight text-ink tabular-nums">
+              {s.unbilled_certificates}
+            </span>
+            <Link
+              to="/speed-limiters/certificates?billing=unbilled"
+              className="text-sm font-medium text-brand-700 hover:underline"
+            >
+              {t("sales.kpi.reviewCertificates")}
+            </Link>
+          </div>
         </Card>
       )}
 
