@@ -661,6 +661,13 @@ export interface Invoice extends SalesDocument, SalesDocumentLinks {
 
 export interface InvoiceLine extends SalesDocumentLine {
   invoice_id: string;
+  /**
+   * The certificate this line bills — the consolidated renewal invoice is a
+   * line per vehicle, each linked to its certificate. A certificate is on at
+   * most one non-void invoice (app.guard_line_certificate); billing state is
+   * derived from these links, see src/lib/certificateBilling.ts.
+   */
+  certificate_id: string | null;
 }
 
 export type PaymentMethod = "cash" | "bank_transfer" | "card" | "cheque" | "online" | "other";
@@ -692,6 +699,8 @@ export interface SalesSummary {
   overdue_invoices: number;
   overdue_amount: number;
   collected_30d: number;
+  /** Live certificates with no invoice against them — renewals issued but never billed. */
+  unbilled_certificates: number;
 }
 
 export type RenewalType =

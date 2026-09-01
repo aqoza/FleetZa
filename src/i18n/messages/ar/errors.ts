@@ -49,4 +49,14 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.invoiceNotFound": "لم يتم العثور على الفاتورة.",
   "errors.invoiceNotPayable": "قم بإصدار الفاتورة قبل تسجيل دفعة عليها.",
   "errors.paymentExceedsBalance": "قيمة الدفعة أكبر من الرصيد المستحق على الفاتورة.",
+
+  // فوترة الشهادات
+  "errors.certAlreadyInvoiced":
+    "إحدى هذه الشهادات مدرجة بالفعل في فاتورة. ألغِ تلك الفاتورة أولًا إن كانت قد أُنشئت بالخطأ.",
+  "errors.certsMultipleCustomers":
+    "الفاتورة تُصدَر لعميل واحد — اختر شهادات تخص عميلًا واحدًا.",
+  "errors.certNoCustomer":
+    "لا يوجد عميل مرتبط بهذه الشهادة لفوترته. حدّد مالك المركبة أولًا.",
+  "errors.certificateNotFound": "لم يتم العثور على الشهادة.",
+  "errors.noCertificates": "اختر شهادة واحدة على الأقل لفوترتها.",
 };

@@ -35,6 +35,7 @@ lines with a dozen round trips is how half-converted documents get created:
 | `convert_quote_to_order(quote)` | quote must be `accepted` and unconverted (also a partial unique index on `sales_orders.quote_id`) | draft order + copied lines, `quotes.sales_order_id` linked |
 | `create_invoice_from_order(order, lines?)` | order must be `confirmed` or `fulfilled`; requested quantities must not exceed what is left | draft invoice + the requested quantities, due date from `payment_terms_days` |
 | `revise_quote(quote)` | quote must not be `draft` | new draft at `revision + 1`, `revision_of` lineage kept |
+| `create_invoice_from_certificates(certs[], description?, price?, tax?, product?)` | one customer, none already billed (`CERTS_MULTIPLE_CUSTOMERS`, `CERT_ALREADY_INVOICED`) | draft invoice + one line per certificate, plate and number on the line |
 
 ## Four customer processes, one chain
 
@@ -70,10 +71,12 @@ raised from a job still knows that job after it becomes an order and then an
 invoice. The job page raises a quote or an invoice directly, prefilled with the
 customer and vehicle and linked at creation rather than after the fact.
 
-One job per document, not a link table: here a job is one vehicle and one
-certificate, which is what these four processes describe. A consolidated
-invoice spanning several jobs is the case that would promote this to a link
-table.
+One job per document *at the header*: here a job is one vehicle and one
+certificate, which is what these four processes describe. The consolidated
+invoice — one document for a fleet's worth of renewals — is the case that
+promoted the certificate link to the **line**: `invoice_lines.certificate_id`
+(with the line's existing `vehicle_id`) bills one certificate for one vehicle
+per line. See **Billing certificates** below.
 
 ## Where the numbers come from
 
@@ -126,6 +129,9 @@ The UI offers the legal moves; these guarantee them (same posture as
   deleting a payment reopens the balance.
 - **Customers with issued invoices can't be deleted** (`CUSTOMER_HAS_INVOICES`),
   extending the existing certificate/job guard.
+- **A certificate is billed at most once** — `app.guard_line_certificate` /
+  `app.guard_invoice_certificate` (`CERT_ALREADY_INVOICED`). Voided invoices
+  release their certificates; drafts hold them.
 
 Every code above is mapped to a localized message in `src/lib/db.ts`
 (`errors.*`), so users never see raw PostgREST text.
@@ -211,6 +217,50 @@ half-built invoice and no consumed document number:
   past the check and together overdraw it.
 - `NOTHING_TO_INVOICE` — the order is fully invoiced.
 
+## Billing certificates — the consolidated renewal invoice
+
+The dealer certifies fleets. A customer turns up with 10 or 100 vehicles, each
+gets a renewed certificate, and the customer expects **one invoice with a line
+per vehicle** naming the plate and the certificate number. The failure this
+guards against is the quiet one: a certificate issued, no invoice raised, and
+a payment that never arrives because nobody noticed.
+
+**The link lives on the line.** `invoice_lines.certificate_id` (plus the line's
+`vehicle_id`) says which certificate a line bills; `invoices.certificate_id`
+stays for the single-document invoice the job page raises, and every tracking
+query reads both. The description is a snapshot — `<service> · <plate> ·
+<certificate number>` — so an issued invoice keeps printing the identifiers
+even if the certificate row is later deleted (the FK goes null, the text
+stays).
+
+**One definition of "invoiced".** `app.certificate_invoice_id(cert)` is the
+non-void invoice that bills a certificate, through either link; drafts count
+(two people preparing drafts cannot both claim the same certificate — the rule
+progress billing applies to order lines), voids never happened. Everything
+reads through it:
+
+| Surface | What it does |
+|---|---|
+| `billing_state(speed_limiter_certificates)` | PostgREST computed column — `unbilled · draft · invoiced · paid` — so the certificates list filters on it (`?billing=unbilled`) alongside its expiry chips and search |
+| `certificate_billing_status(ids[])` | The invoice behind each certificate on a page (number, status, due date, balance); the client derives the badge, adding the invoice list's "overdue" overlay (`src/lib/certificateBilling.ts`, unit-tested) |
+| `create_invoice_from_certificates(...)` | One RPC, one transaction: a draft invoice for one customer with a line per certificate. Every check runs before anything is written, so a rejection consumes no document number |
+| `sales_report_certificates_pending_invoice(customer?)` | Live certificates with no invoice — the worklist behind the KPI, grouped per customer on `/sales/reports` with the invoice one click away |
+| `sales_report_pipeline().certificates_pending_invoice`, `sales_summary().unbilled_certificates` | The count, on the reports page and the hub overview |
+
+**Where the invoice is raised.** The certificates list (select → *Create
+invoice*; the *Not invoiced* chip finds what is missing), the report the bulk
+renewal finishes with (*Create an invoice for these N certificates*), a
+customer's row on the reports worklist, and a vehicle's current certificate.
+All open the same dialog (`InvoiceCertificatesModal`), which splits the
+selection into billable / already on INV-x / other customer / no customer,
+and — because a hundred-vehicle renewal never fits one page of a list —
+offers the rest of that customer's uninvoiced certificates. After that it is
+an ordinary draft: lines and prices are editable until it is issued.
+
+**Jobs pending invoice** now treats a job as billed when *either* an invoice
+names it *or* the certificate it produced is on an invoice line, so a job
+billed through a consolidated invoice does not stay pending forever.
+
 ## Reporting
 
 `/sales/reports` (billing-gated). Four RLS-scoped SQL functions, same posture
@@ -223,6 +273,7 @@ them up:
 | `sales_report_receivables()` | Per customer: open invoices, outstanding, and the aging buckets |
 | `sales_report_revenue(p_months)` | Per month: invoiced, collected, invoice count |
 | `sales_report_jobs_pending_invoice()` | The list behind the pending-invoice count, so it can be acted on |
+| `sales_report_certificates_pending_invoice(customer?)` | Live certificates with no invoice — per customer on the page, with *Create invoice* beside each |
 | `sales_report_payments(customer?, limit)` | Customer payment history — every receipt across invoices, filterable to one customer |
 
 Four rather than thirteen, because most of the requested reports are different
@@ -249,7 +300,12 @@ Definitions worth knowing, since they are judgement calls:
   the bank statement.
 - **"Jobs pending invoice"** matches on `invoices.job_id`, which the whole
   chain carries — so a job billed through a quote and an order still counts as
-  billed.
+  billed — and on the job's certificate being on an invoice line, so a job
+  billed through a consolidated certificate invoice counts too.
+- **"Certificates pending invoice"** are *live* certificates (the one a vehicle
+  carries, not revoked) with no non-void invoice through either link. A
+  superseded certificate that was never billed is history, not work: the
+  renewal that replaced it is what is billable now.
 
 ## Known gaps
 

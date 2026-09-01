@@ -87,6 +87,51 @@ export const enSlCertificates = {
   "slCertificates.bulkSucceeded": "Issued",
   "slCertificates.bulkFailed": "Failed",
 
+  // Billing — derived from the invoice that bills the certificate
+  // (src/lib/certificateBilling.ts); shown only when the billing module is on.
+  "slCertificates.billing": "Billing",
+  "slCertificates.billing.unbilled": "Not invoiced",
+  "slCertificates.billing.draft": "Draft invoice",
+  "slCertificates.billing.invoiced": "Invoiced",
+  "slCertificates.billing.overdue": "Overdue",
+  "slCertificates.billing.paid": "Paid",
+  "slCertificates.billingFilterAll": "Any billing",
+  "slCertificates.billingFilterUnbilled": "Not invoiced",
+  "slCertificates.billingFilterInvoiced": "Invoiced",
+  "slCertificates.billingFilterPaid": "Paid",
+  "slCertificates.openInvoice": "Open invoice {number}",
+
+  // Invoice dialog — one draft invoice for a selection of certificates
+  "slCertificates.createInvoice": "Create invoice",
+  "slCertificates.invoiceTitle": "Invoice {count} certificates",
+  "slCertificates.invoiceLead":
+    "One draft invoice for {customer}, with a line per vehicle carrying its plate and certificate number. Lines and prices can still be adjusted before the invoice is issued.",
+  "slCertificates.invoiceEligible": "Will be invoiced ({count})",
+  "slCertificates.invoiceSkipped": "Skipped ({count})",
+  "slCertificates.invoiceSkipInvoiced": "Already on {number}",
+  "slCertificates.invoiceSkipOtherCustomer": "Different customer — {name}",
+  "slCertificates.invoiceSkipNoCustomer": "No customer to bill",
+  "slCertificates.invoiceNoneEligible": "None of the selected certificates can be invoiced.",
+  "slCertificates.invoiceOthersPending":
+    "{name} has {count} more certificates that are not invoiced yet.",
+  "slCertificates.invoiceAddOthers": "Add them to this invoice",
+  "slCertificates.invoiceOnlySelected": "Only the selected ones",
+  "slCertificates.invoiceCatalogItem": "Catalog item",
+  "slCertificates.invoiceCatalogHint": "Optional — prefills the description, price and tax.",
+  "slCertificates.invoiceDescription": "Description",
+  "slCertificates.invoiceDescriptionHint":
+    "Printed on every line, followed by the plate and the certificate number.",
+  "slCertificates.invoiceDefaultDescription": "Speed limiter certificate renewal",
+  "slCertificates.invoiceUnitPrice": "Price per vehicle",
+  "slCertificates.invoiceTaxRate": "Tax %",
+  "slCertificates.invoicePreview": "{count} lines · {total} incl. tax",
+  "slCertificates.invoiceConfirm": "Create draft invoice",
+  "slCertificates.invoiceCreated": "Draft invoice {number} created with {count} lines.",
+  "slCertificates.invoiceFailed": "Could not create the invoice",
+  "slCertificates.invoiceCloseBlocked":
+    "The invoice is being created — this stays open until it is done.",
+  "slCertificates.invoiceAfterRenew": "Create an invoice for these {count} certificates",
+
   // Revoke modal
   "slCertificates.revokeTitle": "Revoke certificate",
   "slCertificates.revokeLead":

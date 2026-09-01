@@ -370,6 +370,10 @@ export interface EditableLine {
   id: string;
   sort_order: number;
   product_id: string | null;
+  /** Present on every line table; the invoice page reads them for its certificate panel. */
+  vehicle_id?: string | null;
+  /** Invoice lines only — the certificate a consolidated renewal invoice bills. */
+  certificate_id?: string | null;
   description: string;
   quantity: number;
   unit: string | null;
