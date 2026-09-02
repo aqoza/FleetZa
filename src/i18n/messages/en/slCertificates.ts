@@ -91,15 +91,44 @@ export const enSlCertificates = {
   // (src/lib/certificateBilling.ts); shown only when the billing module is on.
   "slCertificates.billing": "Billing",
   "slCertificates.billing.unbilled": "Not invoiced",
+  "slCertificates.billing.quoted": "Quoted",
+  "slCertificates.billing.ordered": "Ordered",
   "slCertificates.billing.draft": "Draft invoice",
   "slCertificates.billing.invoiced": "Invoiced",
   "slCertificates.billing.overdue": "Overdue",
   "slCertificates.billing.paid": "Paid",
   "slCertificates.billingFilterAll": "Any billing",
+  "slCertificates.billingFilterUnquoted": "Not quoted",
+  "slCertificates.billingFilterQuoted": "Quoted",
   "slCertificates.billingFilterUnbilled": "Not invoiced",
   "slCertificates.billingFilterInvoiced": "Invoiced",
   "slCertificates.billingFilterPaid": "Paid",
   "slCertificates.openInvoice": "Open invoice {number}",
+  "slCertificates.openDocument": "Open {number}",
+  "slCertificates.skipQuoted": "Already quoted on {number}",
+  "slCertificates.skipOrdered": "Already ordered on {number}",
+
+  // Quote dialog — the renewal quote, before the work
+  "slCertificates.createQuote": "Create quote",
+  "slCertificates.quoteTitle": "Quote {count} renewals",
+  "slCertificates.quoteLead":
+    "One quote for {customer}, with a line per vehicle carrying its plate and the certificate being renewed. Send it in the same step, or review it first.",
+  "slCertificates.quoteEligible": "Will be quoted ({count})",
+  "slCertificates.quoteOthersPending":
+    "{name} has {count} more renewals due that are not quoted yet.",
+  "slCertificates.quoteSendNow": "Mark as sent and copy the customer link",
+  "slCertificates.quoteSendNowHint":
+    "Skips the draft step: the quote is sent at once and the link the customer accepts from is ready to paste into a message.",
+  "slCertificates.quoteConfirm": "Create draft quote",
+  "slCertificates.quoteConfirmSend": "Create and send quote",
+  "slCertificates.quoteCreated": "Draft quote {number} created with {count} lines.",
+  "slCertificates.quoteSent": "Quote {number} sent — customer link copied.",
+  "slCertificates.quoteSentLead":
+    "Quote {number} is marked as sent. Share this link with the customer; they can accept the quote from it.",
+  "slCertificates.openQuote": "Open quote {number}",
+  "slCertificates.quoteFailed": "Could not create the quote",
+  "slCertificates.quoteCloseBlocked":
+    "The quote is being created — this stays open until it is done.",
 
   // Invoice dialog — one draft invoice for a selection of certificates
   "slCertificates.createInvoice": "Create invoice",

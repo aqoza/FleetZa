@@ -36,6 +36,7 @@ lines with a dozen round trips is how half-converted documents get created:
 | `create_invoice_from_order(order, lines?)` | order must be `confirmed` or `fulfilled`; requested quantities must not exceed what is left | draft invoice + the requested quantities, due date from `payment_terms_days` |
 | `revise_quote(quote)` | quote must not be `draft` | new draft at `revision + 1`, `revision_of` lineage kept |
 | `create_invoice_from_certificates(certs[], description?, price?, tax?, product?)` | one customer, none already billed (`CERTS_MULTIPLE_CUSTOMERS`, `CERT_ALREADY_INVOICED`) | draft invoice + one line per certificate, plate and number on the line |
+| `create_quote_from_certificates(certs[], description?, price?, tax?, product?)` | one customer (`CERTS_MULTIPLE_CUSTOMERS`); no already-quoted guard — a quote is a proposal, not a claim | draft quote + one line per certificate being renewed, validity from `quote_valid_days` |
 
 ## Four customer processes, one chain
 
@@ -73,10 +74,12 @@ customer and vehicle and linked at creation rather than after the fact.
 
 One job per document *at the header*: here a job is one vehicle and one
 certificate, which is what these four processes describe. The consolidated
-invoice — one document for a fleet's worth of renewals — is the case that
-promoted the certificate link to the **line**: `invoice_lines.certificate_id`
-(with the line's existing `vehicle_id`) bills one certificate for one vehicle
-per line. See **Billing certificates** below.
+documents — one quote, later one invoice, for a fleet's worth of renewals —
+are the case that promoted the certificate link to the **line**:
+`quote_lines`, `sales_order_lines` and `invoice_lines` all carry
+`certificate_id` (with the line's existing `vehicle_id`), one certificate for
+one vehicle per line, and the conversion RPCs carry it down the chain. See
+**Billing certificates** below.
 
 ## Where the numbers come from
 
@@ -261,6 +264,36 @@ an ordinary draft: lines and prices are editable until it is issued.
 names it *or* the certificate it produced is on an invoice line, so a job
 billed through a consolidated invoice does not stay pending forever.
 
+### Quoting renewals — before the work
+
+The same shape, one step earlier. A customer's vehicles are coming up for
+expiry; the dealer sends **one quote with a line per vehicle** naming the plate
+and the certificate being renewed, in a few clicks: the certificates list
+filtered to *Not quoted* (or the *Renewals to quote* worklist on
+`/sales/reports`, per customer) → select → *Create quote* → the same dialog,
+with **Mark as sent and copy the customer link** so the quote goes out in the
+same step, the link the customer accepts from ready to paste.
+
+- **The link rides the chain.** `quote_lines.certificate_id` names the
+  certificate being renewed; `convert_quote_to_order` copies it to the order
+  line; `create_invoice_from_order` resolves it through `app.certificate_head`
+  to the certificate the vehicle carries *by then* — the renewal, if the work
+  is done — so the invoice bills the right document and the tracking below
+  moves with it. `revise_quote` keeps the links too.
+- **Two more states in front of "unbilled".** `app.certificate_quote_id` (an
+  open quote: draft, sent or accepted, through the line or the header link)
+  and `app.certificate_order_id` (a non-canceled order) make a certificate
+  *quoted* or *ordered*; an invoice always wins. A declined, expired or
+  canceled quote frees the certificate to be quoted again — the database
+  never refuses a second quote, the dialog only tells the operator about the
+  open one. `certificate_quote_status(ids[])` returns both for a page.
+- **The worklist and the KPI.** `sales_report_renewals_to_quote(days, customer?)`
+  is every live certificate expiring within the window (or already expired)
+  with no quote, order or invoice; `renewals_to_quote` on the pipeline row and
+  on `sales_summary()` is its count. The certificates list's chips map onto
+  the computed column: *Not quoted* (`unbilled`) · *Quoted* (`quoted`,
+  `ordered`) · *Not invoiced* (all three) · *Invoiced* · *Paid*.
+
 ## Reporting
 
 `/sales/reports` (billing-gated). Four RLS-scoped SQL functions, same posture
@@ -274,6 +307,7 @@ them up:
 | `sales_report_revenue(p_months)` | Per month: invoiced, collected, invoice count |
 | `sales_report_jobs_pending_invoice()` | The list behind the pending-invoice count, so it can be acted on |
 | `sales_report_certificates_pending_invoice(customer?)` | Live certificates with no invoice — per customer on the page, with *Create invoice* beside each |
+| `sales_report_renewals_to_quote(days, customer?)` | Live certificates expiring within the window with no quote, order or invoice — per customer, with *Create quote* beside each |
 | `sales_report_payments(customer?, limit)` | Customer payment history — every receipt across invoices, filterable to one customer |
 
 Four rather than thirteen, because most of the requested reports are different
@@ -306,6 +340,9 @@ Definitions worth knowing, since they are judgement calls:
   carries, not revoked) with no non-void invoice through either link. A
   superseded certificate that was never billed is history, not work: the
   renewal that replaced it is what is billable now.
+- **"Renewals to quote"** are live certificates expiring within 90 days — or
+  already expired, which need it most — with no open quote, live order or
+  invoice. Ninety days is the certificates list's own outer band.
 
 ## Known gaps
 

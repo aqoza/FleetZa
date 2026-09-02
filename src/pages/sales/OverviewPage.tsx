@@ -14,6 +14,7 @@ import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import { Badge, Card, ErrorState, LoadingState, StatCard } from "../../components/ui";
+import { RENEWAL_WINDOW_DAYS } from "../speed-limiters/CertificateDocumentModal";
 import { SectionCard } from "./shared";
 
 /** Quotes inside this window are surfaced as "expiring soon". */
@@ -150,6 +151,31 @@ export default function OverviewPage() {
           <span className="text-2xl font-bold tracking-tight text-ink tabular-nums">
             {money(s.collected_30d)}
           </span>
+        </Card>
+      )}
+
+      {/* Renewals coming up that nobody has quoted yet. Shown only while
+          there are some; the certificates list filtered to them is where the
+          quote gets sent from. */}
+      {certificatesOn && s.renewals_to_quote > 0 && (
+        <Card className="mb-5 flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <div className="text-sm font-medium text-ink-2">{t("sales.kpi.renewalsToQuote")}</div>
+            <div className="mt-0.5 text-xs text-ink-3">
+              {t("sales.kpi.renewalsToQuoteSub", { days: RENEWAL_WINDOW_DAYS })}
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-2xl font-bold tracking-tight text-ink tabular-nums">
+              {s.renewals_to_quote}
+            </span>
+            <Link
+              to="/speed-limiters/certificates?billing=unquoted"
+              className="text-sm font-medium text-brand-700 hover:underline"
+            >
+              {t("sales.kpi.reviewRenewals")}
+            </Link>
+          </div>
         </Card>
       )}
 

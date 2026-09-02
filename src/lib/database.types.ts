@@ -1073,6 +1073,7 @@ export type Database = {
       }
       quote_lines: {
         Row: {
+          certificate_id: string | null
           created_at: string
           created_by: string | null
           description: string
@@ -1096,6 +1097,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description: string
@@ -1119,6 +1121,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
@@ -1142,6 +1145,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quote_lines_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quote_lines_product_id_fkey"
             columns: ["product_id"]
@@ -1428,6 +1438,7 @@ export type Database = {
       }
       sales_order_lines: {
         Row: {
+          certificate_id: string | null
           created_at: string
           created_by: string | null
           description: string
@@ -1451,6 +1462,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description: string
@@ -1474,6 +1486,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
@@ -1497,6 +1510,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_order_lines_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_order_lines_product_id_fkey"
             columns: ["product_id"]
@@ -3010,6 +3030,19 @@ export type Database = {
           total: number
         }[]
       }
+      certificate_quote_status: {
+        Args: { p_certificate_ids: string[] }
+        Returns: {
+          certificate_id: string
+          order_id: string
+          order_number: string
+          order_status: string
+          quote_id: string
+          quote_number: string
+          quote_status: string
+          valid_until: string
+        }[]
+      }
       complete_sl_job: {
         Args: {
           p_customer_signed?: boolean
@@ -3208,6 +3241,59 @@ export type Database = {
               isSetofReturn: false
             }
           }
+      create_quote_from_certificates: {
+        Args: {
+          p_certificate_ids: string[]
+          p_description?: string
+          p_product_id?: string
+          p_tax_rate?: number
+          p_unit_price?: number
+        }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_name: string | null
+          certificate_id: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          decline_reason: string | null
+          declined_at: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          job_id: string | null
+          notes: string | null
+          number: number | null
+          public_token: string
+          revision: number
+          revision_of: string | null
+          sales_order_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -3406,6 +3492,7 @@ export type Database = {
           pending_quotes: number
           pos_received: number
           pos_received_value: number
+          renewals_to_quote: number
         }[]
       }
       sales_report_receivables: {
@@ -3421,6 +3508,20 @@ export type Database = {
           overdue_31_60: number
           overdue_61_90: number
           overdue_90_plus: number
+        }[]
+      }
+      sales_report_renewals_to_quote: {
+        Args: { p_customer_id?: string; p_days?: number }
+        Returns: {
+          certificate_id: string
+          certificate_number: string
+          customer_id: string
+          customer_name: string
+          expires_at: string
+          issued_at: string
+          license_plate: string
+          vehicle_id: string
+          vehicle_name: string
         }[]
       }
       sales_report_revenue: {
@@ -3445,6 +3546,7 @@ export type Database = {
           outstanding_amount: number
           overdue_amount: number
           overdue_invoices: number
+          renewals_to_quote: number
           unbilled_certificates: number
           unbilled_order_value: number
         }[]

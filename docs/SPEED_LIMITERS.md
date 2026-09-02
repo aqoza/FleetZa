@@ -144,13 +144,17 @@ stateDiagram-v2
 - **Revocation** — a manager sets `status = "revoked"` with `revoked_at` and
   `revoked_reason` (device removed, tampering found, issued in error). Revocation
   is a stored status and wins over dates on the verify endpoint.
-- **Billing** — with the `billing` module on, a certificate knows whether an
-  invoice bills it (`invoice_lines.certificate_id`, or the header link a job
-  page invoice carries) and whether that invoice is paid. Derived, never
-  stored, through one SQL definition the double-billing guard and the reports
-  share; the certificates list shows it as a column and a *Not invoiced* chip,
-  and any selection becomes one draft invoice with a line per vehicle. The
-  contract is in **docs/SALES.md → Billing certificates**.
+- **Quoting and billing** — with the `sales` / `billing` modules on, a
+  certificate knows where it is in the commercial chain: quoted (an open
+  quote names it on a line), ordered, invoiced, paid. Derived, never stored,
+  through one SQL definition per document that the double-billing guard, the
+  worklists and the KPIs share. The certificates list shows it as a column
+  with chips (*Not quoted · Quoted · Not invoiced · Invoiced · Paid*), and any
+  selection becomes one quote — sendable in the same step, customer link
+  copied — or one invoice, a line per vehicle carrying the plate and the
+  certificate number. The link rides the chain: the quote line names the
+  certificate being renewed, and the invoice line resolves it to the renewed
+  one. The contract is in **docs/SALES.md → Billing certificates**.
 - **Print + QR** — `/speed-limiters/certificates/:id/print` renders the printable
   certificate with a QR code (via the `qrcode` package) encoding
   `<origin>/verify?c=<certUuid>`. See **The printed certificate** below.
@@ -456,12 +460,13 @@ additive, not a migration.
 - Status rules: `src/lib/certificateStatus.ts` (live predicate, buckets, badge
   meta, fleet compliance) — the single source every surface renders from,
   unit-tested in `certificateStatus.test.ts`
-- Billing rules: `src/lib/certificateBilling.ts` (state from the billing
-  invoice, filter values, the selection → invoice partition) — unit-tested in
-  `certificateBilling.test.ts`; the dialog is
-  `src/pages/speed-limiters/InvoiceCertificatesModal.tsx`, mounted by the
+- Commercial tracking: `src/lib/certificateBilling.ts` (state from the
+  quote / order / invoice that name a certificate, filter values, the
+  selection → document partition) — unit-tested in
+  `certificateBilling.test.ts`; the quote/invoice dialog is
+  `src/pages/speed-limiters/CertificateDocumentModal.tsx`, mounted by the
   certificates list (selection + after a bulk renewal), the sales reports
-  worklist and the vehicle page
+  worklists and the vehicle page
 - Renewal: `src/pages/speed-limiters/RenewCertificateModal.tsx` — the modal plus
   `renewCertificate` / `fetchRenewSource` / `defaultRenewalDates`, mounted by the
   certificates list (single + bulk), vehicle detail and customer detail

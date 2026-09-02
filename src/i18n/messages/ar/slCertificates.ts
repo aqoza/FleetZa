@@ -93,15 +93,44 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   // الفوترة
   "slCertificates.billing": "الفوترة",
   "slCertificates.billing.unbilled": "غير مفوترة",
+  "slCertificates.billing.quoted": "صدر لها عرض سعر",
+  "slCertificates.billing.ordered": "صدر لها أمر بيع",
   "slCertificates.billing.draft": "فاتورة مسودة",
   "slCertificates.billing.invoiced": "مفوترة",
   "slCertificates.billing.overdue": "متأخرة السداد",
   "slCertificates.billing.paid": "مدفوعة",
   "slCertificates.billingFilterAll": "كل حالات الفوترة",
+  "slCertificates.billingFilterUnquoted": "بلا عرض سعر",
+  "slCertificates.billingFilterQuoted": "صدر لها عرض سعر",
   "slCertificates.billingFilterUnbilled": "غير مفوترة",
   "slCertificates.billingFilterInvoiced": "مفوترة",
   "slCertificates.billingFilterPaid": "مدفوعة",
   "slCertificates.openInvoice": "فتح الفاتورة {number}",
+  "slCertificates.openDocument": "فتح {number}",
+  "slCertificates.skipQuoted": "صدر لها عرض السعر {number} بالفعل",
+  "slCertificates.skipOrdered": "صدر لها أمر البيع {number} بالفعل",
+
+  // نافذة عرض السعر — عرض تجديد قبل تنفيذ العمل
+  "slCertificates.createQuote": "إنشاء عرض سعر",
+  "slCertificates.quoteTitle": "عرض سعر لتجديد {count} شهادة",
+  "slCertificates.quoteLead":
+    "عرض سعر واحد للعميل {customer}، ببند لكل مركبة يحمل رقم لوحتها ورقم الشهادة المراد تجديدها. أرسله في الخطوة نفسها أو راجعه أولًا.",
+  "slCertificates.quoteEligible": "سيشملها العرض ({count})",
+  "slCertificates.quoteOthersPending":
+    "لدى العميل {name} {count} تجديدًا آخر مستحقًا لم يصدر له عرض سعر بعد.",
+  "slCertificates.quoteSendNow": "وضع علامة \"مُرسل\" ونسخ رابط العميل",
+  "slCertificates.quoteSendNowHint":
+    "يتخطى مرحلة المسودة: يُرسل عرض السعر فورًا ويكون الرابط الذي يقبل العميل من خلاله جاهزًا للصقه في رسالة.",
+  "slCertificates.quoteConfirm": "إنشاء عرض سعر مسودة",
+  "slCertificates.quoteConfirmSend": "إنشاء عرض السعر وإرساله",
+  "slCertificates.quoteCreated": "تم إنشاء عرض السعر المسودة {number} بعدد {count} بند.",
+  "slCertificates.quoteSent": "تم إرسال عرض السعر {number} — ونُسخ رابط العميل.",
+  "slCertificates.quoteSentLead":
+    "وُضعت علامة \"مُرسل\" على عرض السعر {number}. شارك هذا الرابط مع العميل ليتمكن من قبول العرض من خلاله.",
+  "slCertificates.openQuote": "فتح عرض السعر {number}",
+  "slCertificates.quoteFailed": "تعذّر إنشاء عرض السعر",
+  "slCertificates.quoteCloseBlocked":
+    "جارٍ إنشاء عرض السعر — تبقى هذه النافذة مفتوحة حتى الانتهاء.",
 
   // نافذة الفوترة
   "slCertificates.createInvoice": "إنشاء فاتورة",

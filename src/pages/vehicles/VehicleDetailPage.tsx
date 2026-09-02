@@ -2,14 +2,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft, Pencil, Printer, Receipt, RefreshCw, Trash2, UserCheck, Wrench,
+  ArrowLeft, FileText, Pencil, Printer, Receipt, RefreshCw, Trash2, UserCheck, Wrench,
 } from "lucide-react";
 import { deleteRow, getRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDistance, formatMoney } from "../../lib/format";
 import { certificateStatusMeta } from "../../lib/certificateStatus";
 import {
-  certificateBillingMeta, certificateBillingState, type InvoiceableCertificate,
+  certificateBillingMeta, certificateBillingState, certificateTrackingLink,
+  type CertificateDocumentKind, type InvoiceableCertificate,
 } from "../../lib/certificateBilling";
 import { fuelTypes, vehicleStatus, vehicleTypes, workOrderStatus, issueStatus } from "../../lib/labels";
 import { useDriverPicker } from "../../lib/pickers";
@@ -28,8 +29,8 @@ import { Combobox } from "../../components/Combobox";
 import { VehicleForm } from "./VehicleForm";
 import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
 import {
-  InvoiceCertificatesModal, useCertificateBilling,
-} from "../speed-limiters/InvoiceCertificatesModal";
+  CertificateDocumentModal, useCertificateTracking,
+} from "../speed-limiters/CertificateDocumentModal";
 
 // Shared enum keys — defined in the speedLimiters namespace by the hub.
 const jobTypeKeys: Record<SlJobType, MessageKey> = {
@@ -70,14 +71,18 @@ export default function VehicleDetailPage() {
   const customersOn = isEnabled("customers");
   const speedLimitersOn = isEnabled("speed_limiters");
   const slCertsOn = speedLimitersOn && isEnabled("sl_certificates");
-  const billingOn = slCertsOn && isEnabled("billing");
+  const salesOn = slCertsOn && isEnabled("sales");
+  const billingOn = salesOn && isEnabled("billing");
   const [editing, setEditing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState("");
   const [actionError, setActionError] = useState("");
   const [renewingId, setRenewingId] = useState<string | null>(null);
-  const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+  const [raising, setRaising] = useState<{
+    kind: CertificateDocumentKind;
+    certs: InvoiceableCertificate[];
+  } | null>(null);
 
   const { data: vehicle, isLoading } = useQuery({
     queryKey: ["vehicles", id],
@@ -171,11 +176,12 @@ export default function VehicleDetailPage() {
     },
   });
 
-  // Whether the current certificate has been invoiced — the same lookup the
-  // certificates list makes, for this one id (src/lib/certificateBilling.ts).
-  const { data: certBillingRows } = useCertificateBilling(
+  // Where the current certificate is in the commercial chain — the same
+  // lookup the certificates list makes, for this one id
+  // (src/lib/certificateBilling.ts).
+  const { tracking: certTracking } = useCertificateTracking(
     currentCert ? [currentCert.id] : [],
-    billingOn,
+    salesOn,
   );
 
   const { data: slCerts, isLoading: slCertsLoading, error: slCertsError } = useQuery({
@@ -277,10 +283,14 @@ export default function VehicleDetailPage() {
   // both reads succeeded.
   const hasRevokedHead = !currentCert && (slCerts?.length ?? 0) > 0;
 
-  // Billing of the current certificate: derived from the invoice that bills
-  // it, or "not invoiced" when there is none.
-  const certBillingRow = certBillingRows?.[0] ?? null;
-  const certBillingMeta = certificateBillingMeta[certificateBillingState(certBillingRow)];
+  // Billing of the current certificate: derived from the documents that name
+  // it — the invoice, else the live order, else the open quote — or
+  // "not invoiced" when there are none.
+  const certInvoice = currentCert ? certTracking.invoices.get(currentCert.id) : undefined;
+  const certQuote = currentCert ? certTracking.quotes.get(currentCert.id) : undefined;
+  const certBillingState = certificateBillingState(certInvoice, certQuote);
+  const certBillingMeta = certificateBillingMeta[certBillingState];
+  const certTrackingLink = certificateTrackingLink(certInvoice, certQuote);
   const invoiceable = (c: SpeedLimiterCertificate): InvoiceableCertificate => ({
     id: c.id,
     certificate_number: c.certificate_number,
@@ -512,20 +522,20 @@ export default function VehicleDetailPage() {
                         {formatDate(currentCert.expires_at)}
                       </span>
                     </div>
-                    {billingOn && (
+                    {salesOn && (
                       <div className="mt-1.5 flex items-center justify-between gap-4 text-xs">
                         <span className="text-ink-3">{t("slCertificates.billing")}</span>
                         <span className="flex items-center gap-2">
                           <Badge tone={certBillingMeta.tone}>{t(certBillingMeta.labelKey)}</Badge>
-                          {certBillingRow && (
+                          {certTrackingLink && (
                             <Link
-                              to={`/sales/invoices/${certBillingRow.invoice_id}`}
+                              to={certTrackingLink.to}
                               className="font-medium text-brand-700 hover:underline tabular-nums"
-                              title={t("slCertificates.openInvoice", {
-                                number: certBillingRow.doc_number ?? "",
+                              title={t("slCertificates.openDocument", {
+                                number: certTrackingLink.number,
                               })}
                             >
-                              {certBillingRow.doc_number}
+                              {certTrackingLink.number}
                             </Link>
                           )}
                         </span>
@@ -547,13 +557,27 @@ export default function VehicleDetailPage() {
                           <RefreshCw className="h-3.5 w-3.5" /> {t("slCertificates.renew")}
                         </button>
                       )}
-                      {/* The renewal is the work the customer pays for; if
-                          nothing bills this certificate yet, the invoice
-                          starts here — one vehicle, one line. */}
-                      {billingOn && isManager && !certBillingRow && (
+                      {/* The renewal is the work the customer pays for. Before
+                          it, a quote; after it, an invoice — either starts
+                          here when nothing names this certificate yet: one
+                          vehicle, one line. */}
+                      {salesOn && isManager && certBillingState === "unbilled" && (
                         <button
                           type="button"
-                          onClick={() => setInvoicing([invoiceable(currentCert)])}
+                          onClick={() =>
+                            setRaising({ kind: "quote", certs: [invoiceable(currentCert)] })
+                          }
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline"
+                        >
+                          <FileText className="h-3.5 w-3.5" /> {t("slCertificates.createQuote")}
+                        </button>
+                      )}
+                      {billingOn && isManager && !certInvoice && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setRaising({ kind: "invoice", certs: [invoiceable(currentCert)] })
+                          }
                           className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline"
                         >
                           <Receipt className="h-3.5 w-3.5" /> {t("slCertificates.createInvoice")}
@@ -636,8 +660,12 @@ export default function VehicleDetailPage() {
         )}
       </div>
 
-      {billingOn && (
-        <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
+      {salesOn && (
+        <CertificateDocumentModal
+          kind={raising?.kind ?? "invoice"}
+          certificates={raising?.certs ?? null}
+          onClose={() => setRaising(null)}
+        />
       )}
 
       {/* The shared renewal flow — number allocation, UIN write-back and the

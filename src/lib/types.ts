@@ -574,6 +574,14 @@ interface SalesDocumentLine {
   sort_order: number;
   product_id: string | null;
   vehicle_id: string | null;
+  /**
+   * The certificate this line is about: on a quote and an order, the one
+   * being renewed; on an invoice, the one billed. Carried down the chain by
+   * the conversion RPCs (an invoice line resolves it to the renewed
+   * certificate). A certificate is on at most one non-void invoice; billing
+   * state is derived from these links, see src/lib/certificateBilling.ts.
+   */
+  certificate_id: string | null;
   description: string;
   quantity: number;
   unit: string | null;
@@ -661,13 +669,6 @@ export interface Invoice extends SalesDocument, SalesDocumentLinks {
 
 export interface InvoiceLine extends SalesDocumentLine {
   invoice_id: string;
-  /**
-   * The certificate this line bills — the consolidated renewal invoice is a
-   * line per vehicle, each linked to its certificate. A certificate is on at
-   * most one non-void invoice (app.guard_line_certificate); billing state is
-   * derived from these links, see src/lib/certificateBilling.ts.
-   */
-  certificate_id: string | null;
 }
 
 export type PaymentMethod = "cash" | "bank_transfer" | "card" | "cheque" | "online" | "other";
@@ -701,6 +702,8 @@ export interface SalesSummary {
   collected_30d: number;
   /** Live certificates with no invoice against them — renewals issued but never billed. */
   unbilled_certificates: number;
+  /** Live certificates expiring within 90 days with no quote, order or invoice. */
+  renewals_to_quote: number;
 }
 
 export type RenewalType =

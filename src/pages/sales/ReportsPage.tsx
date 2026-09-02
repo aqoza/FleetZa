@@ -7,11 +7,11 @@
  * into the browser — the same rule the overview KPIs follow. A tenant with
  * tens of thousands of invoices pays for one row, not for the table.
  */
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
-  AlertTriangle, Banknote, ClipboardList, FileText, Receipt, ShieldCheck, Wallet,
+  AlertTriangle, Banknote, CalendarClock, ClipboardList, FileText, Receipt, ShieldCheck, Wallet,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { wrapDbError } from "../../lib/db";
@@ -26,8 +26,13 @@ import { Combobox } from "../../components/Combobox";
 import { useCustomerPicker } from "../../lib/pickers";
 import { paymentMethods } from "../../lib/labels";
 import type { PaymentMethod } from "../../lib/types";
-import type { InvoiceableCertificate } from "../../lib/certificateBilling";
-import { InvoiceCertificatesModal } from "../speed-limiters/InvoiceCertificatesModal";
+import type {
+  CertificateDocumentKind, InvoiceableCertificate,
+} from "../../lib/certificateBilling";
+import {
+  CertificateDocumentModal, RENEWAL_WINDOW_DAYS, worklistRowToCertificate,
+  type CertificateWorklistRow,
+} from "../speed-limiters/CertificateDocumentModal";
 import { SectionCard } from "./shared";
 
 interface PipelineRow {
@@ -42,6 +47,7 @@ interface PipelineRow {
   outstanding_amount: number;
   overdue_invoices: number; overdue_amount: number;
   certificates_pending_invoice: number;
+  renewals_to_quote: number;
 }
 
 interface ReceivableRow {
@@ -87,25 +93,46 @@ interface PendingJobRow {
   vehicle_name: string | null;
 }
 
-interface PendingCertificateRow {
-  certificate_id: string;
-  certificate_number: string;
-  issued_at: string;
-  expires_at: string;
-  customer_id: string | null;
-  customer_name: string | null;
-  vehicle_id: string | null;
-  vehicle_name: string | null;
-  license_plate: string | null;
-}
+type PendingCertificateRow = CertificateWorklistRow;
 
-/** Pending certificates folded per customer — the unit an invoice is raised for. */
+/** Worklist rows folded per customer — the unit a quote or an invoice is raised for. */
 interface PendingCustomerGroup {
   customerId: string | null;
   customerName: string | null;
   certs: PendingCertificateRow[];
-  oldestIssued: string;
-  newestIssued: string;
+  /** Earliest and latest of the row date the list is about (issued / expires). */
+  earliest: string;
+  latest: string;
+}
+
+/**
+ * One row per customer, ordered by how many certificates are waiting. The
+ * RPCs already order by customer, so grouping is a single pass.
+ */
+function groupByCustomer(
+  rows: PendingCertificateRow[] | undefined,
+  dateOf: (row: PendingCertificateRow) => string,
+): PendingCustomerGroup[] {
+  const groups = new Map<string, PendingCustomerGroup>();
+  for (const row of rows ?? []) {
+    const key = row.customer_id ?? "";
+    const date = dateOf(row);
+    let g = groups.get(key);
+    if (!g) {
+      g = {
+        customerId: row.customer_id,
+        customerName: row.customer_name,
+        certs: [],
+        earliest: date,
+        latest: date,
+      };
+      groups.set(key, g);
+    }
+    g.certs.push(row);
+    if (date < g.earliest) g.earliest = date;
+    if (date > g.latest) g.latest = date;
+  }
+  return [...groups.values()].sort((a, b) => b.certs.length - a.certs.length);
 }
 
 /** The report functions this page reads; named so the client keeps its typed
@@ -116,6 +143,7 @@ type ReportFn =
   | "sales_report_revenue"
   | "sales_report_jobs_pending_invoice"
   | "sales_report_certificates_pending_invoice"
+  | "sales_report_renewals_to_quote"
   | "sales_report_payments";
 
 /** Every report is one RPC; the generic keeps the row shape at the call site. */
@@ -160,31 +188,25 @@ export default function ReportsPage() {
   const pendingCertsQ = useReport<PendingCertificateRow>(
     "sales_report_certificates_pending_invoice",
   );
-  const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+  const renewalsQ = useReport<PendingCertificateRow>("sales_report_renewals_to_quote", {
+    p_days: RENEWAL_WINDOW_DAYS,
+  });
+  /** Which document is being raised from a worklist row, and for what. */
+  const [raising, setRaising] = useState<{
+    kind: CertificateDocumentKind;
+    certs: InvoiceableCertificate[];
+  } | null>(null);
 
-  // One row per customer: an invoice bills one customer, so that is the unit
-  // to act on. The RPC orders by customer, so grouping is a single pass.
-  const pendingByCustomer = useMemo<PendingCustomerGroup[]>(() => {
-    const groups = new Map<string, PendingCustomerGroup>();
-    for (const row of pendingCertsQ.data ?? []) {
-      const key = row.customer_id ?? "";
-      let g = groups.get(key);
-      if (!g) {
-        g = {
-          customerId: row.customer_id,
-          customerName: row.customer_name,
-          certs: [],
-          oldestIssued: row.issued_at,
-          newestIssued: row.issued_at,
-        };
-        groups.set(key, g);
-      }
-      g.certs.push(row);
-      if (row.issued_at < g.oldestIssued) g.oldestIssued = row.issued_at;
-      if (row.issued_at > g.newestIssued) g.newestIssued = row.issued_at;
-    }
-    return [...groups.values()].sort((a, b) => b.certs.length - a.certs.length);
-  }, [pendingCertsQ.data]);
+  // One row per customer: a document is for one customer, so that is the
+  // unit to act on.
+  const pendingByCustomer = useMemo(
+    () => groupByCustomer(pendingCertsQ.data, (r) => r.issued_at),
+    [pendingCertsQ.data],
+  );
+  const renewalsByCustomer = useMemo(
+    () => groupByCustomer(renewalsQ.data, (r) => r.expires_at),
+    [renewalsQ.data],
+  );
 
   // Payment history is the one report with a filter: "what has THIS customer
   // paid us" is the question asked when a balance is disputed.
@@ -258,7 +280,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Where the work is */}
-      <div className={`grid gap-4 sm:grid-cols-2 ${certificatesOn ? "xl:grid-cols-5" : "xl:grid-cols-4"}`}>
+      <div className={`grid gap-4 sm:grid-cols-2 ${certificatesOn ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>
         <StatCard
           icon={<ClipboardList className="h-5 w-5" />}
           tone="amber"
@@ -286,6 +308,15 @@ export default function ReportsPage() {
           value={String(p?.pos_received ?? 0)}
           sub={money(Number(p?.pos_received_value ?? 0))}
         />
+        {certificatesOn && (
+          <StatCard
+            icon={<CalendarClock className="h-5 w-5" />}
+            tone={Number(p?.renewals_to_quote ?? 0) > 0 ? "amber" : "green"}
+            label={t("sales.kpi.renewalsToQuote")}
+            value={String(p?.renewals_to_quote ?? 0)}
+            sub={t("sales.kpi.renewalsToQuoteSub", { days: RENEWAL_WINDOW_DAYS })}
+          />
+        )}
         {certificatesOn && (
           <StatCard
             icon={<ShieldCheck className="h-5 w-5" />}
@@ -388,89 +419,57 @@ export default function ReportsPage() {
         )}
       </SectionCard>
 
-      {/* Certificates issued but never billed — per customer, because an
-          invoice is per customer, and with the invoice one click away: the
-          whole point of the count is that someone raises the invoice. */}
+      {/* Two worklists, one shape: renewals due that nobody has quoted, and
+          certificates issued that nobody has billed. Per customer, because a
+          document is per customer, and with the document one click away —
+          the whole point of the count is that someone acts on it. */}
+      {certificatesOn && (
+        <SectionCard title={t("sales.reports.renewalsToQuote")}>
+          <p className="mb-3 text-xs text-ink-3">
+            {t("sales.reports.renewalsToQuoteHint", { days: RENEWAL_WINDOW_DAYS })}
+          </p>
+          <CustomerWorklist
+            query={renewalsQ}
+            groups={renewalsByCustomer}
+            dateHeaders={[t("sales.reports.soonestExpiry"), t("sales.reports.latestExpiry")]}
+            emptyIcon={<CalendarClock className="h-5 w-5" />}
+            emptyTitle={t("sales.reports.noRenewalsToQuote")}
+            emptyDesc={t("sales.reports.noRenewalsToQuoteDesc", { days: RENEWAL_WINDOW_DAYS })}
+            action={
+              isManager
+                ? {
+                    icon: <FileText className="h-4 w-4" />,
+                    label: t("sales.reports.createQuote"),
+                    onClick: (certs) => setRaising({ kind: "quote", certs }),
+                  }
+                : undefined
+            }
+          />
+        </SectionCard>
+      )}
+
       {certificatesOn && (
         <SectionCard title={t("sales.reports.certificatesPendingInvoice")}>
           <p className="mb-3 text-xs text-ink-3">
             {t("sales.reports.certificatesPendingInvoiceHint")}
           </p>
-          {pendingCertsQ.isLoading ? (
-            <LoadingState />
-          ) : pendingCertsQ.error ? (
-            <ErrorState message={(pendingCertsQ.error as Error).message} />
-          ) : pendingByCustomer.length === 0 ? (
-            <EmptyState
-              icon={<ShieldCheck className="h-5 w-5" />}
-              title={t("sales.reports.noPendingCertificates")}
-              description={t("sales.reports.noPendingCertificatesDesc")}
-            />
-          ) : (
-            <>
-              <Table
-                headers={[
-                  t("sales.doc.customer"),
-                  t("sales.reports.invoiceCountShort"),
-                  t("sales.reports.oldestIssued"),
-                  t("sales.reports.newestIssued"),
-                  "",
-                ]}
-              >
-                {pendingByCustomer.slice(0, PENDING_CUSTOMER_ROWS).map((g) => (
-                  <tr key={g.customerId ?? "none"} className="border-t border-line">
-                    <td className="px-4 py-2">
-                      {g.customerId ? (
-                        <Link
-                          to={`/customers/${g.customerId}`}
-                          className="text-brand-700 hover:underline"
-                        >
-                          {g.customerName ?? "—"}
-                        </Link>
-                      ) : (
-                        <span className="text-ink-3">{t("common.dash")}</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-end tabular-nums">
-                      {t("sales.reports.certificateCount", { count: g.certs.length })}
-                    </td>
-                    <td className="px-4 py-2">{formatDate(g.oldestIssued)}</td>
-                    <td className="px-4 py-2">{formatDate(g.newestIssued)}</td>
-                    <td className="px-4 py-2 text-end">
-                      {isManager && g.customerId && (
-                        <Button
-                          variant="secondary"
-                          onClick={() =>
-                            setInvoicing(
-                              g.certs.map((r) => ({
-                                id: r.certificate_id,
-                                certificate_number: r.certificate_number,
-                                customer_id: r.customer_id,
-                                customer_name: r.customer_name,
-                                vehicle_id: r.vehicle_id,
-                                vehicle_name: r.vehicle_name,
-                                license_plate: r.license_plate,
-                              })),
-                            )
-                          }
-                        >
-                          <Receipt className="h-4 w-4" /> {t("sales.reports.createInvoice")}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </Table>
-              {pendingByCustomer.length > PENDING_CUSTOMER_ROWS && (
-                <p className="mt-3 text-center text-xs text-ink-3">
-                  {t("sales.reports.showingFirst", {
-                    shown: String(PENDING_CUSTOMER_ROWS),
-                    total: String(pendingByCustomer.length),
-                  })}
-                </p>
-              )}
-            </>
-          )}
+          <CustomerWorklist
+            query={pendingCertsQ}
+            groups={pendingByCustomer}
+            dateHeaders={[t("sales.reports.oldestIssued"), t("sales.reports.newestIssued")]}
+            emptyIcon={<ShieldCheck className="h-5 w-5" />}
+            emptyTitle={t("sales.reports.noPendingCertificates")}
+            emptyDesc={t("sales.reports.noPendingCertificatesDesc")}
+            action={
+              isManager
+                ? {
+                    icon: <Receipt className="h-4 w-4" />,
+                    label: t("sales.reports.createInvoice"),
+                    onClick: (certs) => setRaising({ kind: "invoice", certs }),
+                  }
+                : undefined
+            }
+          />
         </SectionCard>
       )}
 
@@ -605,7 +604,95 @@ export default function ReportsPage() {
         <p className="text-xs text-ink-3">{t("sales.reports.footnote")}</p>
       </Card>
 
-      <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
+      <CertificateDocumentModal
+        kind={raising?.kind ?? "invoice"}
+        certificates={raising?.certs ?? null}
+        onClose={() => setRaising(null)}
+      />
     </div>
+  );
+}
+
+/**
+ * A per-customer worklist: the count, the date span, and the document one
+ * click away. Capped — this is a list to act on, not an export — with the
+ * true total beside it.
+ */
+function CustomerWorklist({
+  query,
+  groups,
+  dateHeaders,
+  emptyIcon,
+  emptyTitle,
+  emptyDesc,
+  action,
+}: {
+  query: { isLoading: boolean; error: unknown };
+  groups: PendingCustomerGroup[];
+  dateHeaders: [string, string];
+  emptyIcon: ReactNode;
+  emptyTitle: string;
+  emptyDesc: string;
+  action?: {
+    icon: ReactNode;
+    label: string;
+    onClick: (certs: InvoiceableCertificate[]) => void;
+  };
+}) {
+  const t = useT();
+  if (query.isLoading) return <LoadingState />;
+  if (query.error) return <ErrorState message={(query.error as Error).message} />;
+  if (groups.length === 0) {
+    return <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyDesc} />;
+  }
+  return (
+    <>
+      <Table
+        headers={[
+          t("sales.doc.customer"),
+          t("sales.reports.invoiceCountShort"),
+          dateHeaders[0],
+          dateHeaders[1],
+          "",
+        ]}
+      >
+        {groups.slice(0, PENDING_CUSTOMER_ROWS).map((g) => (
+          <tr key={g.customerId ?? "none"} className="border-t border-line">
+            <td className="px-4 py-2">
+              {g.customerId ? (
+                <Link to={`/customers/${g.customerId}`} className="text-brand-700 hover:underline">
+                  {g.customerName ?? "—"}
+                </Link>
+              ) : (
+                <span className="text-ink-3">{t("common.dash")}</span>
+              )}
+            </td>
+            <td className="px-4 py-2 text-end tabular-nums">
+              {t("sales.reports.certificateCount", { count: g.certs.length })}
+            </td>
+            <td className="px-4 py-2">{formatDate(g.earliest)}</td>
+            <td className="px-4 py-2">{formatDate(g.latest)}</td>
+            <td className="px-4 py-2 text-end">
+              {action && g.customerId && (
+                <Button
+                  variant="secondary"
+                  onClick={() => action.onClick(g.certs.map(worklistRowToCertificate))}
+                >
+                  {action.icon} {action.label}
+                </Button>
+              )}
+            </td>
+          </tr>
+        ))}
+      </Table>
+      {groups.length > PENDING_CUSTOMER_ROWS && (
+        <p className="mt-3 text-center text-xs text-ink-3">
+          {t("sales.reports.showingFirst", {
+            shown: String(PENDING_CUSTOMER_ROWS),
+            total: String(groups.length),
+          })}
+        </p>
+      )}
+    </>
   );
 }

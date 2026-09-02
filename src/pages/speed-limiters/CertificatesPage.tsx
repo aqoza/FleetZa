@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import {
-  Ban, Check, Copy, Printer, Receipt, RefreshCw, Settings, ShieldCheck, Trash2,
+  Ban, Check, Copy, FileText, Printer, Receipt, RefreshCw, Settings, ShieldCheck, Trash2,
 } from "lucide-react";
 import {
   countRows, deleteRow, listPage, listRows, sanitizeSearch, updateRow, wrapDbError,
@@ -14,8 +14,8 @@ import {
   certificateBucket, certificateStatusMeta, type CertificateBucket,
 } from "../../lib/certificateStatus";
 import {
-  BILLING_FILTER_STATES, certificateBillingMeta, certificateBillingState, indexBillingRows,
-  parseBillingFilter, type BillingFilter, type InvoiceableCertificate,
+  BILLING_FILTER_STATES, certificateBillingMeta, certificateBillingState, certificateTrackingLink,
+  parseBillingFilter, type BillingFilter, type CertificateDocumentKind, type InvoiceableCertificate,
 } from "../../lib/certificateBilling";
 import type {
   Customer,
@@ -38,7 +38,7 @@ import {
   RenewCertificateModal, defaultRenewalDates, renewCertificate,
   resolveDefaultTechnicianName, useActiveTechnicians,
 } from "./RenewCertificateModal";
-import { InvoiceCertificatesModal, useCertificateBilling } from "./InvoiceCertificatesModal";
+import { CertificateDocumentModal, useCertificateTracking } from "./CertificateDocumentModal";
 
 type CertRow = SpeedLimiterCertificate & {
   vehicles: Pick<Vehicle, "name" | "license_plate" | "chassis_number" | "vin"> | null;
@@ -78,13 +78,16 @@ const FILTERS: { id: FilterId; labelKey: MessageKey }[] = [
 const FILTER_IDS = new Set<string>(FILTERS.map((f) => f.id));
 
 /**
- * The second axis, shown only with the billing module: has the certificate
- * been invoiced. Composes with the expiry chips and the search because it
- * filters server-side on the `billing_state` computed column
- * (…_certificate_billing.sql), so "expired AND not invoiced" is one query.
+ * The second axis, shown with the sales module: where the certificate is in
+ * the commercial chain. Composes with the expiry chips and the search because
+ * it filters server-side on the `billing_state` computed column
+ * (…_certificate_billing.sql), so "expiring AND not quoted" is one query —
+ * which is the renewal-quote worklist.
  */
 const BILLING_FILTERS: { id: BillingFilter; labelKey: MessageKey }[] = [
   { id: "all", labelKey: "slCertificates.billingFilterAll" },
+  { id: "unquoted", labelKey: "slCertificates.billingFilterUnquoted" },
+  { id: "quoted", labelKey: "slCertificates.billingFilterQuoted" },
   { id: "unbilled", labelKey: "slCertificates.billingFilterUnbilled" },
   { id: "invoiced", labelKey: "slCertificates.billingFilterInvoiced" },
   { id: "paid", labelKey: "slCertificates.billingFilterPaid" },
@@ -601,7 +604,9 @@ export default function CertificatesPage() {
   const t = useT();
   const { isManager, isAdmin } = useAuth();
   const { isEnabled } = useModules();
-  const billingOn = isEnabled("billing");
+  // Quotes come with sales, invoices with billing (which requires sales).
+  const salesOn = isEnabled("sales");
+  const billingOn = salesOn && isEnabled("billing");
   const qc = useQueryClient();
 
   // Filter, search and page live in the URL: /speed-limiters/certificates?filter=d30
@@ -610,9 +615,9 @@ export default function CertificatesPage() {
   // the URL (a human reads it) and 0-based everywhere else.
   const [params, setParams] = useSearchParams();
   const filter = parseFilter(params.get("filter"));
-  // Only meaningful with billing on; a stale ?billing= in a shared link is
+  // Only meaningful with sales on; a stale ?billing= in a shared link is
   // ignored rather than filtering on a column nobody can see.
-  const billing: BillingFilter = billingOn ? parseBillingFilter(params.get("billing")) : "all";
+  const billing: BillingFilter = salesOn ? parseBillingFilter(params.get("billing")) : "all";
   const search = params.get("q") ?? "";
   const pageParam = Number(params.get("page"));
   const page = Number.isFinite(pageParam) && pageParam >= 2 ? Math.floor(pageParam) - 1 : 0;
@@ -650,7 +655,11 @@ export default function CertificatesPage() {
   const [renewingHint, setRenewingHint] = useState<CertRow | null>(null);
   const [bulkRenewing, setBulkRenewing] = useState<CertRow[] | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
-  const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+  /** Which document is being raised from a selection, and for what. */
+  const [raising, setRaising] = useState<{
+    kind: CertificateDocumentKind;
+    certs: InvoiceableCertificate[];
+  } | null>(null);
   const [revoking, setRevoking] = useState<CertRow | null>(null);
   const [deleting, setDeleting] = useState<CertRow | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -753,14 +762,15 @@ export default function CertificatesPage() {
   });
   const successors = new Map((successorRows ?? []).map((s) => [s.id, s]));
 
-  // The invoice behind each certificate on this page — one keyed lookup,
-  // bounded by the page size, through the same definition the database's
-  // double-billing guard uses (src/lib/certificateBilling.ts).
-  const { data: billingRows } = useCertificateBilling(
+  // The quote, order and invoice behind each certificate on this page — two
+  // keyed lookups bounded by the page size, through the same definitions the
+  // database's guard and reports use (src/lib/certificateBilling.ts).
+  const { tracking } = useCertificateTracking(
     certs.map((c) => c.id),
-    billingOn,
+    salesOn,
   );
-  const billingById = indexBillingRows(billingRows);
+  const stateOf = (c: CertRow) =>
+    certificateBillingState(tracking.invoices.get(c.id), tracking.quotes.get(c.id));
 
   const { data: settingsRows } = useQuery({
     queryKey: ["sl_settings"],
@@ -870,32 +880,34 @@ export default function CertificatesPage() {
       sortValue: (c) => BUCKET_URGENCY[certificateBucket(c)],
       exportValue: (c) => t(certificateStatusMeta(c).labelKey),
     },
-    ...(billingOn
+    ...(salesOn
       ? [
           {
             id: "billing",
             header: t("slCertificates.billing"),
             minBreakpoint: "md",
             cell: (c) => {
-              const row = billingById.get(c.id);
-              const meta = certificateBillingMeta[certificateBillingState(row)];
+              const meta = certificateBillingMeta[stateOf(c)];
+              const link = certificateTrackingLink(
+                tracking.invoices.get(c.id),
+                tracking.quotes.get(c.id),
+              );
               return (
                 <div className="flex flex-col items-start gap-0.5">
                   <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
-                  {row && (
+                  {link && (
                     <Link
-                      to={`/sales/invoices/${row.invoice_id}`}
+                      to={link.to}
                       className="text-xs font-medium text-brand-700 hover:underline tabular-nums"
-                      title={t("slCertificates.openInvoice", { number: row.doc_number ?? "" })}
+                      title={t("slCertificates.openDocument", { number: link.number })}
                     >
-                      {row.doc_number}
+                      {link.number}
                     </Link>
                   )}
                 </div>
               );
             },
-            sortValue: (c) =>
-              t(certificateBillingMeta[certificateBillingState(billingById.get(c.id))].labelKey),
+            sortValue: (c) => t(certificateBillingMeta[stateOf(c)].labelKey),
           } satisfies DataTableColumn<CertRow>,
         ]
       : []),
@@ -1006,7 +1018,7 @@ export default function CertificatesPage() {
         </div>
       </div>
 
-      {billingOn && (
+      {salesOn && (
         <div className="mb-4 flex flex-wrap items-center gap-1.5" aria-label={t("slCertificates.billing")}>
           {BILLING_FILTERS.map((f) => (
             <button
@@ -1069,10 +1081,23 @@ export default function CertificatesPage() {
                   <RefreshCw className="h-4 w-4" />
                   {t("slCertificates.bulkRenew")}
                 </Button>
+                {salesOn && (
+                  <Button
+                    variant="secondary"
+                    onClick={() =>
+                      setRaising({ kind: "quote", certs: selected.map(toInvoiceable) })
+                    }
+                  >
+                    <FileText className="h-4 w-4" />
+                    {t("slCertificates.createQuote")}
+                  </Button>
+                )}
                 {billingOn && (
                   <Button
                     variant="secondary"
-                    onClick={() => setInvoicing(selected.map(toInvoiceable))}
+                    onClick={() =>
+                      setRaising({ kind: "invoice", certs: selected.map(toInvoiceable) })
+                    }
                   >
                     <Receipt className="h-4 w-4" />
                     {t("slCertificates.createInvoice")}
@@ -1134,7 +1159,7 @@ export default function CertificatesPage() {
               billingOn
                 ? (issued) => {
                     setBulkRenewing(null);
-                    setInvoicing(issued);
+                    setRaising({ kind: "invoice", certs: issued });
                   }
                 : undefined
             }
@@ -1142,7 +1167,11 @@ export default function CertificatesPage() {
         )}
       </Modal>
 
-      <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
+      <CertificateDocumentModal
+        kind={raising?.kind ?? "invoice"}
+        certificates={raising?.certs ?? null}
+        onClose={() => setRaising(null)}
+      />
 
       <Modal title={t("slCertificates.revokeTitle")} open={!!revoking} onClose={() => setRevoking(null)}>
         {revoking && <RevokeForm cert={revoking} onDone={() => setRevoking(null)} />}
