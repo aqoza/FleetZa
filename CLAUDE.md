@@ -46,7 +46,7 @@ Pages Function) · Supabase Postgres with RLS tenant isolation · typed en/ar i1
 ## Commands
 
 `npm run dev` (SPA :5173) + `npm run dev:api` (Hono :8788, restart on worker/ edits) ·
-`npm test` · `npm run build` (tsc gates) · deploy = commit → push to `main`
+`npm test` · `npm run build` (tsc gates) · deploy = merge the PR to `main`
 (Cloudflare Pages auto-deploys fleetza.pages.dev).
 
 ## Verification bar
@@ -55,3 +55,15 @@ Pages Function) · Supabase Postgres with RLS tenant isolation · typed en/ar i1
 `demo@fleetmanage.test`) before commit. DB changes: run the Supabase security advisors.
 The public QR endpoint `/api/verify/:certUuid` must never break — printed certificates
 link to it.
+
+## Git & pull requests
+
+- **Every change ships as a pull request** — branch, push, open it (draft is
+  fine). Never push straight to `main`, not even for a one-line doc fix.
+- **Check for open pull requests before starting and before finishing, and warn
+  about any sitting unmerged.** An open PR means the `main` you are branching
+  from is missing work, and two branches touching the same migration, i18n
+  namespace or generated `database.types.ts` conflict badly. Say what is open
+  and let the human decide — never silently stack on top of it.
+- A merged branch is finished: restart it from the latest `main` rather than
+  adding commits on top of history that is already in.
