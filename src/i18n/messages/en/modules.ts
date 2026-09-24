@@ -38,6 +38,8 @@ export const enModules = {
   "modules.renewals.description": "Track registration, insurance, and permit expiry dates with timely reminders.",
   "modules.customers.name": "Customers",
   "modules.customers.description": "Shared customer organizations and contacts, used by every module that deals with clients.",
+  "modules.suppliers.name": "Suppliers",
+  "modules.suppliers.description": "Shared vendor, carrier and insurer records with contacts, used by purchasing, finance and inventory.",
   "modules.speed_limiters.name": "Speed Limiter Supply & Installation",
   "modules.speed_limiters.description": "Manage speed limiter devices, installations, and their status across your vehicles.",
   "modules.sl_certificates.name": "Speed Limiter Certificates",
@@ -78,6 +80,8 @@ export const enModules = {
   "modules.contracts.description": "Create and track contracts, their terms, and renewal dates.",
 
   // --- People ---
+  "modules.employees.name": "Employees",
+  "modules.employees.description": "The people who work for you — departments, documents with expiry tracking, and links to drivers and technicians.",
   "modules.payroll_hr.name": "Payroll & HR",
   "modules.payroll_hr.description": "Manage employee records, attendance, and payroll.",
   "modules.mobile_workforce.name": "Mobile Workforce",

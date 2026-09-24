@@ -38,6 +38,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.renewals.description": "تابع تواريخ انتهاء التسجيل والتأمين والتصاريح مع تذكيرات في الوقت المناسب.",
   "modules.customers.name": "العملاء",
   "modules.customers.description": "منشآت العملاء وجهات الاتصال المشتركة، تستخدمها كل الوحدات التي تتعامل مع العملاء.",
+  "modules.suppliers.name": "الموردون",
+  "modules.suppliers.description": "سجلات مشتركة للموردين والناقلين وشركات التأمين مع جهات الاتصال، تستخدمها المشتريات والمالية والمخزون.",
   "modules.speed_limiters.name": "توريد وتركيب محددات السرعة",
   "modules.speed_limiters.description": "أدر أجهزة محددات السرعة وعمليات تركيبها وحالتها عبر مركباتك.",
   "modules.sl_certificates.name": "شهادات محددات السرعة",
@@ -78,6 +80,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.contracts.description": "أنشئ العقود وتابع بنودها وتواريخ تجديدها.",
 
   // --- People ---
+  "modules.employees.name": "الموظفون",
+  "modules.employees.description": "الأشخاص الذين يعملون لديك — الأقسام، والوثائق مع تتبع تواريخ الانتهاء، والربط بالسائقين والفنيين.",
   "modules.payroll_hr.name": "الرواتب والموارد البشرية",
   "modules.payroll_hr.description": "أدر سجلات الموظفين والحضور والرواتب.",
   "modules.mobile_workforce.name": "القوى العاملة الميدانية",

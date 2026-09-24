@@ -55,18 +55,31 @@ export const MODULES: ModuleDef[] = [
   m("fleet", "fleet_ops", "available", { alwaysOn: true, routes: ["/vehicles"] }),
   m("drivers", "fleet_ops", "available", { requires: ["fleet"], routes: ["/drivers"] }),
   m("fuel", "fleet_ops", "available", { requires: ["fleet"], routes: ["/fuel"] }),
-  m("gps_tracking", "fleet_ops", "coming_soon", { requires: ["fleet"] }),
-  m("driver_behavior", "fleet_ops", "coming_soon", { requires: ["drivers"] }),
-  m("trip_planning", "fleet_ops", "coming_soon", { requires: ["fleet"] }),
-  m("dispatch", "fleet_ops", "coming_soon", { requires: ["fleet", "drivers"] }),
+  m("gps_tracking", "fleet_ops", "available", { requires: ["fleet"], routes: ["/gps"] }),
+  m("driver_behavior", "fleet_ops", "available", {
+    requires: ["drivers"],
+    routes: ["/driver-behavior"],
+  }),
+  m("trip_planning", "fleet_ops", "available", { requires: ["fleet"], routes: ["/trips"] }),
+  m("dispatch", "fleet_ops", "available", { requires: ["fleet", "drivers"], routes: ["/dispatch"] }),
 
   // --- Maintenance & workshop ---
   m("maintenance", "maintenance", "available", { requires: ["fleet"], routes: ["/maintenance"] }),
   m("preventive", "maintenance", "available", { requires: ["fleet", "maintenance"] }),
   m("inspections", "maintenance", "available", { requires: ["fleet"], routes: ["/inspections"] }),
   m("issues", "maintenance", "available", { requires: ["fleet"], routes: ["/issues"] }),
-  m("workshop", "maintenance", "coming_soon", { requires: ["maintenance"] }),
-  m("predictive_ai", "maintenance", "coming_soon", { requires: ["maintenance"] }),
+  // Bays, bookings, technician time and parts issued from stock. Technicians
+  // are employees, so the people master data is a data dependency.
+  m("workshop", "maintenance", "available", {
+    requires: ["maintenance", "employees"],
+    routes: ["/workshop"],
+  }),
+  // Deterministic, explainable risk scoring over odometer, issue and cost
+  // history — the id predates the name and is permanent.
+  m("predictive_ai", "maintenance", "available", {
+    requires: ["maintenance"],
+    routes: ["/predictive"],
+  }),
 
   // --- Compliance & certification ---
   m("renewals", "compliance", "available", { requires: ["fleet"], routes: ["/renewals"] }),
@@ -75,54 +88,75 @@ export const MODULES: ModuleDef[] = [
     routes: ["/speed-limiters"],
   }),
   m("sl_certificates", "compliance", "available", { requires: ["speed_limiters"] }),
-  m("insurance_mgmt", "compliance", "coming_soon", { requires: ["fleet"] }),
-  m("incidents", "compliance", "coming_soon", { requires: ["fleet"] }),
-  m("regulatory", "compliance", "coming_soon"),
+  m("insurance_mgmt", "compliance", "available", { requires: ["fleet"], routes: ["/insurance"] }),
+  m("incidents", "compliance", "available", { requires: ["fleet"], routes: ["/incidents"] }),
+  m("regulatory", "compliance", "available", { requires: ["fleet"], routes: ["/regulatory"] }),
 
   // --- Logistics & transport ---
-  m("tms", "logistics", "coming_soon", { requires: ["fleet"] }),
-  m("logistics_delivery", "logistics", "coming_soon", { requires: ["fleet"] }),
-  m("assets", "logistics", "coming_soon"),
-  m("inventory", "logistics", "coming_soon"),
+  m("tms", "logistics", "available", { requires: ["fleet", "customers"], routes: ["/tms"] }),
+  m("logistics_delivery", "logistics", "available", {
+    requires: ["fleet", "drivers"],
+    routes: ["/deliveries"],
+  }),
+  m("assets", "logistics", "available", { routes: ["/assets"] }),
+  m("inventory", "logistics", "available", { routes: ["/inventory"] }),
 
   // --- Commerce ---
-  m("purchasing", "commerce", "coming_soon"),
+  // Purchase orders, goods receipts and vendor bills. Every document FKs a
+  // supplier, so the supplier master data is a data dependency.
+  m("purchasing", "commerce", "available", { requires: ["suppliers"], routes: ["/purchasing"] }),
   // Quotes + sales orders + the product catalog. Customers is a *data*
   // dependency, not just a UI one: every document FKs a customer.
   m("sales", "commerce", "available", { requires: ["customers"], routes: ["/sales"] }),
-  m("pos", "commerce", "coming_soon", { requires: ["sales"] }),
-  m("crm", "commerce", "coming_soon"),
+  // Sells catalog products, so it rides on the sales catalog.
+  m("pos", "commerce", "available", { requires: ["sales"], routes: ["/pos"] }),
+  m("crm", "commerce", "available", { requires: ["customers"], routes: ["/crm"] }),
 
   // --- Finance ---
-  m("finance", "finance", "coming_soon"),
+  // General ledger, expenses and statements. Expenses and payables name a
+  // supplier, hence the dependency.
+  m("finance", "finance", "available", { requires: ["suppliers"], routes: ["/finance"] }),
   // Invoices + payments. Rides on the sales hub (its own tab there), the way
   // sl_certificates rides on speed_limiters.
   m("billing", "finance", "available", { requires: ["sales"] }),
-  m("contracts", "finance", "coming_soon"),
+  m("contracts", "finance", "available", { requires: ["customers"], routes: ["/contracts"] }),
 
   // --- People ---
-  m("payroll_hr", "people", "coming_soon"),
-  m("mobile_workforce", "people", "coming_soon"),
+  // Global master data: the people who work for the tenant. Consumed by
+  // HR, field workforce and the workshop.
+  m("employees", "people", "available", { routes: ["/employees"] }),
+  m("payroll_hr", "people", "available", { requires: ["employees"], routes: ["/hr"] }),
+  m("mobile_workforce", "people", "available", { requires: ["employees"], routes: ["/field"] }),
 
   // --- Customer & partners ---
   // Global master data: client organizations + their contacts. Consumed by
   // speed_limiters today and by CRM/sales/billing/portal as they land.
   m("customers", "customer", "available", { routes: ["/customers"] }),
-  m("customer_portal", "customer", "coming_soon", { requires: ["customers"] }),
-  m("vendor_portal", "customer", "coming_soon"),
+  // Global master data: the tenant's vendors, carriers and insurers.
+  m("suppliers", "customer", "available", { routes: ["/suppliers"] }),
+  // Admin side at /customer-portal; customers use a public /portal/:token link.
+  m("customer_portal", "customer", "available", {
+    requires: ["customers"],
+    routes: ["/customer-portal"],
+  }),
+  // Admin side at /vendor-portal; suppliers use a public /vendor/:token link.
+  m("vendor_portal", "customer", "available", {
+    requires: ["purchasing"],
+    routes: ["/vendor-portal"],
+  }),
 
   // --- Analytics ---
   m("reports", "analytics", "available", { requires: ["fleet"], routes: ["/reports"] }),
-  m("bi_analytics", "analytics", "coming_soon", { requires: ["reports"] }),
+  m("bi_analytics", "analytics", "available", { requires: ["reports"], routes: ["/analytics"] }),
 
   // --- Platform ---
-  m("documents", "platform", "coming_soon"),
-  m("workflow_automation", "platform", "coming_soon"),
-  m("integrations", "platform", "coming_soon"),
-  m("iot_devices", "platform", "coming_soon"),
-  m("notifications", "platform", "coming_soon"),
-  m("audit_security", "platform", "coming_soon"),
-  m("multi_company", "platform", "coming_soon"),
+  m("documents", "platform", "available", { routes: ["/documents"] }),
+  m("workflow_automation", "platform", "available", { routes: ["/automation"] }),
+  m("integrations", "platform", "available", { routes: ["/integrations"] }),
+  m("iot_devices", "platform", "available", { requires: ["fleet"], routes: ["/iot"] }),
+  m("notifications", "platform", "available", { routes: ["/notifications"] }),
+  m("audit_security", "platform", "available", { routes: ["/security"] }),
+  m("multi_company", "platform", "available", { routes: ["/companies"] }),
 ];
 
 export type ModuleId = string;
