@@ -9,7 +9,7 @@ import { renewalTypes } from "../../lib/labels";
 import { useVehiclePicker } from "../../lib/pickers";
 import type { Renewal, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT, type Translate } from "../../i18n";
+import { useT, useTp, type Translate, type TranslatePlural } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -18,7 +18,7 @@ import { useToast } from "../../components/Toast";
 
 type RenewalRow = Renewal & { vehicles: Pick<Vehicle, "name"> | null };
 
-function dueDateCell(r: RenewalRow, t: Translate) {
+function dueDateCell(r: RenewalRow, t: Translate, tp: TranslatePlural) {
   if (r.completed_at) return <span className="text-slate-600">{formatDate(r.due_date)}</span>;
   const days = daysUntil(r.due_date);
   if (days < 0) {
@@ -32,7 +32,7 @@ function dueDateCell(r: RenewalRow, t: Translate) {
   if (days <= 30) {
     return (
       <div className="flex items-center gap-2">
-        <Badge tone="yellow">{t("renewals.dueInDays", { count: days })}</Badge>
+        <Badge tone="yellow">{tp("renewals.dueInDays", days)}</Badge>
         <span className="text-xs text-slate-500">{formatDate(r.due_date)}</span>
       </div>
     );
@@ -150,6 +150,7 @@ function RenewalForm({ renewal, onDone }: { renewal?: Renewal; onDone: () => voi
 
 function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const qc = useQueryClient();
   const country = getCountry(tenant.country);
@@ -224,7 +225,7 @@ function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
             <li key={entry.type} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
               <span className="text-slate-700">{entry.label}</span>
               <span className="whitespace-nowrap text-xs text-slate-500">
-                {t("renewals.everyMonthsLong", { count: entry.months })}
+                {tp("renewals.everyMonthsLong", entry.months)}
               </span>
             </li>
           ))}
@@ -240,7 +241,7 @@ function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
           }
         >
           {result.added > 0
-            ? t("renewals.addedN", { count: result.added })
+            ? tp("renewals.addedN", result.added)
             : t("renewals.allExist")}
         </p>
       )}
@@ -254,6 +255,7 @@ function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
 
 export default function RenewalsPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -428,11 +430,11 @@ export default function RenewalsPage() {
                 )}
               </td>
               <td className="px-4 py-3 text-slate-600">{r.vehicles?.name ?? "—"}</td>
-              <td className="px-4 py-3">{dueDateCell(r, t)}</td>
+              <td className="px-4 py-3">{dueDateCell(r, t, tp)}</td>
               <td className="px-4 py-3 text-slate-600">{formatMoney(r.amount, tenant.currency)}</td>
               <td className="px-4 py-3 text-slate-600">
                 {r.recurrence_months
-                  ? t("renewals.everyMonthsShort", { count: r.recurrence_months })
+                  ? tp("renewals.everyMonthsShort", r.recurrence_months)
                   : "—"}
               </td>
               <td className="px-4 py-3">

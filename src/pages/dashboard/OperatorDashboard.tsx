@@ -44,7 +44,7 @@ import {
   StatCard,
   Card,
 } from "../../components/ui";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import { ActivityCard, InsightsStrip, ListCard, NothingDue, type Insight } from "./shared";
 import {
   CURSOR_FILL,
@@ -92,6 +92,7 @@ function reminderDue(r: ReminderRow) {
 export default function OperatorDashboard() {
   const tenant = useTenant();
   const t = useT();
+  const tp = useTp();
   const { isEnabled } = useModules();
 
   const customersOn = isEnabled("customers");
@@ -257,7 +258,7 @@ export default function OperatorDashboard() {
     insights.push({
       key: "service",
       tone: "serious",
-      text: t("insights.overdueService", { count: overdueService }),
+      text: tp("insights.overdueService", overdueService),
       to: "/maintenance",
     });
   }
@@ -266,7 +267,7 @@ export default function OperatorDashboard() {
     insights.push({
       key: "renewals",
       tone: "serious",
-      text: t("insights.overdueRenewals", { count: overdueRenewals }),
+      text: tp("insights.overdueRenewals", overdueRenewals),
       to: "/renewals",
     });
   }
@@ -277,7 +278,7 @@ export default function OperatorDashboard() {
     insights.push({
       key: "certs",
       tone: "warn",
-      text: t("insights.certsExpiring", { count: certs30 }),
+      text: tp("insights.certsExpiring", certs30),
       to: "/speed-limiters/certificates",
     });
   }
@@ -286,7 +287,7 @@ export default function OperatorDashboard() {
     insights.push({
       key: "shop",
       tone: "warn",
-      text: t("insights.inShop", { count: inShop, total: fleetVehicles.length }),
+      text: tp("insights.inShop", inShop, { total: fleetVehicles.length }),
       to: "/vehicles",
     });
   }
@@ -558,7 +559,7 @@ export default function OperatorDashboard() {
                             ? t("dashboard.overdue")
                             : days === 0
                               ? t("dashboard.dueToday")
-                              : t("dashboard.dueInDays", { count: days })}
+                              : tp("dashboard.dueInDays", days)}
                         </Badge>
                       </li>
                     ))}
@@ -588,7 +589,7 @@ export default function OperatorDashboard() {
                             ? t("dashboard.expired")
                             : days === 0
                               ? t("dashboard.dueToday")
-                              : t("dashboard.dueInDays", { count: days })}
+                              : tp("dashboard.dueInDays", days)}
                         </Badge>
                       </li>
                     ))}

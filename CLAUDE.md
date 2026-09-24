@@ -38,8 +38,9 @@ Pages Function) · Supabase Postgres with RLS tenant isolation · typed en/ar i1
 - **Modules**: new features are modules — registry entry in `shared/modules.ts`
   (declare *data* dependencies in `requires`), `<ModuleGate>` routes, nav item with a
   `section`, per-module i18n namespace (en + ar in the same commit, compile-enforced).
-- **i18n/RTL**: every string through `t()`; logical Tailwind utilities only; charts in
-  `dir="ltr"`; icons that point get `rtl:-scale-x-100`.
+- **i18n/RTL**: every string through `t()`, and every count that inflects words through
+  `tp()` (plural messages, all six Arabic forms — docs/I18N.md "Plurals"); logical
+  Tailwind utilities only; charts in `dir="ltr"`; icons that point get `rtl:-scale-x-100`.
 - **Errors**: user-facing DB errors go through `wrapDbError` (localized `errors.*`
   keys); raised exceptions from triggers/RPCs use SCREAMING_SNAKE codes mapped there.
 

@@ -66,7 +66,10 @@ export const enSlJobs = {
   "slJobs.startedAt": "Started",
   "slJobs.completedAt": "Completed",
   "slJobs.duration": "Duration",
-  "slJobs.durationValue": "{minutes} min",
+  "slJobs.durationValue": {
+    one: "{count} min",
+    other: "{count} min",
+  },
   "slJobs.qcApprovedInfo": "QC approved",
   "slJobs.customerSignature": "Customer signature",
   "slJobs.technicianSignature": "Technician signature",
@@ -86,7 +89,10 @@ export const enSlJobs = {
 
   // Complete modal
   "slJobs.durationMinutes": "Duration (minutes)",
-  "slJobs.checklistIncomplete": "{count} checklist item(s) not done — an override note is required.",
+  "slJobs.checklistIncomplete": {
+    one: "{count} checklist item not done — an override note is required.",
+    other: "{count} checklist items not done — an override note is required.",
+  },
   "slJobs.overrideNote": "Override note",
   "slJobs.overrideNoteHint": "Explain why the job is being completed with unfinished checklist items",
   "slJobs.completeFailed": "Completing the job failed",

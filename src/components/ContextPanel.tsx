@@ -24,7 +24,7 @@ import type { Renewal, SpeedLimiterCertificate } from "../lib/types";
 import { useAuth } from "../context/AuthContext";
 import { useModules } from "../context/ModulesContext";
 import { Badge } from "./ui";
-import { useT } from "../i18n";
+import { useT, useTp } from "../i18n";
 
 const COLLAPSE_KEY = "fm.contextPanel";
 
@@ -83,6 +83,7 @@ function SectionHeading({ children }: { children: string }) {
  */
 export function ContextPanel() {
   const t = useT();
+  const tp = useTp();
   const { isAdmin } = useAuth();
   const { isEnabled } = useModules();
   const location = useLocation();
@@ -308,7 +309,7 @@ export function ContextPanel() {
                         <Badge tone={item.days < 0 ? "red" : item.days <= 30 ? "yellow" : "slate"}>
                           {item.days < 0
                             ? t("dashboard.overdue")
-                            : t("dashboard.dueInDays", { count: item.days })}
+                            : tp("dashboard.dueInDays", item.days)}
                         </Badge>
                       </Link>
                     </li>
@@ -322,7 +323,7 @@ export function ContextPanel() {
                 >
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warn" />
                   <span className="truncate tabular-nums">
-                    {t("panel.certBacklog", { count: certBacklog })}
+                    {tp("panel.certBacklog", certBacklog)}
                   </span>
                 </Link>
               )}
@@ -333,7 +334,7 @@ export function ContextPanel() {
                 >
                   <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warn" />
                   <span className="truncate tabular-nums">
-                    {t("panel.renewalBacklog", { count: renewalBacklog })}
+                    {tp("panel.renewalBacklog", renewalBacklog)}
                   </span>
                 </Link>
               )}

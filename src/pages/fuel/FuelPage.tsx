@@ -17,7 +17,7 @@ import {
 import { useDriverPicker, useVehiclePicker } from "../../lib/pickers";
 import type { FuelLog } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import {
   Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Textarea,
 } from "../../components/ui";
@@ -179,6 +179,7 @@ function FuelForm({ onDone }: { onDone: () => void }) {
 
 export default function FuelPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -397,7 +398,7 @@ export default function FuelPage() {
     <>
       <PageHeader
         title={t("fuel.title")}
-        description={t("fuel.logCount", { count: logsPage?.total ?? 0 })}
+        description={tp("fuel.logCount", logsPage?.total ?? 0)}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>

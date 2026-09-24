@@ -1,12 +1,20 @@
 import { enVehicles } from "../en/vehicles";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: مركبة (vehicle), سائق (driver), أمر عمل (work order),
 // الوقود (fuel), الفحص (inspection), عطل (issue), الأسطول (fleet),
 // عداد المسافة (odometer). The Record type enforces completeness.
-export const arVehicles: Record<keyof typeof enVehicles, string> = {
+export const arVehicles: Translation<typeof enVehicles, "ar"> = {
   // Page
   "vehicles.title": "المركبات",
-  "vehicles.countInFleet": "{count} مركبة في أسطولك",
+  "vehicles.countInFleet": {
+    zero: "لا توجد مركبات في أسطولك",
+    one: "مركبة واحدة في أسطولك",
+    two: "مركبتان في أسطولك",
+    few: "{count} مركبات في أسطولك",
+    many: "{count} مركبة في أسطولك",
+    other: "{count} مركبة في أسطولك",
+  },
   "vehicles.add": "إضافة مركبة",
 
   // Ownership

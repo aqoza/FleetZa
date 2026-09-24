@@ -1,6 +1,9 @@
 export const enIssues = {
   "issues.title": "Issues",
-  "issues.reportedCount": "{count} reported issues",
+  "issues.reportedCount": {
+    one: "{count} reported issue",
+    other: "{count} reported issues",
+  },
   "issues.report": "Report issue",
 
   // Filters

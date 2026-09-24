@@ -1,7 +1,10 @@
 export const enDrivers = {
   // Page
   "drivers.title": "Drivers",
-  "drivers.countDrivers": "{count} drivers",
+  "drivers.countDrivers": {
+    one: "{count} driver",
+    other: "{count} drivers",
+  },
   "drivers.searchPlaceholder": "Search drivers…",
 
   // Actions / modals

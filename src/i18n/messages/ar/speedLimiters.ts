@@ -1,10 +1,11 @@
 import { enSpeedLimiters } from "../en/speedLimiters";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: محدد السرعة (speed limiter), عميل (customer),
 // جهاز (device), فني (technician), مهمة (job), تركيب (installation),
 // فحص (inspection), صيانة (maintenance), إزالة (removal), استبدال (replacement),
 // طوارئ (emergency), شهادة (certificate), مراقبة الجودة (QC), المخزون (stock).
-export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
+export const arSpeedLimiters: Translation<typeof enSpeedLimiters, "ar"> = {
   // Hub
   "speedLimiters.title": "محددات السرعة",
   "speedLimiters.subtitle":
@@ -41,8 +42,22 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   // حلّت محلها شهادة أحدث — سجل تاريخي وليس مخالفة.
   "speedLimiters.certStatus.superseded": "مُستبدَلة",
   "speedLimiters.certStatus.supersededBy": "جُدِّدت بالشهادة {number}",
-  "speedLimiters.certStatus.expiresInDays": "تنتهي خلال {count} يوم",
-  "speedLimiters.certStatus.expiredDaysAgo": "انتهت منذ {count} يوم",
+  "speedLimiters.certStatus.expiresInDays": {
+    zero: "تنتهي اليوم",
+    one: "تنتهي خلال يوم واحد",
+    two: "تنتهي خلال يومين",
+    few: "تنتهي خلال {count} أيام",
+    many: "تنتهي خلال {count} يومًا",
+    other: "تنتهي خلال {count} يوم",
+  },
+  "speedLimiters.certStatus.expiredDaysAgo": {
+    zero: "انتهت اليوم",
+    one: "انتهت منذ يوم واحد",
+    two: "انتهت منذ يومين",
+    few: "انتهت منذ {count} أيام",
+    many: "انتهت منذ {count} يومًا",
+    other: "انتهت منذ {count} يوم",
+  },
 
   "speedLimiters.kmhValue": "{value} كم/س",
 
@@ -58,8 +73,22 @@ export const arSpeedLimiters: Record<keyof typeof enSpeedLimiters, string> = {
   "speedLimiters.overview.bucket60": "31–60 يومًا",
   "speedLimiters.overview.bucket90": "61–90 يومًا",
   "speedLimiters.overview.bucketEmpty": "لا توجد شهادات",
-  "speedLimiters.overview.daysOverdue": "متأخرة {count} يوم",
-  "speedLimiters.overview.inDays": "خلال {count} يوم",
+  "speedLimiters.overview.daysOverdue": {
+    zero: "متأخرة {count} يوم",
+    one: "متأخرة يومًا واحدًا",
+    two: "متأخرة يومين",
+    few: "متأخرة {count} أيام",
+    many: "متأخرة {count} يومًا",
+    other: "متأخرة {count} يوم",
+  },
+  "speedLimiters.overview.inDays": {
+    zero: "اليوم",
+    one: "خلال يوم واحد",
+    two: "خلال يومين",
+    few: "خلال {count} أيام",
+    many: "خلال {count} يومًا",
+    other: "خلال {count} يوم",
+  },
   "speedLimiters.overview.viewAll": "عرض الكل",
   "speedLimiters.overview.viewAllCount": "عرض الكل ({count})",
   "speedLimiters.overview.recentJobs": "أحدث المهام",

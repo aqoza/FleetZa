@@ -18,7 +18,7 @@ import type {
 } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
   Pagination, Table, Textarea, type BadgeTone,
@@ -281,6 +281,7 @@ function AttachVehicleForm({
 
 export default function CustomerDetailPage() {
   const t = useT();
+  const tp = useTp();
   const { customerId = "" } = useParams();
   const { isManager } = useAuth();
   const { isEnabled } = useModules();
@@ -578,12 +579,12 @@ export default function CustomerDetailPage() {
   function certBadge(c: CertificateStatusFields) {
     const { bucket, labelKey, tone, daysLeft } = certificateStatusMeta(c);
     if (bucket === "d30" || bucket === "d60" || bucket === "d90") {
-      return <Badge tone={tone}>{t("speedLimiters.certStatus.expiresInDays", { count: daysLeft })}</Badge>;
+      return <Badge tone={tone}>{tp("speedLimiters.certStatus.expiresInDays", daysLeft)}</Badge>;
     }
     if (bucket === "expired") {
       return (
         <Badge tone={tone}>
-          {t("speedLimiters.certStatus.expiredDaysAgo", { count: Math.abs(daysLeft) })}
+          {tp("speedLimiters.certStatus.expiredDaysAgo", Math.abs(daysLeft))}
         </Badge>
       );
     }

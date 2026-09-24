@@ -6,7 +6,7 @@ import { listRows } from "../../lib/db";
 import { formatDateTime } from "../../lib/format";
 import type { Inspection, InspectionResult } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Badge, EmptyState, ErrorState, LoadingState, Modal, PageHeader, Table, type BadgeTone,
 } from "../../components/ui";
@@ -33,6 +33,7 @@ function NewInspectionLink() {
 
 export default function InspectionsPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const [viewing, setViewing] = useState<InspectionRow | null>(null);
@@ -49,7 +50,7 @@ export default function InspectionsPage() {
     <>
       <PageHeader
         title={t("inspections.title")}
-        description={t("inspections.countRecorded", { count: inspections?.length ?? 0 })}
+        description={tp("inspections.countRecorded", inspections?.length ?? 0)}
         actions={isManager && <NewInspectionLink />}
       />
 

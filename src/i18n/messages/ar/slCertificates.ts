@@ -1,10 +1,11 @@
 import { enSlCertificates } from "../en/slCertificates";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: شهادة (certificate), محدد السرعة (speed limiter),
 // عميل (customer), جهاز (device), الرقم التسلسلي (serial),
 // جهة الإصدار (issuing authority), السرعة المضبوطة (set speed),
 // تجديد (renew), سحب (revoke).
-export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
+export const arSlCertificates: Translation<typeof enSlCertificates, "ar"> = {
   // List page
   "slCertificates.title": "الشهادات",
   "slCertificates.description": "شهادات مطابقة محددات السرعة الصادرة لعملائك",
@@ -12,8 +13,14 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.searchPlaceholder": "رقم الشهادة أو UIN أو الختم أو المركبة أو اللوحة…",
   "slCertificates.searchNarrowHint":
     "أكثر من {count} مركبة تطابق هذا البحث، ولم تُدرَج سوى أول {count} منها. ضيّق نطاق البحث لعرض الباقي.",
-  "slCertificates.searchSupersededHint":
-    "توجد {count} شهادة مُستبدَلة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+  "slCertificates.searchSupersededHint": {
+    zero: "لا توجد شهادات مُستبدَلة مطابقة.",
+    one: "توجد شهادة مُستبدَلة واحدة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+    two: "توجد شهادتان مُستبدَلتان مطابقتان، وقد حلّ محلهما تجديد لاحق، لذا لا تظهران هنا.",
+    few: "توجد {count} شهادات مُستبدَلة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+    many: "توجد {count} شهادة مُستبدَلة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+    other: "توجد {count} شهادة مُستبدَلة مطابقة، وقد حلّ محلها تجديد لاحق، لذا لا تظهر هنا.",
+  },
   "slCertificates.searchSupersededLink": "عرضها",
 
   // Filter chips
@@ -32,7 +39,14 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.vehicle": "المركبة",
   "slCertificates.issued": "تاريخ الإصدار",
   "slCertificates.expires": "تاريخ الانتهاء",
-  "slCertificates.expiresInDays": "تنتهي خلال {count} يوم",
+  "slCertificates.expiresInDays": {
+    zero: "تنتهي اليوم",
+    one: "تنتهي خلال يوم واحد",
+    two: "تنتهي خلال يومين",
+    few: "تنتهي خلال {count} أيام",
+    many: "تنتهي خلال {count} يومًا",
+    other: "تنتهي خلال {count} يوم",
+  },
 
   // Row actions
   "slCertificates.print": "طباعة",
@@ -72,9 +86,22 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
 
   // Bulk renew
   "slCertificates.bulkRenew": "تجديد المحدد",
-  "slCertificates.bulkRenewTitle": "تجديد {count} شهادة",
-  "slCertificates.bulkRenewLead":
-    "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+  "slCertificates.bulkRenewTitle": {
+    zero: "تجديد {count} شهادة",
+    one: "تجديد شهادة واحدة",
+    two: "تجديد شهادتين",
+    few: "تجديد {count} شهادات",
+    many: "تجديد {count} شهادة",
+    other: "تجديد {count} شهادة",
+  },
+  "slCertificates.bulkRenewLead": {
+    zero: "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+    one: "ستُصدَر شهادة بديلة للمركبة أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+    two: "ستُصدَر شهادة بديلة لكل من المركبتين أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+    few: "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+    many: "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+    other: "ستُصدَر شهادة بديلة لكل مركبة من المركبات الـ{count} أدناه، مع نقل جهة الإصدار والسرعات المضبوطة كما هي.",
+  },
   "slCertificates.bulkEligible": "سيتم تجديدها ({count})",
   "slCertificates.bulkSkipped": "تم تخطيها ({count})",
   "slCertificates.bulkSkipRevoked": "مسحوبة — لا يمكن تجديدها",
@@ -83,10 +110,30 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.bulkProgress": "جارٍ إصدار {done} من {total}…",
   "slCertificates.bulkCloseBlocked":
     "جارٍ إصدار الشهادات — تبقى هذه النافذة مفتوحة حتى انتهاء العملية ليصلك التقرير كاملًا.",
-  "slCertificates.bulkConfirm": "إصدار {count} شهادة",
-  "slCertificates.bulkDoneAll": "تم إصدار {count} شهادة.",
-  "slCertificates.bulkDonePartial":
-    "تم إصدار {done} من {total} شهادة، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+  "slCertificates.bulkConfirm": {
+    zero: "إصدار {count} شهادة",
+    one: "إصدار شهادة واحدة",
+    two: "إصدار شهادتين",
+    few: "إصدار {count} شهادات",
+    many: "إصدار {count} شهادة",
+    other: "إصدار {count} شهادة",
+  },
+  "slCertificates.bulkDoneAll": {
+    zero: "لم يتم إصدار أي شهادة.",
+    one: "تم إصدار شهادة واحدة.",
+    two: "تم إصدار شهادتين.",
+    few: "تم إصدار {count} شهادات.",
+    many: "تم إصدار {count} شهادة.",
+    other: "تم إصدار {count} شهادة.",
+  },
+  "slCertificates.bulkDonePartial": {
+    zero: "تم إصدار {done} من {count} شهادة، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+    one: "تم إصدار {done} من أصل شهادة واحدة، وفشل {failed} — الشهادة أدناه لم تُجدَّد.",
+    two: "تم إصدار {done} من أصل شهادتين، وفشل {failed} منهما — الشهادات أدناه لم تُجدَّد.",
+    few: "تم إصدار {done} من {count} شهادات، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+    many: "تم إصدار {done} من {count} شهادة، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+    other: "تم إصدار {done} من {count} شهادة، وفشل {failed} منها — الشهادات أدناه لم تُجدَّد.",
+  },
   "slCertificates.bulkSucceeded": "تم إصدارها",
   "slCertificates.bulkFailed": "فشلت",
 
@@ -105,7 +152,14 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
 
   // نافذة الفوترة
   "slCertificates.createInvoice": "إنشاء فاتورة",
-  "slCertificates.invoiceTitle": "فوترة {count} شهادة",
+  "slCertificates.invoiceTitle": {
+    zero: "فوترة {count} شهادة",
+    one: "فوترة شهادة واحدة",
+    two: "فوترة شهادتين",
+    few: "فوترة {count} شهادات",
+    many: "فوترة {count} شهادة",
+    other: "فوترة {count} شهادة",
+  },
   "slCertificates.invoiceLead":
     "فاتورة مسودة واحدة للعميل {customer}، ببند لكل مركبة يحمل رقم لوحتها ورقم شهادتها. يمكن تعديل البنود والأسعار قبل إصدار الفاتورة.",
   "slCertificates.invoiceEligible": "ستتم فوترتها ({count})",
@@ -114,8 +168,14 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.invoiceSkipOtherCustomer": "عميل مختلف — {name}",
   "slCertificates.invoiceSkipNoCustomer": "لا يوجد عميل لفوترته",
   "slCertificates.invoiceNoneEligible": "لا يمكن فوترة أي من الشهادات المحددة.",
-  "slCertificates.invoiceOthersPending":
-    "لدى العميل {name} {count} شهادة أخرى لم تُفوتر بعد.",
+  "slCertificates.invoiceOthersPending": {
+    zero: "ليس لدى العميل {name} شهادات أخرى غير مفوترة.",
+    one: "لدى العميل {name} شهادة أخرى واحدة لم تُفوتر بعد.",
+    two: "لدى العميل {name} شهادتان أخريان لم تُفوترا بعد.",
+    few: "لدى العميل {name} {count} شهادات أخرى لم تُفوتر بعد.",
+    many: "لدى العميل {name} {count} شهادة أخرى لم تُفوتر بعد.",
+    other: "لدى العميل {name} {count} شهادة أخرى لم تُفوتر بعد.",
+  },
   "slCertificates.invoiceAddOthers": "إضافتها إلى هذه الفاتورة",
   "slCertificates.invoiceOnlySelected": "المحددة فقط",
   "slCertificates.invoiceCatalogItem": "بند من الكتالوج",
@@ -126,13 +186,34 @@ export const arSlCertificates: Record<keyof typeof enSlCertificates, string> = {
   "slCertificates.invoiceDefaultDescription": "تجديد شهادة محدد السرعة",
   "slCertificates.invoiceUnitPrice": "السعر لكل مركبة",
   "slCertificates.invoiceTaxRate": "الضريبة %",
-  "slCertificates.invoicePreview": "{count} بند · {total} شاملة الضريبة",
+  "slCertificates.invoicePreview": {
+    zero: "{count} بند · {total} شاملة الضريبة",
+    one: "بند واحد · {total} شاملة الضريبة",
+    two: "بندان · {total} شاملة الضريبة",
+    few: "{count} بنود · {total} شاملة الضريبة",
+    many: "{count} بندًا · {total} شاملة الضريبة",
+    other: "{count} بند · {total} شاملة الضريبة",
+  },
   "slCertificates.invoiceConfirm": "إنشاء فاتورة مسودة",
-  "slCertificates.invoiceCreated": "تم إنشاء الفاتورة المسودة {number} بعدد {count} بند.",
+  "slCertificates.invoiceCreated": {
+    zero: "تم إنشاء الفاتورة المسودة {number} بدون بنود.",
+    one: "تم إنشاء الفاتورة المسودة {number} ببند واحد.",
+    two: "تم إنشاء الفاتورة المسودة {number} ببندين.",
+    few: "تم إنشاء الفاتورة المسودة {number} بـ {count} بنود.",
+    many: "تم إنشاء الفاتورة المسودة {number} بـ {count} بندًا.",
+    other: "تم إنشاء الفاتورة المسودة {number} بـ {count} بند.",
+  },
   "slCertificates.invoiceFailed": "تعذّر إنشاء الفاتورة",
   "slCertificates.invoiceCloseBlocked":
     "جارٍ إنشاء الفاتورة — تبقى هذه النافذة مفتوحة حتى الانتهاء.",
-  "slCertificates.invoiceAfterRenew": "إنشاء فاتورة لهذه الشهادات الـ{count}",
+  "slCertificates.invoiceAfterRenew": {
+    zero: "إنشاء فاتورة لهذه الشهادات الـ{count}",
+    one: "إنشاء فاتورة لهذه الشهادة",
+    two: "إنشاء فاتورة لهاتين الشهادتين",
+    few: "إنشاء فاتورة لهذه الشهادات الـ{count}",
+    many: "إنشاء فاتورة لهذه الشهادات الـ{count}",
+    other: "إنشاء فاتورة لهذه الشهادات الـ{count}",
+  },
 
   // Revoke modal
   "slCertificates.revokeTitle": "سحب الشهادة",
