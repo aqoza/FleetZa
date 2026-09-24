@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, Check, FileCheck2, PackageCheck, ReceiptText } from "lucide-react";
+import { ltrText } from "../../lib/bidi";
 import { listRows, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { formatDate, formatMoney } from "../../lib/format";
@@ -10,7 +11,9 @@ import type { Invoice, SalesOrder } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
-import { Badge, Button, ErrorState, Field, Input, LoadingState, Modal } from "../../components/ui";
+import {
+  Badge, Bdi, Button, ErrorState, Field, Input, LoadingState, Ltr, Modal,
+} from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import { DocumentDetailShell, type ShellRenderArgs } from "./DocumentDetailShell";
 import { InfoRow, SectionCard } from "./shared";
@@ -89,13 +92,16 @@ export default function OrderDetailPage() {
       dateLabel={t("sales.doc.expectedDate")}
       editTitle={t("sales.orders.edit")}
       deleteTitle={t("sales.orders.delete")}
-      deleteConfirm={(o) => t("sales.orders.deleteConfirm", { number: o.doc_number })}
+      deleteConfirm={(o) => t("sales.orders.deleteConfirm", { number: ltrText(o.doc_number) })}
       isEditable={(o) => o.status === "draft"}
       isDeletable={(o) => o.status === "draft" || o.status === "canceled"}
       purchaseOrder="full"
       detailRows={(o) => (
         <>
-          <InfoRow label={t("sales.doc.orderDate")} value={formatDate(o.order_date)} />
+          <InfoRow
+            label={t("sales.doc.orderDate")}
+            value={<Ltr>{formatDate(o.order_date)}</Ltr>}
+          />
           {o.customer_po_number && (
             <InfoRow
               label={t("sales.doc.poNumber")}
@@ -107,16 +113,19 @@ export default function OrderDetailPage() {
                     rel="noreferrer noopener"
                     className="text-brand-700 hover:underline"
                   >
-                    {o.customer_po_number}
+                    <Ltr>{o.customer_po_number}</Ltr>
                   </a>
                 ) : (
-                  o.customer_po_number
+                  <Ltr>{o.customer_po_number}</Ltr>
                 )
               }
             />
           )}
           {o.customer_po_date && (
-            <InfoRow label={t("sales.doc.poDate")} value={formatDate(o.customer_po_date)} />
+            <InfoRow
+              label={t("sales.doc.poDate")}
+              value={<Ltr>{formatDate(o.customer_po_date)}</Ltr>}
+            />
           )}
           {o.job_id && (
             <InfoRow
@@ -132,7 +141,10 @@ export default function OrderDetailPage() {
             />
           )}
           {o.expected_date && (
-            <InfoRow label={t("sales.doc.expectedDate")} value={formatDate(o.expected_date)} />
+            <InfoRow
+              label={t("sales.doc.expectedDate")}
+              value={<Ltr>{formatDate(o.expected_date)}</Ltr>}
+            />
           )}
           {o.quote_id && (
             <InfoRow
@@ -153,12 +165,14 @@ export default function OrderDetailPage() {
             <div className="mb-3 space-y-1.5 text-sm tabular-nums">
               <div className="flex justify-between gap-4">
                 <span className="text-ink-2">{t("sales.orders.invoiced")}</span>
-                <span className="text-ink">{formatMoney(doc.invoiced_total, doc.currency)}</span>
+                <span className="text-ink">
+                  <Ltr>{formatMoney(doc.invoiced_total, doc.currency)}</Ltr>
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-ink-2">{t("sales.orders.unbilled")}</span>
                 <span className="font-medium text-ink">
-                  {formatMoney(Math.max(doc.total - doc.invoiced_total, 0), doc.currency)}
+                  <Ltr>{formatMoney(Math.max(doc.total - doc.invoiced_total, 0), doc.currency)}</Ltr>
                 </span>
               </div>
             </div>
@@ -178,12 +192,12 @@ export default function OrderDetailPage() {
                         to={`/sales/invoices/${inv.id}`}
                         className="text-sm font-medium text-brand-700 hover:underline tabular-nums"
                       >
-                        {inv.doc_number}
+                        <Ltr>{inv.doc_number}</Ltr>
                       </Link>
                       <div className="flex items-center gap-2">
                         <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
                         <span className="text-sm text-ink tabular-nums">
-                          {formatMoney(inv.total, inv.currency)}
+                          <Ltr>{formatMoney(inv.total, inv.currency)}</Ltr>
                         </span>
                       </div>
                     </li>
@@ -214,7 +228,7 @@ export default function OrderDetailPage() {
               void qc.invalidateQueries({ queryKey: ["sales_summary"] });
               void qc.invalidateQueries({ queryKey: ["sales_order_line_balance"] });
               navigate(`/sales/invoices/${invoice.id}`);
-              toast.success(t("sales.toast.invoiced", { number: invoice.doc_number }));
+              toast.success(t("sales.toast.invoiced", { number: ltrText(invoice.doc_number) }));
             }}
           />
         )}
@@ -310,7 +324,9 @@ function PartialInvoiceForm({
             const remaining = Number(r.remaining_quantity);
             return (
               <div key={r.line_id} className="rounded-lg border border-line p-3">
-                <p className="text-sm font-medium text-ink">{r.description}</p>
+                <p className="text-sm font-medium text-ink">
+                  <Bdi>{r.description}</Bdi>
+                </p>
                 <p className="mt-0.5 text-xs text-ink-3">
                   {t("sales.orders.lineBalance", {
                     ordered: String(Number(r.quantity)),

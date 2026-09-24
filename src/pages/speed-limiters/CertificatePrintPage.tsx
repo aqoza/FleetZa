@@ -12,6 +12,7 @@ import "@fontsource/ibm-plex-sans-arabic/600.css";
 import "@fontsource/ibm-plex-sans-arabic/700.css";
 import { getCountry } from "../../../shared/countries";
 import { listRows } from "../../lib/db";
+import { bdiText, ltrText } from "../../lib/bidi";
 import {
   formatDocumentDate,
   formatSpeedBand,
@@ -31,7 +32,7 @@ import type {
 } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { translateIn, useI18n } from "../../i18n";
-import { Button, Card, ErrorState, LoadingState } from "../../components/ui";
+import { Bdi, Button, Card, ErrorState, LoadingState, Ltr } from "../../components/ui";
 
 type CertPrintRow = SpeedLimiterCertificate & {
   vehicles: Pick<
@@ -248,11 +249,11 @@ export default function CertificatePrintPage() {
 
   // Phones and the verify URL stay LTR-isolated so digit groups don't
   // bidi-reorder on an Arabic certificate (same treatment as the settings form).
-  const phoneNode = tenant.phone ? <span dir="ltr">{tenant.phone}</span> : null;
+  const phoneNode = tenant.phone ? <Ltr>{tenant.phone}</Ltr> : null;
   const dealerContact: ReactNode =
     tenant.address && phoneNode ? (
       <>
-        {tenant.address} · {phoneNode}
+        <Bdi>{tenant.address}</Bdi> · {phoneNode}
       </>
     ) : (
       tenant.address ?? phoneNode ?? countryName
@@ -520,7 +521,7 @@ export default function CertificatePrintPage() {
             </p>
           )}
           <h1 className="text-3xl font-bold uppercase leading-tight tracking-wide rtl:tracking-normal">
-            {tenant.name}
+            <Bdi>{tenant.name}</Bdi>
           </h1>
         </div>
 
@@ -554,12 +555,12 @@ export default function CertificatePrintPage() {
             {cert.revoked_at && (
               <p className="mt-1 text-xs text-serious">
                 {t("slCertificates.revokedOn", {
-                  date: formatDocumentDate(cert.revoked_at) ?? DASH,
+                  date: ltrText(formatDocumentDate(cert.revoked_at) ?? DASH),
                 })}
               </p>
             )}
             {cert.revoked_reason && (
-              <p className="mt-0.5 text-xs text-serious">{cert.revoked_reason}</p>
+              <p className="mt-0.5 text-xs text-serious"><Bdi>{cert.revoked_reason}</Bdi></p>
             )}
           </div>
         )}
@@ -579,13 +580,23 @@ export default function CertificatePrintPage() {
           </tr>
           <tr>
             <Cell>{t("slCertificates.report.registrationNo")}</Cell>
-            <Cell>{vehicle?.license_plate ?? vehicle?.name ?? DASH}</Cell>
+            <Cell>
+              {vehicle?.license_plate ? (
+                <Ltr>{vehicle.license_plate}</Ltr>
+              ) : (
+                vehicle?.name ?? DASH
+              )}
+            </Cell>
             <Cell>{t("slCertificates.report.chassisNo")}</Cell>
-            <Cell>{vehicle?.chassis_number ?? vehicle?.vin ?? DASH}</Cell>
+            <Cell>
+              <Ltr>{vehicle?.chassis_number ?? vehicle?.vin ?? DASH}</Ltr>
+            </Cell>
           </tr>
           <tr>
             <Cell>{t("slCertificates.report.engineNo")}</Cell>
-            <Cell>{vehicle?.engine_number ?? DASH}</Cell>
+            <Cell>
+              <Ltr>{vehicle?.engine_number ?? DASH}</Ltr>
+            </Cell>
             <Cell>{t("slCertificates.report.makeOfVehicle")}</Cell>
             <Cell>{vehicle?.make ?? DASH}</Cell>
           </tr>
@@ -608,14 +619,18 @@ export default function CertificatePrintPage() {
           </tr>
           <tr>
             <Cell>{t("slCertificates.report.serialNo")}</Cell>
-            <Cell>{device?.serial ?? DASH}</Cell>
+            <Cell>
+              <Ltr>{device?.serial ?? DASH}</Ltr>
+            </Cell>
             <Cell>{t("slCertificates.report.tamperSealNo")}</Cell>
-            <Cell>{tamperSeal}</Cell>
+            <Cell>
+              <Ltr>{tamperSeal}</Ltr>
+            </Cell>
           </tr>
           <tr>
             <Cell>{t("slCertificates.report.dateOfInstallation")}</Cell>
             <Cell>
-              <span dir="ltr">{formatDocumentDate(installedOn) ?? DASH}</span>
+              <Ltr>{formatDocumentDate(installedOn) ?? DASH}</Ltr>
             </Cell>
             <Cell>{t("slCertificates.report.technicianName")}</Cell>
             <Cell>{technicianName ?? DASH}</Cell>
@@ -641,10 +656,12 @@ export default function CertificatePrintPage() {
           <tbody>
             <tr>
               <Cell>{t("slCertificates.report.uinLabel")}</Cell>
-              <Cell>{uin}</Cell>
+              <Cell>
+                <Ltr>{uin}</Ltr>
+              </Cell>
               <Cell>{t("slCertificates.report.validUpto")}</Cell>
               <Cell>
-                <span dir="ltr">{formatDocumentDate(cert.expires_at) ?? DASH}</span>
+                <Ltr>{formatDocumentDate(cert.expires_at) ?? DASH}</Ltr>
               </Cell>
             </tr>
             {/* The certificate's own reference, unique per record. It used to
@@ -652,7 +669,9 @@ export default function CertificatePrintPage() {
                 the other identifiers, so the header can carry the standard. */}
             <tr>
               <Cell>{t("slCertificates.report.certificateNo")}</Cell>
-              <Cell span={3}>{certificateNumber}</Cell>
+              <Cell span={3}>
+                <Ltr>{certificateNumber}</Ltr>
+              </Cell>
             </tr>
           </tbody>
         </table>
@@ -686,7 +705,7 @@ export default function CertificatePrintPage() {
                 {signatoryName ? (
                   <span className="block text-[11px] leading-[14px]">
                     <span className="block">
-                      {t("slCertificates.report.forCompany", { name: signatoryCompany })}
+                      {t("slCertificates.report.forCompany", { name: bdiText(signatoryCompany) })}
                     </span>
                     {tenant.signature_url ? (
                       <img
@@ -698,7 +717,9 @@ export default function CertificatePrintPage() {
                       // Room to sign by hand, as on the scanned original.
                       <span className="my-0.5 block h-[52px]" />
                     )}
-                    <span className="block font-semibold">{signatoryName}</span>
+                    <span className="block font-semibold">
+                      <Bdi>{signatoryName}</Bdi>
+                    </span>
                   </span>
                 ) : (
                   tenant.signature_url && (
@@ -752,7 +773,7 @@ export default function CertificatePrintPage() {
                   <rect x="0" y="0" width="100" height="24" fill="var(--color-doc-red)" />
                 </svg>
                 <div className="-mt-6 h-6 px-4 text-center text-[11px] font-bold uppercase leading-6 tracking-wide text-surface rtl:tracking-normal">
-                  {servicesLine}
+                  <Bdi>{servicesLine}</Bdi>
                 </div>
                 <svg
                   aria-hidden="true"
@@ -773,7 +794,7 @@ export default function CertificatePrintPage() {
               {registrationEn && <p dir="ltr">{registrationEn}</p>}
               {tenant.email && (
                 <p dir="auto">
-                  {t("slCertificates.report.footerEmail", { value: tenant.email })}
+                  {t("slCertificates.report.footerEmail", { value: ltrText(tenant.email) })}
                 </p>
               )}
             </div>

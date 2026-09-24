@@ -15,7 +15,7 @@ import type { Invoice, Quote } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
-import { Badge, Card, ErrorState, LoadingState } from "../../components/ui";
+import { Badge, Card, ErrorState, LoadingState, Ltr } from "../../components/ui";
 
 const RECENT_LIMIT = 5;
 
@@ -89,7 +89,7 @@ export default function CustomerSalesPanel({ customerId }: { customerId: string 
         {billingOn && (
           <Metric
             label={t("sales.customer.outstanding")}
-            value={formatMoney(outstanding, tenant.currency)}
+            value={<Ltr>{formatMoney(outstanding, tenant.currency)}</Ltr>}
             tone={outstanding > 0 ? "warn" : "muted"}
           />
         )}
@@ -174,7 +174,7 @@ function Metric({
   tone = "muted",
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   tone?: "muted" | "warn";
 }) {
   return (
@@ -208,13 +208,17 @@ function DocRow({
     <li className="flex items-center justify-between gap-3 py-2">
       <div className="min-w-0">
         <Link to={to} className="text-sm font-medium text-brand-700 hover:underline tabular-nums">
-          {number}
+          <Ltr>{number}</Ltr>
         </Link>
-        <div className="text-xs text-ink-3">{formatDate(date)}</div>
+        <div className="text-xs text-ink-3">
+          <Ltr>{formatDate(date)}</Ltr>
+        </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {badge}
-        <span className="text-sm text-ink tabular-nums">{amount}</span>
+        <span className="text-sm text-ink tabular-nums">
+          <Ltr>{amount}</Ltr>
+        </span>
       </div>
     </li>
   );

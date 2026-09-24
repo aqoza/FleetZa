@@ -8,6 +8,7 @@
  * layout is print-first (`print:` utilities strip the app chrome) rather than a
  * separate generator.
  */
+import type { ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Printer } from "lucide-react";
@@ -18,7 +19,7 @@ import { balanceDue } from "../../lib/sales";
 import type { Customer, Invoice, Quote, SalesOrder } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
-import { Button, Card, ErrorState, LoadingState } from "../../components/ui";
+import { Bdi, Button, Card, ErrorState, LoadingState, Ltr } from "../../components/ui";
 import { BackLink, taxHeading, type EditableLine } from "./shared";
 
 type DocKind = "quote" | "order" | "invoice";
@@ -114,14 +115,22 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
         <header className="flex flex-wrap items-start justify-between gap-6">
           <div>
             <h1 className="text-2xl font-bold tracking-wide text-brand-700 rtl:tracking-normal">
-              {tenant.name}
+              <Bdi>{tenant.name}</Bdi>
             </h1>
             <div className="mt-1 space-y-0.5 text-xs text-ink-3">
-              {tenant.address && <div>{tenant.address}</div>}
-              {tenant.phone && <div dir="ltr">{tenant.phone}</div>}
+              {tenant.address && (
+                <div>
+                  <Bdi>{tenant.address}</Bdi>
+                </div>
+              )}
+              {tenant.phone && (
+                <div>
+                  <Ltr>{tenant.phone}</Ltr>
+                </div>
+              )}
               {tenant.tax_registration_number && (
                 <div>
-                  {t("sales.print.taxNumber")}: {tenant.tax_registration_number}
+                  {t("sales.print.taxNumber")}: <Ltr>{tenant.tax_registration_number}</Ltr>
                 </div>
               )}
             </div>
@@ -130,7 +139,9 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
             <div className="text-sm font-semibold uppercase tracking-wide text-ink rtl:tracking-normal">
               {t(config.headingKey)}
             </div>
-            <div className="mt-1 text-lg font-bold text-ink tabular-nums">{doc.doc_number}</div>
+            <div className="mt-1 text-lg font-bold text-ink tabular-nums">
+              <Ltr>{doc.doc_number}</Ltr>
+            </div>
           </div>
         </header>
 
@@ -140,40 +151,63 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
               {t("sales.print.billTo")}
             </div>
             <div className="mt-1.5 text-sm text-ink">
-              <div className="font-semibold">{customer?.name ?? "—"}</div>
-              {customer?.address && <div className="text-ink-2">{customer.address}</div>}
+              <div className="font-semibold">
+                <Bdi>{customer?.name ?? "—"}</Bdi>
+              </div>
+              {customer?.address && (
+                <div className="text-ink-2">
+                  <Bdi>{customer.address}</Bdi>
+                </div>
+              )}
               {(customer?.city || customer?.country) && (
                 <div className="text-ink-2">
-                  {[customer.city, customer.country].filter(Boolean).join(", ")}
+                  <Bdi>{[customer.city, customer.country].filter(Boolean).join(", ")}</Bdi>
                 </div>
               )}
               {customer?.tax_number && (
                 <div className="text-ink-2">
-                  {t("sales.print.taxNumber")}: {customer.tax_number}
+                  {t("sales.print.taxNumber")}: <Ltr>{customer.tax_number}</Ltr>
                 </div>
               )}
               {customer?.cr_number && (
                 <div className="text-ink-2">
-                  {t("sales.print.crNumber")}: {customer.cr_number}
+                  {t("sales.print.crNumber")}: <Ltr>{customer.cr_number}</Ltr>
                 </div>
               )}
             </div>
           </div>
           <dl className="space-y-1 text-sm">
-            <PrintRow label={t("sales.doc.issueDate")} value={formatDate(doc.issue_date ?? doc.order_date)} />
+            <PrintRow
+              label={t("sales.doc.issueDate")}
+              value={<Ltr>{formatDate(doc.issue_date ?? doc.order_date)}</Ltr>}
+            />
             {kind === "quote" && doc.valid_until && (
-              <PrintRow label={t("sales.doc.validUntil")} value={formatDate(doc.valid_until)} />
+              <PrintRow
+                label={t("sales.doc.validUntil")}
+                value={<Ltr>{formatDate(doc.valid_until)}</Ltr>}
+              />
             )}
             {kind === "order" && doc.expected_date && (
-              <PrintRow label={t("sales.doc.expectedDate")} value={formatDate(doc.expected_date)} />
+              <PrintRow
+                label={t("sales.doc.expectedDate")}
+                value={<Ltr>{formatDate(doc.expected_date)}</Ltr>}
+              />
             )}
             {kind === "invoice" && doc.due_date && (
-              <PrintRow label={t("sales.doc.dueDate")} value={formatDate(doc.due_date)} />
+              <PrintRow
+                label={t("sales.doc.dueDate")}
+                value={<Ltr>{formatDate(doc.due_date)}</Ltr>}
+              />
             )}
             {doc.customer_reference && (
-              <PrintRow label={t("sales.doc.reference")} value={doc.customer_reference} />
+              <PrintRow
+                label={t("sales.doc.reference")}
+                value={<Ltr>{doc.customer_reference}</Ltr>}
+              />
             )}
-            {doc.title && <PrintRow label={t("sales.doc.title")} value={doc.title} />}
+            {doc.title && (
+              <PrintRow label={t("sales.doc.title")} value={<Bdi>{doc.title}</Bdi>} />
+            )}
           </dl>
         </div>
 
@@ -198,21 +232,21 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
             {lines.map((line) => (
               <tr key={line.id}>
                 <td className="py-2.5 text-ink">
-                  {line.description}
+                  <Bdi>{line.description}</Bdi>
                   {line.discount_percent > 0 && (
                     <span className="ms-2 text-xs text-ink-3">
-                      −{line.discount_percent}%
+                      <Ltr>−{line.discount_percent}%</Ltr>
                     </span>
                   )}
                 </td>
                 <td className="py-2.5 text-end text-ink-2 tabular-nums">
-                  {line.quantity}{line.unit ? ` ${line.unit}` : ""}
+                  <Bdi>{line.quantity}{line.unit ? ` ${line.unit}` : ""}</Bdi>
                 </td>
                 <td className="py-2.5 text-end text-ink-2 tabular-nums">
-                  {money(line.unit_price)}
+                  <Ltr>{money(line.unit_price)}</Ltr>
                 </td>
                 <td className="py-2.5 text-end font-medium text-ink tabular-nums">
-                  {money(line.line_total)}
+                  <Ltr>{money(line.line_total)}</Ltr>
                 </td>
               </tr>
             ))}
@@ -221,20 +255,28 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
 
         <div className="mt-6 flex justify-end">
           <dl className="w-64 space-y-1.5 text-sm tabular-nums">
-            <PrintRow label={t("sales.doc.subtotal")} value={money(doc.subtotal)} />
+            <PrintRow label={t("sales.doc.subtotal")} value={<Ltr>{money(doc.subtotal)}</Ltr>} />
             {doc.discount_total > 0 && (
-              <PrintRow label={t("sales.doc.discount")} value={`− ${money(doc.discount_total)}`} />
+              <PrintRow
+                label={t("sales.doc.discount")}
+                value={<Ltr>{`− ${money(doc.discount_total)}`}</Ltr>}
+              />
             )}
-            {doc.tax_total > 0 && <PrintRow label={taxLabel} value={money(doc.tax_total)} />}
+            {doc.tax_total > 0 && (
+              <PrintRow label={taxLabel} value={<Ltr>{money(doc.tax_total)}</Ltr>} />
+            )}
             <div className="border-t border-ink/70 pt-1.5">
-              <PrintRow label={t("sales.doc.total")} value={money(doc.total)} strong />
+              <PrintRow label={t("sales.doc.total")} value={<Ltr>{money(doc.total)}</Ltr>} strong />
             </div>
             {kind === "invoice" && doc.amount_paid > 0 && (
               <>
-                <PrintRow label={t("sales.doc.amountPaid")} value={money(doc.amount_paid)} />
+                <PrintRow
+                  label={t("sales.doc.amountPaid")}
+                  value={<Ltr>{money(doc.amount_paid)}</Ltr>}
+                />
                 <PrintRow
                   label={t("sales.doc.balanceDue")}
-                  value={money(balanceDue(doc))}
+                  value={<Ltr>{money(balanceDue(doc))}</Ltr>}
                   strong
                 />
               </>
@@ -243,14 +285,18 @@ export default function DocumentPrintPage({ kind }: { kind: DocKind }) {
         </div>
 
         {doc.notes && (
-          <p className="mt-6 whitespace-pre-line text-sm text-ink-2">{doc.notes}</p>
+          <p className="mt-6 whitespace-pre-line text-sm text-ink-2">
+            <Bdi>{doc.notes}</Bdi>
+          </p>
         )}
         {doc.terms && (
           <div className="mt-6 border-t border-line pt-4">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-3 rtl:tracking-normal">
               {t("sales.doc.terms")}
             </div>
-            <p className="mt-1.5 whitespace-pre-line text-xs text-ink-2">{doc.terms}</p>
+            <p className="mt-1.5 whitespace-pre-line text-xs text-ink-2">
+              <Bdi>{doc.terms}</Bdi>
+            </p>
           </div>
         )}
 
@@ -269,7 +315,8 @@ function PrintRow({
   strong,
 }: {
   label: string;
-  value: string;
+  /** Isolated by the caller: <Ltr> for dates, numbers and amounts, <Bdi> for text. */
+  value: ReactNode;
   strong?: boolean;
 }) {
   return (

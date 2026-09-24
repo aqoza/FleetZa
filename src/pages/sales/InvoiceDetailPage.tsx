@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, Plus, Send, Trash2 } from "lucide-react";
+import { ltrText } from "../../lib/bidi";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { daysUntil, formatDate, formatMoney } from "../../lib/format";
 import { invoiceStatus, paymentMethods } from "../../lib/labels";
@@ -10,7 +11,7 @@ import type { Invoice, Payment } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import {
-  Button, ErrorState, Field, Input, LoadingState, Modal, Select, Textarea,
+  Bdi, Button, ErrorState, Field, Input, LoadingState, Ltr, Modal, Select, Textarea,
   type BadgeTone,
 } from "../../components/ui";
 import { useToast } from "../../components/Toast";
@@ -89,7 +90,7 @@ export default function InvoiceDetailPage() {
       dateLabel={t("sales.doc.dueDate")}
       editTitle={t("sales.invoices.edit")}
       deleteTitle={t("sales.invoices.delete")}
-      deleteConfirm={(i) => t("sales.invoices.deleteConfirm", { number: i.doc_number })}
+      deleteConfirm={(i) => t("sales.invoices.deleteConfirm", { number: ltrText(i.doc_number) })}
       isEditable={(i) => i.status === "draft"}
       isDeletable={(i) => i.status === "draft"}
       totalsExtra={(i) => ({ paid: i.amount_paid, balance: balanceDue(i) })}
@@ -98,9 +99,15 @@ export default function InvoiceDetailPage() {
         const days = i.due_date ? daysUntil(i.due_date) : null;
         return (
           <>
-            <InfoRow label={t("sales.doc.issueDate")} value={formatDate(i.issue_date)} />
+            <InfoRow
+              label={t("sales.doc.issueDate")}
+              value={<Ltr>{formatDate(i.issue_date)}</Ltr>}
+            />
             {i.customer_po_number && (
-              <InfoRow label={t("sales.doc.poNumber")} value={i.customer_po_number} />
+              <InfoRow
+                label={t("sales.doc.poNumber")}
+                value={<Ltr>{i.customer_po_number}</Ltr>}
+              />
             )}
             {i.job_id && (
               <InfoRow
@@ -132,7 +139,7 @@ export default function InvoiceDetailPage() {
               label={t("sales.doc.dueDate")}
               value={
                 <span className={isInvoiceOverdue(i) ? "text-serious" : undefined}>
-                  {formatDate(i.due_date)}
+                  <Ltr>{formatDate(i.due_date)}</Ltr>
                   {days !== null && (i.status === "issued" || i.status === "partially_paid") && (
                     <span className="ms-2 text-xs">
                       {days < 0
@@ -157,7 +164,10 @@ export default function InvoiceDetailPage() {
               />
             )}
             {i.void_reason && (
-              <InfoRow label={t("sales.invoices.voidReason")} value={i.void_reason} />
+              <InfoRow
+                label={t("sales.invoices.voidReason")}
+                value={<Bdi>{i.void_reason}</Bdi>}
+              />
             )}
           </>
         );
@@ -179,7 +189,9 @@ export default function InvoiceDetailPage() {
                       key={l.id}
                       className="flex items-center justify-between gap-3 py-2 text-sm"
                     >
-                      <span className="min-w-0 truncate text-ink-2">{l.description}</span>
+                      <span className="min-w-0 truncate text-ink-2">
+                        <Bdi>{l.description}</Bdi>
+                      </span>
                       <span className="flex shrink-0 gap-3">
                         {l.vehicle_id && (
                           <Link
@@ -297,11 +309,16 @@ function PaymentsList({
           <li key={p.id} className="flex items-center justify-between gap-3 py-2.5">
             <div className="min-w-0">
               <div className="text-sm font-medium text-ink tabular-nums">
-                {formatMoney(p.amount, invoice.currency)}
+                <Ltr>{formatMoney(p.amount, invoice.currency)}</Ltr>
               </div>
               <div className="text-xs text-ink-3">
-                {formatDate(p.paid_at)} · {t(paymentMethods[p.method])}
-                {p.reference ? ` · ${p.reference}` : ""}
+                <Ltr>{formatDate(p.paid_at)}</Ltr> · {t(paymentMethods[p.method])}
+                {p.reference && (
+                  <>
+                    {" · "}
+                    <Ltr>{p.reference}</Ltr>
+                  </>
+                )}
               </div>
             </div>
             {canEdit && (
@@ -328,7 +345,7 @@ function PaymentsList({
           <>
             <p className="text-sm text-ink-2">
               {t("sales.payments.deleteConfirm", {
-                amount: formatMoney(deleting.amount, invoice.currency),
+                amount: ltrText(formatMoney(deleting.amount, invoice.currency)),
               })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
@@ -416,7 +433,7 @@ function PaymentModal({
           onClick={() => setAmount(String(balance))}
         >
           {t("sales.payments.settleFull", {
-            amount: formatMoney(balance, invoice.currency),
+            amount: ltrText(formatMoney(balance, invoice.currency)),
           })}
         </button>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -436,6 +453,7 @@ function PaymentModal({
         </div>
         <Field label={t("sales.payments.reference")}>
           <Input
+            dir="ltr"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             placeholder={t("sales.payments.referencePlaceholder")}
@@ -491,7 +509,7 @@ function VoidModal({
     <Modal title={t("sales.invoices.void")} open={open} onClose={onClose}>
       {error && <ErrorState message={error} />}
       <p className="text-sm text-ink-2">
-        {t("sales.invoices.voidConfirm", { number: invoice.doc_number })}
+        {t("sales.invoices.voidConfirm", { number: ltrText(invoice.doc_number) })}
       </p>
       <div className="mt-4">
         <Field label={t("sales.invoices.voidReason")}>

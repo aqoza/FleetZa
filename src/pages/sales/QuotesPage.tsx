@@ -45,6 +45,7 @@ export default function QuotesPage() {
               id: "validUntil",
               header: t("sales.doc.validUntil"),
               minBreakpoint: "lg",
+              dir: "ltr",
               cell: (q) => <span className="text-ink-2">{formatDate(q.valid_until)}</span>,
               sortValue: (q) => q.valid_until,
               exportValue: (q) => q.valid_until ?? "",

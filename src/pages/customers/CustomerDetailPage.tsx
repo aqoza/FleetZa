@@ -8,6 +8,7 @@ import {
 } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { useVehiclePicker } from "../../lib/pickers";
 import {
   certificateBucket, certificateStatusMeta, fleetCompliancePercent,
@@ -20,8 +21,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import {
-  Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Pagination, Table, Textarea, type BadgeTone,
+  Badge, Bdi, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal,
+  PageHeader, Pagination, Table, Textarea, type BadgeTone,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
@@ -186,10 +187,10 @@ function ContactForm({
           <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
         </Field>
         <Field label={t("field.phone")}>
-          <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <Input dir="ltr" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
         <Field label={t("customers.whatsapp")}>
-          <Input value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
+          <Input dir="ltr" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} />
         </Field>
       </div>
       <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
@@ -608,8 +609,8 @@ export default function CustomerDetailPage() {
             if (!head) return <span className="text-ink-3">{t("common.dash")}</span>;
             return (
               <>
-                <div className="text-ink-2">{head.certificate_number}</div>
-                <div className="text-xs text-ink-3">{formatDate(head.expires_at)}</div>
+                <div className="text-ink-2"><Ltr>{head.certificate_number}</Ltr></div>
+                <div className="text-xs text-ink-3"><Ltr>{formatDate(head.expires_at)}</Ltr></div>
               </>
             );
           },
@@ -650,14 +651,14 @@ export default function CustomerDetailPage() {
         </Link>
       ),
       sortValue: (v) => v.name,
+      dir: "auto",
     },
     {
       id: "plate",
       header: t("field.licensePlate"),
-      cell: (v) => (
-        <span className="text-ink-2"><bdi>{v.license_plate ?? t("common.dash")}</bdi></span>
-      ),
+      cell: (v) => <span className="text-ink-2">{v.license_plate ?? t("common.dash")}</span>,
       sortValue: (v) => v.license_plate,
+      dir: "ltr",
     },
     {
       id: "fleet",
@@ -665,6 +666,7 @@ export default function CustomerDetailPage() {
       cell: (v) => <span className="text-ink-2">{v.fleet_number ?? t("common.dash")}</span>,
       sortValue: (v) => v.fleet_number,
       minBreakpoint: "xl",
+      dir: "ltr",
     },
     {
       id: "chassis",
@@ -672,6 +674,7 @@ export default function CustomerDetailPage() {
       cell: (v) => <span className="text-ink-2">{v.chassis_number ?? t("common.dash")}</span>,
       sortValue: (v) => v.chassis_number,
       minBreakpoint: "xl",
+      dir: "ltr",
     },
     ...certColumns,
     {
@@ -730,7 +733,7 @@ export default function CustomerDetailPage() {
       </Link>
       <PageHeader
         title={customer.name}
-        description={customer.cr_number ?? undefined}
+        description={ltrText(customer.cr_number) || undefined}
         actions={
           <>
             <Badge tone={st.tone}>{t(st.labelKey)}</Badge>
@@ -821,19 +824,21 @@ export default function CustomerDetailPage() {
                           aria-label={t("customers.primaryContact")}
                         />
                       )}
-                      <span className="truncate text-sm font-medium text-ink">{c.name}</span>
+                      <span className="truncate text-sm font-medium text-ink"><Bdi>{c.name}</Bdi></span>
                     </div>
                     {(c.title || c.department) && (
                       <div className="text-xs text-ink-3">
-                        {[c.title, c.department].filter(Boolean).join(" · ")}
+                        {c.title && <Bdi>{c.title}</Bdi>}
+                        {c.title && c.department && " · "}
+                        {c.department && <Bdi>{c.department}</Bdi>}
                       </div>
                     )}
                     <div className="mt-0.5 space-y-0.5 text-xs text-ink-3">
-                      {c.phone && <div>{c.phone}</div>}
+                      {c.phone && <div><Ltr>{c.phone}</Ltr></div>}
                       {c.whatsapp && (
-                        <div>{t("customers.whatsapp")}: {c.whatsapp}</div>
+                        <div>{t("customers.whatsapp")}: <Ltr>{c.whatsapp}</Ltr></div>
                       )}
-                      {c.email && <div className="truncate">{c.email}</div>}
+                      {c.email && <div className="truncate"><Ltr>{c.email}</Ltr></div>}
                     </div>
                   </div>
                   {isManager && (
@@ -994,15 +999,15 @@ export default function CustomerDetailPage() {
                           to={`/speed-limiters/jobs/${j.id}`}
                           className="font-medium text-brand-700 hover:underline"
                         >
-                          #{j.number}
+                          <Ltr>#{j.number}</Ltr>
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-ink-2">{t(jobTypeKeys[j.job_type])}</td>
                       <td className="px-4 py-3">
                         <Badge tone={jm.tone}>{t(jm.labelKey)}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-ink-2">{j.vehicles?.name ?? t("common.dash")}</td>
-                      <td className="px-4 py-3 text-ink-2">{formatDate(j.scheduled_date)}</td>
+                      <td className="px-4 py-3 text-ink-2"><Bdi>{j.vehicles?.name ?? t("common.dash")}</Bdi></td>
+                      <td className="px-4 py-3 text-ink-2"><Ltr>{formatDate(j.scheduled_date)}</Ltr></td>
                     </tr>
                   );
                 })}
@@ -1072,23 +1077,21 @@ export default function CustomerDetailPage() {
                           to={certHref(c)}
                           className="font-medium text-brand-700 hover:underline"
                         >
-                          {c.certificate_number}
+                          <Ltr>{c.certificate_number}</Ltr>
                         </Link>
                       </td>
                       <td className="px-4 py-3 text-ink-2">
-                        <div>{c.vehicles?.name ?? t("common.dash")}</div>
-                        {/* Plates are digits + Latin letters; <bdi> keeps the
-                            RTL paragraph from reordering "5637 RA". */}
+                        <div><Bdi>{c.vehicles?.name ?? t("common.dash")}</Bdi></div>
                         {c.vehicles?.license_plate && (
                           <div className="text-xs text-ink-3">
-                            <bdi>{c.vehicles.license_plate}</bdi>
+                            <Ltr>{c.vehicles.license_plate}</Ltr>
                           </div>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {certBadge(c)}
-                          <span className="text-xs text-ink-3">{formatDate(c.expires_at)}</span>
+                          <span className="text-xs text-ink-3"><Ltr>{formatDate(c.expires_at)}</Ltr></span>
                         </div>
                       </td>
                     </tr>
@@ -1161,7 +1164,7 @@ export default function CustomerDetailPage() {
         {deletingContact && (
           <>
             <p className="text-sm text-ink-2">
-              {t("customers.deleteContactConfirm", { name: deletingContact.name })}
+              {t("customers.deleteContactConfirm", { name: bdiText(deletingContact.name) })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeletingContact(null)}>
@@ -1198,8 +1201,8 @@ export default function CustomerDetailPage() {
           <>
             <p className="text-sm text-ink-2">
               {t("customers.detachConfirm", {
-                vehicle: detaching.name,
-                customer: customer.name,
+                vehicle: bdiText(detaching.name),
+                customer: bdiText(customer.name),
               })}
             </p>
             <div className="mt-4 flex justify-end gap-2">

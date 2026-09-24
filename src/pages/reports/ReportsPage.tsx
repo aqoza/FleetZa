@@ -27,7 +27,7 @@ import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, LoadingState, PageHeader, Select, Table,
+  Bdi, Button, Card, EmptyState, ErrorState, LoadingState, Ltr, PageHeader, Select, Table,
 } from "../../components/ui";
 
 interface CostRow {
@@ -276,18 +276,18 @@ export default function ReportsPage() {
                 >
                   {costRows.map((r) => (
                     <tr key={r.vehicleId} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
+                      <td className="px-4 py-3 font-medium text-slate-800"><Bdi>{r.name}</Bdi></td>
                       <td className="px-4 py-3 text-slate-600">
-                        {formatMoney(r.fuel, tenant.currency)}
+                        <Ltr>{formatMoney(r.fuel, tenant.currency)}</Ltr>
                       </td>
                       <td className="px-4 py-3 text-slate-600">
-                        {formatMoney(r.maintenance, tenant.currency)}
+                        <Ltr>{formatMoney(r.maintenance, tenant.currency)}</Ltr>
                       </td>
                       <td className="px-4 py-3 font-medium text-slate-800">
-                        {formatMoney(r.total, tenant.currency)}
+                        <Ltr>{formatMoney(r.total, tenant.currency)}</Ltr>
                       </td>
                       <td className="px-4 py-3 text-slate-600">
-                        {formatMoney(r.costPerDistance, tenant.currency)}
+                        <Ltr>{formatMoney(r.costPerDistance, tenant.currency)}</Ltr>
                       </td>
                     </tr>
                   ))}
@@ -322,14 +322,16 @@ export default function ReportsPage() {
               >
                 {efficiencyRows.map((r) => (
                   <tr key={r.vehicleId} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-800">{r.name}</td>
+                    <td className="px-4 py-3 font-medium text-slate-800"><Bdi>{r.name}</Bdi></td>
                     <td className="px-4 py-3 text-slate-600">
-                      {formatVolume(r.liters, tenant.volume_unit)}
+                      <Ltr>{formatVolume(r.liters, tenant.volume_unit)}</Ltr>
                     </td>
                     <td className="px-4 py-3 text-slate-600">
-                      {r.avgEfficiency === null
-                        ? "—"
-                        : `${r.avgEfficiency.toFixed(1)} ${efficiencyLabel(tenant)}`}
+                      <Ltr>
+                        {r.avgEfficiency === null
+                          ? "—"
+                          : `${r.avgEfficiency.toFixed(1)} ${efficiencyLabel(tenant)}`}
+                      </Ltr>
                     </td>
                   </tr>
                 ))}

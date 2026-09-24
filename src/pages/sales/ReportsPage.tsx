@@ -14,13 +14,14 @@ import {
   AlertTriangle, Banknote, ClipboardList, FileText, Receipt, ShieldCheck, Wallet,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { ltrText } from "../../lib/bidi";
 import { wrapDbError } from "../../lib/db";
 import { formatDate, formatMoney } from "../../lib/format";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, useTp } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, Field, LoadingState, StatCard, Table,
+  Bdi, Button, Card, EmptyState, ErrorState, Field, LoadingState, Ltr, StatCard, Table,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useCustomerPicker } from "../../lib/pickers";
@@ -224,7 +225,7 @@ export default function ReportsPage() {
           icon={<Wallet className="h-5 w-5" />}
           tone="blue"
           label={t("sales.reports.outstanding")}
-          value={money(Number(p?.outstanding_amount ?? 0))}
+          value={<Ltr>{money(Number(p?.outstanding_amount ?? 0))}</Ltr>}
           sub={t("sales.reports.outstandingHint", {
             count: String(p?.partially_paid_invoices ?? 0),
           })}
@@ -233,21 +234,21 @@ export default function ReportsPage() {
           icon={<AlertTriangle className="h-5 w-5" />}
           tone={Number(p?.overdue_amount ?? 0) > 0 ? "red" : "slate"}
           label={t("sales.reports.overdue")}
-          value={money(Number(p?.overdue_amount ?? 0))}
+          value={<Ltr>{money(Number(p?.overdue_amount ?? 0))}</Ltr>}
           sub={tp("sales.reports.invoiceCount", p?.overdue_invoices ?? 0)}
         />
         <StatCard
           icon={<Receipt className="h-5 w-5" />}
           tone="green"
           label={t("sales.reports.paid")}
-          value={money(Number(p?.paid_value ?? 0))}
+          value={<Ltr>{money(Number(p?.paid_value ?? 0))}</Ltr>}
           sub={tp("sales.reports.invoiceCount", p?.paid_invoices ?? 0)}
         />
         <StatCard
           icon={<FileText className="h-5 w-5" />}
           tone="violet"
           label={t("sales.reports.invoiced")}
-          value={money(Number(p?.invoiced_value ?? 0))}
+          value={<Ltr>{money(Number(p?.invoiced_value ?? 0))}</Ltr>}
           sub={tp("sales.reports.invoiceCount", p?.invoices_generated ?? 0)}
         />
       </div>
@@ -259,14 +260,14 @@ export default function ReportsPage() {
           tone="amber"
           label={t("sales.reports.pendingQuotes")}
           value={String(p?.pending_quotes ?? 0)}
-          sub={money(Number(p?.pending_quote_value ?? 0))}
+          sub={ltrText(money(Number(p?.pending_quote_value ?? 0)))}
         />
         <StatCard
           icon={<ClipboardList className="h-5 w-5" />}
           tone="green"
           label={t("sales.reports.acceptedQuotes")}
           value={String(p?.accepted_quotes ?? 0)}
-          sub={money(Number(p?.accepted_quote_value ?? 0))}
+          sub={ltrText(money(Number(p?.accepted_quote_value ?? 0)))}
         />
         <StatCard
           icon={<ClipboardList className="h-5 w-5" />}
@@ -279,7 +280,7 @@ export default function ReportsPage() {
           tone="blue"
           label={t("sales.reports.posReceived")}
           value={String(p?.pos_received ?? 0)}
-          sub={money(Number(p?.pos_received_value ?? 0))}
+          sub={ltrText(money(Number(p?.pos_received_value ?? 0)))}
         />
         {certificatesOn && (
           <StatCard
@@ -310,7 +311,7 @@ export default function ReportsPage() {
               <div key={key as string} className="rounded-lg border border-line p-3">
                 <p className="text-xs text-ink-3">{t(key as never)}</p>
                 <p className={`mt-1 text-sm font-semibold tabular-nums ${tone as string}`}>
-                  {money(Number(value))}
+                  <Ltr>{money(Number(value))}</Ltr>
                 </p>
               </div>
             ))}
@@ -341,19 +342,27 @@ export default function ReportsPage() {
                     to={`/customers/${r.customer_id}`}
                     className="text-brand-700 hover:underline"
                   >
-                    {r.customer_name}
+                    <Bdi>{r.customer_name}</Bdi>
                   </Link>
                 </td>
                 <td className="px-4 py-2 text-end tabular-nums">{r.open_invoices}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.not_yet_due))}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.overdue_1_30))}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.overdue_31_60))}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.overdue_61_90))}</td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.not_yet_due))}</Ltr>
+                </td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.overdue_1_30))}</Ltr>
+                </td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.overdue_31_60))}</Ltr>
+                </td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.overdue_61_90))}</Ltr>
+                </td>
                 <td className="px-4 py-2 text-end tabular-nums text-red-700">
-                  {money(Number(r.overdue_90_plus))}
+                  <Ltr>{money(Number(r.overdue_90_plus))}</Ltr>
                 </td>
                 <td className="px-4 py-2 text-end font-medium tabular-nums">
-                  {money(Number(r.outstanding))}
+                  <Ltr>{money(Number(r.outstanding))}</Ltr>
                 </td>
               </tr>
             ))}
@@ -373,10 +382,16 @@ export default function ReportsPage() {
           >
             {(revenueQ.data ?? []).map((r) => (
               <tr key={r.month} className="border-t border-line">
-                <td className="px-4 py-2">{formatDate(r.month)}</td>
+                <td className="px-4 py-2">
+                  <Ltr>{formatDate(r.month)}</Ltr>
+                </td>
                 <td className="px-4 py-2 text-end tabular-nums">{r.invoice_count}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.invoiced))}</td>
-                <td className="px-4 py-2 text-end tabular-nums">{money(Number(r.collected))}</td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.invoiced))}</Ltr>
+                </td>
+                <td className="px-4 py-2 text-end tabular-nums">
+                  <Ltr>{money(Number(r.collected))}</Ltr>
+                </td>
               </tr>
             ))}
           </Table>
@@ -420,7 +435,7 @@ export default function ReportsPage() {
                           to={`/customers/${g.customerId}`}
                           className="text-brand-700 hover:underline"
                         >
-                          {g.customerName ?? "—"}
+                          <Bdi>{g.customerName ?? "—"}</Bdi>
                         </Link>
                       ) : (
                         <span className="text-ink-3">{t("common.dash")}</span>
@@ -429,8 +444,12 @@ export default function ReportsPage() {
                     <td className="px-4 py-2 text-end tabular-nums">
                       {tp("sales.reports.certificateCount", g.certs.length)}
                     </td>
-                    <td className="px-4 py-2">{formatDate(g.oldestIssued)}</td>
-                    <td className="px-4 py-2">{formatDate(g.newestIssued)}</td>
+                    <td className="px-4 py-2">
+                      <Ltr>{formatDate(g.oldestIssued)}</Ltr>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Ltr>{formatDate(g.newestIssued)}</Ltr>
+                    </td>
                     <td className="px-4 py-2 text-end">
                       {isManager && g.customerId && (
                         <Button
@@ -497,13 +516,17 @@ export default function ReportsPage() {
                       to={`/speed-limiters/jobs/${j.job_id}`}
                       className="text-brand-700 hover:underline"
                     >
-                      #{j.job_number}
+                      <Ltr>#{j.job_number}</Ltr>
                     </Link>
                   </td>
-                  <td className="px-4 py-2">{j.customer_name ?? "—"}</td>
-                  <td className="px-4 py-2">{j.vehicle_name ?? "—"}</td>
                   <td className="px-4 py-2">
-                    {j.completed_at ? formatDate(j.completed_at) : "—"}
+                    <Bdi>{j.customer_name ?? "—"}</Bdi>
+                  </td>
+                  <td className="px-4 py-2">
+                    <Bdi>{j.vehicle_name ?? "—"}</Bdi>
+                  </td>
+                  <td className="px-4 py-2">
+                    <Ltr>{j.completed_at ? formatDate(j.completed_at) : "—"}</Ltr>
                   </td>
                 </tr>
               ))}
@@ -560,13 +583,15 @@ export default function ReportsPage() {
             >
               {(paymentsQ.data ?? []).map((pmt) => (
                 <tr key={pmt.payment_id} className="border-t border-line">
-                  <td className="px-4 py-2">{formatDate(pmt.paid_at)}</td>
+                  <td className="px-4 py-2">
+                    <Ltr>{formatDate(pmt.paid_at)}</Ltr>
+                  </td>
                   <td className="px-4 py-2">
                     <Link
                       to={`/customers/${pmt.customer_id}`}
                       className="text-brand-700 hover:underline"
                     >
-                      {pmt.customer_name}
+                      <Bdi>{pmt.customer_name}</Bdi>
                     </Link>
                   </td>
                   <td className="px-4 py-2">
@@ -574,21 +599,23 @@ export default function ReportsPage() {
                       to={`/sales/invoices/${pmt.invoice_id}`}
                       className="text-brand-700 hover:underline"
                     >
-                      {pmt.invoice_number ?? "—"}
+                      <Ltr>{pmt.invoice_number ?? "—"}</Ltr>
                     </Link>
                   </td>
                   <td className="px-4 py-2">{t(paymentMethodKey(pmt.method))}</td>
-                  <td className="px-4 py-2 text-ink-2">{pmt.reference ?? "—"}</td>
+                  <td className="px-4 py-2 text-ink-2">
+                    <Ltr>{pmt.reference ?? "—"}</Ltr>
+                  </td>
                   <td className="px-4 py-2 text-end font-medium tabular-nums">
-                    {money(Number(pmt.amount))}
+                    <Ltr>{money(Number(pmt.amount))}</Ltr>
                   </td>
                 </tr>
               ))}
             </Table>
             <p className="mt-3 text-end text-sm text-ink-2">
               {t("sales.reports.paymentsTotal", {
-                amount: money(
-                  (paymentsQ.data ?? []).reduce((sum, x) => sum + Number(x.amount), 0),
+                amount: ltrText(
+                  money((paymentsQ.data ?? []).reduce((sum, x) => sum + Number(x.amount), 0)),
                 ),
               })}
             </p>

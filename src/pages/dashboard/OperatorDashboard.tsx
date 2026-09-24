@@ -38,8 +38,10 @@ import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import {
   Badge,
+  Bdi,
   ErrorState,
   LoadingState,
+  Ltr,
   PageHeader,
   StatCard,
   Card,
@@ -513,18 +515,17 @@ export default function OperatorDashboard() {
                     {dueReminders.slice(0, 6).map(({ reminder: r, overdue }) => (
                       <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-ink">{r.task}</div>
+                          <div className="truncate text-sm font-medium text-ink">
+                            <Bdi>{r.task}</Bdi>
+                          </div>
                           <div className="truncate text-xs text-ink-3">
-                            {r.vehicles.name}
+                            <Bdi>{r.vehicles.name}</Bdi>
                             {" · "}
-                            {[
-                              r.due_date ? formatDate(r.due_date) : null,
-                              r.due_km != null
-                                ? formatDistance(r.due_km, tenant.distance_unit)
-                                : null,
-                            ]
-                              .filter(Boolean)
-                              .join(" · ")}
+                            {r.due_date && <Ltr>{formatDate(r.due_date)}</Ltr>}
+                            {r.due_date && r.due_km != null && " · "}
+                            {r.due_km != null && (
+                              <Ltr>{formatDistance(r.due_km, tenant.distance_unit)}</Ltr>
+                            )}
                           </div>
                         </div>
                         <Badge tone={overdue ? "red" : "yellow"}>
@@ -548,10 +549,18 @@ export default function OperatorDashboard() {
                         <div className="min-w-0">
                           <div className="truncate text-sm font-medium text-ink">
                             {t(renewalTypes[r.renewal_type])}
-                            {r.name ? ` — ${r.name}` : ""}
+                            {r.name ? (
+                              <>
+                                {" — "}
+                                <Bdi>{r.name}</Bdi>
+                              </>
+                            ) : (
+                              ""
+                            )}
                           </div>
                           <div className="truncate text-xs text-ink-3">
-                            {r.vehicles?.name ?? t("common.dash")} · {formatDate(r.due_date)}
+                            <Bdi>{r.vehicles?.name ?? t("common.dash")}</Bdi> ·{" "}
+                            <Ltr>{formatDate(r.due_date)}</Ltr>
                           </div>
                         </div>
                         <Badge tone={days < 0 ? "red" : days <= 30 ? "yellow" : "slate"}>
@@ -578,10 +587,11 @@ export default function OperatorDashboard() {
                       <li key={c.id} className="flex items-center justify-between gap-3 px-5 py-3">
                         <div className="min-w-0">
                           <div className="truncate text-sm font-medium text-ink">
-                            {c.certificate_number}
+                            <Ltr>{c.certificate_number}</Ltr>
                           </div>
                           <div className="truncate text-xs text-ink-3">
-                            {c.vehicles?.name ?? t("common.dash")} · {formatDate(c.expires_at)}
+                            <Bdi>{c.vehicles?.name ?? t("common.dash")}</Bdi> ·{" "}
+                            <Ltr>{formatDate(c.expires_at)}</Ltr>
                           </div>
                         </div>
                         <Badge tone={days < 0 ? "red" : "yellow"}>
@@ -619,10 +629,10 @@ export default function OperatorDashboard() {
                               to={`/maintenance/work-orders/${w.id}`}
                               className="block truncate text-sm font-medium text-brand-700 hover:underline"
                             >
-                              #{w.number} {w.title}
+                              <Ltr>#{w.number}</Ltr> <Bdi>{w.title}</Bdi>
                             </Link>
                             <div className="truncate text-xs text-ink-3">
-                              {formatDate(w.scheduled_date ?? w.created_at)}
+                              <Ltr>{formatDate(w.scheduled_date ?? w.created_at)}</Ltr>
                             </div>
                           </div>
                           <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>

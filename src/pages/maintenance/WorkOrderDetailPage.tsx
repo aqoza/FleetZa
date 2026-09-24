@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Ban, Check, Pencil, Play, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { getCountry, taxBreakdown } from "../../../shared/countries";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import {
@@ -12,7 +13,7 @@ import { priority, workOrderStatus } from "../../lib/labels";
 import type { WorkOrder, WorkOrderLine } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import {
-  Badge, Button, Card, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Badge, Bdi, Button, Card, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
 
@@ -121,7 +122,7 @@ function WorkOrderEditForm({
           hint={
             workOrder.vehicles
               ? t("maintenance.vehicleCurrentlyAt", {
-                  distance: formatDistance(workOrder.vehicles.odometer, tenant.distance_unit),
+                  distance: ltrText(formatDistance(workOrder.vehicles.odometer, tenant.distance_unit)),
                 })
               : undefined
           }
@@ -267,7 +268,7 @@ export default function WorkOrderDetailPage() {
       </Link>
       <PageHeader
         title={t("maintenance.workOrderNumber", { number: workOrder.number })}
-        description={workOrder.vehicles?.name}
+        description={bdiText(workOrder.vehicles?.name)}
         actions={
           <>
             <Badge tone={st.tone}>{t(st.labelKey)}</Badge>
@@ -343,7 +344,7 @@ export default function WorkOrderDetailPage() {
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="p-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("maintenance.details")}</h3>
-          <InfoRow label={t("maintenance.woTitle")} value={workOrder.title} />
+          <InfoRow label={t("maintenance.woTitle")} value={<Bdi>{workOrder.title}</Bdi>} />
           <InfoRow
             label={t("field.vehicle")}
             value={
@@ -352,20 +353,20 @@ export default function WorkOrderDetailPage() {
                   to={`/vehicles/${workOrder.vehicle_id}`}
                   className="text-brand-700 hover:underline"
                 >
-                  {workOrder.vehicles.name}
+                  <Bdi>{workOrder.vehicles.name}</Bdi>
                 </Link>
               ) : (
                 "—"
               )
             }
           />
-          <InfoRow label={t("field.vendor")} value={workOrder.vendor ?? "—"} />
-          <InfoRow label={t("maintenance.scheduled")} value={formatDate(workOrder.scheduled_date)} />
-          <InfoRow label={t("field.odometer")} value={formatDistance(workOrder.odometer, tenant.distance_unit)} />
-          <InfoRow label={t("maintenance.completed")} value={formatDateTime(workOrder.completed_at, tenant.timezone)} />
+          <InfoRow label={t("field.vendor")} value={<Bdi>{workOrder.vendor ?? "—"}</Bdi>} />
+          <InfoRow label={t("maintenance.scheduled")} value={<Ltr>{formatDate(workOrder.scheduled_date)}</Ltr>} />
+          <InfoRow label={t("field.odometer")} value={<Ltr>{formatDistance(workOrder.odometer, tenant.distance_unit)}</Ltr>} />
+          <InfoRow label={t("maintenance.completed")} value={<Ltr>{formatDateTime(workOrder.completed_at, tenant.timezone)}</Ltr>} />
           {workOrder.description && (
             <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
-              {workOrder.description}
+              <Bdi>{workOrder.description}</Bdi>
             </p>
           )}
         </Card>
@@ -395,13 +396,13 @@ export default function WorkOrderDetailPage() {
               {(lines ?? []).map((l) => (
                 <tr key={l.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 text-slate-600">{t(lineCategories[l.category])}</td>
-                  <td className="px-4 py-3 font-medium text-slate-800">{l.description}</td>
+                  <td className="px-4 py-3 font-medium text-slate-800"><Bdi>{l.description}</Bdi></td>
                   <td className="px-4 py-3 text-slate-600">{l.quantity}</td>
                   <td className="px-4 py-3 text-slate-600">
-                    {formatMoney(l.unit_cost, tenant.currency)}
+                    <Ltr>{formatMoney(l.unit_cost, tenant.currency)}</Ltr>
                   </td>
                   <td className="px-4 py-3 font-medium text-slate-800">
-                    {formatMoney(l.quantity * l.unit_cost, tenant.currency)}
+                    <Ltr>{formatMoney(l.quantity * l.unit_cost, tenant.currency)}</Ltr>
                   </td>
                   <td className="px-4 py-3 text-end">
                     {isManager && (
@@ -432,16 +433,16 @@ export default function WorkOrderDetailPage() {
                         {t("maintenance.subtotal")}
                       </td>
                       <td className="px-4 py-2 text-slate-700">
-                        {formatMoney(subtotal, tenant.currency)}
+                        <Ltr>{formatMoney(subtotal, tenant.currency)}</Ltr>
                       </td>
                       <td />
                     </tr>
                     <tr className="bg-slate-50">
                       <td colSpan={4} className="px-4 py-2 text-end text-slate-600">
-                        {t("maintenance.taxLine", { label: taxLabel, rate: workOrder.tax_rate })}
+                        {t("maintenance.taxLine", { label: ltrText(taxLabel), rate: workOrder.tax_rate })}
                       </td>
                       <td className="px-4 py-2 text-slate-700">
-                        {formatMoney(taxAmount, tenant.currency)}
+                        <Ltr>{formatMoney(taxAmount, tenant.currency)}</Ltr>
                       </td>
                       <td />
                     </tr>
@@ -450,7 +451,7 @@ export default function WorkOrderDetailPage() {
                         {t("maintenance.total")}
                       </td>
                       <td className="px-4 py-3 font-semibold text-slate-900">
-                        {formatMoney(total, tenant.currency)}
+                        <Ltr>{formatMoney(total, tenant.currency)}</Ltr>
                       </td>
                       <td />
                     </tr>
@@ -461,7 +462,7 @@ export default function WorkOrderDetailPage() {
                       {t("maintenance.total")}
                     </td>
                     <td className="px-4 py-3 font-semibold text-slate-900">
-                      {formatMoney(total, tenant.currency)}
+                      <Ltr>{formatMoney(total, tenant.currency)}</Ltr>
                     </td>
                     <td />
                   </tr>
@@ -537,7 +538,7 @@ export default function WorkOrderDetailPage() {
         onClose={() => setDeletingLine(null)}
       >
         <p className="text-sm text-slate-600">
-          {t("maintenance.deleteLineConfirm", { description: deletingLine?.description ?? "" })}
+          {t("maintenance.deleteLineConfirm", { description: bdiText(deletingLine?.description) })}
         </p>
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setDeletingLine(null)}>{t("action.cancel")}</Button>

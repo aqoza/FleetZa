@@ -7,7 +7,7 @@ import { formatDate } from "../../lib/format";
 import { certificateDaysLeft } from "../../lib/certificateStatus";
 import type { SlJob, SlJobStatus, SlJobType, SpeedLimiterCertificate } from "../../lib/types";
 import { useModules } from "../../context/ModulesContext";
-import { Badge, Card, EmptyState, ErrorState, LoadingState, StatCard } from "../../components/ui";
+import { Badge, Bdi, Card, EmptyState, ErrorState, LoadingState, Ltr, StatCard } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
 import { useT, useTp, type MessageKey, type Translate } from "../../i18n";
 
@@ -173,7 +173,7 @@ function BucketCard({
               <li key={cert.id} className="py-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-medium text-ink">
-                    {cert.certificate_number}
+                    <Ltr>{cert.certificate_number}</Ltr>
                   </span>
                   <span className="shrink-0 text-xs font-medium text-ink-3 tabular-nums">
                     {days < 0
@@ -183,10 +183,17 @@ function BucketCard({
                 </div>
                 <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-ink-3">
                   <span className="truncate">
-                    {[cert.customers?.name, cert.vehicles?.name].filter(Boolean).join(" · ") ||
-                      t("common.dash")}
+                    {cert.customers?.name || cert.vehicles?.name ? (
+                      <>
+                        {cert.customers?.name && <Bdi>{cert.customers.name}</Bdi>}
+                        {cert.customers?.name && cert.vehicles?.name && " · "}
+                        {cert.vehicles?.name && <Bdi>{cert.vehicles.name}</Bdi>}
+                      </>
+                    ) : (
+                      t("common.dash")
+                    )}
                   </span>
-                  <span className="shrink-0">{formatDate(cert.expires_at)}</span>
+                  <span className="shrink-0"><Ltr>{formatDate(cert.expires_at)}</Ltr></span>
                 </div>
               </li>
             );
@@ -376,7 +383,7 @@ export default function OverviewPage() {
                     <span className="text-sm text-ink-2">{t(jobTypeKey[job.job_type])}</span>
                   </div>
                   <div className="mt-0.5 truncate text-xs text-ink-3">
-                    {job.vehicles?.name ?? t("common.dash")}
+                    {job.vehicles?.name ? <Bdi>{job.vehicles.name}</Bdi> : t("common.dash")}
                   </div>
                 </div>
                 <Badge tone={jobStatusMeta[job.status].tone}>

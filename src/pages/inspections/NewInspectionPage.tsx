@@ -11,7 +11,7 @@ import type {
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import {
-  Button, Card, ErrorState, Field, Input, LoadingState, PageHeader, Select, Textarea,
+  Bdi, Button, Card, ErrorState, Field, Input, LoadingState, PageHeader, Select, Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 
@@ -208,8 +208,10 @@ export default function NewInspectionPage() {
                   value={effectiveTemplateId}
                   onChange={(e) => onTemplateChange(e.target.value)}
                 >
+                  {/* dir="auto", not bdiText(): isolate characters at the
+                      start of the text break the select's type-to-select. */}
                   {templates?.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                    <option key={t.id} value={t.id} dir="auto">{t.name}</option>
                   ))}
                 </Select>
               </Field>
@@ -241,7 +243,7 @@ export default function NewInspectionPage() {
             {grouped.map(([section, items]) => (
               <div key={section} className="mb-4 last:mb-0">
                 <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-3">
-                  {section}
+                  <Bdi>{section}</Bdi>
                 </h4>
                 <ul className="divide-y divide-slate-100">
                   {items.map((item) => {
@@ -249,7 +251,7 @@ export default function NewInspectionPage() {
                     return (
                       <li key={item.id} className="py-2.5">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm text-ink-2">{item.label}</span>
+                          <span className="text-sm text-ink-2"><Bdi>{item.label}</Bdi></span>
                           <div className="flex shrink-0 gap-1">
                             {resultOptions.map((o) => (
                               <button

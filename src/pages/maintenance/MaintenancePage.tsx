@@ -8,13 +8,14 @@ import { deleteRow, insertRow, listPage, listRows, updateRow } from "../../lib/d
 import {
   daysUntil, displayToKm, formatDate, formatDistance, formatMoney, kmToDisplay,
 } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { priority, workOrderStatus } from "../../lib/labels";
 import { useVehiclePicker } from "../../lib/pickers";
 import type { ServiceReminder, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Select, Table, Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Pagination, Select, Table, Textarea,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
@@ -286,17 +287,17 @@ function RemindersTab({
             return (
               <tr key={r.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800">{r.task}</div>
-                  {r.notes && <div className="text-xs text-slate-500">{r.notes}</div>}
+                  <div className="font-medium text-slate-800"><Bdi>{r.task}</Bdi></div>
+                  {r.notes && <div className="text-xs text-slate-500"><Bdi>{r.notes}</Bdi></div>}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{r.vehicles.name}</td>
+                <td className="px-4 py-3 text-slate-600"><Bdi>{r.vehicles.name}</Bdi></td>
                 <td className="px-4 py-3 text-slate-600">
                   {r.due_date || r.due_km != null ? (
                     <>
-                      {r.due_date && <div>{formatDate(r.due_date)}</div>}
+                      {r.due_date && <div><Ltr>{formatDate(r.due_date)}</Ltr></div>}
                       {r.due_km != null && (
                         <div className={r.due_date ? "text-xs text-slate-500" : undefined}>
-                          {formatDistance(r.due_km, tenant.distance_unit)}
+                          <Ltr>{formatDistance(r.due_km, tenant.distance_unit)}</Ltr>
                         </div>
                       )}
                     </>
@@ -307,10 +308,10 @@ function RemindersTab({
                 <td className="px-4 py-3 text-slate-600">
                   {r.last_completed_at ? (
                     <>
-                      <div>{formatDate(r.last_completed_at)}</div>
+                      <div><Ltr>{formatDate(r.last_completed_at)}</Ltr></div>
                       {r.last_completed_km != null && (
                         <div className="text-xs text-slate-500">
-                          {formatDistance(r.last_completed_km, tenant.distance_unit)}
+                          <Ltr>{formatDistance(r.last_completed_km, tenant.distance_unit)}</Ltr>
                         </div>
                       )}
                     </>
@@ -371,8 +372,8 @@ function RemindersTab({
           <>
             <p className="text-sm text-slate-600">
               {t("maintenance.deleteReminderConfirm", {
-                task: deleting.task,
-                vehicle: deleting.vehicles.name,
+                task: bdiText(deleting.task),
+                vehicle: bdiText(deleting.vehicles.name),
               })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
@@ -598,15 +599,15 @@ function WorkOrdersTab({
               const total = taxBreakdown(subtotal, w.tax_rate, currencyDecimals).total;
               return (
                 <tr key={w.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 text-slate-500">{w.number}</td>
+                  <td className="px-4 py-3 text-slate-500"><Ltr>{w.number}</Ltr></td>
                   <td className="px-4 py-3">
                     <Link
                       to={`/maintenance/work-orders/${w.id}`}
                       className="font-medium text-brand-700 hover:underline"
                     >
-                      {w.title}
+                      <Bdi>{w.title}</Bdi>
                     </Link>
-                    <div className="text-xs text-slate-500">{w.vehicles.name}</div>
+                    <div className="text-xs text-slate-500"><Bdi>{w.vehicles.name}</Bdi></div>
                   </td>
                   <td className="px-4 py-3">
                     <Badge tone={priority[w.priority].tone}>{t(priority[w.priority].labelKey)}</Badge>
@@ -616,12 +617,12 @@ function WorkOrdersTab({
                       {t(workOrderStatus[w.status].labelKey)}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{formatDate(w.scheduled_date)}</td>
+                  <td className="px-4 py-3 text-slate-600"><Ltr>{formatDate(w.scheduled_date)}</Ltr></td>
                   <td className="px-4 py-3 font-medium text-slate-800">
-                    {formatMoney(total, tenant.currency)}
+                    <Ltr>{formatMoney(total, tenant.currency)}</Ltr>
                     {w.tax_rate > 0 && (
                       <div className="text-xs font-normal text-slate-500">
-                        {t("maintenance.inclTax", { label: taxLabel, rate: w.tax_rate })}
+                        {t("maintenance.inclTax", { label: ltrText(taxLabel), rate: w.tax_rate })}
                       </div>
                     )}
                   </td>

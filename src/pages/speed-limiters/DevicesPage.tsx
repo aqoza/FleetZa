@@ -5,13 +5,14 @@ import { AlertTriangle, Archive, Cpu, History, PackageOpen, Pencil, Plus, Trash2
 import { deleteRow, insertRow, listPage, listRows, updateRow, wrapDbError, sanitizeSearch } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
+import { ltrText } from "../../lib/bidi";
 import type { SlDevice, SlDeviceStatus, SlJob, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, useTp, type MessageKey, type Translate, type TranslatePlural } from "../../i18n";
 import type { BadgeTone } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader,
   Pagination, Select, StatCard, Table, Textarea,
 } from "../../components/ui";
 
@@ -56,7 +57,7 @@ function warrantyCell(d: SlDevice, t: Translate, tp: TranslatePlural) {
     return (
       <div className="flex items-center gap-2">
         <Badge tone="slate">{t("slDevices.outOfWarranty")}</Badge>
-        <span className="text-xs text-slate-500">{formatDate(d.warranty_until)}</span>
+        <span className="text-xs text-slate-500"><Ltr>{formatDate(d.warranty_until)}</Ltr></span>
       </div>
     );
   }
@@ -64,11 +65,11 @@ function warrantyCell(d: SlDevice, t: Translate, tp: TranslatePlural) {
     return (
       <div className="flex items-center gap-2">
         <Badge tone="yellow">{tp("slDevices.warrantyDaysLeft", days)}</Badge>
-        <span className="text-xs text-slate-500">{formatDate(d.warranty_until)}</span>
+        <span className="text-xs text-slate-500"><Ltr>{formatDate(d.warranty_until)}</Ltr></span>
       </div>
     );
   }
-  return <span className="text-slate-600">{formatDate(d.warranty_until)}</span>;
+  return <span className="text-slate-600"><Ltr>{formatDate(d.warranty_until)}</Ltr></span>;
 }
 
 function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void }) {
@@ -142,7 +143,7 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
       {error && <ErrorState message={error} />}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label={t("slDevices.serialNumber")} required>
-          <Input value={form.serial} onChange={(e) => set("serial", e.target.value)} required />
+          <Input dir="ltr" value={form.serial} onChange={(e) => set("serial", e.target.value)} required />
         </Field>
         <Field label={t("common.status")}>
           <Select value={form.status} onChange={(e) => set("status", e.target.value)}>
@@ -165,12 +166,13 @@ function DeviceForm({ device, onDone }: { device?: SlDevice; onDone: () => void 
         </Field>
         <Field label={t("slDevices.firmwareVersion")}>
           <Input
+            dir="ltr"
             value={form.firmware_version}
             onChange={(e) => set("firmware_version", e.target.value)}
           />
         </Field>
         <Field label={t("slDevices.imei")}>
-          <Input value={form.imei} onChange={(e) => set("imei", e.target.value)} />
+          <Input dir="ltr" value={form.imei} onChange={(e) => set("imei", e.target.value)} />
         </Field>
         <Field label={t("slDevices.purchaseDate")}>
           <Input
@@ -250,9 +252,9 @@ function DeviceHistory({ device }: { device: SlDevice }) {
             <Badge tone={jobStatus[j.status].tone}>{t(jobStatus[j.status].labelKey)}</Badge>
           </div>
           <div className="mt-0.5 text-xs text-slate-500">
-            {j.vehicles?.name ?? "—"}
+            {j.vehicles?.name ? <Bdi>{j.vehicles.name}</Bdi> : "—"}
             {" · "}
-            {formatDate(j.created_at)}
+            <Ltr>{formatDate(j.created_at)}</Ltr>
           </div>
         </li>
       ))}
@@ -436,22 +438,27 @@ export default function DevicesPage() {
           ]}
         >
           {devices.map((d) => {
-            const sub = [d.manufacturer, d.model].filter(Boolean).join(" · ");
             return (
               <tr key={d.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800">{d.serial}</div>
-                  {sub && <div className="text-xs text-slate-500">{sub}</div>}
+                  <div className="font-medium text-slate-800"><Ltr>{d.serial}</Ltr></div>
+                  {(d.manufacturer || d.model) && (
+                    <div className="text-xs text-slate-500">
+                      {d.manufacturer && <Bdi>{d.manufacturer}</Bdi>}
+                      {d.manufacturer && d.model && " · "}
+                      {d.model && <Bdi>{d.model}</Bdi>}
+                    </div>
+                  )}
                 </td>
-                <td className="px-4 py-3 text-slate-600">{d.firmware_version ?? "—"}</td>
-                <td className="px-4 py-3 text-slate-600">{d.imei ?? "—"}</td>
+                <td className="px-4 py-3 text-slate-600"><Ltr>{d.firmware_version ?? "—"}</Ltr></td>
+                <td className="px-4 py-3 text-slate-600"><Ltr>{d.imei ?? "—"}</Ltr></td>
                 <td className="px-4 py-3">
                   {d.current_vehicle_id && d.vehicles ? (
                     <Link
                       to={`/vehicles/${d.current_vehicle_id}`}
                       className="font-medium text-brand-700 hover:underline"
                     >
-                      {d.vehicles.name}
+                      <Bdi>{d.vehicles.name}</Bdi>
                     </Link>
                   ) : (
                     <span className="text-slate-400">—</span>
@@ -517,7 +524,7 @@ export default function DevicesPage() {
       </Modal>
 
       <Modal
-        title={historyFor ? t("slDevices.historyTitle", { serial: historyFor.serial }) : ""}
+        title={historyFor ? t("slDevices.historyTitle", { serial: ltrText(historyFor.serial) }) : ""}
         open={!!historyFor}
         onClose={() => setHistoryFor(null)}
         wide
@@ -529,7 +536,7 @@ export default function DevicesPage() {
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              {t("slDevices.deleteConfirm", { serial: deleting.serial })}
+              {t("slDevices.deleteConfirm", { serial: ltrText(deleting.serial) })}
             </p>
             {deleting.status === "installed" && (
               <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">

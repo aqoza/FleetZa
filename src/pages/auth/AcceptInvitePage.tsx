@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiFetch } from "../../lib/api";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, LoadingState } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
@@ -79,10 +80,10 @@ export default function AcceptInvitePage() {
 
   return (
     <AuthShell
-      title={t("auth.joinOrg", { org: invite.organization })}
+      title={t("auth.joinOrg", { org: bdiText(invite.organization) })}
       subtitle={t("auth.invitedAs", {
         role: t(`role.${invite.role}` as MessageKey),
-        email: invite.email,
+        email: ltrText(invite.email),
       })}
     >
       <form onSubmit={onSubmit} className="space-y-4">

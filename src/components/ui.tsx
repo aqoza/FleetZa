@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
@@ -12,6 +12,38 @@ import { useT } from "../i18n";
 function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
 }
+
+// --- Bidi isolation (docs/I18N.md "Left-to-right data") ---
+
+/**
+ * Data that always reads left to right: phone numbers, emails, URLs, plates,
+ * VINs, serials, document numbers, SKUs, CR/tax numbers, IBANs — and anything
+ * from src/lib/format.ts, which formats in the tenant's en-<CC> locale. On an
+ * Arabic page the bidi algorithm otherwise reorders it ("+1 702 555 0133"
+ * renders as "0133 555 702 1+", "84,210 km" as "km 84,210"). Inline and
+ * isolated, so the surrounding alignment and sentence order are untouched.
+ */
+export function Ltr({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <span dir="ltr" className={cx("[unicode-bidi:isolate]", className)}>
+      {children}
+    </span>
+  );
+}
+
+/**
+ * User-entered text in an unknown script: customer, vehicle, driver and
+ * product names, titles, addresses. Isolated, with its direction taken from
+ * its first strong character, so "Gulf Freight Co." keeps its period at the
+ * end and an Arabic name still reads right to left. Use <Ltr> instead when the
+ * value has no letters to decide by (a phone, a bare number).
+ */
+export function Bdi({ children, className }: { children: ReactNode; className?: string }) {
+  return <bdi className={className}>{children}</bdi>;
+}
+
+/** Input types whose values are left-to-right data. */
+const LTR_INPUT_TYPES = new Set(["email", "tel", "url"]);
 
 // --- Button ---
 
@@ -84,8 +116,19 @@ export function Field({
 const inputBase =
   "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-brand-500 focus:outline-2 focus:outline-brand-500/30 disabled:bg-canvas disabled:text-ink-3";
 
+/**
+ * Free text takes its direction from what it holds (`unicode-bidi: plaintext`),
+ * so editing "Gulf Freight Co." on an Arabic page doesn't show ".Gulf Freight
+ * Co", while Arabic values and placeholders stay right to left. Skipped when
+ * the field has an explicit direction.
+ */
+const freeTextBidi = "[unicode-bidi:plaintext]";
+
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cx(inputBase, className)} {...rest} />;
+  // Emails, phone numbers and URLs are typed and read left to right on an
+  // Arabic page too. Pass `dir="ltr"` for other LTR data (VIN, IBAN, codes).
+  const dir = rest.dir ?? (rest.type && LTR_INPUT_TYPES.has(rest.type) ? "ltr" : undefined);
+  return <input className={cx(inputBase, !dir && freeTextBidi, className)} {...rest} dir={dir} />;
 }
 
 export function Select({
@@ -101,7 +144,9 @@ export function Select({
 }
 
 export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cx(inputBase, "min-h-20", className)} {...rest} />;
+  return (
+    <textarea className={cx(inputBase, "min-h-20", !rest.dir && freeTextBidi, className)} {...rest} />
+  );
 }
 
 // --- Badge ---
@@ -229,7 +274,12 @@ export function PageHeader({
         {/* Baseline-aligned rather than centred: the badge is small text next
             to a 2xl heading, and centring leaves it visibly floating. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+          {/* Record pages title themselves with user data ("Gulf Freight
+              Co.", a plate); <bdi> keeps its punctuation in place on an
+              Arabic page and is a no-op for translated titles. */}
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            <bdi>{title}</bdi>
+          </h1>
           {badge}
         </div>
         {description && <p className="mt-1 text-sm text-ink-2">{description}</p>}
@@ -266,17 +316,21 @@ export function Modal({
   busyTitle?: string;
 }) {
   const t = useT();
+  const titleId = useId();
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-sidebar/50 p-4 pt-[8vh] backdrop-blur-[2px]">
+      {/* Named by the visible heading rather than aria-label={title}: a title
+          may carry bidi isolates (ltrText/bdiText), which belong in rendered
+          text, never in an attribute. */}
       <div
         className={cx("animate-pop-in w-full rounded-2xl bg-surface shadow-pop", wide ? "max-w-2xl" : "max-w-md")}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleId}
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-          <h2 className="text-base font-semibold text-ink">{title}</h2>
+          <h2 id={titleId} className="text-base font-semibold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}

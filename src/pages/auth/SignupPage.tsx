@@ -7,6 +7,7 @@ import {
   otherCountries,
 } from "../../../shared/countries";
 import { apiFetch } from "../../lib/api";
+import { ltrText } from "../../lib/bidi";
 import type { TenantArchetype } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { Button, ErrorState, Field, Input, Select } from "../../components/ui";
@@ -62,10 +63,10 @@ export default function SignupPage() {
   const countryOptions = useMemo<ComboboxOption[]>(
     () => [
       ...MIDDLE_EAST_OPTIONS.map((c) => ({
-        value: c.code, label: c.name, meta: t("auth.middleEast"),
+        value: c.code, label: c.name, meta: t("auth.middleEast"), metaDir: "auto" as const,
       })),
       ...OTHER_OPTIONS.map((c) => ({
-        value: c.code, label: c.name, meta: t("auth.otherCountries"),
+        value: c.code, label: c.name, meta: t("auth.otherCountries"), metaDir: "auto" as const,
       })),
     ],
     [t],
@@ -207,7 +208,7 @@ export default function SignupPage() {
             required
             hint={
               tax.rate > 0
-                ? t("auth.taxHint", { label: tax.label, rate: tax.rate })
+                ? t("auth.taxHint", { label: ltrText(tax.label), rate: tax.rate })
                 : undefined
             }
           >

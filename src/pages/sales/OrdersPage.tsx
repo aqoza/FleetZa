@@ -43,6 +43,7 @@ export default function OrdersPage() {
               header: t("sales.orders.invoiced"),
               align: "end",
               minBreakpoint: "lg",
+              dir: "ltr",
               cell: (o) => (
                 <span className="text-ink-2">{formatMoney(o.invoiced_total, o.currency)}</span>
               ),

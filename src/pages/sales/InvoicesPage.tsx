@@ -49,6 +49,7 @@ export default function InvoicesPage() {
               id: "dueDate",
               header: t("sales.doc.dueDate"),
               minBreakpoint: "lg",
+              dir: "ltr",
               cell: (i) => <span className="text-ink-2">{formatDate(i.due_date)}</span>,
               sortValue: (i) => i.due_date,
               exportValue: (i) => i.due_date ?? "",
@@ -58,6 +59,7 @@ export default function InvoicesPage() {
               header: t("sales.doc.balanceDue"),
               align: "end",
               minBreakpoint: "md",
+              dir: "ltr",
               cell: (i) => {
                 const balance = balanceDue(i);
                 return (

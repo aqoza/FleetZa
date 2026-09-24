@@ -5,6 +5,7 @@ import {
   ArrowRightLeft, Ban, Check, Copy, CopyPlus, Send, ThumbsDown,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { wrapDbError } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import { quoteStatus } from "../../lib/labels";
@@ -13,7 +14,7 @@ import type { Quote, SalesOrder } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
-import { Button, ErrorState, Field, Modal, Textarea } from "../../components/ui";
+import { Bdi, Button, ErrorState, Field, Ltr, Modal, Textarea } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import { DocumentDetailShell, type ShellRenderArgs } from "./DocumentDetailShell";
 import { InfoRow, SectionCard } from "./shared";
@@ -41,7 +42,7 @@ export default function QuoteDetailPage() {
       void qc.invalidateQueries({ queryKey: ["sales_orders"] });
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
       navigate(`/sales/orders/${order.id}`);
-      toast.success(t("sales.toast.converted", { number: order.doc_number }));
+      toast.success(t("sales.toast.converted", { number: ltrText(order.doc_number) }));
     },
   });
 
@@ -54,7 +55,7 @@ export default function QuoteDetailPage() {
     onSuccess: (quote) => {
       void qc.invalidateQueries({ queryKey: ["quotes"] });
       navigate(`/sales/quotes/${quote.id}`);
-      toast.success(t("sales.toast.revised", { number: quote.doc_number }));
+      toast.success(t("sales.toast.revised", { number: ltrText(quote.doc_number) }));
     },
   });
 
@@ -157,13 +158,19 @@ export default function QuoteDetailPage() {
         dateLabel={t("sales.doc.validUntil")}
         editTitle={t("sales.quotes.edit")}
         deleteTitle={t("sales.quotes.delete")}
-        deleteConfirm={(q) => t("sales.quotes.deleteConfirm", { number: q.doc_number })}
+        deleteConfirm={(q) => t("sales.quotes.deleteConfirm", { number: ltrText(q.doc_number) })}
         isEditable={(q) => q.status === "draft"}
         isDeletable={(q) => q.status === "draft" || q.status === "canceled"}
         detailRows={(q) => (
           <>
-            <InfoRow label={t("sales.doc.issueDate")} value={formatDate(q.issue_date)} />
-            <InfoRow label={t("sales.doc.validUntil")} value={formatDate(q.valid_until)} />
+            <InfoRow
+              label={t("sales.doc.issueDate")}
+              value={<Ltr>{formatDate(q.issue_date)}</Ltr>}
+            />
+            <InfoRow
+              label={t("sales.doc.validUntil")}
+              value={<Ltr>{formatDate(q.valid_until)}</Ltr>}
+            />
             {q.revision > 1 && (
               <InfoRow
                 label={t("sales.doc.revisionOf")}
@@ -172,12 +179,15 @@ export default function QuoteDetailPage() {
             )}
             {q.accepted_by_name && (
               <InfoRow
-                label={t("sales.quotes.acceptedBy", { name: q.accepted_by_name })}
-                value={formatDate(q.accepted_at)}
+                label={t("sales.quotes.acceptedBy", { name: bdiText(q.accepted_by_name) })}
+                value={<Ltr>{formatDate(q.accepted_at)}</Ltr>}
               />
             )}
             {q.decline_reason && (
-              <InfoRow label={t("sales.quotes.declineReason")} value={q.decline_reason} />
+              <InfoRow
+                label={t("sales.quotes.declineReason")}
+                value={<Bdi>{q.decline_reason}</Bdi>}
+              />
             )}
           </>
         )}
