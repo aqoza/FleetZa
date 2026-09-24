@@ -17,6 +17,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          name: string
+          revoked_at: string | null
+          scopes: string[]
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          name: string
+          revoked_at?: string | null
+          scopes?: string[]
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          name?: string
+          revoked_at?: string | null
+          scopes?: string[]
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -49,6 +108,159 @@ export type Database = {
           tenant_id?: string
         }
         Relationships: []
+      }
+      branches: {
+        Row: {
+          active: boolean
+          address: string | null
+          city: string | null
+          code: string | null
+          company_id: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          manager_employee_id: string | null
+          name: string
+          name_ar: string | null
+          phone: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          code?: string | null
+          company_id?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_employee_id?: string | null
+          name: string
+          name_ar?: string | null
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          code?: string | null
+          company_id?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_employee_id?: string | null
+          name?: string
+          name_ar?: string | null
+          phone?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "branches_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "branches_manager_employee_id_fkey"
+            columns: ["manager_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "branches_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          active: boolean
+          address: string | null
+          city: string | null
+          country: string | null
+          cr_number: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          email: string | null
+          id: string
+          is_default: boolean
+          legal_name: string
+          name_ar: string | null
+          phone: string | null
+          tax_number: string | null
+          tenant_id: string
+          trade_name: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          email?: string | null
+          id?: string
+          is_default?: boolean
+          legal_name: string
+          name_ar?: string | null
+          phone?: string | null
+          tax_number?: string | null
+          tenant_id?: string
+          trade_name?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          email?: string | null
+          id?: string
+          is_default?: boolean
+          legal_name?: string
+          name_ar?: string | null
+          phone?: string | null
+          tax_number?: string | null
+          tenant_id?: string
+          trade_name?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companies_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contacts: {
         Row: {
@@ -200,20 +412,87 @@ export type Database = {
           },
         ]
       }
+      departments: {
+        Row: {
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          manager_employee_id: string | null
+          name: string
+          name_ar: string | null
+          parent_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_employee_id?: string | null
+          name: string
+          name_ar?: string | null
+          parent_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manager_employee_id?: string | null
+          name?: string
+          name_ar?: string | null
+          parent_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "departments_manager_employee_id_fkey"
+            columns: ["manager_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "departments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_sequences: {
         Row: {
           doc_type: string
           next_number: number
+          prefix: string | null
           tenant_id: string
         }
         Insert: {
           doc_type: string
           next_number?: number
+          prefix?: string | null
           tenant_id: string
         }
         Update: {
           doc_type?: string
           next_number?: number
+          prefix?: string | null
           tenant_id?: string
         }
         Relationships: [
@@ -226,8 +505,118 @@ export type Database = {
           },
         ]
       }
+      documents: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          entity_id: string | null
+          entity_type: string | null
+          expires_on: string | null
+          id: string
+          mime_type: string | null
+          name: string
+          size_bytes: number | null
+          storage_path: string
+          tags: string[]
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expires_on?: string | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          size_bytes?: number | null
+          storage_path: string
+          tags?: string[]
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          expires_on?: string | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          size_bytes?: number | null
+          storage_path?: string
+          tags?: string[]
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      domain_events: {
+        Row: {
+          actor: string | null
+          dedupe_key: string | null
+          entity_id: string | null
+          entity_type: string | null
+          event: string
+          id: number
+          occurred_at: string
+          payload: Json
+          tenant_id: string
+        }
+        Insert: {
+          actor?: string | null
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event: string
+          id?: never
+          occurred_at?: string
+          payload?: Json
+          tenant_id: string
+        }
+        Update: {
+          actor?: string | null
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event?: string
+          id?: never
+          occurred_at?: string
+          payload?: Json
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domain_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
+          branch_id: string | null
           created_at: string
           created_by: string | null
           email: string | null
@@ -246,6 +635,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          branch_id?: string | null
           created_at?: string
           created_by?: string | null
           email?: string | null
@@ -264,6 +654,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          branch_id?: string | null
           created_at?: string
           created_by?: string | null
           email?: string | null
@@ -283,10 +674,211 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "drivers_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "drivers_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          address: string | null
+          bank_name: string | null
+          basic_salary: number | null
+          birth_date: string | null
+          branch_id: string | null
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          doc_number: string | null
+          driver_id: string | null
+          email: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          employment_type: string
+          first_name: string
+          gender: string | null
+          hire_date: string | null
+          hourly_rate: number | null
+          housing_allowance: number | null
+          iban: string | null
+          id: string
+          job_title: string | null
+          last_name: string | null
+          manager_id: string | null
+          name_ar: string | null
+          national_id: string | null
+          nationality: string | null
+          notes: string | null
+          number: number | null
+          other_allowance: number | null
+          passport_expiry: string | null
+          passport_number: string | null
+          phone: string | null
+          residence_permit_expiry: string | null
+          residence_permit_number: string | null
+          sl_technician_id: string | null
+          social_insurance_number: string | null
+          status: string
+          tenant_id: string
+          termination_date: string | null
+          transport_allowance: number | null
+          updated_at: string
+          updated_by: string | null
+          user_id: string | null
+          work_permit_expiry: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_name?: string | null
+          basic_salary?: number | null
+          birth_date?: string | null
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string
+          first_name: string
+          gender?: string | null
+          hire_date?: string | null
+          hourly_rate?: number | null
+          housing_allowance?: number | null
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          manager_id?: string | null
+          name_ar?: string | null
+          national_id?: string | null
+          nationality?: string | null
+          notes?: string | null
+          number?: number | null
+          other_allowance?: number | null
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          residence_permit_expiry?: string | null
+          residence_permit_number?: string | null
+          sl_technician_id?: string | null
+          social_insurance_number?: string | null
+          status?: string
+          tenant_id?: string
+          termination_date?: string | null
+          transport_allowance?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+          work_permit_expiry?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_name?: string | null
+          basic_salary?: number | null
+          birth_date?: string | null
+          branch_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          email?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          employment_type?: string
+          first_name?: string
+          gender?: string | null
+          hire_date?: string | null
+          hourly_rate?: number | null
+          housing_allowance?: number | null
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          manager_id?: string | null
+          name_ar?: string | null
+          national_id?: string | null
+          nationality?: string | null
+          notes?: string | null
+          number?: number | null
+          other_allowance?: number | null
+          passport_expiry?: string | null
+          passport_number?: string | null
+          phone?: string | null
+          residence_permit_expiry?: string | null
+          residence_permit_number?: string | null
+          sl_technician_id?: string | null
+          social_insurance_number?: string | null
+          status?: string
+          tenant_id?: string
+          termination_date?: string | null
+          transport_allowance?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          user_id?: string | null
+          work_permit_expiry?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_sl_technician_id_fkey"
+            columns: ["sl_technician_id"]
+            isOneToOne: false
+            referencedRelation: "sl_technicians"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -481,6 +1073,103 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          active: boolean
+          barcode: string | null
+          category: string | null
+          cost_price: number
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          item_type: string
+          name: string
+          name_ar: string | null
+          preferred_supplier_id: string | null
+          product_id: string | null
+          reorder_point: number | null
+          reorder_qty: number | null
+          sale_price: number | null
+          sku: string | null
+          tenant_id: string
+          track_stock: boolean
+          uom: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          barcode?: string | null
+          category?: string | null
+          cost_price?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          item_type?: string
+          name: string
+          name_ar?: string | null
+          preferred_supplier_id?: string | null
+          product_id?: string | null
+          reorder_point?: number | null
+          reorder_qty?: number | null
+          sale_price?: number | null
+          sku?: string | null
+          tenant_id?: string
+          track_stock?: boolean
+          uom?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          barcode?: string | null
+          category?: string | null
+          cost_price?: number
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          item_type?: string
+          name?: string
+          name_ar?: string | null
+          preferred_supplier_id?: string | null
+          product_id?: string | null
+          reorder_point?: number | null
+          reorder_qty?: number | null
+          sale_price?: number | null
+          sku?: string | null
+          tenant_id?: string
+          track_stock?: boolean
+          uom?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_preferred_supplier_id_fkey"
+            columns: ["preferred_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -911,6 +1600,143 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          muted: boolean
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          muted?: boolean
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          muted?: boolean
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_state: {
+        Row: {
+          last_scan_at: string | null
+          last_scan_count: number | null
+          tenant_id: string
+        }
+        Insert: {
+          last_scan_at?: string | null
+          last_scan_count?: number | null
+          tenant_id: string
+        }
+        Update: {
+          last_scan_at?: string | null
+          last_scan_count?: number | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_state_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          dedupe_key: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          kind: string
+          link: string | null
+          params: Json
+          read_at: string | null
+          recipient_id: string
+          severity: string
+          tenant_id: string
+          title: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          kind: string
+          link?: string | null
+          params?: Json
+          read_at?: string | null
+          recipient_id: string
+          severity?: string
+          tenant_id: string
+          title: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          kind?: string
+          link?: string | null
+          params?: Json
+          read_at?: string | null
+          recipient_id?: string
+          severity?: string
+          tenant_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1073,6 +1899,7 @@ export type Database = {
       }
       quote_lines: {
         Row: {
+          certificate_id: string | null
           created_at: string
           created_by: string | null
           description: string
@@ -1096,6 +1923,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description: string
@@ -1119,6 +1947,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
@@ -1142,6 +1971,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "quote_lines_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "quote_lines_product_id_fkey"
             columns: ["product_id"]
@@ -1428,6 +2264,7 @@ export type Database = {
       }
       sales_order_lines: {
         Row: {
+          certificate_id: string | null
           created_at: string
           created_by: string | null
           description: string
@@ -1451,6 +2288,7 @@ export type Database = {
           vehicle_id: string | null
         }
         Insert: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description: string
@@ -1474,6 +2312,7 @@ export type Database = {
           vehicle_id?: string | null
         }
         Update: {
+          certificate_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string
@@ -1497,6 +2336,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sales_order_lines_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "speed_limiter_certificates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sales_order_lines_product_id_fkey"
             columns: ["product_id"]
@@ -2399,6 +3245,292 @@ export type Database = {
           },
         ]
       }
+      stock_levels: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          item_id: string
+          on_hand: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id: string
+          on_hand?: number
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id?: string
+          on_hand?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_levels_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_levels_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_levels_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_moves: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          item_id: string
+          move_type: string
+          moved_at: string
+          notes: string | null
+          on_hand_after: number | null
+          quantity: number
+          reference_id: string | null
+          reference_type: string | null
+          tenant_id: string
+          unit_cost: number | null
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id: string
+          move_type: string
+          moved_at?: string
+          notes?: string | null
+          on_hand_after?: number | null
+          quantity: number
+          reference_id?: string | null
+          reference_type?: string | null
+          tenant_id: string
+          unit_cost?: number | null
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id?: string
+          move_type?: string
+          moved_at?: string
+          notes?: string | null
+          on_hand_after?: number | null
+          quantity?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          tenant_id?: string
+          unit_cost?: number | null
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_moves_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_moves_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_contacts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          is_primary: boolean
+          name: string
+          phone: string | null
+          supplier_id: string
+          tenant_id: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          name: string
+          phone?: string | null
+          supplier_id: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_primary?: boolean
+          name?: string
+          phone?: string | null
+          supplier_id?: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_contacts_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_contacts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          bank_name: string | null
+          city: string | null
+          country: string | null
+          cr_number: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          doc_number: string | null
+          email: string | null
+          iban: string | null
+          id: string
+          name: string
+          name_ar: string | null
+          notes: string | null
+          number: number | null
+          payment_terms_days: number | null
+          phone: string | null
+          rating: number | null
+          status: string
+          supplier_type: string
+          tax_number: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          bank_name?: string | null
+          city?: string | null
+          country?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          doc_number?: string | null
+          email?: string | null
+          iban?: string | null
+          id?: string
+          name: string
+          name_ar?: string | null
+          notes?: string | null
+          number?: number | null
+          payment_terms_days?: number | null
+          phone?: string | null
+          rating?: number | null
+          status?: string
+          supplier_type?: string
+          tax_number?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          bank_name?: string | null
+          city?: string | null
+          country?: string | null
+          cr_number?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          doc_number?: string | null
+          email?: string | null
+          iban?: string | null
+          id?: string
+          name?: string
+          name_ar?: string | null
+          notes?: string | null
+          number?: number | null
+          payment_terms_days?: number | null
+          phone?: string | null
+          rating?: number | null
+          status?: string
+          supplier_type?: string
+          tax_number?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_modules: {
         Row: {
           enabled: boolean
@@ -2596,6 +3728,7 @@ export type Database = {
       }
       vehicles: {
         Row: {
+          branch_id: string | null
           chassis_number: string | null
           created_at: string
           created_by: string | null
@@ -2623,6 +3756,7 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          branch_id?: string | null
           chassis_number?: string | null
           created_at?: string
           created_by?: string | null
@@ -2650,6 +3784,7 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          branch_id?: string | null
           chassis_number?: string | null
           created_at?: string
           created_by?: string | null
@@ -2678,6 +3813,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "vehicles_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "vehicles_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
@@ -2693,6 +3835,69 @@ export type Database = {
           },
           {
             foreignKeyName: "vehicles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      warehouses: {
+        Row: {
+          active: boolean
+          address: string | null
+          branch_id: string | null
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_default: boolean
+          name: string
+          name_ar: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          address?: string | null
+          branch_id?: string | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_default?: boolean
+          name: string
+          name_ar?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          address?: string | null
+          branch_id?: string | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_default?: boolean
+          name?: string
+          name_ar?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouses_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouses_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -3010,6 +4215,19 @@ export type Database = {
           total: number
         }[]
       }
+      certificate_quote_status: {
+        Args: { p_certificate_ids: string[] }
+        Returns: {
+          certificate_id: string
+          order_id: string
+          order_number: string
+          order_status: string
+          quote_id: string
+          quote_number: string
+          quote_status: string
+          valid_until: string
+        }[]
+      }
       complete_sl_job: {
         Args: {
           p_customer_signed?: boolean
@@ -3068,6 +4286,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      create_api_key: {
+        Args: { p_expires_at?: string; p_name: string; p_scopes: string[] }
+        Returns: string
       }
       create_invoice_from_certificates: {
         Args: {
@@ -3208,6 +4430,59 @@ export type Database = {
               isSetofReturn: false
             }
           }
+      create_quote_from_certificates: {
+        Args: {
+          p_certificate_ids: string[]
+          p_description?: string
+          p_product_id?: string
+          p_tax_rate?: number
+          p_unit_price?: number
+        }
+        Returns: {
+          accepted_at: string | null
+          accepted_by_name: string | null
+          certificate_id: string | null
+          contact_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string
+          customer_reference: string | null
+          decline_reason: string | null
+          declined_at: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          internal_notes: string | null
+          issue_date: string
+          job_id: string | null
+          notes: string | null
+          number: number | null
+          public_token: string
+          revision: number
+          revision_of: string | null
+          sales_order_id: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          title: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          valid_until: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -3260,6 +4535,7 @@ export type Database = {
         }
       }
       next_certificate_number: { Args: never; Returns: string }
+      refresh_notifications: { Args: { p_force?: boolean }; Returns: number }
       report_cost_by_vehicle: {
         Args: { p_from: string; p_ownership?: string; p_to: string }
         Returns: {
@@ -3329,6 +4605,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      revoke_api_key: { Args: { p_id: string }; Returns: undefined }
       sales_order_line_balance: {
         Args: { p_order_id: string }
         Returns: {
@@ -3406,6 +4683,7 @@ export type Database = {
           pending_quotes: number
           pos_received: number
           pos_received_value: number
+          renewals_to_quote: number
         }[]
       }
       sales_report_receivables: {
@@ -3421,6 +4699,20 @@ export type Database = {
           overdue_31_60: number
           overdue_61_90: number
           overdue_90_plus: number
+        }[]
+      }
+      sales_report_renewals_to_quote: {
+        Args: { p_customer_id?: string; p_days?: number }
+        Returns: {
+          certificate_id: string
+          certificate_number: string
+          customer_id: string
+          customer_name: string
+          expires_at: string
+          issued_at: string
+          license_plate: string
+          vehicle_id: string
+          vehicle_name: string
         }[]
       }
       sales_report_revenue: {
@@ -3445,9 +4737,54 @@ export type Database = {
           outstanding_amount: number
           overdue_amount: number
           overdue_invoices: number
+          renewals_to_quote: number
           unbilled_certificates: number
           unbilled_order_value: number
         }[]
+      }
+      set_document_prefix: {
+        Args: { p_doc_type: string; p_prefix: string }
+        Returns: undefined
+      }
+      stock_adjust: {
+        Args: {
+          p_item: string
+          p_new_on_hand: number
+          p_notes?: string
+          p_warehouse: string
+        }
+        Returns: string
+      }
+      stock_issue: {
+        Args: {
+          p_item: string
+          p_notes?: string
+          p_qty: number
+          p_ref_id?: string
+          p_ref_type?: string
+          p_warehouse: string
+        }
+        Returns: string
+      }
+      stock_receive: {
+        Args: {
+          p_item: string
+          p_notes?: string
+          p_qty: number
+          p_unit_cost?: number
+          p_warehouse: string
+        }
+        Returns: string
+      }
+      stock_transfer: {
+        Args: {
+          p_from_warehouse: string
+          p_item: string
+          p_notes?: string
+          p_qty: number
+          p_to_warehouse: string
+        }
+        Returns: string
       }
     }
     Enums: {
@@ -3467,12 +4804,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3496,11 +4833,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3521,11 +4858,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3546,11 +4883,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3563,11 +4900,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

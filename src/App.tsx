@@ -37,6 +37,42 @@ const SalesHub = lazy(() => import("./pages/sales/SalesHub"));
 const PublicQuotePage = lazy(() => import("./pages/sales/PublicQuotePage"));
 const CustomersPage = lazy(() => import("./pages/customers/CustomersPage"));
 const CustomerDetailPage = lazy(() => import("./pages/customers/CustomerDetailPage"));
+// Module hubs: each owns its sub-routes and ships as its own chunk.
+const GpsTrackingHub = lazy(() => import("./pages/gps-tracking/GpsTrackingHub"));
+const DriverBehaviorHub = lazy(() => import("./pages/driver-behavior/DriverBehaviorHub"));
+const TripsHub = lazy(() => import("./pages/trips/TripsHub"));
+const DispatchHub = lazy(() => import("./pages/dispatch/DispatchHub"));
+const WorkshopHub = lazy(() => import("./pages/workshop/WorkshopHub"));
+const PredictiveHub = lazy(() => import("./pages/predictive/PredictiveHub"));
+const InsuranceHub = lazy(() => import("./pages/insurance/InsuranceHub"));
+const IncidentsHub = lazy(() => import("./pages/incidents/IncidentsHub"));
+const RegulatoryHub = lazy(() => import("./pages/regulatory/RegulatoryHub"));
+const TmsHub = lazy(() => import("./pages/tms/TmsHub"));
+const DeliveriesHub = lazy(() => import("./pages/deliveries/DeliveriesHub"));
+const AssetsHub = lazy(() => import("./pages/assets/AssetsHub"));
+const InventoryHub = lazy(() => import("./pages/inventory/InventoryHub"));
+const PurchasingHub = lazy(() => import("./pages/purchasing/PurchasingHub"));
+const PosHub = lazy(() => import("./pages/pos/PosHub"));
+const CrmHub = lazy(() => import("./pages/crm/CrmHub"));
+const FinanceHub = lazy(() => import("./pages/finance/FinanceHub"));
+const ContractsHub = lazy(() => import("./pages/contracts/ContractsHub"));
+const HrHub = lazy(() => import("./pages/hr/HrHub"));
+const FieldHub = lazy(() => import("./pages/field/FieldHub"));
+const EmployeesHub = lazy(() => import("./pages/employees/EmployeesHub"));
+const SuppliersHub = lazy(() => import("./pages/suppliers/SuppliersHub"));
+const CustomerPortalHub = lazy(() => import("./pages/customer-portal/CustomerPortalHub"));
+const VendorPortalHub = lazy(() => import("./pages/vendor-portal/VendorPortalHub"));
+const AnalyticsHub = lazy(() => import("./pages/analytics/AnalyticsHub"));
+const DocumentsHub = lazy(() => import("./pages/documents/DocumentsHub"));
+const AutomationHub = lazy(() => import("./pages/automation/AutomationHub"));
+const IntegrationsHub = lazy(() => import("./pages/integrations/IntegrationsHub"));
+const IotHub = lazy(() => import("./pages/iot/IotHub"));
+const NotificationsHub = lazy(() => import("./pages/notifications/NotificationsHub"));
+const SecurityHub = lazy(() => import("./pages/security/SecurityHub"));
+const CompaniesHub = lazy(() => import("./pages/companies/CompaniesHub"));
+const PublicPortalPage = lazy(() => import("./pages/customer-portal/PublicPortalPage"));
+const PublicVendorPage = lazy(() => import("./pages/vendor-portal/PublicVendorPage"));
+const PublicTrackingPage = lazy(() => import("./pages/deliveries/PublicTrackingPage"));
 
 /**
  * The query client is built inside the tree so it can reach the toast API.
@@ -118,6 +154,31 @@ export default function App() {
               }
             />
 
+            {/* Public capability links (portal, vendor portal, delivery tracking) — no auth. */}
+            <Route
+              path="/portal/:token"
+              element={
+                <Suspense fallback={<LoadingState />}>
+                  <PublicPortalPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/vendor/:token"
+              element={
+                <Suspense fallback={<LoadingState />}>
+                  <PublicVendorPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/track/:token"
+              element={
+                <Suspense fallback={<LoadingState />}>
+                  <PublicTrackingPage />
+                </Suspense>
+              }
+            />
             <Route element={<Protected />}>
               <Route element={<AppLayout />}>
                 <Route
@@ -218,6 +279,326 @@ export default function App() {
                     <Suspense fallback={<LoadingState />}>
                       <ModuleGate module="reports">
                         <ReportsPage />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/gps/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="gps_tracking">
+                        <GpsTrackingHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/driver-behavior/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="driver_behavior">
+                        <DriverBehaviorHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/trips/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="trip_planning">
+                        <TripsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/dispatch/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="dispatch">
+                        <DispatchHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/workshop/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="workshop">
+                        <WorkshopHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/predictive/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="predictive_ai">
+                        <PredictiveHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/insurance/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="insurance_mgmt">
+                        <InsuranceHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/incidents/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="incidents">
+                        <IncidentsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/regulatory/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="regulatory">
+                        <RegulatoryHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/tms/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="tms">
+                        <TmsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/deliveries/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="logistics_delivery">
+                        <DeliveriesHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/assets/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="assets">
+                        <AssetsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/inventory/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="inventory">
+                        <InventoryHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/purchasing/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="purchasing">
+                        <PurchasingHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/pos/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="pos">
+                        <PosHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/crm/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="crm">
+                        <CrmHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/finance/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="finance">
+                        <FinanceHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/contracts/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="contracts">
+                        <ContractsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/hr/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="payroll_hr">
+                        <HrHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/field/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="mobile_workforce">
+                        <FieldHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/employees/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="employees">
+                        <EmployeesHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/suppliers/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="suppliers">
+                        <SuppliersHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/customer-portal/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="customer_portal">
+                        <CustomerPortalHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/vendor-portal/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="vendor_portal">
+                        <VendorPortalHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/analytics/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="bi_analytics">
+                        <AnalyticsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/documents/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="documents">
+                        <DocumentsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/automation/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="workflow_automation">
+                        <AutomationHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/integrations/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="integrations">
+                        <IntegrationsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/iot/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="iot_devices">
+                        <IotHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/notifications/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="notifications">
+                        <NotificationsHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/security/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="audit_security">
+                        <SecurityHub />
+                      </ModuleGate>
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/companies/*"
+                  element={
+                    <Suspense fallback={<LoadingState />}>
+                      <ModuleGate module="multi_company">
+                        <CompaniesHub />
                       </ModuleGate>
                     </Suspense>
                   }

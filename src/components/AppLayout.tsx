@@ -57,10 +57,13 @@ export default function AppLayout() {
 
   /** Narrow dark rail: brand mark + icon-only shortcuts for the enabled nav. */
   const iconRail = (
-    <div className="flex h-full w-14 flex-col items-center gap-1 bg-sidebar py-4">
-      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white shadow-sm">
+    <div className="flex h-full w-14 flex-col items-center bg-sidebar py-4">
+      <div className="mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-sm font-bold text-white shadow-sm">
         F
       </div>
+      {/* A tenant with most modules on has more shortcuts than a laptop screen
+          is tall: the list scrolls inside the rail instead of the page. */}
+      <div className="flex min-h-0 w-full flex-1 flex-col items-center gap-1 overflow-y-auto [scrollbar-width:none]">
       {enabledItems.map(({ to, labelKey: itemKey, icon: Icon, end }) => (
         <NavLink
           key={to}
@@ -70,7 +73,7 @@ export default function AppLayout() {
           aria-label={t(itemKey)}
           onClick={() => setMobileOpen(false)}
           className={({ isActive }) =>
-            `flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+            `flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
               isActive
                 ? "bg-sidebar-2 text-brand-400"
                 : "text-slate-500 hover:bg-sidebar-2 hover:text-slate-300"
@@ -80,6 +83,7 @@ export default function AppLayout() {
           <Icon className="h-4.5 w-4.5" />
         </NavLink>
       ))}
+      </div>
     </div>
   );
 

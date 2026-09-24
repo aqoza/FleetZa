@@ -1,0 +1,83 @@
+{
+  "tables": {
+    "quotes": [
+      {
+        "id": "9e0a1b2c-0001-4d5e-8f90-a1b2c3d4e501",
+        "customer_id": "c1a0e5f2-3b4d-4e6f-8a9b-0c1d2e3f4a51",
+        "vehicle_id": "a7e1c0de-0003-4b2c-9d3e-4f5a6b7c8d03",
+        "doc_number": "QT-2026-0007",
+        "number": 7,
+        "title": "Speed limiter install — GF Tractor 7",
+        "status": "sent",
+        "issue_date": "2026-09-15",
+        "valid_until": "2026-09-30",
+        "sent_at": "2026-09-15T10:00:00.000Z",
+        "currency": "USD",
+        "currency_decimals": 2,
+        "subtotal": 1200,
+        "discount_total": 0,
+        "tax_total": 0,
+        "total": 1200,
+        "revision": 1,
+        "public_token": "smoke-public-token-7",
+        "customer_reference": "PO-88121"
+      },
+      {
+        "id": "9e0a1b2c-0002-4d5e-8f90-a1b2c3d4e502",
+        "customer_id": "c1a0e5f2-3b4d-4e6f-8a9b-0c1d2e3f4a52",
+        "doc_number": null,
+        "number": null,
+        "title": "Annual compliance package",
+        "status": "draft",
+        "issue_date": "2026-09-22",
+        "valid_until": null,
+        "currency": "USD",
+        "currency_decimals": 2,
+        "subtotal": 4800,
+        "discount_total": 300,
+        "tax_total": 0,
+        "total": 4500,
+        "revision": 1,
+        "public_token": "smoke-public-token-8"
+      }
+    ],
+    "quote_lines": [
+      {
+        "id": "9e0a1b2c-1001-4d5e-8f90-a1b2c3d4e511",
+        "quote_id": "9e0a1b2c-0001-4d5e-8f90-a1b2c3d4e501",
+        "sort_order": 1,
+        "description": "Speed limiter unit + installation",
+        "quantity": 1,
+        "unit": "ea",
+        "unit_price": 1200,
+        "discount_percent": 0,
+        "tax_rate": 0,
+        "line_gross": 1200,
+        "line_discount": 0,
+        "line_net": 1200,
+        "line_tax": 0,
+        "line_total": 1200
+      }
+    ],
+    "audit_events": [
+      {
+        "id": 1,
+        "action": "insert",
+        "table_name": "quotes",
+        "row_id": "9e0a1b2c-0001-4d5e-8f90-a1b2c3d4e501",
+        "actor": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+        "at": "2026-09-15T10:00:00.000Z",
+        "diff": null
+      }
+    ]
+  },
+  "rpc": {
+    "sales_order_line_balance": [],
+    "next_certificate_number": "RSL-2026-00042"
+  },
+  "api": {
+    "GET /api/verify/*": { "valid": true, "certificate_number": "RSL-2026-00042" },
+    "PATCH /api/members/*": { "ok": true },
+    "POST /api/invitations/accept": { "__status": 400, "__body": { "error": "Invitation expired" } }
+  }
+}

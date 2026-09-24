@@ -60,6 +60,70 @@ import { enSales } from "./messages/en/sales";
 import { arSales } from "./messages/ar/sales";
 import { enSlCertificates } from "./messages/en/slCertificates";
 import { arSlCertificates } from "./messages/ar/slCertificates";
+import { enGpsTracking } from "./messages/en/gpsTracking";
+import { arGpsTracking } from "./messages/ar/gpsTracking";
+import { enDriverBehavior } from "./messages/en/driverBehavior";
+import { arDriverBehavior } from "./messages/ar/driverBehavior";
+import { enTrips } from "./messages/en/trips";
+import { arTrips } from "./messages/ar/trips";
+import { enDispatch } from "./messages/en/dispatch";
+import { arDispatch } from "./messages/ar/dispatch";
+import { enWorkshop } from "./messages/en/workshop";
+import { arWorkshop } from "./messages/ar/workshop";
+import { enPredictive } from "./messages/en/predictive";
+import { arPredictive } from "./messages/ar/predictive";
+import { enInsurance } from "./messages/en/insurance";
+import { arInsurance } from "./messages/ar/insurance";
+import { enIncidents } from "./messages/en/incidents";
+import { arIncidents } from "./messages/ar/incidents";
+import { enRegulatory } from "./messages/en/regulatory";
+import { arRegulatory } from "./messages/ar/regulatory";
+import { enTms } from "./messages/en/tms";
+import { arTms } from "./messages/ar/tms";
+import { enDeliveries } from "./messages/en/deliveries";
+import { arDeliveries } from "./messages/ar/deliveries";
+import { enAssets } from "./messages/en/assets";
+import { arAssets } from "./messages/ar/assets";
+import { enInventory } from "./messages/en/inventory";
+import { arInventory } from "./messages/ar/inventory";
+import { enPurchasing } from "./messages/en/purchasing";
+import { arPurchasing } from "./messages/ar/purchasing";
+import { enPos } from "./messages/en/pos";
+import { arPos } from "./messages/ar/pos";
+import { enCrm } from "./messages/en/crm";
+import { arCrm } from "./messages/ar/crm";
+import { enFinance } from "./messages/en/finance";
+import { arFinance } from "./messages/ar/finance";
+import { enContracts } from "./messages/en/contracts";
+import { arContracts } from "./messages/ar/contracts";
+import { enHr } from "./messages/en/hr";
+import { arHr } from "./messages/ar/hr";
+import { enField } from "./messages/en/field";
+import { arField } from "./messages/ar/field";
+import { enEmployees } from "./messages/en/employees";
+import { arEmployees } from "./messages/ar/employees";
+import { enSuppliers } from "./messages/en/suppliers";
+import { arSuppliers } from "./messages/ar/suppliers";
+import { enCustomerPortal } from "./messages/en/customerPortal";
+import { arCustomerPortal } from "./messages/ar/customerPortal";
+import { enVendorPortal } from "./messages/en/vendorPortal";
+import { arVendorPortal } from "./messages/ar/vendorPortal";
+import { enAnalytics } from "./messages/en/analytics";
+import { arAnalytics } from "./messages/ar/analytics";
+import { enDocuments } from "./messages/en/documents";
+import { arDocuments } from "./messages/ar/documents";
+import { enAutomation } from "./messages/en/automation";
+import { arAutomation } from "./messages/ar/automation";
+import { enIntegrations } from "./messages/en/integrations";
+import { arIntegrations } from "./messages/ar/integrations";
+import { enIot } from "./messages/en/iot";
+import { arIot } from "./messages/ar/iot";
+import { enNotifications } from "./messages/en/notifications";
+import { arNotifications } from "./messages/ar/notifications";
+import { enSecurity } from "./messages/en/security";
+import { arSecurity } from "./messages/ar/security";
+import { enCompanies } from "./messages/en/companies";
+import { arCompanies } from "./messages/ar/companies";
 import { enErrors } from "./messages/en/errors";
 import { arErrors } from "./messages/ar/errors";
 
@@ -91,6 +155,38 @@ const en = {
   ...enSlJobs,
   ...enSales,
   ...enSlCertificates,
+  ...enGpsTracking,
+  ...enDriverBehavior,
+  ...enTrips,
+  ...enDispatch,
+  ...enWorkshop,
+  ...enPredictive,
+  ...enInsurance,
+  ...enIncidents,
+  ...enRegulatory,
+  ...enTms,
+  ...enDeliveries,
+  ...enAssets,
+  ...enInventory,
+  ...enPurchasing,
+  ...enPos,
+  ...enCrm,
+  ...enFinance,
+  ...enContracts,
+  ...enHr,
+  ...enField,
+  ...enEmployees,
+  ...enSuppliers,
+  ...enCustomerPortal,
+  ...enVendorPortal,
+  ...enAnalytics,
+  ...enDocuments,
+  ...enAutomation,
+  ...enIntegrations,
+  ...enIot,
+  ...enNotifications,
+  ...enSecurity,
+  ...enCompanies,
   ...enErrors,
 };
 
@@ -114,6 +210,38 @@ const ar: Record<string, string> = {
   ...arSlJobs,
   ...arSales,
   ...arSlCertificates,
+  ...arGpsTracking,
+  ...arDriverBehavior,
+  ...arTrips,
+  ...arDispatch,
+  ...arWorkshop,
+  ...arPredictive,
+  ...arInsurance,
+  ...arIncidents,
+  ...arRegulatory,
+  ...arTms,
+  ...arDeliveries,
+  ...arAssets,
+  ...arInventory,
+  ...arPurchasing,
+  ...arPos,
+  ...arCrm,
+  ...arFinance,
+  ...arContracts,
+  ...arHr,
+  ...arField,
+  ...arEmployees,
+  ...arSuppliers,
+  ...arCustomerPortal,
+  ...arVendorPortal,
+  ...arAnalytics,
+  ...arDocuments,
+  ...arAutomation,
+  ...arIntegrations,
+  ...arIot,
+  ...arNotifications,
+  ...arSecurity,
+  ...arCompanies,
   ...arErrors,
 };
 

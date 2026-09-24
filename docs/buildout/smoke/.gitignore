@@ -1,0 +1,6 @@
+node_modules/
+out/
+vite.pid
+vite-*.json
+vite.log
+*.lock
