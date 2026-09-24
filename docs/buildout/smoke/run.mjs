@@ -690,6 +690,10 @@ async function main() {
 function resolveExecutable() {
   // playwright-core is pinned to the Chromium build in /opt/pw-browsers; if a
   // different build is ever needed, fall back to whatever chrome is there.
+  // SMOKE_CHROME points at a locally installed Chrome (e.g. on Windows).
+  if (process.env.SMOKE_CHROME && existsSync(process.env.SMOKE_CHROME)) {
+    return { executablePath: process.env.SMOKE_CHROME };
+  }
   try {
     chromium.executablePath();
     if (existsSync(chromium.executablePath())) return null;
