@@ -3,7 +3,7 @@
  * Local PGlite replica of the FleetManage database, for fast migration dry-runs
  * that never touch production. See README.md.
  *
- *   node harness.mjs build                      # prelude + every repo migration + extras/ + seed.sql -> base.tgz
+ *   node harness.mjs build [--skip=a,b]         # prelude + every repo migration + extras/ + seed.sql -> base.tgz
  *   node harness.mjs run a.sql [b.sql ...]      # load base.tgz, run the files statement by statement
  *   node harness.mjs bundle out.sql a.sql ...   # comment-stripped concatenation (+ md5) for execute_sql
  *
@@ -186,7 +186,11 @@ async function freshDb({ quiet, only } = {}) {
 }
 
 async function build() {
-  const db = await freshDb({ quiet: false, only: (f) => !/_(cluster|draft)\./.test(f) });
+  // --skip=a,b leaves out migration files whose name contains any substring
+  // (e.g. files that are not applied to production yet).
+  const skipArg = argv.find((a) => a.startsWith("--skip="));
+  const skip = skipArg ? skipArg.slice("--skip=".length).split(",").filter(Boolean) : [];
+  const db = await freshDb({ quiet: false, only: (f) => !skip.some((x) => basename(f).includes(x)) });
   const seed = join(HERE, "seed.sql");
   if (existsSync(seed)) {
     const r = await execFile(db, seed, { quiet: false });
