@@ -94,7 +94,14 @@ export default function AppLayout() {
         <div className="truncate text-[15px] font-bold tracking-tight text-ink">
           {t("app.name")}
         </div>
-        <div className="truncate text-xs text-ink-3">{tenant?.name}</div>
+        {/* Truncated data carries its own direction, so a Latin name loses its
+            end to the ellipsis rather than its start; the flex row keeps it at
+            the page's start edge (docs/I18N.md "Left-to-right data"). */}
+        <div className="flex text-xs text-ink-3">
+          <span dir="auto" className="truncate">
+            {tenant?.name}
+          </span>
+        </div>
       </div>
 
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 pb-4">
@@ -138,8 +145,10 @@ export default function AppLayout() {
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-medium text-ink">
-              {profile?.full_name || profile?.email}
+            <div className="flex text-sm font-medium text-ink">
+              <span dir={profile?.full_name ? "auto" : "ltr"} className="truncate">
+                {profile?.full_name || profile?.email}
+              </span>
             </div>
             <div className="truncate text-xs text-ink-3">
               {profile?.role ? t(`role.${profile.role}`) : ""}

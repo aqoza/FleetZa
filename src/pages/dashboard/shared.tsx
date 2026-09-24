@@ -5,7 +5,7 @@ import { Activity, ArrowRight, Lightbulb } from "lucide-react";
 import { listRows } from "../../lib/db";
 import { formatDateTime } from "../../lib/format";
 import { useAuth } from "../../context/AuthContext";
-import { Badge, Card, ErrorState } from "../../components/ui";
+import { Badge, Bdi, Card, ErrorState, Ltr } from "../../components/ui";
 import { useT, type MessageKey } from "../../i18n";
 
 export { GRID_STROKE, TICK_STYLE } from "../../lib/chart";
@@ -171,10 +171,19 @@ export function ActivityCard() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-ink">
-                    {entityKey ? t(entityKey) : a.table_name}
-                    {name ? ` · ${name}` : ""}
+                    {entityKey ? t(entityKey) : <Ltr>{a.table_name}</Ltr>}
+                    {name ? (
+                      <>
+                        {" · "}
+                        <Bdi>{name}</Bdi>
+                      </>
+                    ) : (
+                      ""
+                    )}
                   </div>
-                  <div className="truncate text-xs text-ink-3">{formatDateTime(a.at)}</div>
+                  <div className="truncate text-xs text-ink-3">
+                    <Ltr>{formatDateTime(a.at)}</Ltr>
+                  </div>
                 </div>
                 <Badge tone={ACTION_TONE[a.action]}>{t(`dashboard.activity.${a.action}`)}</Badge>
               </li>

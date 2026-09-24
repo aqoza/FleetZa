@@ -14,12 +14,14 @@ import {
   formatVolume,
   litersToDisplay,
 } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { useDriverPicker, useVehiclePicker } from "../../lib/pickers";
 import type { FuelLog } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination, Textarea,
+  Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Pagination,
+  Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
@@ -298,6 +300,7 @@ export default function FuelPage() {
       ),
       sortValue: (log) => log.filled_at,
       exportValue: (log) => formatDate(log.filled_at, tenant.timezone),
+      dir: "ltr",
     },
     {
       id: "vehicle",
@@ -307,6 +310,7 @@ export default function FuelPage() {
       ),
       sortValue: (log) => log.vehicles?.name ?? null,
       exportValue: (log) => log.vehicles?.name ?? "",
+      dir: "auto",
     },
     {
       id: "odometer",
@@ -318,6 +322,7 @@ export default function FuelPage() {
       exportValue: (log) => formatDistance(log.odometer, tenant.distance_unit),
       align: "end",
       minBreakpoint: "md",
+      dir: "ltr",
     },
     {
       id: "volume",
@@ -329,6 +334,7 @@ export default function FuelPage() {
       exportValue: (log) => formatVolume(log.volume, tenant.volume_unit),
       align: "end",
       minBreakpoint: "md",
+      dir: "ltr",
     },
     {
       id: "total_cost",
@@ -341,6 +347,7 @@ export default function FuelPage() {
       sortValue: (log) => log.total_cost,
       exportValue: (log) => formatMoney(log.total_cost, tenant.currency),
       align: "end",
+      dir: "ltr",
     },
     {
       id: "price",
@@ -353,6 +360,7 @@ export default function FuelPage() {
       exportValue: (log) => pricePerUnit(log),
       align: "end",
       minBreakpoint: "lg",
+      dir: "ltr",
     },
     {
       id: "efficiency",
@@ -362,6 +370,7 @@ export default function FuelPage() {
       exportValue: (log) => efficiencyCell(log),
       minBreakpoint: "lg",
       defaultHidden: true,
+      dir: "ltr",
     },
     {
       id: "vendor",
@@ -371,6 +380,7 @@ export default function FuelPage() {
       exportValue: (log) => log.vendor ?? "",
       minBreakpoint: "xl",
       defaultHidden: true,
+      dir: "auto",
     },
     {
       id: "actions",
@@ -430,7 +440,7 @@ export default function FuelPage() {
               {t("fuel.totalSpend")}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
-              {formatMoney(totals.spend, tenant.currency)}
+              <Ltr>{formatMoney(totals.spend, tenant.currency)}</Ltr>
             </div>
           </Card>
           <Card className="p-4">
@@ -438,7 +448,7 @@ export default function FuelPage() {
               {t("fuel.totalVolume")}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
-              {formatVolume(totals.liters, tenant.volume_unit)}
+              <Ltr>{formatVolume(totals.liters, tenant.volume_unit)}</Ltr>
             </div>
           </Card>
           <Card className="p-4">
@@ -446,7 +456,7 @@ export default function FuelPage() {
               {t("fuel.avgPrice")} / {tenant.volume_unit}
             </div>
             <div className="mt-1 text-lg font-semibold text-slate-900">
-              {formatMoney(totals.avgPrice, tenant.currency)}
+              <Ltr>{formatMoney(totals.avgPrice, tenant.currency)}</Ltr>
             </div>
           </Card>
         </div>
@@ -504,10 +514,10 @@ export default function FuelPage() {
             )}
             <p className="text-sm text-slate-600">
               {t("fuel.deleteConfirm", {
-                date: formatDate(deleting.filled_at, tenant.timezone),
-                vehicle: deleting.vehicles?.name ?? t("fuel.thisVehicle"),
-                volume: formatVolume(deleting.volume, tenant.volume_unit),
-                cost: formatMoney(deleting.total_cost, tenant.currency),
+                date: ltrText(formatDate(deleting.filled_at, tenant.timezone)),
+                vehicle: bdiText(deleting.vehicles?.name) || t("fuel.thisVehicle"),
+                volume: ltrText(formatVolume(deleting.volume, tenant.volume_unit)),
+                cost: ltrText(formatMoney(deleting.total_cost, tenant.currency)),
               })}
             </p>
             <div className="mt-4 flex justify-end gap-2">

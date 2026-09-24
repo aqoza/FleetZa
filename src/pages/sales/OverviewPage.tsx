@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   AlertTriangle, ClipboardList, FileText, Percent, Wallet,
 } from "lucide-react";
+import { ltrText } from "../../lib/bidi";
 import { listRows, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate, formatMoney } from "../../lib/format";
@@ -13,7 +14,7 @@ import type { Invoice, Quote, SalesOrder, SalesSummary } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
-import { Badge, Card, ErrorState, LoadingState, StatCard } from "../../components/ui";
+import { Badge, Card, ErrorState, LoadingState, Ltr, StatCard } from "../../components/ui";
 import { SectionCard } from "./shared";
 
 /** Quotes inside this window are surfaced as "expiring soon". */
@@ -101,7 +102,7 @@ export default function OverviewPage() {
           icon={<FileText className="h-5 w-5" />}
           tone="blue"
           label={t("sales.kpi.openQuotes")}
-          value={money(s.open_quote_value)}
+          value={<Ltr>{money(s.open_quote_value)}</Ltr>}
           sub={t("sales.kpi.openQuotesSub", { count: s.open_quotes })}
         />
         <StatCard
@@ -122,19 +123,19 @@ export default function OverviewPage() {
           icon={<ClipboardList className="h-5 w-5" />}
           tone="violet"
           label={t("sales.kpi.openOrders")}
-          value={money(s.open_order_value)}
-          sub={t("sales.kpi.unbilled", { amount: money(s.unbilled_order_value) })}
+          value={<Ltr>{money(s.open_order_value)}</Ltr>}
+          sub={t("sales.kpi.unbilled", { amount: ltrText(money(s.unbilled_order_value)) })}
         />
         {billingOn && (
           <StatCard
             icon={<Wallet className="h-5 w-5" />}
             tone={s.overdue_amount > 0 ? "red" : "green"}
             label={t("sales.kpi.outstanding")}
-            value={money(s.outstanding_amount)}
+            value={<Ltr>{money(s.outstanding_amount)}</Ltr>}
             sub={
               s.overdue_invoices > 0
                 ? t("sales.kpi.overdueSub", {
-                    amount: money(s.overdue_amount),
+                    amount: ltrText(money(s.overdue_amount)),
                     count: s.overdue_invoices,
                   })
                 : t("sales.kpi.nothingOverdue")
@@ -148,7 +149,7 @@ export default function OverviewPage() {
         <Card className="mb-5 flex flex-wrap items-baseline justify-between gap-3 p-5">
           <span className="text-sm font-medium text-ink-2">{t("sales.kpi.collected")}</span>
           <span className="text-2xl font-bold tracking-tight text-ink tabular-nums">
-            {money(s.collected_30d)}
+            <Ltr>{money(s.collected_30d)}</Ltr>
           </span>
         </Card>
       )}
@@ -193,7 +194,7 @@ export default function OverviewPage() {
                     key={q.id}
                     to={`/sales/quotes/${q.id}`}
                     primary={q.doc_number}
-                    secondary={formatDate(q.valid_until)}
+                    secondary={<Ltr>{formatDate(q.valid_until)}</Ltr>}
                     amount={formatMoney(q.total, q.currency)}
                     badge={<Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>}
                   />
@@ -243,7 +244,7 @@ export default function OverviewPage() {
                     key={o.id}
                     to={`/sales/orders/${o.id}`}
                     primary={o.doc_number}
-                    secondary={formatDate(o.order_date)}
+                    secondary={<Ltr>{formatDate(o.order_date)}</Ltr>}
                     amount={formatMoney(o.total - o.invoiced_total, o.currency)}
                     badge={<Badge tone="blue">{t("sales.orders.unbilled")}</Badge>}
                   />
@@ -269,8 +270,10 @@ function AttentionRow({
   badge,
 }: {
   to: string;
+  /** A document number. */
   primary: string;
-  secondary: string;
+  /** A date (isolated by the caller) or a translated sentence. */
+  secondary: ReactNode;
   amount: string;
   badge: ReactNode;
 }) {
@@ -281,9 +284,11 @@ function AttentionRow({
           to={to}
           className="text-sm font-medium text-brand-700 hover:underline tabular-nums"
         >
-          {primary}
+          <Ltr>{primary}</Ltr>
         </Link>
-        <span className="text-sm font-medium text-ink tabular-nums">{amount}</span>
+        <span className="text-sm font-medium text-ink tabular-nums">
+          <Ltr>{amount}</Ltr>
+        </span>
       </div>
       <div className="mt-1 flex items-center gap-2">
         {badge}

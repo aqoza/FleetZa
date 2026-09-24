@@ -13,11 +13,13 @@ import type { Customer } from "../../lib/types";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge,
+  Bdi,
   Button,
   EmptyState,
   ErrorState,
   Input,
   LoadingState,
+  Ltr,
   PageHeader,
   Pagination,
   Select,
@@ -140,9 +142,13 @@ export function DocumentListPage<T extends ListedDocument>({
             to={`${config.routeBase}/${row.id}`}
             className="font-medium text-brand-700 hover:underline tabular-nums"
           >
-            {row.doc_number}
+            <Ltr>{row.doc_number}</Ltr>
           </Link>
-          {row.title && <div className="text-xs text-ink-3">{row.title}</div>}
+          {row.title && (
+            <div className="text-xs text-ink-3">
+              <Bdi>{row.title}</Bdi>
+            </div>
+          )}
         </>
       ),
       sortValue: (row) => row.doc_number,
@@ -151,6 +157,7 @@ export function DocumentListPage<T extends ListedDocument>({
     {
       id: "customer",
       header: t("sales.doc.customer"),
+      dir: "auto",
       cell: (row) => (
         <Link
           to={`/customers/${row.customer_id}`}
@@ -166,6 +173,7 @@ export function DocumentListPage<T extends ListedDocument>({
       id: "primaryDate",
       header: config.primaryDate.header,
       minBreakpoint: "sm",
+      dir: "ltr",
       cell: (row) => (
         <span className="text-ink-2">{formatDate(config.primaryDate.value(row))}</span>
       ),
@@ -187,6 +195,7 @@ export function DocumentListPage<T extends ListedDocument>({
       id: "total",
       header: t("sales.doc.total"),
       align: "end",
+      dir: "ltr",
       cell: (row) => (
         <span className="font-medium text-ink">{formatMoney(row.total, row.currency)}</span>
       ),

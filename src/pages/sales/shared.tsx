@@ -17,6 +17,7 @@ import {
   updateRow,
   type TableName,
 } from "../../lib/db";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { formatMoney } from "../../lib/format";
 import { computeLine } from "../../lib/sales";
 import {
@@ -31,12 +32,14 @@ import { useT, type Translate } from "../../i18n";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
 import {
+  Bdi,
   Button,
   Card,
   ErrorState,
   Field,
   Input,
   LoadingState,
+  Ltr,
   Textarea,
 } from "../../components/ui";
 
@@ -200,6 +203,7 @@ export function DocumentFormFields({
         </Field>
         <Field label={t("sales.doc.reference")}>
           <Input
+            dir="ltr"
             value={form.customer_reference}
             onChange={(e) => set("customer_reference", e.target.value)}
           />
@@ -224,6 +228,7 @@ export function DocumentFormFields({
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("sales.doc.poNumber")} hint={t("sales.doc.poNumberHint")}>
             <Input
+              dir="ltr"
               value={form.customer_po_number}
               onChange={(e) => set("customer_po_number", e.target.value)}
             />
@@ -347,7 +352,9 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className={strong ? "font-semibold text-ink" : "text-ink-2"}>{label}</dt>
-      <dd className={strong ? "text-base font-semibold text-ink" : "text-ink"}>{value}</dd>
+      <dd className={strong ? "text-base font-semibold text-ink" : "text-ink"}>
+        <Ltr>{value}</Ltr>
+      </dd>
     </div>
   );
 }
@@ -360,7 +367,7 @@ export function taxHeading(
 ): string {
   const distinct = [...new Set(rates.filter((r) => r > 0))];
   return distinct.length === 1
-    ? t("sales.doc.tax", { label: countryTaxLabel, rate: distinct[0] })
+    ? t("sales.doc.tax", { label: bdiText(countryTaxLabel), rate: distinct[0] })
     : t("sales.doc.taxTotal");
 }
 
@@ -621,12 +628,13 @@ export function LineEditor({
               if (!editable) {
                 return (
                   <tr key={line.id}>
-                    <td className="px-3 py-2.5 text-ink">{line.description}</td>
+                    <td className="px-3 py-2.5 text-ink"><Bdi>{line.description}</Bdi></td>
                     <td className="px-3 py-2.5 text-end text-ink-2 tabular-nums">
-                      {line.quantity}{line.unit ? ` ${line.unit}` : ""}
+                      {/* One isolate: the unit's script picks the order (3 pcs / 3 قطعة). */}
+                      <Bdi>{line.quantity}{line.unit ? ` ${line.unit}` : ""}</Bdi>
                     </td>
                     <td className="px-3 py-2.5 text-end text-ink-2 tabular-nums">
-                      {formatMoney(line.unit_price, currency)}
+                      <Ltr>{formatMoney(line.unit_price, currency)}</Ltr>
                     </td>
                     <td className="px-3 py-2.5 text-end text-ink-2 tabular-nums">
                       {line.discount_percent > 0 ? `${line.discount_percent}%` : "—"}
@@ -635,7 +643,7 @@ export function LineEditor({
                       {line.tax_rate > 0 ? `${line.tax_rate}%` : "—"}
                     </td>
                     <td className="px-3 py-2.5 text-end font-medium text-ink tabular-nums">
-                      {formatMoney(line.line_total, currency)}
+                      <Ltr>{formatMoney(line.line_total, currency)}</Ltr>
                     </td>
                   </tr>
                 );
@@ -687,7 +695,7 @@ export function LineEditor({
                     />
                   </td>
                   <td className="px-3 py-2 text-end font-medium text-ink tabular-nums">
-                    {formatMoney(preview.total, currency)}
+                    <Ltr>{formatMoney(preview.total, currency)}</Ltr>
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-0.5">
@@ -760,7 +768,7 @@ export function LineEditor({
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-serious/30 bg-serious-soft px-4 py-3">
           <span className="text-sm text-ink">
             {t("sales.lines.deleteConfirm", {
-              description: sorted.find((l) => l.id === deleting)?.description ?? "",
+              description: bdiText(sorted.find((l) => l.id === deleting)?.description),
             })}
           </span>
           <div className="flex gap-2">
@@ -853,7 +861,7 @@ export function LineEditor({
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-ink-2 tabular-nums">
               {t("sales.lines.previewTotal", {
-                amount: formatMoney(addPreview.total, currency),
+                amount: ltrText(formatMoney(addPreview.total, currency)),
               })}
             </span>
             <Button type="submit" loading={add.isPending}>

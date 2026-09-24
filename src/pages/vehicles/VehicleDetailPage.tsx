@@ -7,6 +7,7 @@ import {
 import { deleteRow, getRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDistance, formatMoney } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { certificateStatusMeta } from "../../lib/certificateStatus";
 import {
   certificateBillingMeta, certificateBillingState, type InvoiceableCertificate,
@@ -21,7 +22,7 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
-  Badge, Button, Card, ErrorState, Field, LoadingState, Modal, PageHeader,
+  Badge, Bdi, Button, Card, ErrorState, Field, LoadingState, Ltr, Modal, PageHeader,
   type BadgeTone,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
@@ -242,7 +243,7 @@ export default function VehicleDetailPage() {
     vehicle.ownership === "customer" ? (
       customersOn && vehicle.customer_id ? (
         <Link to={`/customers/${vehicle.customer_id}`} className="text-brand-700 hover:underline">
-          {owner?.name ?? t("vehicles.ownerCustomer")}
+          {owner ? <Bdi>{owner.name}</Bdi> : t("vehicles.ownerCustomer")}
         </Link>
       ) : (
         t("vehicles.ownerCustomer")
@@ -298,7 +299,7 @@ export default function VehicleDetailPage() {
       </Link>
       <PageHeader
         title={vehicle.name}
-        description={[vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ") || undefined}
+        description={bdiText([vehicle.year, vehicle.make, vehicle.model].filter(Boolean).join(" ")) || undefined}
         /*
          * Compliance state at the top of the page: whether this vehicle's
          * certificate is valid, close to expiry, or lapsed is the reason most
@@ -357,22 +358,22 @@ export default function VehicleDetailPage() {
           <InfoRow label={t("vehicles.owner")} value={ownerValue} />
           <InfoRow label={t("vehicles.type")} value={t(vehicleTypes[vehicle.vehicle_type])} />
           <InfoRow label={t("vehicles.fuel")} value={t(fuelTypes[vehicle.fuel_type])} />
-          <InfoRow label={t("field.odometer")} value={formatDistance(vehicle.odometer, tenant.distance_unit)} />
-          <InfoRow label={t("field.licensePlate")} value={vehicle.license_plate ?? t("common.dash")} />
-          <InfoRow label={t("field.vin")} value={vehicle.vin ?? t("common.dash")} />
+          <InfoRow label={t("field.odometer")} value={<Ltr>{formatDistance(vehicle.odometer, tenant.distance_unit)}</Ltr>} />
+          <InfoRow label={t("field.licensePlate")} value={<Ltr>{vehicle.license_plate ?? t("common.dash")}</Ltr>} />
+          <InfoRow label={t("field.vin")} value={<Ltr>{vehicle.vin ?? t("common.dash")}</Ltr>} />
           {vehicle.chassis_number && (
-            <InfoRow label={t("vehicles.chassisNumber")} value={vehicle.chassis_number} />
+            <InfoRow label={t("vehicles.chassisNumber")} value={<Ltr>{vehicle.chassis_number}</Ltr>} />
           )}
           {vehicle.engine_number && (
-            <InfoRow label={t("vehicles.engineNumber")} value={vehicle.engine_number} />
+            <InfoRow label={t("vehicles.engineNumber")} value={<Ltr>{vehicle.engine_number}</Ltr>} />
           )}
           {vehicle.fleet_number && (
-            <InfoRow label={t("vehicles.fleetNumber")} value={vehicle.fleet_number} />
+            <InfoRow label={t("vehicles.fleetNumber")} value={<Ltr>{vehicle.fleet_number}</Ltr>} />
           )}
-          <InfoRow label={t("vehicles.purchased")} value={formatDate(vehicle.purchase_date)} />
-          <InfoRow label={t("vehicles.purchasePrice")} value={formatMoney(vehicle.purchase_price, tenant.currency)} />
+          <InfoRow label={t("vehicles.purchased")} value={<Ltr>{formatDate(vehicle.purchase_date)}</Ltr>} />
+          <InfoRow label={t("vehicles.purchasePrice")} value={<Ltr>{formatMoney(vehicle.purchase_price, tenant.currency)}</Ltr>} />
           {vehicle.notes && (
-            <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{vehicle.notes}</p>
+            <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600"><Bdi>{vehicle.notes}</Bdi></p>
           )}
         </Card>
 
@@ -388,10 +389,10 @@ export default function VehicleDetailPage() {
           {currentDriver ? (
             <div>
               <div className="text-sm font-medium text-slate-800">
-                {currentDriver.first_name} {currentDriver.last_name}
+                <Bdi>{currentDriver.first_name} {currentDriver.last_name}</Bdi>
               </div>
               <div className="text-xs text-slate-500">
-                {t("vehicles.since", { date: formatDate(assignment!.started_at) })}
+                {t("vehicles.since", { date: ltrText(formatDate(assignment!.started_at)) })}
               </div>
             </div>
           ) : (
@@ -403,7 +404,7 @@ export default function VehicleDetailPage() {
             <ul className="space-y-1.5">
               {openIssues.map((i) => (
                 <li key={i.id} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="truncate text-slate-700">{i.title}</span>
+                  <span className="truncate text-slate-700"><Bdi>{i.title}</Bdi></span>
                   <Badge tone={issueStatus[i.status].tone}>{t(issueStatus[i.status].labelKey)}</Badge>
                 </li>
               ))}
@@ -420,7 +421,7 @@ export default function VehicleDetailPage() {
               {openWork.map((w) => (
                 <li key={w.id} className="flex items-center justify-between gap-2 text-sm">
                   <Link to={`/maintenance/work-orders/${w.id}`} className="truncate text-brand-700 hover:underline">
-                    #{w.number} {w.title}
+                    <Ltr>#{w.number}</Ltr> <Bdi>{w.title}</Bdi>
                   </Link>
                   <Badge tone={workOrderStatus[w.status].tone}>{t(workOrderStatus[w.status].labelKey)}</Badge>
                 </li>
@@ -435,9 +436,9 @@ export default function VehicleDetailPage() {
             <ul className="space-y-1.5">
               {recentFuel.map((f) => (
                 <li key={f.id} className="flex items-center justify-between gap-2 text-sm">
-                  <span className="text-slate-600">{formatDate(f.filled_at, tenant.timezone)}</span>
+                  <span className="text-slate-600"><Ltr>{formatDate(f.filled_at, tenant.timezone)}</Ltr></span>
                   <span className="font-medium text-slate-800">
-                    {formatMoney(f.total_cost, tenant.currency)}
+                    <Ltr>{formatMoney(f.total_cost, tenant.currency)}</Ltr>
                   </span>
                 </li>
               ))}
@@ -452,9 +453,9 @@ export default function VehicleDetailPage() {
             <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("vehicles.speedLimiterPanel")}</h3>
             {slInstallation ? (
               <div>
-                <div className="text-sm font-medium text-slate-800">{slInstallation.device_serial}</div>
+                <div className="text-sm font-medium text-slate-800"><Ltr>{slInstallation.device_serial}</Ltr></div>
                 <div className="text-xs text-slate-500">
-                  {t("vehicles.since", { date: formatDate(slInstallation.installed_at) })}
+                  {t("vehicles.since", { date: ltrText(formatDate(slInstallation.installed_at)) })}
                 </div>
                 <InfoRow
                   label={t("speedLimiters.verify.setSpeed")}
@@ -494,7 +495,7 @@ export default function VehicleDetailPage() {
                     </div>
                     <div className="mt-1 flex items-center justify-between gap-2">
                       <span className="truncate text-sm font-medium text-ink">
-                        {currentCert.certificate_number}
+                        <Ltr>{currentCert.certificate_number}</Ltr>
                       </span>
                       {certBadge(currentCert)}
                     </div>
@@ -502,14 +503,14 @@ export default function VehicleDetailPage() {
                       <div className="mt-1.5 flex justify-between gap-4 text-xs">
                         <span className="text-ink-3">{t("speedLimiters.verify.uin")}</span>
                         <span className="text-end font-medium text-ink-2 tabular-nums">
-                          {currentCert.uin}
+                          <Ltr>{currentCert.uin}</Ltr>
                         </span>
                       </div>
                     )}
                     <div className="mt-1 flex justify-between gap-4 text-xs">
                       <span className="text-ink-3">{t("slCertificates.expires")}</span>
                       <span className="text-end font-medium text-ink-2 tabular-nums">
-                        {formatDate(currentCert.expires_at)}
+                        <Ltr>{formatDate(currentCert.expires_at)}</Ltr>
                       </span>
                     </div>
                     {billingOn && (
@@ -525,7 +526,7 @@ export default function VehicleDetailPage() {
                                 number: certBillingRow.doc_number ?? "",
                               })}
                             >
-                              {certBillingRow.doc_number}
+                              <Ltr>{certBillingRow.doc_number}</Ltr>
                             </Link>
                           )}
                         </span>
@@ -597,10 +598,10 @@ export default function VehicleDetailPage() {
                     <ul className="space-y-1.5">
                       {historyCerts.map((c) => (
                         <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
-                          <span className="truncate text-ink-2">{c.certificate_number}</span>
+                          <span className="truncate text-ink-2"><Ltr>{c.certificate_number}</Ltr></span>
                           <span className="flex items-center gap-2">
                             <span className="text-xs tabular-nums text-ink-3">
-                              {formatDate(c.expires_at)}
+                              <Ltr>{formatDate(c.expires_at)}</Ltr>
                             </span>
                             {certBadge(c)}
                           </span>
@@ -623,7 +624,7 @@ export default function VehicleDetailPage() {
                 {slJobs.map((j) => (
                   <li key={j.id} className="flex items-center justify-between gap-2 text-sm">
                     <Link to={`/speed-limiters/jobs/${j.id}`} className="truncate text-brand-700 hover:underline">
-                      #{j.number} {t(jobTypeKeys[j.job_type])}
+                      <Ltr>#{j.number}</Ltr> {t(jobTypeKeys[j.job_type])}
                     </Link>
                     <Badge tone={jobStatusMeta[j.status].tone}>{t(jobStatusMeta[j.status].labelKey)}</Badge>
                   </li>
@@ -679,7 +680,7 @@ export default function VehicleDetailPage() {
       <Modal title={t("vehicles.delete")} open={confirmDelete} onClose={() => setConfirmDelete(false)}>
         <p className="text-sm text-slate-600">
           {t("vehicles.deleteConfirmPrefix")}{" "}
-          <span className="font-semibold">{vehicle.name}</span>{" "}
+          <Bdi className="font-semibold">{vehicle.name}</Bdi>{" "}
           {t("vehicles.deleteConfirmSuffix")}
         </p>
         <div className="mt-4 flex justify-end gap-2">

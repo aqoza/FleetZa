@@ -10,16 +10,26 @@ import type { Customer, Invoice, Quote, SpeedLimiterCertificate, Vehicle } from 
 import { useModules } from "../context/ModulesContext";
 import { NAV_ITEMS } from "../modules/nav";
 import { useT } from "../i18n";
+import { Bdi, Ltr } from "./ui";
 
 const LIMIT = 5;
+
+/** How a data value is isolated on an Arabic page (docs/I18N.md); unset = translated text. */
+type ValueDir = "ltr" | "auto";
 
 interface PaletteItem {
   key: string;
   icon: LucideIcon;
   label: string;
+  labelDir?: ValueDir;
   meta?: string;
+  metaDir?: ValueDir;
   path: string;
   group: "recent" | "goto" | "vehicles" | "customers" | "certificates" | "quotes" | "invoices";
+}
+
+function isolate(value: string, dir: ValueDir | undefined) {
+  return dir === "ltr" ? <Ltr>{value}</Ltr> : dir === "auto" ? <Bdi>{value}</Bdi> : value;
 }
 
 /**
@@ -148,7 +158,11 @@ export function GlobalSearch() {
 
     if (!searching) {
       for (const r of getRecent()) {
-        out.push({ key: `r:${r.path}`, icon: Clock, label: r.label, path: r.path, group: "recent" });
+        // Stored as one string by the detail pages ("#12 · Gulf Freight Co."),
+        // so the first strong character decides.
+        out.push({
+          key: `r:${r.path}`, icon: Clock, label: r.label, labelDir: "auto", path: r.path, group: "recent",
+        });
       }
     }
 
@@ -165,7 +179,9 @@ export function GlobalSearch() {
           key: `v:${v.id}`,
           icon: Truck,
           label: v.name,
+          labelDir: "auto",
           meta: v.license_plate ?? v.vin ?? undefined,
+          metaDir: "ltr",
           path: `/vehicles/${v.id}`,
           group: "vehicles",
         });
@@ -175,7 +191,9 @@ export function GlobalSearch() {
           key: `c:${c.id}`,
           icon: Building2,
           label: c.name,
+          labelDir: "auto",
           meta: c.cr_number ?? undefined,
+          metaDir: "ltr",
           path: `/customers/${c.id}`,
           group: "customers",
         });
@@ -185,6 +203,7 @@ export function GlobalSearch() {
           key: `x:${c.id}`,
           icon: Award,
           label: c.certificate_number,
+          labelDir: "ltr",
           path: "/speed-limiters/certificates",
           group: "certificates",
         });
@@ -194,7 +213,9 @@ export function GlobalSearch() {
           key: `q:${q.id}`,
           icon: FileText,
           label: q.doc_number,
+          labelDir: "ltr",
           meta: q.title ?? undefined,
+          metaDir: "auto",
           path: `/sales/quotes/${q.id}`,
           group: "quotes",
         });
@@ -204,7 +225,9 @@ export function GlobalSearch() {
           key: `i:${inv.id}`,
           icon: ReceiptText,
           label: inv.doc_number,
+          labelDir: "ltr",
           meta: inv.title ?? undefined,
+          metaDir: "auto",
           path: `/sales/invoices/${inv.id}`,
           group: "invoices",
         });
@@ -288,7 +311,7 @@ export function GlobalSearch() {
         className="w-full rounded-xl border border-line bg-canvas ps-9 pe-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-brand-400 focus:bg-surface focus:outline-2 focus:outline-brand-500/25 sm:pe-14"
       />
       <kbd className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line bg-surface px-1.5 py-0.5 text-[10px] font-medium text-ink-3 sm:block">
-        {navigator.platform.toUpperCase().includes("MAC") ? "⌘K" : "Ctrl K"}
+        <Ltr>{navigator.platform.toUpperCase().includes("MAC") ? "⌘K" : "Ctrl K"}</Ltr>
       </kbd>
 
       {showPanel && (
@@ -324,9 +347,13 @@ export function GlobalSearch() {
                   onClick={() => go(item.path)}
                 >
                   <Icon className="h-4 w-4 shrink-0 text-ink-3" />
-                  <span className="truncate font-medium text-ink">{item.label}</span>
+                  <span className="truncate font-medium text-ink">
+                    {isolate(item.label, item.labelDir)}
+                  </span>
                   {item.meta && (
-                    <span className="ms-auto truncate text-xs text-ink-3">{item.meta}</span>
+                    <span className="ms-auto truncate text-xs text-ink-3">
+                      {isolate(item.meta, item.metaDir)}
+                    </span>
                   )}
                 </button>
               </div>

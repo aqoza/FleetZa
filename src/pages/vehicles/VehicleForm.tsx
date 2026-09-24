@@ -150,10 +150,10 @@ export function VehicleForm({
           />
         </Field>
         <Field label={t("field.licensePlate")}>
-          <Input value={form.license_plate} onChange={(e) => set("license_plate", e.target.value)} />
+          <Input dir="ltr" value={form.license_plate} onChange={(e) => set("license_plate", e.target.value)} />
         </Field>
         <Field label={t("field.vin")}>
-          <Input value={form.vin} onChange={(e) => set("vin", e.target.value)} />
+          <Input dir="ltr" value={form.vin} onChange={(e) => set("vin", e.target.value)} />
         </Field>
         {customersEnabled && (
           <Field label={t("vehicles.owner")}>
@@ -180,18 +180,21 @@ export function VehicleForm({
         )}
         <Field label={t("vehicles.chassisNumber")}>
           <Input
+            dir="ltr"
             value={form.chassis_number}
             onChange={(e) => set("chassis_number", e.target.value)}
           />
         </Field>
         <Field label={t("vehicles.engineNumber")}>
           <Input
+            dir="ltr"
             value={form.engine_number}
             onChange={(e) => set("engine_number", e.target.value)}
           />
         </Field>
         <Field label={t("vehicles.fleetNumber")}>
           <Input
+            dir="ltr"
             value={form.fleet_number}
             onChange={(e) => set("fleet_number", e.target.value)}
           />

@@ -21,9 +21,11 @@ import type { SlJob, SpeedLimiterCertificate } from "../../lib/types";
 import { useModules } from "../../context/ModulesContext";
 import {
   Badge,
+  Bdi,
   Card,
   ErrorState,
   LoadingState,
+  Ltr,
   PageHeader,
   StatCard,
 } from "../../components/ui";
@@ -477,11 +479,19 @@ export default function ProviderDashboard() {
                             to={`/speed-limiters/jobs/${j.id}`}
                             className="block truncate text-sm font-medium text-brand-700 hover:underline"
                           >
-                            #{j.number} · {j.customers?.name ?? t("common.dash")}
+                            <Ltr>#{j.number}</Ltr> ·{" "}
+                            <Bdi>{j.customers?.name ?? t("common.dash")}</Bdi>
                           </Link>
                           <div className="truncate text-xs text-ink-3">
-                            {j.vehicles?.name ?? t("common.dash")}
-                            {j.scheduled_date ? ` · ${formatDate(j.scheduled_date)}` : ""}
+                            <Bdi>{j.vehicles?.name ?? t("common.dash")}</Bdi>
+                            {j.scheduled_date ? (
+                              <>
+                                {" · "}
+                                <Ltr>{formatDate(j.scheduled_date)}</Ltr>
+                              </>
+                            ) : (
+                              ""
+                            )}
                           </div>
                         </div>
                         <Badge tone={j.status === "in_progress" ? "yellow" : "blue"}>
@@ -513,13 +523,13 @@ export default function ProviderDashboard() {
                               to={`/customers/${c.id}`}
                               className="block truncate text-sm font-medium text-brand-700 hover:underline"
                             >
-                              {c.name}
+                              <Bdi>{c.name}</Bdi>
                             </Link>
                           ) : (
                             <div className="truncate text-sm font-medium text-ink">{c.name}</div>
                           )}
                           <div className="truncate text-xs text-ink-3">
-                            {formatDate(c.soonest)}
+                            <Ltr>{formatDate(c.soonest)}</Ltr>
                           </div>
                         </div>
                         <Badge tone="yellow">
@@ -552,12 +562,22 @@ export default function ProviderDashboard() {
                         >
                           <div className="min-w-0">
                             <div className="truncate text-sm font-medium text-ink">
-                              {c.certificate_number}
+                              <Ltr>{c.certificate_number}</Ltr>
                             </div>
                             <div className="truncate text-xs text-ink-3">
-                              {[c.customers?.name, c.vehicles?.name, formatDate(c.expires_at)]
-                                .filter(Boolean)
-                                .join(" · ")}
+                              {c.customers?.name && (
+                                <>
+                                  <Bdi>{c.customers.name}</Bdi>
+                                  {" · "}
+                                </>
+                              )}
+                              {c.vehicles?.name && (
+                                <>
+                                  <Bdi>{c.vehicles.name}</Bdi>
+                                  {" · "}
+                                </>
+                              )}
+                              <Ltr>{formatDate(c.expires_at)}</Ltr>
                             </div>
                           </div>
                           <Badge tone={days <= 30 ? "red" : "yellow"}>

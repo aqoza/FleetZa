@@ -10,7 +10,7 @@ import type { Issue, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
@@ -256,10 +256,10 @@ export default function IssuesPage() {
             <tr key={i.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium text-slate-800">{i.title}</span>
+                  <span className="font-medium text-slate-800"><Bdi>{i.title}</Bdi></span>
                   {i.source === "inspection" && <Badge tone="purple">{t("issues.fromInspection")}</Badge>}
                 </div>
-                <div className="text-xs text-slate-500">{i.vehicles?.name ?? "—"}</div>
+                <div className="text-xs text-slate-500"><Bdi>{i.vehicles?.name ?? "—"}</Bdi></div>
               </td>
               <td className="px-4 py-3">
                 <Badge tone={priority[i.priority].tone}>{t(priority[i.priority].labelKey)}</Badge>
@@ -268,7 +268,7 @@ export default function IssuesPage() {
                 <Badge tone={issueStatus[i.status].tone}>{t(issueStatus[i.status].labelKey)}</Badge>
               </td>
               <td className="px-4 py-3 text-slate-600">
-                {formatDate(i.reported_at, tenant.timezone)}
+                <Ltr>{formatDate(i.reported_at, tenant.timezone)}</Ltr>
               </td>
               <td className="px-4 py-3 text-end">
                 <div className="flex items-center justify-end gap-1">
@@ -348,7 +348,7 @@ export default function IssuesPage() {
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              {t("issues.deleteConfirm")} <span className="font-semibold">{deleting.title}</span>
+              {t("issues.deleteConfirm")} <span className="font-semibold"><Bdi>{deleting.title}</Bdi></span>
               {t("issues.deleteConfirmUndone")}
             </p>
             <div className="mt-4 flex justify-end gap-2">

@@ -23,7 +23,7 @@ import { getRecent, type RecentEntity } from "../lib/recent";
 import type { Renewal, SpeedLimiterCertificate } from "../lib/types";
 import { useAuth } from "../context/AuthContext";
 import { useModules } from "../context/ModulesContext";
-import { Badge } from "./ui";
+import { Badge, Bdi, Ltr } from "./ui";
 import { useT } from "../i18n";
 
 const COLLAPSE_KEY = "fm.contextPanel";
@@ -210,7 +210,11 @@ export function ContextPanel() {
     ...(dueRenewalsQ.data ?? []).map((r) => ({
       key: `r:${r.id}`,
       icon: ShieldCheck,
-      label: r.name || t(`enum.renewalType.${r.renewal_type}` as Parameters<typeof t>[0]),
+      label: r.name ? (
+        <Bdi>{r.name}</Bdi>
+      ) : (
+        t(`enum.renewalType.${r.renewal_type}` as Parameters<typeof t>[0])
+      ),
       meta: r.vehicles?.name ?? "",
       days: daysUntil(r.due_date),
       date: r.due_date,
@@ -222,7 +226,7 @@ export function ContextPanel() {
     ...(dueCertsQ.data ?? []).map((c) => ({
       key: `c:${c.id}`,
       icon: Award,
-      label: c.certificate_number,
+      label: <Ltr>{c.certificate_number}</Ltr>,
       meta: c.vehicles?.name ?? "",
       days: daysUntil(c.expires_at),
       date: c.expires_at,
@@ -302,7 +306,13 @@ export function ContextPanel() {
                             {item.label}
                           </span>
                           <span className="block truncate text-xs text-ink-3">
-                            {[item.meta, formatDate(item.date)].filter(Boolean).join(" · ")}
+                            {item.meta && (
+                              <>
+                                <Bdi>{item.meta}</Bdi>
+                                {" · "}
+                              </>
+                            )}
+                            <Ltr>{formatDate(item.date)}</Ltr>
                           </span>
                         </span>
                         <Badge tone={item.days < 0 ? "red" : item.days <= 30 ? "yellow" : "slate"}>
@@ -353,7 +363,9 @@ export function ContextPanel() {
                   className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-ink-2 transition-colors hover:bg-canvas hover:text-ink"
                 >
                   <Clock className="h-4 w-4 shrink-0 text-ink-3" />
-                  <span className="truncate">{r.label}</span>
+                  <span className="truncate">
+                    <Bdi>{r.label}</Bdi>
+                  </span>
                 </Link>
               </li>
             ))}
@@ -373,7 +385,7 @@ export function ContextPanel() {
                     {t(`dashboard.entity.${a.table_name}` as Parameters<typeof t>[0])}
                   </span>
                   <span className="block truncate text-xs text-ink-3">
-                    {formatDateTime(a.at)}
+                    <Ltr>{formatDateTime(a.at)}</Ltr>
                   </span>
                 </span>
               </li>

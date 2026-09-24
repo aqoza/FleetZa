@@ -10,6 +10,7 @@ import {
 } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { formatDate } from "../../lib/format";
+import { ltrText } from "../../lib/bidi";
 import {
   certificateBucket, certificateStatusMeta, type CertificateBucket,
 } from "../../lib/certificateStatus";
@@ -28,8 +29,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Pagination,
-  Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader,
+  Pagination, Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useTechnicianPicker } from "../../lib/pickers";
@@ -347,7 +348,8 @@ function BulkRenewForm({
             <ul className="mt-1 space-y-0.5 text-sm text-ink-2">
               {results.ok.map((r) => (
                 <li key={r.from}>
-                  {t("speedLimiters.certStatus.supersededBy", { number: r.to })} — {r.from}
+                  {t("speedLimiters.certStatus.supersededBy", { number: ltrText(r.to) })} —{" "}
+                  <Ltr>{r.from}</Ltr>
                 </li>
               ))}
             </ul>
@@ -361,7 +363,7 @@ function BulkRenewForm({
             <ul className="mt-1 space-y-0.5 text-sm text-serious">
               {results.failed.map((r) => (
                 <li key={r.from}>
-                  <span className="font-medium">{r.from}</span> — {r.message}
+                  <span className="font-medium"><Ltr>{r.from}</Ltr></span> — {r.message}
                 </li>
               ))}
             </ul>
@@ -400,13 +402,19 @@ function BulkRenewForm({
           <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-sm text-ink-2">
             {eligible.map((c) => (
               <li key={c.id} className="flex justify-between gap-4">
-                <span className="font-medium text-ink">{c.certificate_number}</span>
+                <span className="font-medium text-ink"><Ltr>{c.certificate_number}</Ltr></span>
                 {/* A plate like "5637 RA" is digits + Latin letters: inside the
                     RTL paragraph the bidi algorithm would reorder it to
-                    "RA 5637". <bdi> isolates it, so the operator confirming a
+                    "RA 5637". <Ltr> isolates it, so the operator confirming a
                     renewal reads the plate exactly as the register prints it. */}
                 <span className="text-end text-ink-3">
-                  <bdi>{c.vehicles?.license_plate ?? c.vehicles?.name ?? t("common.dash")}</bdi>
+                  {c.vehicles?.license_plate ? (
+                    <Ltr>{c.vehicles.license_plate}</Ltr>
+                  ) : c.vehicles?.name ? (
+                    <Bdi>{c.vehicles.name}</Bdi>
+                  ) : (
+                    t("common.dash")
+                  )}
                 </span>
               </li>
             ))}
@@ -422,7 +430,7 @@ function BulkRenewForm({
           <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-sm text-ink-2">
             {skipped.map(({ cert, reason }) => (
               <li key={cert.id} className="flex justify-between gap-4">
-                <span className="font-medium text-ink">{cert.certificate_number}</span>
+                <span className="font-medium text-ink"><Ltr>{cert.certificate_number}</Ltr></span>
                 <span className="text-end text-ink-3">{t(SKIP_LABEL[reason])}</span>
               </li>
             ))}
@@ -507,7 +515,7 @@ function RevokeForm({ cert, onDone }: { cert: CertRow; onDone: () => void }) {
     <form onSubmit={onSubmit} className="space-y-4">
       {error && <ErrorState message={error} />}
       <p className="text-sm text-ink-2">
-        {t("slCertificates.revokeLead", { number: cert.certificate_number })}
+        {t("slCertificates.revokeLead", { number: ltrText(cert.certificate_number) })}
       </p>
       <Field label={t("slCertificates.revokeReason")} required>
         <Textarea value={reason} onChange={(e) => setReason(e.target.value)} required />
@@ -566,6 +574,7 @@ function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () =
       {error && <ErrorState message={error} />}
       <Field label={t("slCertificates.certPrefix")} hint={t("slCertificates.certPrefixHint")} required>
         <Input
+          dir="ltr"
           value={form.cert_prefix}
           onChange={(e) => setForm((f) => ({ ...f, cert_prefix: e.target.value }))}
           required
@@ -811,9 +820,9 @@ export default function CertificatesPage() {
         const successor = c.superseded_by ? successors.get(c.superseded_by) : undefined;
         return (
           <>
-            <div className="font-medium text-ink">{c.certificate_number}</div>
+            <div className="font-medium text-ink"><Ltr>{c.certificate_number}</Ltr></div>
             {c.issuing_authority && (
-              <div className="text-xs text-ink-3">{c.issuing_authority}</div>
+              <div className="text-xs text-ink-3"><Bdi>{c.issuing_authority}</Bdi></div>
             )}
             {successor && (
               <Link
@@ -821,7 +830,7 @@ export default function CertificatesPage() {
                 className="text-xs font-medium text-brand-700 hover:underline"
               >
                 {t("speedLimiters.certStatus.supersededBy", {
-                  number: successor.certificate_number,
+                  number: ltrText(successor.certificate_number),
                 })}
               </Link>
             )}
@@ -836,15 +845,18 @@ export default function CertificatesPage() {
       cell: (c) => <span className="text-ink-2">{c.customers?.name ?? t("common.dash")}</span>,
       sortValue: (c) => c.customers?.name ?? null,
       minBreakpoint: "md",
+      dir: "auto",
     },
     {
       id: "vehicle",
       header: t("slCertificates.vehicle"),
       cell: (c) => (
         <>
-          <div className="text-ink-2">{c.vehicles?.name ?? t("common.dash")}</div>
+          <div className="text-ink-2">
+            {c.vehicles?.name ? <Bdi>{c.vehicles.name}</Bdi> : t("common.dash")}
+          </div>
           {c.vehicles?.license_plate && (
-            <div className="text-xs text-ink-3"><bdi>{c.vehicles.license_plate}</bdi></div>
+            <div className="text-xs text-ink-3"><Ltr>{c.vehicles.license_plate}</Ltr></div>
           )}
         </>
       ),
@@ -856,12 +868,14 @@ export default function CertificatesPage() {
       cell: (c) => <span className="text-ink-2">{formatDate(c.issued_at)}</span>,
       sortValue: (c) => c.issued_at,
       minBreakpoint: "lg",
+      dir: "ltr",
     },
     {
       id: "expires",
       header: t("slCertificates.expires"),
       cell: (c) => <span className="text-ink-2">{formatDate(c.expires_at)}</span>,
       sortValue: (c) => c.expires_at,
+      dir: "ltr",
     },
     {
       id: "status",
@@ -888,7 +902,7 @@ export default function CertificatesPage() {
                       className="text-xs font-medium text-brand-700 hover:underline tabular-nums"
                       title={t("slCertificates.openInvoice", { number: row.doc_number ?? "" })}
                     >
-                      {row.doc_number}
+                      <Ltr>{row.doc_number}</Ltr>
                     </Link>
                   )}
                 </div>
@@ -1152,7 +1166,7 @@ export default function CertificatesPage() {
         {deleting && (
           <>
             <p className="text-sm text-ink-2">
-              {t("slCertificates.deleteConfirm", { number: deleting.certificate_number })}
+              {t("slCertificates.deleteConfirm", { number: ltrText(deleting.certificate_number) })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeleting(null)}>{t("action.cancel")}</Button>

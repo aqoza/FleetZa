@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getCountry } from "../../../shared/countries";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { useAuth, useTenant } from "../../context/AuthContext";
@@ -109,10 +110,11 @@ export default function SalesSettingsPage() {
             <Field
               label={t("sales.settings.quotePrefix")}
               hint={t("sales.settings.prefixHint", {
-                example: `${form.quote_prefix || "QT"}-00001`,
+                example: ltrText(`${form.quote_prefix || "QT"}-00001`),
               })}
             >
               <Input
+                dir="ltr"
                 value={form.quote_prefix}
                 onChange={(e) => set("quote_prefix", e.target.value)}
                 disabled={!isAdmin}
@@ -122,10 +124,11 @@ export default function SalesSettingsPage() {
             <Field
               label={t("sales.settings.orderPrefix")}
               hint={t("sales.settings.prefixHint", {
-                example: `${form.order_prefix || "SO"}-00001`,
+                example: ltrText(`${form.order_prefix || "SO"}-00001`),
               })}
             >
               <Input
+                dir="ltr"
                 value={form.order_prefix}
                 onChange={(e) => set("order_prefix", e.target.value)}
                 disabled={!isAdmin}
@@ -135,10 +138,11 @@ export default function SalesSettingsPage() {
             <Field
               label={t("sales.settings.invoicePrefix")}
               hint={t("sales.settings.prefixHint", {
-                example: `${form.invoice_prefix || "INV"}-00001`,
+                example: ltrText(`${form.invoice_prefix || "INV"}-00001`),
               })}
             >
               <Input
+                dir="ltr"
                 value={form.invoice_prefix}
                 onChange={(e) => set("invoice_prefix", e.target.value)}
                 disabled={!isAdmin}
@@ -172,9 +176,9 @@ export default function SalesSettingsPage() {
             <Field
               label={t("sales.settings.defaultTaxRate")}
               hint={t("sales.settings.defaultTaxHint", {
-                label: country.tax.label,
+                label: bdiText(country.tax.label),
                 rate: country.tax.rate,
-                country: country.name,
+                country: bdiText(country.name),
               })}
             >
               <Input

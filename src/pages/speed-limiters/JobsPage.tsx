@@ -22,12 +22,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge,
+  Bdi,
   Button,
   EmptyState,
   ErrorState,
   Field,
   Input,
   LoadingState,
+  Ltr,
   Modal,
   PageHeader,
   Pagination,
@@ -332,6 +334,7 @@ function TechniciansManager({
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label={t("field.phone")}>
             <Input
+              dir="ltr"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
             />
@@ -380,14 +383,16 @@ function TechniciansManager({
             <li key={tech.id} className="flex items-center justify-between gap-3 px-3 py-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="truncate text-sm font-medium text-slate-800">{tech.name}</span>
+                  <span className="truncate text-sm font-medium text-slate-800"><Bdi>{tech.name}</Bdi></span>
                   <Badge tone={tech.active ? "green" : "slate"}>
                     {tech.active ? t("slJobs.active") : t("slJobs.inactive")}
                   </Badge>
                 </div>
                 {(tech.phone || tech.email) && (
                   <div className="truncate text-xs text-slate-500">
-                    {[tech.phone, tech.email].filter(Boolean).join(" · ")}
+                    {tech.phone && <Ltr>{tech.phone}</Ltr>}
+                    {tech.phone && tech.email && " · "}
+                    {tech.email && <Ltr>{tech.email}</Ltr>}
                   </div>
                 )}
               </div>
@@ -496,6 +501,7 @@ export default function JobsPage() {
       ),
       sortValue: (j) => j.number,
       exportValue: (j) => j.number,
+      dir: "ltr",
     },
     {
       id: "customer",
@@ -503,12 +509,14 @@ export default function JobsPage() {
       cell: (j) => <span className="text-slate-600">{j.customers?.name ?? "—"}</span>,
       sortValue: (j) => j.customers?.name ?? null,
       minBreakpoint: "md",
+      dir: "auto",
     },
     {
       id: "vehicle",
       header: t("field.vehicle"),
       cell: (j) => <span className="text-slate-600">{j.vehicles?.name ?? "—"}</span>,
       sortValue: (j) => j.vehicles?.name ?? null,
+      dir: "auto",
     },
     {
       id: "type",
@@ -524,6 +532,7 @@ export default function JobsPage() {
       sortValue: (j) => j.sl_technicians?.name ?? null,
       minBreakpoint: "lg",
       defaultHidden: true,
+      dir: "auto",
     },
     {
       id: "scheduled",
@@ -531,6 +540,7 @@ export default function JobsPage() {
       cell: (j) => <span className="text-slate-600">{formatDate(j.scheduled_date)}</span>,
       sortValue: (j) => j.scheduled_date,
       minBreakpoint: "lg",
+      dir: "ltr",
     },
     {
       id: "status",

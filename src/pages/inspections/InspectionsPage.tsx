@@ -8,7 +8,7 @@ import type { Inspection, InspectionResult } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
-  Badge, EmptyState, ErrorState, LoadingState, Modal, PageHeader, Table, type BadgeTone,
+  Badge, Bdi, EmptyState, ErrorState, LoadingState, Ltr, Modal, PageHeader, Table, type BadgeTone,
 } from "../../components/ui";
 
 type InspectionRow = Inspection & { vehicles: { name: string } | null };
@@ -84,7 +84,7 @@ export default function InspectionsPage() {
                 onClick={() => setViewing(i)}
               >
                 <td className="px-4 py-3 text-ink-2">
-                  {formatDateTime(i.performed_at, tenant.timezone)}
+                  <Ltr>{formatDateTime(i.performed_at, tenant.timezone)}</Ltr>
                 </td>
                 <td className="px-4 py-3 font-medium">
                   <button
@@ -96,7 +96,7 @@ export default function InspectionsPage() {
                     })}
                     className="font-medium text-brand-700 hover:underline"
                   >
-                    {i.vehicles?.name ?? t("common.dash")}
+                    <Bdi>{i.vehicles?.name ?? t("common.dash")}</Bdi>
                   </button>
                 </td>
                 <td className="px-4 py-3">
@@ -112,7 +112,7 @@ export default function InspectionsPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-ink-3">
-                  <div className="max-w-xs truncate">{i.notes ?? t("common.dash")}</div>
+                  <div className="max-w-xs truncate"><Bdi>{i.notes ?? t("common.dash")}</Bdi></div>
                 </td>
               </tr>
             );
@@ -126,10 +126,10 @@ export default function InspectionsPage() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <div className="text-sm font-medium text-ink">
-                  {viewing.vehicles?.name ?? t("common.dash")}
+                  <Bdi>{viewing.vehicles?.name ?? t("common.dash")}</Bdi>
                 </div>
                 <div className="text-xs text-ink-3">
-                  {formatDateTime(viewing.performed_at, tenant.timezone)}
+                  <Ltr>{formatDateTime(viewing.performed_at, tenant.timezone)}</Ltr>
                 </div>
               </div>
               <Badge tone={viewing.status === "pass" ? "green" : "red"}>
@@ -141,8 +141,8 @@ export default function InspectionsPage() {
               {viewing.results.map((r) => (
                 <li key={r.item_id} className="flex items-start justify-between gap-3 py-2">
                   <div>
-                    <div className="text-sm text-ink-2">{r.label}</div>
-                    {r.note && <div className="mt-0.5 text-xs text-ink-3">{r.note}</div>}
+                    <div className="text-sm text-ink-2"><Bdi>{r.label}</Bdi></div>
+                    {r.note && <div className="mt-0.5 text-xs text-ink-3"><Bdi>{r.note}</Bdi></div>}
                   </div>
                   <Badge tone={resultBadge[r.result].tone}>{t(resultBadge[r.result].labelKey)}</Badge>
                 </li>
@@ -150,7 +150,7 @@ export default function InspectionsPage() {
             </ul>
 
             {viewing.notes && (
-              <p className="rounded-lg bg-canvas p-3 text-sm text-ink-2">{viewing.notes}</p>
+              <p className="rounded-lg bg-canvas p-3 text-sm text-ink-2"><Bdi>{viewing.notes}</Bdi></p>
             )}
           </div>
         )}

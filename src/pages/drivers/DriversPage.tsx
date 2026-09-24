@@ -3,12 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Plus, Trash2, Users } from "lucide-react";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { daysUntil, formatDate } from "../../lib/format";
+import { ltrText } from "../../lib/bidi";
 import { driverStatus } from "../../lib/labels";
 import type { Driver } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useT, type Translate } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table,
+  Textarea,
 } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 
@@ -16,10 +18,10 @@ function licenseBadge(expiry: string | null, t: Translate) {
   if (!expiry) return <span className="text-slate-400">—</span>;
   const days = daysUntil(expiry);
   if (days < 0)
-    return <Badge tone="red">{t("drivers.licenseExpired", { date: formatDate(expiry) })}</Badge>;
+    return <Badge tone="red">{t("drivers.licenseExpired", { date: ltrText(formatDate(expiry)) })}</Badge>;
   if (days <= 30)
-    return <Badge tone="yellow">{t("drivers.licenseExpires", { date: formatDate(expiry) })}</Badge>;
-  return <span className="text-slate-600">{formatDate(expiry)}</span>;
+    return <Badge tone="yellow">{t("drivers.licenseExpires", { date: ltrText(formatDate(expiry)) })}</Badge>;
+  return <span className="text-slate-600"><Ltr>{formatDate(expiry)}</Ltr></span>;
 }
 
 function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void }) {
@@ -89,13 +91,13 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
           <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
         </Field>
         <Field label={t("field.phone")}>
-          <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <Input dir="ltr" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
         <Field label={t("drivers.licenseNumber")}>
-          <Input value={form.license_number} onChange={(e) => set("license_number", e.target.value)} />
+          <Input dir="ltr" value={form.license_number} onChange={(e) => set("license_number", e.target.value)} />
         </Field>
         <Field label={t("drivers.licenseClass")}>
-          <Input value={form.license_class} onChange={(e) => set("license_class", e.target.value)} />
+          <Input dir="ltr" value={form.license_class} onChange={(e) => set("license_class", e.target.value)} />
         </Field>
         <Field label={t("drivers.licenseExpiry")}>
           <Input type="date" value={form.license_expiry} onChange={(e) => set("license_expiry", e.target.value)} />
@@ -225,15 +227,17 @@ export default function DriversPage() {
           {filtered.map((d) => (
             <tr key={d.id} className="hover:bg-slate-50">
               <td className="px-4 py-3 font-medium text-slate-800">
-                {d.first_name} {d.last_name}
+                <Bdi>{d.first_name} {d.last_name}</Bdi>
               </td>
               <td className="px-4 py-3 text-slate-600">
-                <div>{d.email ?? "—"}</div>
-                <div className="text-xs text-slate-500">{d.phone ?? ""}</div>
+                <div><Ltr>{d.email ?? "—"}</Ltr></div>
+                <div className="text-xs text-slate-500"><Ltr>{d.phone ?? ""}</Ltr></div>
               </td>
               <td className="px-4 py-3 text-slate-600">
-                {d.license_number ?? "—"}
-                {d.license_class && <span className="text-xs text-slate-400"> ({d.license_class})</span>}
+                <Ltr>{d.license_number ?? "—"}</Ltr>
+                {d.license_class && (
+                  <span className="text-xs text-slate-400"> (<Ltr>{d.license_class}</Ltr>)</span>
+                )}
               </td>
               <td className="px-4 py-3">{licenseBadge(d.license_expiry, t)}</td>
               <td className="px-4 py-3">
@@ -277,7 +281,7 @@ export default function DriversPage() {
           <>
             <p className="text-sm text-slate-600">
               {t("drivers.deleteConfirmBefore")}{" "}
-              <span className="font-semibold">{deleting.first_name} {deleting.last_name}</span>
+              <Bdi className="font-semibold">{deleting.first_name} {deleting.last_name}</Bdi>
               {t("drivers.deleteConfirmAfter")}
             </p>
             <div className="mt-4 flex justify-end gap-2">

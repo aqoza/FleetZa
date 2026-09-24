@@ -9,9 +9,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { CheckCircle2, Loader2, SearchX, XCircle } from "lucide-react";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { formatDate, formatMoney } from "../../lib/format";
 import { LANGUAGES, useI18n } from "../../i18n";
-import { Button, Card, ErrorState, Field, Input } from "../../components/ui";
+import { Bdi, Button, Card, ErrorState, Field, Input, Ltr } from "../../components/ui";
 
 interface PublicLine {
   id: string;
@@ -144,19 +145,27 @@ export default function PublicQuotePage() {
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-brand-700">
-              {t("sales.public.heading", { number: quote.docNumber })}
+              {t("sales.public.heading", { number: ltrText(quote.docNumber) })}
             </h1>
             {quote.companyName && (
               <p className="mt-1 text-sm text-ink-2">
-                {t("sales.public.from", { company: quote.companyName })}
+                {t("sales.public.from", { company: bdiText(quote.companyName) })}
               </p>
             )}
-            {quote.title && <p className="mt-2 text-sm text-ink">{quote.title}</p>}
+            {quote.title && (
+              <p className="mt-2 text-sm text-ink">
+                <Bdi>{quote.title}</Bdi>
+              </p>
+            )}
           </div>
           <div className="text-end text-xs text-ink-3">
-            <div>{formatDate(quote.issueDate)}</div>
+            <div>
+              <Ltr>{formatDate(quote.issueDate)}</Ltr>
+            </div>
             {quote.validUntil && (
-              <div>{t("sales.public.validUntil", { date: formatDate(quote.validUntil) })}</div>
+              <div>
+                {t("sales.public.validUntil", { date: ltrText(formatDate(quote.validUntil)) })}
+              </div>
             )}
           </div>
         </header>
@@ -167,8 +176,8 @@ export default function PublicQuotePage() {
             {quote.acceptedAt && quote.acceptedByName && (
               <p className="mt-0.5 text-xs">
                 {t("sales.public.acceptedOn", {
-                  date: formatDate(quote.acceptedAt),
-                  name: quote.acceptedByName,
+                  date: ltrText(formatDate(quote.acceptedAt)),
+                  name: bdiText(quote.acceptedByName),
                 })}
               </p>
             )}
@@ -206,19 +215,21 @@ export default function PublicQuotePage() {
             {quote.lines.map((line) => (
               <tr key={line.id}>
                 <td className="py-2.5 text-ink">
-                  {line.description}
+                  <Bdi>{line.description}</Bdi>
                   {line.discount_percent > 0 && (
-                    <span className="ms-2 text-xs text-ink-3">−{line.discount_percent}%</span>
+                    <span className="ms-2 text-xs text-ink-3">
+                      <Ltr>−{line.discount_percent}%</Ltr>
+                    </span>
                   )}
                 </td>
                 <td className="py-2.5 text-end text-ink-2 tabular-nums">
-                  {line.quantity}{line.unit ? ` ${line.unit}` : ""}
+                  <Bdi>{line.quantity}{line.unit ? ` ${line.unit}` : ""}</Bdi>
                 </td>
                 <td className="py-2.5 text-end text-ink-2 tabular-nums">
-                  {money(line.unit_price)}
+                  <Ltr>{money(line.unit_price)}</Ltr>
                 </td>
                 <td className="py-2.5 text-end font-medium text-ink tabular-nums">
-                  {money(line.line_total)}
+                  <Ltr>{money(line.line_total)}</Ltr>
                 </td>
               </tr>
             ))}
@@ -241,14 +252,18 @@ export default function PublicQuotePage() {
         </div>
 
         {quote.notes && (
-          <p className="mt-5 whitespace-pre-line text-sm text-ink-2">{quote.notes}</p>
+          <p className="mt-5 whitespace-pre-line text-sm text-ink-2">
+            <Bdi>{quote.notes}</Bdi>
+          </p>
         )}
         {quote.terms && (
           <div className="mt-5 border-t border-line pt-4">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-3 rtl:tracking-normal">
               {t("sales.doc.terms")}
             </div>
-            <p className="mt-1.5 whitespace-pre-line text-xs text-ink-2">{quote.terms}</p>
+            <p className="mt-1.5 whitespace-pre-line text-xs text-ink-2">
+              <Bdi>{quote.terms}</Bdi>
+            </p>
           </div>
         )}
 
@@ -269,7 +284,7 @@ export default function PublicQuotePage() {
               onClick={() => void accept()}
             >
               <CheckCircle2 className="h-4 w-4" />
-              {t("sales.public.confirmAccept", { number: quote.docNumber })}
+              {t("sales.public.confirmAccept", { number: ltrText(quote.docNumber) })}
             </Button>
           </div>
         )}
@@ -329,7 +344,9 @@ function SummaryRow({
   return (
     <div className="flex items-baseline justify-between gap-4">
       <dt className={strong ? "font-semibold text-ink" : "text-ink-3"}>{label}</dt>
-      <dd className={strong ? "text-base font-semibold text-ink" : "text-ink"}>{value}</dd>
+      <dd className={strong ? "text-base font-semibold text-ink" : "text-ink"}>
+        <Ltr>{value}</Ltr>
+      </dd>
     </div>
   );
 }

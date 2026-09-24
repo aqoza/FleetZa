@@ -18,6 +18,7 @@ import {
 } from "../../../shared/modules";
 import type { ModuleDef } from "../../../shared/modules";
 import { apiFetch } from "../../lib/api";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { insertRow, listRows, updateRow } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import type {
@@ -33,7 +34,7 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT, type MessageKey, type Translate } from "../../i18n";
 import {
-  Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table,
+  Badge, Bdi, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
 import { Combobox, type ComboboxOption } from "../../components/Combobox";
@@ -253,10 +254,10 @@ function OrganizationTab() {
       out.push({ value: tenant.country, label: countryName(tenant.country) });
     }
     for (const c of MIDDLE_EAST_OPTIONS) {
-      out.push({ value: c.code, label: c.name, meta: t("settings.middleEast") });
+      out.push({ value: c.code, label: c.name, meta: t("settings.middleEast"), metaDir: "auto" });
     }
     for (const c of OTHER_OPTIONS) {
-      out.push({ value: c.code, label: c.name, meta: t("settings.otherCountries") });
+      out.push({ value: c.code, label: c.name, meta: t("settings.otherCountries"), metaDir: "auto" });
     }
     return out;
   }, [tenant.country, t]);
@@ -357,17 +358,17 @@ function OrganizationTab() {
   }
 
   if (!isAdmin) {
-    const rows: Array<[string, string]> = [
-      [t("field.name"), tenant.name],
+    const rows: Array<[string, ReactNode]> = [
+      [t("field.name"), <Bdi>{tenant.name}</Bdi>],
       [
         t("settings.archetype"),
         tenant.archetype === "service_provider"
           ? t("settings.archetypeProvider")
           : t("settings.archetypeOperator"),
       ],
-      [t("settings.country"), countryName(tenant.country)],
-      [t("settings.currency"), tenant.currency],
-      [t("settings.timezone"), tenant.timezone],
+      [t("settings.country"), <Bdi>{countryName(tenant.country)}</Bdi>],
+      [t("settings.currency"), <Ltr>{tenant.currency}</Ltr>],
+      [t("settings.timezone"), <Ltr>{tenant.timezone}</Ltr>],
       [
         t("settings.distanceUnit"),
         tenant.distance_unit === "mi" ? t("settings.miles") : t("settings.kilometers"),
@@ -376,9 +377,9 @@ function OrganizationTab() {
         t("settings.volumeUnit"),
         tenant.volume_unit === "gal" ? t("settings.gallons") : t("settings.liters"),
       ],
-      [t("settings.address"), tenant.address ?? t("common.dash")],
-      [t("field.phone"), tenant.phone ?? t("common.dash")],
-      [t("settings.created"), formatDate(tenant.created_at)],
+      [t("settings.address"), <Bdi>{tenant.address ?? t("common.dash")}</Bdi>],
+      [t("field.phone"), <Ltr>{tenant.phone ?? t("common.dash")}</Ltr>],
+      [t("settings.created"), <Ltr>{formatDate(tenant.created_at)}</Ltr>],
     ];
     return (
       <Card className="max-w-2xl">
@@ -472,8 +473,9 @@ function OrganizationTab() {
             </div>
           </div>
 
-          <Field label={getCountry(form.country).tax.registrationLabel}>
+          <Field label={bdiText(getCountry(form.country).tax.registrationLabel)}>
             <Input
+              dir="ltr"
               value={form.tax_registration_number}
               onChange={(e) => set("tax_registration_number", e.target.value)}
               autoComplete="off"
@@ -695,7 +697,7 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
     <Card className="p-5 lg:col-span-2">
       <h2 className="text-sm font-semibold text-slate-900">{t("settings.countryProfile")}</h2>
       <p className="mt-1 text-xs text-slate-500">
-        {t("settings.countryProfileDesc", { name: cfg.name })}
+        {t("settings.countryProfileDesc", { name: bdiText(cfg.name) })}
       </p>
 
       <dl className="mt-4 space-y-4">
@@ -704,9 +706,9 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
             {t("settings.currency")}
           </dt>
           <dd className="mt-1 text-sm text-slate-800">
-            {cfg.currency}{" "}
+            <Ltr>{cfg.currency}</Ltr>{" "}
             <span className="text-slate-500">
-              {t("settings.egSample", { sample: currencySample })}
+              {t("settings.egSample", { sample: ltrText(currencySample) })}
             </span>
           </dd>
         </div>
@@ -714,18 +716,26 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {t("settings.dateFormat")}
           </dt>
-          <dd className="mt-1 text-sm text-slate-800">{dateSample}</dd>
+          <dd className="mt-1 text-sm text-slate-800">
+            <Ltr>{dateSample}</Ltr>
+          </dd>
         </div>
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             {t("settings.tax")}
           </dt>
           <dd className="mt-1 text-sm text-slate-800">
-            {cfg.tax.rate > 0
-              ? `${cfg.tax.label} ${cfg.tax.rate}%`
-              : t("settings.noTax", { label: cfg.tax.label })}
+            {cfg.tax.rate > 0 ? (
+              <Bdi>{`${cfg.tax.label} ${cfg.tax.rate}%`}</Bdi>
+            ) : (
+              t("settings.noTax", { label: bdiText(cfg.tax.label) })
+            )}
           </dd>
-          {cfg.tax.note && <dd className="mt-1 text-xs text-slate-500">{cfg.tax.note}</dd>}
+          {cfg.tax.note && (
+            <dd className="mt-1 text-xs text-slate-500">
+              <Bdi>{cfg.tax.note}</Bdi>
+            </dd>
+          )}
         </div>
         <div>
           <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -738,7 +748,9 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
                   key={`${r.type}-${r.label}`}
                   className="flex items-baseline justify-between gap-3 text-sm"
                 >
-                  <span className="text-slate-700">{r.label}</span>
+                  <span className="text-slate-700">
+                    <Bdi>{r.label}</Bdi>
+                  </span>
                   <span className="whitespace-nowrap text-xs text-slate-500">
                     {t("settings.everyMonths", { count: r.months })}
                   </span>
@@ -972,8 +984,12 @@ function MembersTab() {
           {(members ?? []).map((m) => (
             <tr key={m.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
-                <div className="font-medium text-slate-800">{m.full_name}</div>
-                <div className="text-xs text-slate-500">{m.email}</div>
+                <div className="font-medium text-slate-800">
+                  <Bdi>{m.full_name}</Bdi>
+                </div>
+                <div className="text-xs text-slate-500">
+                  <Ltr>{m.email}</Ltr>
+                </div>
               </td>
               <td className="px-4 py-3">
                 {canManage(m) ? (
@@ -993,7 +1009,9 @@ function MembersTab() {
                   <Badge tone={roleTone[m.role]}>{t(`role.${m.role}`)}</Badge>
                 )}
               </td>
-              <td className="px-4 py-3 text-slate-600">{formatDate(m.created_at)}</td>
+              <td className="px-4 py-3 text-slate-600">
+                <Ltr>{formatDate(m.created_at)}</Ltr>
+              </td>
               {isAdmin && (
                 <td className="px-4 py-3 text-end">
                   {canManage(m) && (
@@ -1016,7 +1034,7 @@ function MembersTab() {
           <>
             <p className="text-sm text-slate-600">
               {t("settings.removeMemberConfirmPre")}{" "}
-              <span className="font-semibold">{removing.full_name}</span>{" "}
+              <Bdi className="font-semibold">{removing.full_name}</Bdi>{" "}
               {t("settings.removeMemberConfirmPost")}
             </p>
             <div className="mt-4 flex justify-end gap-2">
@@ -1187,10 +1205,14 @@ function InvitationsTab({
           >
             {(invitations ?? []).map((inv) => (
               <tr key={inv.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-800">{inv.email}</td>
+                <td className="px-4 py-3 font-medium text-slate-800">
+                  <Ltr>{inv.email}</Ltr>
+                </td>
                 <td className="px-4 py-3 text-slate-600">{t(`role.${inv.role}`)}</td>
                 <td className="px-4 py-3">{invitationBadge(inv, t)}</td>
-                <td className="px-4 py-3 text-slate-600">{formatDate(inv.created_at)}</td>
+                <td className="px-4 py-3 text-slate-600">
+                  <Ltr>{formatDate(inv.created_at)}</Ltr>
+                </td>
                 <td className="px-4 py-3 text-end">
                   {inv.status === "pending" && (
                     <div className="flex justify-end gap-2">
@@ -1229,7 +1251,7 @@ function InvitationsTab({
           <>
             <p className="text-sm text-slate-600">
               {t("settings.revokeInvitationConfirmPre")}{" "}
-              <span className="font-semibold">{revoking.email}</span>
+              <Ltr className="font-semibold">{revoking.email}</Ltr>
               {t("settings.revokeInvitationConfirmPost")}
             </p>
             <div className="mt-4 flex justify-end gap-2">

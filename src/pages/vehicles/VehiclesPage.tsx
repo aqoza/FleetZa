@@ -11,7 +11,7 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { useT } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Input, LoadingState, Modal, PageHeader, Pagination,
+  Badge, Bdi, Button, EmptyState, ErrorState, Input, LoadingState, Modal, PageHeader, Pagination,
   Select,
 } from "../../components/ui";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
@@ -89,7 +89,7 @@ export default function VehiclesPage() {
           className="text-brand-700 hover:underline"
           onClick={(e) => e.stopPropagation()}
         >
-          {v.customers?.name ?? t("common.dash")}
+          <Bdi>{v.customers?.name ?? t("common.dash")}</Bdi>
         </Link>
       ) : (
         <span className="text-slate-600">{t("vehicles.ownerCompany")}</span>
@@ -107,10 +107,10 @@ export default function VehiclesPage() {
       cell: (v) => (
         <>
           <Link to={`/vehicles/${v.id}`} className="font-medium text-brand-700 hover:underline">
-            {v.name}
+            <Bdi>{v.name}</Bdi>
           </Link>
           <div className="text-xs text-slate-500">
-            {[v.year, v.make, v.model].filter(Boolean).join(" ") || t("common.dash")}
+            <Bdi>{[v.year, v.make, v.model].filter(Boolean).join(" ") || t("common.dash")}</Bdi>
           </div>
         </>
       ),
@@ -131,12 +131,14 @@ export default function VehiclesPage() {
       cell: (v) => <span className="text-slate-600">{v.license_plate ?? t("common.dash")}</span>,
       sortValue: (v) => v.license_plate,
       exportValue: (v) => v.license_plate ?? "",
+      dir: "ltr",
     },
     {
       id: "odometer",
       header: t("field.odometer"),
       align: "end",
       minBreakpoint: "md",
+      dir: "ltr",
       cell: (v) => (
         <span className="text-slate-600">{formatDistance(v.odometer, tenant.distance_unit)}</span>
       ),

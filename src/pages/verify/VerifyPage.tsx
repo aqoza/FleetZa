@@ -4,6 +4,7 @@ import { AlertTriangle, CheckCircle2, Loader2, SearchX, XCircle } from "lucide-r
 import type { LucideIcon } from "lucide-react";
 import { LANGUAGES, useI18n, type MessageKey } from "../../i18n";
 import { formatDocumentDate, formatSpeedBand } from "../../lib/certificate";
+import { Bdi, Ltr } from "../../components/ui";
 
 /**
  * Public certificate verification page (linked from the QR code printed on
@@ -97,6 +98,25 @@ function VerifyLanguageSwitcher() {
 function formatPlainDate(iso: string): string {
   return formatDocumentDate(iso) ?? iso;
 }
+
+/**
+ * Rows whose value is an identifier, number or date: always left to right, as
+ * on the printed certificate. Every other value is a name or free text in
+ * either script (docs/I18N.md "Left-to-right data").
+ */
+const LTR_ROWS = new Set<MessageKey>([
+  "speedLimiters.verify.plate",
+  "speedLimiters.verify.year",
+  "speedLimiters.verify.chassis",
+  "speedLimiters.verify.engine",
+  "speedLimiters.verify.serialNo",
+  "speedLimiters.verify.tamperSeal",
+  "speedLimiters.verify.installedAt",
+  "speedLimiters.verify.certificateNumber",
+  "speedLimiters.verify.uin",
+  "speedLimiters.verify.issuedAt",
+  "speedLimiters.verify.expiresAt",
+]);
 
 export default function VerifyPage() {
   const { t } = useI18n();
@@ -251,11 +271,8 @@ export default function VerifyPage() {
                         className="flex items-baseline justify-between gap-4 py-2.5"
                       >
                         <dt className="shrink-0 text-sm text-ink-3">{t(labelKey)}</dt>
-                        {/* Identifiers are mixed-script (plates, chassis, VINs);
-                            <bdi> keeps each one ordered on its own so a plate
-                            doesn't reverse on the Arabic pass. */}
                         <dd className="min-w-0 break-words text-end text-sm font-medium text-ink">
-                          <bdi>{value}</bdi>
+                          {LTR_ROWS.has(labelKey) ? <Ltr>{value}</Ltr> : <Bdi>{value}</Bdi>}
                         </dd>
                       </div>
                     ))}

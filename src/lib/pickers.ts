@@ -174,7 +174,9 @@ export function useContactPicker(selectedId: string, customerId: string): Picker
     selectedId,
     searchColumns: ["name", "email", "phone", "title"],
     orderBy: "name",
-    toOption: (c) => ({ value: c.id, label: c.name, meta: c.title ?? undefined }),
+    toOption: (c) => ({
+      value: c.id, label: c.name, meta: c.title ?? undefined, metaDir: "auto",
+    }),
     filter: (q) => q.eq("customer_id", customerId),
     scope: ["contacts", customerId],
     enabled: Boolean(customerId),
@@ -227,7 +229,9 @@ export function useDevicePicker(
     selectedId,
     searchColumns: ["serial", "imei", "model", "manufacturer"],
     orderBy: "serial",
-    toOption: (d) => ({ value: d.id, label: d.serial, meta: d.model ?? undefined }),
+    toOption: (d) => ({
+      value: d.id, label: d.serial, meta: d.model ?? undefined, metaDir: "auto",
+    }),
     filter: inStockOnly ? (q) => q.eq("status", "in_stock") : undefined,
     scope: ["sl_devices", inStockOnly],
   });
@@ -266,7 +270,9 @@ export function useDocumentPicker(
     searchColumns: ["doc_number", "title", "customer_reference"],
     orderBy: dateColumn,
     ascending: false,
-    toOption: (d) => ({ value: d.id, label: d.doc_number, meta: d.title ?? undefined }),
+    toOption: (d) => ({
+      value: d.id, label: d.doc_number, meta: d.title ?? undefined, metaDir: "auto",
+    }),
     filter: customerId ? (q) => q.eq("customer_id", customerId) : undefined,
     scope: [table, customerId],
   });

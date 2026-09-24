@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addMonths, format } from "date-fns";
 import { CalendarClock, Check, Pencil, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { getCountry } from "../../../shared/countries";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { deleteRow, insertRow, listRows, updateRow } from "../../lib/db";
 import { daysUntil, formatDate, formatMoney } from "../../lib/format";
 import { renewalTypes } from "../../lib/labels";
@@ -11,7 +12,7 @@ import type { Renewal, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type Translate } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader, Select, Table, Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
@@ -19,13 +20,13 @@ import { useToast } from "../../components/Toast";
 type RenewalRow = Renewal & { vehicles: Pick<Vehicle, "name"> | null };
 
 function dueDateCell(r: RenewalRow, t: Translate) {
-  if (r.completed_at) return <span className="text-slate-600">{formatDate(r.due_date)}</span>;
+  if (r.completed_at) return <span className="text-slate-600"><Ltr>{formatDate(r.due_date)}</Ltr></span>;
   const days = daysUntil(r.due_date);
   if (days < 0) {
     return (
       <div className="flex items-center gap-2">
         <Badge tone="red">{t("renewals.overdue")}</Badge>
-        <span className="text-xs text-slate-500">{formatDate(r.due_date)}</span>
+        <span className="text-xs text-slate-500"><Ltr>{formatDate(r.due_date)}</Ltr></span>
       </div>
     );
   }
@@ -33,11 +34,11 @@ function dueDateCell(r: RenewalRow, t: Translate) {
     return (
       <div className="flex items-center gap-2">
         <Badge tone="yellow">{t("renewals.dueInDays", { count: days })}</Badge>
-        <span className="text-xs text-slate-500">{formatDate(r.due_date)}</span>
+        <span className="text-xs text-slate-500"><Ltr>{formatDate(r.due_date)}</Ltr></span>
       </div>
     );
   }
-  return <span className="text-slate-600">{formatDate(r.due_date)}</span>;
+  return <span className="text-slate-600"><Ltr>{formatDate(r.due_date)}</Ltr></span>;
 }
 
 function RenewalForm({ renewal, onDone }: { renewal?: Renewal; onDone: () => void }) {
@@ -217,12 +218,12 @@ function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
       </Field>
       <div>
         <span className="mb-1 block text-sm font-medium text-slate-700">
-          {t("renewals.standardFor", { country: country.name })}
+          {t("renewals.standardFor", { country: bdiText(country.name) })}
         </span>
         <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-slate-50">
           {catalog.map((entry) => (
             <li key={entry.type} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
-              <span className="text-slate-700">{entry.label}</span>
+              <span className="text-slate-700"><Bdi>{entry.label}</Bdi></span>
               <span className="whitespace-nowrap text-xs text-slate-500">
                 {t("renewals.everyMonthsLong", { count: entry.months })}
               </span>
@@ -230,7 +231,7 @@ function CountryDefaultsForm({ onDone }: { onDone: () => void }) {
           ))}
         </ul>
         {notes?.map((note) => (
-          <p key={note} className="mt-2 text-xs text-slate-500">{note}</p>
+          <p key={note} className="mt-2 text-xs text-slate-500"><Bdi>{note}</Bdi></p>
         ))}
       </div>
       {result && (
@@ -421,15 +422,15 @@ export default function RenewalsPage() {
             <tr key={r.id} className="hover:bg-slate-50">
               <td className="px-4 py-3">
                 <div className="font-medium text-slate-800">
-                  {r.name ?? t(renewalTypes[r.renewal_type])}
+                  {r.name != null ? <Bdi>{r.name}</Bdi> : t(renewalTypes[r.renewal_type])}
                 </div>
                 {r.name && (
                   <div className="text-xs text-slate-500">{t(renewalTypes[r.renewal_type])}</div>
                 )}
               </td>
-              <td className="px-4 py-3 text-slate-600">{r.vehicles?.name ?? "—"}</td>
+              <td className="px-4 py-3 text-slate-600"><Bdi>{r.vehicles?.name ?? "—"}</Bdi></td>
               <td className="px-4 py-3">{dueDateCell(r, t)}</td>
-              <td className="px-4 py-3 text-slate-600">{formatMoney(r.amount, tenant.currency)}</td>
+              <td className="px-4 py-3 text-slate-600"><Ltr>{formatMoney(r.amount, tenant.currency)}</Ltr></td>
               <td className="px-4 py-3 text-slate-600">
                 {r.recurrence_months
                   ? t("renewals.everyMonthsShort", { count: r.recurrence_months })
@@ -438,7 +439,7 @@ export default function RenewalsPage() {
               <td className="px-4 py-3">
                 {r.completed_at ? (
                   <Badge tone="green">
-                    {t("renewals.completedOn", { date: formatDate(r.completed_at) })}
+                    {t("renewals.completedOn", { date: ltrText(formatDate(r.completed_at)) })}
                   </Badge>
                 ) : (
                   <Badge tone="blue">{t("renewals.statusPending")}</Badge>
@@ -508,10 +509,10 @@ export default function RenewalsPage() {
             <p className="text-sm text-slate-600">
               {t("renewals.deleteLead")}
               <span className="font-semibold">
-                {deleting.name ?? t(renewalTypes[deleting.renewal_type])}
+                {deleting.name != null ? <Bdi>{deleting.name}</Bdi> : t(renewalTypes[deleting.renewal_type])}
               </span>
               {deleting.vehicles
-                ? t("renewals.deleteRestVehicle", { vehicle: deleting.vehicles.name })
+                ? t("renewals.deleteRestVehicle", { vehicle: bdiText(deleting.vehicles.name) })
                 : t("renewals.deleteRestNoVehicle")}
             </p>
             <div className="mt-4 flex justify-end gap-2">

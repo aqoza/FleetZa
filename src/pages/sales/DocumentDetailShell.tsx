@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Printer, Trash2 } from "lucide-react";
 import { getCountry } from "../../../shared/countries";
+import { bdiText } from "../../lib/bidi";
 import { deleteRow, getRow, listRows, updateRow, type TableName } from "../../lib/db";
 import { formatDate } from "../../lib/format";
 import { recordRecent } from "../../lib/recent";
@@ -16,10 +17,12 @@ import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge,
+  Bdi,
   Button,
   Card,
   ErrorState,
   LoadingState,
+  Ltr,
   Modal,
   PageHeader,
   type BadgeTone,
@@ -215,7 +218,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
         <BackLink to={routeBase} label={backLabel} />
         <PageHeader
           title={doc.doc_number}
-          description={doc.title ?? customerQuery.data?.name}
+          description={bdiText(doc.title ?? customerQuery.data?.name)}
           actions={
             <>
               {meta && <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>}
@@ -256,7 +259,7 @@ export function DocumentDetailShell<T extends ShellDocument>({
                     to={`/customers/${doc.customer_id}`}
                     className="text-brand-700 hover:underline"
                   >
-                    {customerQuery.data.name}
+                    <Bdi>{customerQuery.data.name}</Bdi>
                   </Link>
                 ) : (
                   "—"
@@ -265,15 +268,23 @@ export function DocumentDetailShell<T extends ShellDocument>({
             />
             {detailRows?.(doc)}
             {doc.customer_reference && (
-              <InfoRow label={t("sales.doc.reference")} value={doc.customer_reference} />
+              <InfoRow
+                label={t("sales.doc.reference")}
+                value={<Ltr>{doc.customer_reference}</Ltr>}
+              />
             )}
-            <InfoRow label={t("sales.doc.created")} value={formatDate(doc.created_at)} />
+            <InfoRow
+              label={t("sales.doc.created")}
+              value={<Ltr>{formatDate(doc.created_at)}</Ltr>}
+            />
             {doc.notes && (
-              <p className="mt-3 rounded-lg bg-canvas p-3 text-sm text-ink-2">{doc.notes}</p>
+              <p className="mt-3 rounded-lg bg-canvas p-3 text-sm text-ink-2">
+                <Bdi>{doc.notes}</Bdi>
+              </p>
             )}
             {doc.internal_notes && (
               <p className="mt-2 rounded-lg border border-dashed border-line p-3 text-sm text-ink-3">
-                {doc.internal_notes}
+                <Bdi>{doc.internal_notes}</Bdi>
               </p>
             )}
           </SectionCard>
@@ -318,7 +329,9 @@ export function DocumentDetailShell<T extends ShellDocument>({
           {doc.terms && (
             <Card className="p-5">
               <h3 className="mb-2 text-sm font-semibold text-ink">{t("sales.doc.terms")}</h3>
-              <p className="whitespace-pre-line text-sm text-ink-2">{doc.terms}</p>
+              <p className="whitespace-pre-line text-sm text-ink-2">
+                <Bdi>{doc.terms}</Bdi>
+              </p>
             </Card>
           )}
         </div>

@@ -19,6 +19,7 @@ import { getCountry } from "../../../shared/countries";
 import { getRow, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { formatMoney } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { computeLine, roundTo } from "../../lib/sales";
 import {
   indexBillingRows,
@@ -34,7 +35,7 @@ import { useT, type Translate } from "../../i18n";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
 import {
-  Button, ErrorState, Field, Input, LoadingState, Modal,
+  Bdi, Button, ErrorState, Field, Input, LoadingState, Ltr, Modal,
 } from "../../components/ui";
 import { useDefaultTaxRate } from "../sales/shared";
 
@@ -97,10 +98,10 @@ export function InvoiceCertificatesModal({
 function skipLabel(t: Translate, reason: InvoiceSkipReason): string {
   switch (reason.kind) {
     case "invoiced":
-      return t("slCertificates.invoiceSkipInvoiced", { number: reason.row.doc_number ?? "" });
+      return t("slCertificates.invoiceSkipInvoiced", { number: ltrText(reason.row.doc_number) });
     case "other_customer":
       return t("slCertificates.invoiceSkipOtherCustomer", {
-        name: reason.customerName ?? t("common.dash"),
+        name: bdiText(reason.customerName) || t("common.dash"),
       });
     case "no_customer":
       return t("slCertificates.invoiceSkipNoCustomer");
@@ -218,7 +219,10 @@ function InvoiceForm({
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
       void qc.invalidateQueries({ queryKey: ["sales_report"] });
       toast.success(
-        t("slCertificates.invoiceCreated", { number: invoice.doc_number, count: lines.length }),
+        t("slCertificates.invoiceCreated", {
+          number: ltrText(invoice.doc_number),
+          count: lines.length,
+        }),
       );
       onDone();
       navigate(`/sales/invoices/${invoice.id}`);
@@ -249,7 +253,7 @@ function InvoiceForm({
       {error && <ErrorState message={error} />}
       <p className="text-sm text-ink-2">
         {t("slCertificates.invoiceLead", {
-          customer: partition.customerName ?? t("common.dash"),
+          customer: bdiText(partition.customerName) || t("common.dash"),
         })}
       </p>
 
@@ -261,11 +265,17 @@ function InvoiceForm({
           <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-sm text-ink-2">
             {lines.map((c) => (
               <li key={c.id} className="flex justify-between gap-4">
-                <span className="font-medium text-ink">{c.certificate_number}</span>
-                {/* <bdi>: a plate is digits + Latin letters and would be
+                <span className="font-medium text-ink"><Ltr>{c.certificate_number}</Ltr></span>
+                {/* <Ltr>: a plate is digits + Latin letters and would be
                     reordered inside an RTL paragraph. */}
                 <span className="text-end text-ink-3">
-                  <bdi>{c.license_plate ?? c.vehicle_name ?? t("common.dash")}</bdi>
+                  {c.license_plate ? (
+                    <Ltr>{c.license_plate}</Ltr>
+                  ) : c.vehicle_name ? (
+                    <Bdi>{c.vehicle_name}</Bdi>
+                  ) : (
+                    t("common.dash")
+                  )}
                 </span>
               </li>
             ))}
@@ -281,7 +291,7 @@ function InvoiceForm({
           <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-sm text-ink-2">
             {skipped.map(({ cert, reason }) => (
               <li key={cert.id} className="flex justify-between gap-4">
-                <span className="font-medium text-ink">{cert.certificate_number}</span>
+                <span className="font-medium text-ink"><Ltr>{cert.certificate_number}</Ltr></span>
                 {reason.kind === "invoiced" ? (
                   <Link
                     to={`/sales/invoices/${reason.row.invoice_id}`}
@@ -302,7 +312,7 @@ function InvoiceForm({
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line p-3">
           <span className="text-sm text-ink-2">
             {t("slCertificates.invoiceOthersPending", {
-              name: partition.customerName ?? t("common.dash"),
+              name: bdiText(partition.customerName) || t("common.dash"),
               count: others.length,
             })}
           </span>
@@ -369,7 +379,7 @@ function InvoiceForm({
             <span className="text-sm text-ink-2 tabular-nums">
               {t("slCertificates.invoicePreview", {
                 count: lines.length,
-                total: formatMoney(total, tenant.currency),
+                total: ltrText(formatMoney(total, tenant.currency)),
               })}
             </span>
             <div className="flex gap-2">

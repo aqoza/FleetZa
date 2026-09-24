@@ -6,6 +6,7 @@ import { Archive, ArrowLeft, Award, Ban, Check, FileText, Play, ShieldCheck } fr
 import { listRows, updateRow, wrapDbError } from "../../lib/db";
 import { recordRecent } from "../../lib/recent";
 import { formatDate, formatDateTime } from "../../lib/format";
+import { bdiText, ltrText } from "../../lib/bidi";
 import { supabase } from "../../lib/supabase";
 import type {
   SlChecklistItem,
@@ -21,12 +22,14 @@ import { NewDocumentModal } from "../sales/NewDocumentModal";
 import { useT, type MessageKey } from "../../i18n";
 import {
   Badge,
+  Bdi,
   Button,
   Card,
   ErrorState,
   Field,
   Input,
   LoadingState,
+  Ltr,
   Modal,
   PageHeader,
   Textarea,
@@ -192,7 +195,7 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
         </Field>
         {CERT_JOB_TYPES.includes(job.job_type) && (
           <Field label={t("slJobs.tamperSealNumber")}>
-            <Input value={tamperSeal} onChange={(e) => setTamperSeal(e.target.value)} />
+            <Input dir="ltr" value={tamperSeal} onChange={(e) => setTamperSeal(e.target.value)} />
           </Field>
         )}
       </div>
@@ -279,7 +282,7 @@ function IssueCertificateForm({
       setError("");
       setIssued(num);
       void qc.invalidateQueries({ queryKey: ["speed_limiter_certificates"] });
-      toast.success(t("slCertificates.toast.issued", { number: num }));
+      toast.success(t("slCertificates.toast.issued", { number: ltrText(num) }));
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("slJobs.issueFailed")),
   });
@@ -294,7 +297,7 @@ function IssueCertificateForm({
     return (
       <div className="space-y-4">
         <p className="text-sm font-medium text-emerald-700">
-          {t("slJobs.certIssued", { number: issued })}
+          {t("slJobs.certIssued", { number: ltrText(issued) })}
         </p>
         <div className="flex justify-end gap-2">
           <Button variant="secondary" onClick={onDone}>{t("action.close")}</Button>
@@ -450,7 +453,7 @@ export default function JobDetailPage() {
 
   const checklistLabel = (item: SlChecklistItem) => {
     const key = CHECKLIST_LABEL_KEYS[item.id];
-    return key ? t(key) : item.label;
+    return key ? t(key) : <Bdi>{item.label}</Bdi>;
   };
 
   return (
@@ -463,7 +466,7 @@ export default function JobDetailPage() {
       </Link>
       <PageHeader
         title={t("slJobs.jobNumber", { number: job.number })}
-        description={job.vehicles?.name}
+        description={bdiText(job.vehicles?.name)}
         actions={
           <>
             {/* Billing a job is a separate decision from doing it, and the
@@ -539,7 +542,7 @@ export default function JobDetailPage() {
                   to={`/customers/${job.customer_id}`}
                   className="text-brand-700 hover:underline"
                 >
-                  {job.customers.name}
+                  <Bdi>{job.customers.name}</Bdi>
                 </Link>
               ) : (
                 "—"
@@ -551,17 +554,23 @@ export default function JobDetailPage() {
             value={
               job.vehicles ? (
                 <Link to={`/vehicles/${job.vehicle_id}`} className="text-brand-700 hover:underline">
-                  {job.vehicles.name}
+                  <Bdi>{job.vehicles.name}</Bdi>
                 </Link>
               ) : (
                 "—"
               )
             }
           />
-          <InfoRow label={t("slJobs.device")} value={job.sl_devices?.serial ?? "—"} />
-          <InfoRow label={t("slJobs.technician")} value={job.sl_technicians?.name ?? "—"} />
-          <InfoRow label={t("slJobs.scheduled")} value={formatDate(job.scheduled_date)} />
-          <InfoRow label={t("slJobs.location")} value={job.location ?? "—"} />
+          <InfoRow
+            label={t("slJobs.device")}
+            value={job.sl_devices?.serial ? <Ltr>{job.sl_devices.serial}</Ltr> : "—"}
+          />
+          <InfoRow
+            label={t("slJobs.technician")}
+            value={job.sl_technicians?.name ? <Bdi>{job.sl_technicians.name}</Bdi> : "—"}
+          />
+          <InfoRow label={t("slJobs.scheduled")} value={<Ltr>{formatDate(job.scheduled_date)}</Ltr>} />
+          <InfoRow label={t("slJobs.location")} value={job.location ? <Bdi>{job.location}</Bdi> : "—"} />
           <InfoRow
             label={t("slJobs.setSpeed")}
             value={
@@ -577,11 +586,16 @@ export default function JobDetailPage() {
             />
           )}
           {job.tamper_seal_number && (
-            <InfoRow label={t("slJobs.tamperSealNumber")} value={job.tamper_seal_number} />
+            <InfoRow
+              label={t("slJobs.tamperSealNumber")}
+              value={<Ltr>{job.tamper_seal_number}</Ltr>}
+            />
           )}
-          {job.uin && <InfoRow label={t("slJobs.uin")} value={job.uin} />}
+          {job.uin && <InfoRow label={t("slJobs.uin")} value={<Ltr>{job.uin}</Ltr>} />}
           {job.notes && (
-            <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">{job.notes}</p>
+            <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-600">
+              <Bdi>{job.notes}</Bdi>
+            </p>
           )}
         </Card>
 
@@ -650,7 +664,7 @@ export default function JobDetailPage() {
                   className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
                 >
                   <Award className="h-4 w-4" />
-                  {t("slJobs.certIssued", { number: existingCert.certificate_number })}
+                  {t("slJobs.certIssued", { number: ltrText(existingCert.certificate_number) })}
                 </Link>
               )}
             </div>
@@ -727,11 +741,11 @@ export default function JobDetailPage() {
           <div className="mt-4 border-t border-slate-100 pt-3">
             <InfoRow
               label={t("slJobs.startedAt")}
-              value={formatDateTime(job.started_at, tenant.timezone)}
+              value={<Ltr>{formatDateTime(job.started_at, tenant.timezone)}</Ltr>}
             />
             <InfoRow
               label={t("slJobs.completedAt")}
-              value={formatDateTime(job.completed_at, tenant.timezone)}
+              value={<Ltr>{formatDateTime(job.completed_at, tenant.timezone)}</Ltr>}
             />
             <InfoRow
               label={t("slJobs.duration")}
@@ -743,7 +757,7 @@ export default function JobDetailPage() {
             />
             <InfoRow
               label={t("slJobs.qcApprovedInfo")}
-              value={formatDateTime(job.qc_at, tenant.timezone)}
+              value={<Ltr>{formatDateTime(job.qc_at, tenant.timezone)}</Ltr>}
             />
             {showSignatureRows && (
               <>

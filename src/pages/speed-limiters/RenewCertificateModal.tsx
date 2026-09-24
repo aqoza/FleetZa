@@ -29,6 +29,7 @@ import { addMonths, format } from "date-fns";
 import { insertRow, listRows, updateRow, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { resolveUin } from "../../lib/certificate";
+import { ltrText } from "../../lib/bidi";
 import type {
   Customer,
   SlSettings,
@@ -38,7 +39,7 @@ import type {
   Vehicle,
 } from "../../lib/types";
 import { useT } from "../../i18n";
-import { Button, ErrorState, Field, Input, LoadingState, Modal } from "../../components/ui";
+import { Bdi, Button, ErrorState, Field, Input, LoadingState, Modal } from "../../components/ui";
 import { Combobox, type ComboboxOption } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
 
@@ -245,7 +246,7 @@ function RenewForm({
       onRenewed?.(created);
       onDone();
       toast.success(
-        t("slCertificates.toast.renewed", { number: created.certificate_number }),
+        t("slCertificates.toast.renewed", { number: ltrText(created.certificate_number) }),
       );
     },
     onError: (err) => setError(err instanceof Error ? err.message : t("slCertificates.renewFailed")),
@@ -262,7 +263,7 @@ function RenewForm({
       {error && <ErrorState message={error} />}
       <div>
         <p className="text-sm text-ink-2">
-          {t("slCertificates.renewLead", { number: cert.certificate_number })}
+          {t("slCertificates.renewLead", { number: ltrText(cert.certificate_number) })}
         </p>
         <p className="mt-1 text-xs text-ink-3">{t("slCertificates.renewNumberHint")}</p>
       </div>
@@ -270,13 +271,13 @@ function RenewForm({
         <div className="flex justify-between gap-4 py-0.5">
           <span className="text-ink-3">{t("slCertificates.customer")}</span>
           <span className="text-end font-medium text-ink">
-            {cert.customers?.name ?? t("common.dash")}
+            {cert.customers?.name ? <Bdi>{cert.customers.name}</Bdi> : t("common.dash")}
           </span>
         </div>
         <div className="flex justify-between gap-4 py-0.5">
           <span className="text-ink-3">{t("slCertificates.vehicle")}</span>
           <span className="text-end font-medium text-ink">
-            {cert.vehicles?.name ?? t("common.dash")}
+            {cert.vehicles?.name ? <Bdi>{cert.vehicles.name}</Bdi> : t("common.dash")}
           </span>
         </div>
       </div>
@@ -410,7 +411,7 @@ export function RenewCertificateModal({
         <>
           {hint && (
             <p className="mb-3 text-sm text-ink-2">
-              {t("slCertificates.renewLead", { number: hint.certificate_number })}
+              {t("slCertificates.renewLead", { number: ltrText(hint.certificate_number) })}
             </p>
           )}
           <LoadingState />

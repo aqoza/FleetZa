@@ -4,11 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, Pencil, Plus, Trash2 } from "lucide-react";
 import { deleteRow, insertRow, listPage, listRows, updateRow, sanitizeSearch } from "../../lib/db";
 import { formatMoney } from "../../lib/format";
+import { bdiText } from "../../lib/bidi";
 import type { Contact, Customer } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT, type MessageKey } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader,
   Pagination, Select, Textarea, type BadgeTone,
 } from "../../components/ui";
 import { useToast } from "../../components/Toast";
@@ -99,19 +100,19 @@ export function CustomerForm({
           <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
         </Field>
         <Field label={t("customers.crNumber")}>
-          <Input value={form.cr_number} onChange={(e) => set("cr_number", e.target.value)} />
+          <Input dir="ltr" value={form.cr_number} onChange={(e) => set("cr_number", e.target.value)} />
         </Field>
         <Field label={t("customers.taxNumber")}>
-          <Input value={form.tax_number} onChange={(e) => set("tax_number", e.target.value)} />
+          <Input dir="ltr" value={form.tax_number} onChange={(e) => set("tax_number", e.target.value)} />
         </Field>
         <Field label={t("field.email")}>
           <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
         </Field>
         <Field label={t("field.phone")}>
-          <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+          <Input dir="ltr" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
         </Field>
         <Field label={t("customers.website")}>
-          <Input value={form.website} onChange={(e) => set("website", e.target.value)} />
+          <Input dir="ltr" value={form.website} onChange={(e) => set("website", e.target.value)} />
         </Field>
         <Field label={t("customers.address")}>
           <Input value={form.address} onChange={(e) => set("address", e.target.value)} />
@@ -242,9 +243,9 @@ export default function CustomersPage() {
             to={`/customers/${c.id}`}
             className="font-medium text-brand-700 hover:underline"
           >
-            {c.name}
+            <Bdi>{c.name}</Bdi>
           </Link>
-          {c.cr_number && <div className="text-xs text-slate-500">{c.cr_number}</div>}
+          {c.cr_number && <div className="text-xs text-slate-500"><Ltr>{c.cr_number}</Ltr></div>}
         </>
       ),
       sortValue: (c) => c.name,
@@ -256,7 +257,13 @@ export default function CustomersPage() {
       minBreakpoint: "md",
       cell: (c) => (
         <span className="text-slate-600">
-          {[c.city, c.country].filter(Boolean).join(", ") || "—"}
+          {/* One isolate for the whole address line: split parts would read
+              "US ,Las Vegas" on an Arabic page. */}
+          {c.city || c.country ? (
+            <Bdi>{[c.city, c.country].filter(Boolean).join(", ")}</Bdi>
+          ) : (
+            "—"
+          )}
         </span>
       ),
       sortValue: (c) => [c.city, c.country].filter(Boolean).join(", ") || null,
@@ -270,11 +277,11 @@ export default function CustomersPage() {
         const contact = contactByCustomer.get(c.id);
         return contact ? (
           <>
-            <div className="text-slate-700">{contact.name}</div>
-            {contact.phone && <div className="text-xs text-slate-500">{contact.phone}</div>}
+            <div className="text-slate-700"><Bdi>{contact.name}</Bdi></div>
+            {contact.phone && <div className="text-xs text-slate-500"><Ltr>{contact.phone}</Ltr></div>}
           </>
         ) : (
-          <span className="text-slate-600">{c.phone ?? "—"}</span>
+          <span className="text-slate-600"><Ltr>{c.phone ?? "—"}</Ltr></span>
         );
       },
       sortValue: (c) => contactByCustomer.get(c.id)?.name ?? c.phone ?? null,
@@ -293,6 +300,7 @@ export default function CustomersPage() {
       cell: (c) => <span className="text-slate-600">{c.billing_terms ?? "—"}</span>,
       sortValue: (c) => c.billing_terms,
       exportValue: (c) => c.billing_terms ?? "",
+      dir: "auto",
     },
     {
       id: "creditLimit",
@@ -305,6 +313,7 @@ export default function CustomersPage() {
       ),
       sortValue: (c) => c.credit_limit,
       exportValue: (c) => c.credit_limit,
+      dir: "ltr",
     },
     {
       id: "status",
@@ -449,7 +458,7 @@ export default function CustomersPage() {
         {deleting && (
           <>
             <p className="text-sm text-slate-600">
-              {t("customers.deleteConfirm", { name: deleting.name })}
+              {t("customers.deleteConfirm", { name: bdiText(deleting.name) })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeleting(null)}>

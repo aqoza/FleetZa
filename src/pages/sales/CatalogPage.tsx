@@ -4,14 +4,15 @@ import { Package, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   deleteRow, insertRow, listPage, sanitizeSearch, updateRow,
 } from "../../lib/db";
+import { bdiText } from "../../lib/bidi";
 import { formatMoney } from "../../lib/format";
 import { productKinds } from "../../lib/labels";
 import type { Product, ProductKind } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useT } from "../../i18n";
 import {
-  Badge, Button, EmptyState, ErrorState, Field, Input, LoadingState, Modal, PageHeader,
-  Pagination, Select, Textarea,
+  Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal,
+  PageHeader, Pagination, Select, Textarea,
 } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
@@ -79,7 +80,7 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
           <Input value={form.name} onChange={(e) => set("name", e.target.value)} required />
         </Field>
         <Field label={t("sales.catalog.sku")}>
-          <Input value={form.sku} onChange={(e) => set("sku", e.target.value)} />
+          <Input dir="ltr" value={form.sku} onChange={(e) => set("sku", e.target.value)} />
         </Field>
         <Field label={t("sales.catalog.kind")}>
           <Select
@@ -187,8 +188,14 @@ export default function CatalogPage() {
       header: t("sales.catalog.name"),
       cell: (p) => (
         <>
-          <span className="font-medium text-ink">{p.name}</span>
-          {p.sku && <div className="text-xs text-ink-3">{p.sku}</div>}
+          <span className="font-medium text-ink">
+            <Bdi>{p.name}</Bdi>
+          </span>
+          {p.sku && (
+            <div className="text-xs text-ink-3">
+              <Ltr>{p.sku}</Ltr>
+            </div>
+          )}
         </>
       ),
       sortValue: (p) => p.name,
@@ -205,6 +212,7 @@ export default function CatalogPage() {
       id: "unit",
       header: t("sales.catalog.unit"),
       minBreakpoint: "md",
+      dir: "auto",
       cell: (p) => <span className="text-ink-2">{p.unit}</span>,
       sortValue: (p) => p.unit,
       exportValue: (p) => p.unit,
@@ -213,6 +221,7 @@ export default function CatalogPage() {
       id: "price",
       header: t("sales.catalog.unitPrice"),
       align: "end",
+      dir: "ltr",
       cell: (p) => (
         <span className="font-medium text-ink">{formatMoney(p.unit_price, tenant.currency)}</span>
       ),
@@ -376,7 +385,7 @@ export default function CatalogPage() {
         {deleting && (
           <>
             <p className="text-sm text-ink-2">
-              {t("sales.catalog.deleteConfirm", { name: deleting.name })}
+              {t("sales.catalog.deleteConfirm", { name: bdiText(deleting.name) })}
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setDeleting(null)}>
