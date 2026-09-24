@@ -1,10 +1,11 @@
 import { enCommon } from "../en/common";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Business/fleet glossary — keep terminology consistent with
 // module dictionaries: مركبة (vehicle), سائق (driver), الصيانة (maintenance),
 // أمر عمل (work order), الوقود (fuel), الفحص (inspection), عطل (issue),
 // تجديد (renewal), الضريبة (tax). The Record type enforces completeness.
-export const arCommon: Record<keyof typeof enCommon, string> = {
+export const arCommon: Translation<typeof enCommon, "ar"> = {
   "app.name": "FleetManage",
 
   "nav.dashboard": "لوحة المعلومات",
@@ -72,8 +73,22 @@ export const arCommon: Record<keyof typeof enCommon, string> = {
   "search.recent": "الأخيرة",
   "panel.quickActions": "إجراءات سريعة",
   "panel.dueSoon": "مستحق قريبًا",
-  "panel.certBacklog": "{count} شهادة منتهية بحاجة إلى تجديد",
-  "panel.renewalBacklog": "{count} تجديد متأخر",
+  "panel.certBacklog": {
+    zero: "لا توجد شهادات منتهية بحاجة إلى تجديد",
+    one: "شهادة منتهية واحدة بحاجة إلى تجديد",
+    two: "شهادتان منتهيتان بحاجة إلى تجديد",
+    few: "{count} شهادات منتهية بحاجة إلى تجديد",
+    many: "{count} شهادة منتهية بحاجة إلى تجديد",
+    other: "{count} شهادة منتهية بحاجة إلى تجديد",
+  },
+  "panel.renewalBacklog": {
+    zero: "لا توجد تجديدات متأخرة",
+    one: "تجديد واحد متأخر",
+    two: "تجديدان متأخران",
+    few: "{count} تجديدات متأخرة",
+    many: "{count} تجديدًا متأخرًا",
+    other: "{count} تجديد متأخر",
+  },
   "panel.hide": "إخفاء اللوحة",
   "panel.show": "إظهار اللوحة",
   "table.columns": "الأعمدة",

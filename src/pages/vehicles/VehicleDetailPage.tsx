@@ -19,7 +19,7 @@ import type {
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Badge, Button, Card, ErrorState, Field, LoadingState, Modal, PageHeader,
   type BadgeTone,
@@ -61,6 +61,7 @@ function InfoRow({ label, value }: { label: string; value: ReactNode }) {
 
 export default function VehicleDetailPage() {
   const t = useT();
+  const tp = useTp();
   const { id = "" } = useParams();
   const tenant = useTenant();
   const { isManager } = useAuth();
@@ -259,7 +260,7 @@ export default function VehicleDetailPage() {
     return (
       <Badge tone={tone}>
         {bucket === "d30" || bucket === "d60" || bucket === "d90"
-          ? t("speedLimiters.certStatus.expiresInDays", { count: daysLeft })
+          ? tp("speedLimiters.certStatus.expiresInDays", daysLeft)
           : t(labelKey)}
       </Badge>
     );

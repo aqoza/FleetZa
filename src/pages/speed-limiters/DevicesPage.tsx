@@ -7,7 +7,7 @@ import { supabase } from "../../lib/supabase";
 import { daysUntil, formatDate } from "../../lib/format";
 import type { SlDevice, SlDeviceStatus, SlJob, Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT, type MessageKey, type Translate } from "../../i18n";
+import { useT, useTp, type MessageKey, type Translate, type TranslatePlural } from "../../i18n";
 import type { BadgeTone } from "../../components/ui";
 import { useToast } from "../../components/Toast";
 import {
@@ -49,7 +49,7 @@ const STATUS_FILTERS: Array<SlDeviceStatus> = ["in_stock", "installed", "faulty"
 
 const PAGE_SIZE = 25;
 
-function warrantyCell(d: SlDevice, t: Translate) {
+function warrantyCell(d: SlDevice, t: Translate, tp: TranslatePlural) {
   if (!d.warranty_until) return <span className="text-slate-400">—</span>;
   const days = daysUntil(d.warranty_until);
   if (days < 0) {
@@ -63,7 +63,7 @@ function warrantyCell(d: SlDevice, t: Translate) {
   if (days <= 60) {
     return (
       <div className="flex items-center gap-2">
-        <Badge tone="yellow">{t("slDevices.warrantyDaysLeft", { count: days })}</Badge>
+        <Badge tone="yellow">{tp("slDevices.warrantyDaysLeft", days)}</Badge>
         <span className="text-xs text-slate-500">{formatDate(d.warranty_until)}</span>
       </div>
     );
@@ -262,6 +262,7 @@ function DeviceHistory({ device }: { device: SlDevice }) {
 
 export default function DevicesPage() {
   const t = useT();
+  const tp = useTp();
   const { isManager } = useAuth();
   const qc = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<SlDeviceStatus | "all">("all");
@@ -456,7 +457,7 @@ export default function DevicesPage() {
                     <span className="text-slate-400">—</span>
                   )}
                 </td>
-                <td className="px-4 py-3">{warrantyCell(d, t)}</td>
+                <td className="px-4 py-3">{warrantyCell(d, t, tp)}</td>
                 <td className="px-4 py-3">
                   <Badge tone={deviceStatus[d.status].tone}>
                     {t(deviceStatus[d.status].labelKey)}

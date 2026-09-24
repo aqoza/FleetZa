@@ -35,8 +35,14 @@ export const enSpeedLimiters = {
   // A later certificate replaced this one — history, not a compliance failure.
   "speedLimiters.certStatus.superseded": "Superseded",
   "speedLimiters.certStatus.supersededBy": "Renewed by {number}",
-  "speedLimiters.certStatus.expiresInDays": "Expires in {count} d",
-  "speedLimiters.certStatus.expiredDaysAgo": "Expired {count} d ago",
+  "speedLimiters.certStatus.expiresInDays": {
+    one: "Expires in {count} d",
+    other: "Expires in {count} d",
+  },
+  "speedLimiters.certStatus.expiredDaysAgo": {
+    one: "Expired {count} d ago",
+    other: "Expired {count} d ago",
+  },
 
   "speedLimiters.kmhValue": "{value} km/h",
 
@@ -52,8 +58,14 @@ export const enSpeedLimiters = {
   "speedLimiters.overview.bucket60": "31–60 days",
   "speedLimiters.overview.bucket90": "61–90 days",
   "speedLimiters.overview.bucketEmpty": "No certificates",
-  "speedLimiters.overview.daysOverdue": "{count} d overdue",
-  "speedLimiters.overview.inDays": "in {count} d",
+  "speedLimiters.overview.daysOverdue": {
+    one: "{count} d overdue",
+    other: "{count} d overdue",
+  },
+  "speedLimiters.overview.inDays": {
+    one: "in {count} d",
+    other: "in {count} d",
+  },
   "speedLimiters.overview.viewAll": "View all",
   // The board lists five rows per bucket; the link carries the real total so
   // "View all 474" reads as a queue, not as everything the card showed.

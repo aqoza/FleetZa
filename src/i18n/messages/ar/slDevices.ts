@@ -1,7 +1,8 @@
 import { enSlDevices } from "../en/slDevices";
+import type { Translation } from "../../plural";
 
 // سجل أجهزة محدد السرعة — الترجمة العربية الكاملة (النوع يفرض اكتمالها).
-export const arSlDevices: Record<keyof typeof enSlDevices, string> = {
+export const arSlDevices: Translation<typeof enSlDevices, "ar"> = {
   "slDevices.title": "الأجهزة",
   "slDevices.description": "سجل أجهزة محدد السرعة — المخزون والتركيبات والضمان.",
 
@@ -20,7 +21,14 @@ export const arSlDevices: Record<keyof typeof enSlDevices, string> = {
   "slDevices.imei": "IMEI",
   "slDevices.warranty": "الضمان",
   "slDevices.outOfWarranty": "خارج الضمان",
-  "slDevices.warrantyDaysLeft": "متبقٍ {count} يومًا",
+  "slDevices.warrantyDaysLeft": {
+    zero: "ينتهي اليوم",
+    one: "متبقٍ يوم واحد",
+    two: "متبقٍ يومان",
+    few: "متبقٍ {count} أيام",
+    many: "متبقٍ {count} يومًا",
+    other: "متبقٍ {count} يوم",
+  },
 
   // النموذج
   "slDevices.serialNumber": "الرقم التسلسلي",

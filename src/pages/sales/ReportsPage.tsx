@@ -18,7 +18,7 @@ import { wrapDbError } from "../../lib/db";
 import { formatDate, formatMoney } from "../../lib/format";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import {
   Button, Card, EmptyState, ErrorState, Field, LoadingState, StatCard, Table,
 } from "../../components/ui";
@@ -146,6 +146,7 @@ function paymentMethodKey(method: string) {
 
 export default function ReportsPage() {
   const t = useT();
+  const tp = useTp();
   const { currency } = useTenant();
   const { isManager } = useAuth();
   const { isEnabled } = useModules();
@@ -233,27 +234,21 @@ export default function ReportsPage() {
           tone={Number(p?.overdue_amount ?? 0) > 0 ? "red" : "slate"}
           label={t("sales.reports.overdue")}
           value={money(Number(p?.overdue_amount ?? 0))}
-          sub={t("sales.reports.invoiceCount", {
-            count: String(p?.overdue_invoices ?? 0),
-          })}
+          sub={tp("sales.reports.invoiceCount", p?.overdue_invoices ?? 0)}
         />
         <StatCard
           icon={<Receipt className="h-5 w-5" />}
           tone="green"
           label={t("sales.reports.paid")}
           value={money(Number(p?.paid_value ?? 0))}
-          sub={t("sales.reports.invoiceCount", {
-            count: String(p?.paid_invoices ?? 0),
-          })}
+          sub={tp("sales.reports.invoiceCount", p?.paid_invoices ?? 0)}
         />
         <StatCard
           icon={<FileText className="h-5 w-5" />}
           tone="violet"
           label={t("sales.reports.invoiced")}
           value={money(Number(p?.invoiced_value ?? 0))}
-          sub={t("sales.reports.invoiceCount", {
-            count: String(p?.invoices_generated ?? 0),
-          })}
+          sub={tp("sales.reports.invoiceCount", p?.invoices_generated ?? 0)}
         />
       </div>
 
@@ -432,7 +427,7 @@ export default function ReportsPage() {
                       )}
                     </td>
                     <td className="px-4 py-2 text-end tabular-nums">
-                      {t("sales.reports.certificateCount", { count: g.certs.length })}
+                      {tp("sales.reports.certificateCount", g.certs.length)}
                     </td>
                     <td className="px-4 py-2">{formatDate(g.oldestIssued)}</td>
                     <td className="px-4 py-2">{formatDate(g.newestIssued)}</td>

@@ -1,10 +1,18 @@
 import { enIssues } from "../en/issues";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: عطل (issue), مركبة (vehicle), أمر عمل (work order),
 // الفحص (inspection). The Record type enforces completeness.
-export const arIssues: Record<keyof typeof enIssues, string> = {
+export const arIssues: Translation<typeof enIssues, "ar"> = {
   "issues.title": "الأعطال",
-  "issues.reportedCount": "{count} عطل مُبلَّغ عنه",
+  "issues.reportedCount": {
+    zero: "لا توجد أعطال مُبلَّغ عنها",
+    one: "عطل واحد مُبلَّغ عنه",
+    two: "عطلان مُبلَّغ عنهما",
+    few: "{count} أعطال مُبلَّغ عنها",
+    many: "{count} عطلًا مُبلَّغًا عنه",
+    other: "{count} عطل مُبلَّغ عنه",
+  },
   "issues.report": "الإبلاغ عن عطل",
 
   "issues.allVehicles": "جميع المركبات",

@@ -1,10 +1,11 @@
 import { enSettings } from "../en/settings";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: الإعدادات (settings), المؤسسة (organization),
 // عضو (member), دعوة (invitation), الضريبة (tax), تجديد (renewal),
 // المسافة/الحجم (distance/volume), وحدة (module).
 // The Record type enforces completeness.
-export const arSettings: Record<keyof typeof enSettings, string> = {
+export const arSettings: Translation<typeof enSettings, "ar"> = {
   // Page
   "settings.title": "الإعدادات",
   "settings.subtitle": "مؤسستك وأعضاء فريقك والدعوات",
@@ -96,7 +97,14 @@ export const arSettings: Record<keyof typeof enSettings, string> = {
   "settings.tax": "الضريبة",
   "settings.noTax": "بدون {label}",
   "settings.renewalDefaults": "إعدادات التجديد الافتراضية",
-  "settings.everyMonths": "كل {count} شهر",
+  "settings.everyMonths": {
+    zero: "كل {count} شهر",
+    one: "كل شهر",
+    two: "كل شهرين",
+    few: "كل {count} أشهر",
+    many: "كل {count} شهرًا",
+    other: "كل {count} شهر",
+  },
 
   // Members
   "settings.role": "الدور",

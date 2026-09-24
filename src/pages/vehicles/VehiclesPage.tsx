@@ -9,7 +9,7 @@ import { vehicleStatus, vehicleTypes } from "../../lib/labels";
 import type { Vehicle } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import {
   Badge, Button, EmptyState, ErrorState, Input, LoadingState, Modal, PageHeader, Pagination,
   Select,
@@ -23,6 +23,7 @@ const PAGE_SIZE = 25;
 
 export default function VehiclesPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const navigate = useNavigate();
   const { isManager } = useAuth();
@@ -157,7 +158,7 @@ export default function VehiclesPage() {
     <>
       <PageHeader
         title={t("vehicles.title")}
-        description={t("vehicles.countInFleet", { count: companyCount ?? 0 })}
+        description={tp("vehicles.countInFleet", companyCount ?? 0)}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>

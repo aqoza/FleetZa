@@ -20,7 +20,10 @@ export const enSlDevices = {
   "slDevices.imei": "IMEI",
   "slDevices.warranty": "Warranty",
   "slDevices.outOfWarranty": "Out of warranty",
-  "slDevices.warrantyDaysLeft": "{count} d left",
+  "slDevices.warrantyDaysLeft": {
+    one: "{count} d left",
+    other: "{count} d left",
+  },
 
   // Form
   "slDevices.serialNumber": "Serial number",

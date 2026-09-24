@@ -18,7 +18,7 @@ import type {
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
 import { NewDocumentModal } from "../sales/NewDocumentModal";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Badge,
   Button,
@@ -84,6 +84,7 @@ function InfoRow({ label, value }: { label: string; value: ReactNode }) {
 
 function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }) {
   const t = useT();
+  const tp = useTp();
   const qc = useQueryClient();
   const checklist: SlChecklistItem[] = job.checklist ?? [];
   const undone = checklist.filter((c) => !c.done).length;
@@ -147,7 +148,7 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (undone > 0 && !overrideNote.trim()) {
-      setError(t("slJobs.checklistIncomplete", { count: undone }));
+      setError(tp("slJobs.checklistIncomplete", undone));
       return;
     }
     setError("");
@@ -159,7 +160,7 @@ function CompleteJobForm({ job, onDone }: { job: JobDetail; onDone: () => void }
       {error && <ErrorState message={error} />}
       {undone > 0 && (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-700">
-          {t("slJobs.checklistIncomplete", { count: undone })}
+          {tp("slJobs.checklistIncomplete", undone)}
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-2">
@@ -335,6 +336,7 @@ function IssueCertificateForm({
 
 export default function JobDetailPage() {
   const t = useT();
+  const tp = useTp();
   const { jobId = "" } = useParams();
   const tenant = useTenant();
   const { isManager, session } = useAuth();
@@ -737,7 +739,7 @@ export default function JobDetailPage() {
               label={t("slJobs.duration")}
               value={
                 job.duration_minutes != null
-                  ? t("slJobs.durationValue", { minutes: job.duration_minutes })
+                  ? tp("slJobs.durationValue", job.duration_minutes)
                   : "—"
               }
             />
