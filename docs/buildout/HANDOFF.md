@@ -29,7 +29,7 @@ or folded into permanent docs before the PR merges.
 |---|---|
 | 0. Plan + contract | ✅ `FOUNDATION.md`, `CLUSTERS.md`, `UI_CONVENTIONS.md` |
 | 1. Shell wiring | ✅ committed. Covers: registry (all modules `available`, with data dependencies); nav items and sections (new: logistics, finance, people, platform); lazy `<ModuleGate>` hub route per module; public routes `/portal/:token`, `/vendor/:token`, `/track/:token`; en+ar namespace per module (registered); placeholder hub per module; worker route stubs mounted in `worker/index.ts`; `worker/apiKey.ts` (API-key auth for `/api/v1/*`); `src/components/HubNav.tsx`; Leaflet dependency; icon rail scrolls (fix for many enabled modules). |
-| 2. Foundation migration | ✅ written, reviewed and dry-run tested (96/96 against the live schema, rolled back). ❗ **NOT APPLIED**: `supabase/migrations/20260924000001_platform_foundation.sql` |
+| 2. Foundation migration | ✅ **applied** to production 2026-09-24 as `20260924111532 platform_foundation`. The 22 live function definitions are byte-identical to the committed file. The post-apply suite passed 96/96 (rolled back, nothing persisted). Advisors: only the intended lint 0029, plus INFO-level unused-index notices on the new, still-empty tables. `database.types.ts` regenerated. Dormant: no tenant has a new module enabled. |
 | 3. Cluster migrations (8) | ⏳ not started. Briefs are in `CLUSTERS.md`; order and file names in `FOUNDATION.md` §4. |
 | 4. Module UIs (32) | ⏳ not started. The hubs are placeholders. |
 | 5. Integration + docs + final verification | ⏳ not started (list below) |
@@ -38,19 +38,24 @@ or folded into permanent docs before the PR merges.
 
 ## Next steps
 
-### Step 1: apply the foundation migration
-1. Read the migration header and `FOUNDATION_REVIEW.md` (the fixer's section lists the final public API).
-2. Optionally re-run the dry-run: run `bash docs/buildout/tests/build_foundation_test.sh`, then pass
-   `docs/buildout/tests/foundation_test_live.sql` to the Supabase MCP `execute_sql`
-   (project `ugfdexoaxladblafcrlc`). It ends in `rollback;`, and every test row should be `pass = true`.
-3. Apply with the Supabase MCP `apply_migration` (name `platform_foundation`, body = the file).
-   - The migration creates all RLS policies last, under a 1 s `lock_timeout`, because any
-     `CREATE POLICY` on this project briefly locks 23 auth/storage/realtime tables.
-   - If it times out on a lock, simply retry.
-4. Run the security and performance advisors.
-   - Expect lint 0029 on the new public SECURITY DEFINER RPCs. This is intentional: each one re-checks tenant, role and module.
-   - Nothing else new should appear.
-5. Regenerate `src/lib/database.types.ts` (MCP `generate_typescript_types`), then run `npx tsc -b`.
+### Step 1: apply the foundation migration — ✅ done
+Applied 2026-09-24 (`20260924111532 platform_foundation`) and verified:
+- The 22 live function definitions match the committed file byte for byte.
+- Existing write paths are unchanged: a work order is still numbered by the existing counter, and an issue insert still works.
+- The post-apply suite passes 96/96, run inside a rolled-back transaction.
+- The advisors are clean apart from the intended lint 0029 on the public definer RPCs and INFO-level unused-index notices on the new tables, which are still empty.
+- `src/lib/database.types.ts` has been regenerated.
+
+To re-verify at any time, run the test sources without the migration: `begin;` + the stub
+`create temp table _lock_probe on commit drop as select ''::text as held;` + body + storage + report + `rollback;`.
+
+⚠️ **Production is ahead of `main`.** Production migration `20260902044256 certificate_quotes` comes from commit
+`1401d88` on `origin/claude/gawhrat-vehicles-update-43abxy`.
+- That commit has the migration file plus SPA code (certificate renewal quotes, sales reports, vehicle page).
+- It was pushed after PR #14 merged, and never reached `main`; no PR is open for it.
+- So the regenerated types include its three functions: `certificate_quote_status`, `create_quote_from_certificates` and `sales_report_renewals_to_quote`.
+
+Decide whether to open a PR for it. When it lands, it will conflict with this branch on `database.types.ts`; resolve that by regenerating the file.
 
 ### Step 2: wiring pass 2 (shared files; do this before the module builds start)
 - **`src/lib/db.ts` `RAISED_MESSAGES`, plus `errors.*` keys in `src/i18n/messages/{en,ar}/errors.ts`,** for the foundation codes:
