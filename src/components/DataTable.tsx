@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Download, Columns3 } from "lucide-react";
-import { Button } from "./ui";
+import { Bdi, Button, Ltr } from "./ui";
 import { useT } from "../i18n";
 
 export interface DataTableColumn<T> {
@@ -12,6 +12,14 @@ export interface DataTableColumn<T> {
   /** Plain-text value for CSV export; falls back to sortValue. */
   exportValue?: (row: T) => string | number | null;
   align?: "start" | "end";
+  /**
+   * Bidi isolation for the cell (docs/I18N.md "Left-to-right data"): "ltr" for
+   * phones, emails, plates, VINs, serials, document numbers and codes; "auto"
+   * for user-entered names and titles whose script is unknown. Only for cells
+   * that render inline content — a `<div>` stack inside would inherit the
+   * direction and align to the wrong side; isolate its text in `cell` instead.
+   */
+  dir?: "ltr" | "auto";
   /** Column renders only at this breakpoint and up (responsive priority). */
   minBreakpoint?: "sm" | "md" | "lg" | "xl";
   /** Hidden until the user enables it in the column chooser. */
@@ -329,7 +337,13 @@ export function DataTable<T>({
                           c.align === "end" ? "text-end tabular-nums" : "text-start"
                         } ${c.minBreakpoint ? BREAKPOINT_CLASS[c.minBreakpoint] : ""}`}
                       >
-                        {c.cell(row)}
+                        {c.dir === "ltr" ? (
+                          <Ltr>{c.cell(row)}</Ltr>
+                        ) : c.dir === "auto" ? (
+                          <Bdi>{c.cell(row)}</Bdi>
+                        ) : (
+                          c.cell(row)
+                        )}
                       </td>
                     ))}
                   </tr>

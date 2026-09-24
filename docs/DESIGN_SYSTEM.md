@@ -177,6 +177,10 @@ parallax, no attention-seeking loops.
 - Logical utilities only (`ps-/pe-/ms-/me-/text-start/start-/end-`); `rtl:-scale-x-100`
   on direction-bearing icons; every string through `t()` (see `docs/I18N.md`).
 - New keys ship en + ar in the same commit (compile-enforced).
+- Data values are bidi-isolated: `<Ltr>` for phones, emails, plates, VINs,
+  document numbers, codes and `format.ts` output (money, distances, dates);
+  `<Bdi>` for user-entered names; `DataTableColumn.dir` in tables
+  (docs/I18N.md "Left-to-right data").
 
 ## 7. Page checklist
 
@@ -184,7 +188,8 @@ Before a page ships: uses `PageHeader` · cards/tables from primitives · tokens
 raw `bg-white`/`text-slate-*`/`border-slate-*` in new code) · lists use
 `listPage` + `Pagination` + server-side filters · reference dropdowns use `Combobox` +
 a `lib/pickers.ts` hook (never a capped `<Select>`) · loading/empty/error paths ·
-role-gated actions · en+ar · RTL-safe · charts per §5 · numbers `tabular-nums`.
+role-gated actions · en+ar · RTL-safe · data values bidi-isolated (`<Ltr>`/`<Bdi>`, §6) ·
+charts per §5 · numbers `tabular-nums`.
 
 > Migration note: pages written before this system still carry raw slate classes; they
 > render coherently (tokens are slate-derived) and are converted opportunistically —

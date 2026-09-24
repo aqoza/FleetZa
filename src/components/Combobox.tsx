@@ -18,6 +18,7 @@ import {
 } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import { useT } from "../i18n";
+import { Ltr } from "./ui";
 
 export interface ComboboxOption {
   value: string;
@@ -262,13 +263,15 @@ export function Combobox({
                   option.value === value ? "" : "invisible"
                 }`}
               />
-              {/* Options are identifiers in mixed scripts — plates, serials,
-                  CR numbers. <bdi> keeps "12345 A/1" in that order on an
-                  Arabic page instead of reordering it to "A/1 12345". */}
+              {/* Labels are names in either script: <bdi> takes the direction
+                  from the text itself, keeping "12345 A/1" in order. Meta is
+                  always an identifier — a plate, serial, CR number or phone —
+                  that may have no letters to decide by, so it is forced left
+                  to right. */}
               <span className="truncate"><bdi>{option.label}</bdi></span>
               {option.meta && (
                 <span className="ms-auto truncate ps-2 text-xs text-ink-3">
-                  <bdi>{option.meta}</bdi>
+                  <Ltr>{option.meta}</Ltr>
                 </span>
               )}
             </button>

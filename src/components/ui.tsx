@@ -13,6 +13,38 @@ function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
 }
 
+// --- Bidi isolation (docs/I18N.md "Left-to-right data") ---
+
+/**
+ * Data that always reads left to right: phone numbers, emails, URLs, plates,
+ * VINs, serials, document numbers, SKUs, CR/tax numbers, IBANs — and anything
+ * from src/lib/format.ts, which formats in the tenant's en-<CC> locale. On an
+ * Arabic page the bidi algorithm otherwise reorders it ("+1 702 555 0133"
+ * renders as "0133 555 702 1+", "84,210 km" as "km 84,210"). Inline and
+ * isolated, so the surrounding alignment and sentence order are untouched.
+ */
+export function Ltr({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <span dir="ltr" className={cx("[unicode-bidi:isolate]", className)}>
+      {children}
+    </span>
+  );
+}
+
+/**
+ * User-entered text in an unknown script: customer, vehicle, driver and
+ * product names, titles, addresses. Isolated, with its direction taken from
+ * its first strong character, so "Gulf Freight Co." keeps its period at the
+ * end and an Arabic name still reads right to left. Use <Ltr> instead when the
+ * value has no letters to decide by (a phone, a bare number).
+ */
+export function Bdi({ children, className }: { children: ReactNode; className?: string }) {
+  return <bdi className={className}>{children}</bdi>;
+}
+
+/** Input types whose values are left-to-right data. */
+const LTR_INPUT_TYPES = new Set(["email", "tel", "url"]);
+
 // --- Button ---
 
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost";
@@ -85,7 +117,10 @@ const inputBase =
   "w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-3 focus:border-brand-500 focus:outline-2 focus:outline-brand-500/30 disabled:bg-canvas disabled:text-ink-3";
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cx(inputBase, className)} {...rest} />;
+  // Emails, phone numbers and URLs are typed and read left to right on an
+  // Arabic page too. Pass `dir="ltr"` for other LTR data (VIN, IBAN, codes).
+  const dir = rest.dir ?? (rest.type && LTR_INPUT_TYPES.has(rest.type) ? "ltr" : undefined);
+  return <input className={cx(inputBase, className)} {...rest} dir={dir} />;
 }
 
 export function Select({
@@ -229,7 +264,12 @@ export function PageHeader({
         {/* Baseline-aligned rather than centred: the badge is small text next
             to a 2xl heading, and centring leaves it visibly floating. */}
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
+          {/* Record pages title themselves with user data ("Gulf Freight
+              Co.", a plate); <bdi> keeps its punctuation in place on an
+              Arabic page and is a no-op for translated titles. */}
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">
+            <bdi>{title}</bdi>
+          </h1>
           {badge}
         </div>
         {description && <p className="mt-1 text-sm text-ink-2">{description}</p>}
