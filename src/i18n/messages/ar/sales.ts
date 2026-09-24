@@ -1,6 +1,7 @@
 import { enSales } from "../en/sales";
+import type { Translation } from "../../plural";
 
-export const arSales: Record<keyof typeof enSales, string> = {
+export const arSales: Translation<typeof enSales, "ar"> = {
   // المركز
   "sales.title": "المبيعات",
   "sales.subtitle": "عروض الأسعار وأوامر البيع والفواتير — سلسلة واحدة من أول سعر حتى آخر دفعة",
@@ -19,7 +20,14 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.kpi.openOrders": "الأوامر المفتوحة",
   "sales.kpi.unbilled": "{amount} لم تُفوتر بعد",
   "sales.kpi.outstanding": "المستحق",
-  "sales.kpi.overdueSub": "{amount} متأخرة على {count} فاتورة",
+  "sales.kpi.overdueSub": {
+    zero: "لا توجد فواتير متأخرة",
+    one: "{amount} متأخرة على فاتورة واحدة",
+    two: "{amount} متأخرة على فاتورتين",
+    few: "{amount} متأخرة على {count} فواتير",
+    many: "{amount} متأخرة على {count} فاتورة",
+    other: "{amount} متأخرة على {count} فاتورة",
+  },
   "sales.kpi.nothingOverdue": "لا توجد مبالغ متأخرة",
   "sales.kpi.collected": "المُحصَّل (٣٠ يومًا)",
   "sales.overview.pipeline": "يحتاج إلى انتباه",
@@ -44,7 +52,14 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.reports.paid": "مدفوعة بالكامل",
   "sales.reports.invoiced": "المفوتر",
   "sales.reports.collected": "المحصّل",
-  "sales.reports.invoiceCount": "{count} فاتورة",
+  "sales.reports.invoiceCount": {
+    zero: "لا توجد فواتير",
+    one: "فاتورة واحدة",
+    two: "فاتورتان",
+    few: "{count} فواتير",
+    many: "{count} فاتورة",
+    other: "{count} فاتورة",
+  },
   "sales.reports.invoiceCountShort": "الفواتير",
   "sales.reports.pendingQuotes": "عروض أسعار قيد الانتظار",
   "sales.reports.acceptedQuotes": "عروض أسعار معتمدة",
@@ -83,7 +98,14 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.reports.certificatesPendingInvoice": "شهادات بانتظار الفوترة",
   "sales.reports.certificatesPendingInvoiceHint":
     "شهادات سارية لم تصدر لها فاتورة — تجديدات أُصدرت ولم تُفوتر. صف لكل عميل، ويمكن إنشاء الفاتورة من هنا.",
-  "sales.reports.certificateCount": "{count} شهادة",
+  "sales.reports.certificateCount": {
+    zero: "لا توجد شهادات",
+    one: "شهادة واحدة",
+    two: "شهادتان",
+    few: "{count} شهادات",
+    many: "{count} شهادة",
+    other: "{count} شهادة",
+  },
   "sales.reports.oldestIssued": "أقدم إصدار",
   "sales.reports.newestIssued": "أحدث إصدار",
   "sales.reports.noPendingCertificates": "كل الشهادات مفوترة",
@@ -179,7 +201,14 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.quotes.declineReason": "سبب الرفض",
   "sales.quotes.acceptedBy": "قبله {name}",
   "sales.quotes.acceptedOn": "قُبل في {date}",
-  "sales.quotes.expiresIn": "ينتهي خلال {days} يومًا",
+  "sales.quotes.expiresIn": {
+    zero: "ينتهي اليوم",
+    one: "ينتهي خلال يوم واحد",
+    two: "ينتهي خلال يومين",
+    few: "ينتهي خلال {count} أيام",
+    many: "ينتهي خلال {count} يومًا",
+    other: "ينتهي خلال {count} يوم",
+  },
   "sales.quotes.expiredOn": "انتهت صلاحيته في {date}",
   "sales.quotes.shareLink": "رابط العميل",
   "sales.quotes.copyLink": "نسخ رابط العميل",
@@ -237,8 +266,22 @@ export const arSales: Record<keyof typeof enSales, string> = {
   "sales.invoices.voidReason": "سبب الإلغاء",
   "sales.invoices.voidConfirm":
     "هل تريد إلغاء الفاتورة {number}؟ ستبقى مسجلة برقمها لكنها لن تُحتسب ضمن المستحقات.",
-  "sales.invoices.dueIn": "تستحق خلال {days} يومًا",
-  "sales.invoices.overdueBy": "متأخرة بـ {days} يومًا",
+  "sales.invoices.dueIn": {
+    zero: "تستحق اليوم",
+    one: "تستحق خلال يوم واحد",
+    two: "تستحق خلال يومين",
+    few: "تستحق خلال {count} أيام",
+    many: "تستحق خلال {count} يومًا",
+    other: "تستحق خلال {count} يوم",
+  },
+  "sales.invoices.overdueBy": {
+    zero: "متأخرة بـ {count} يوم",
+    one: "متأخرة بيوم واحد",
+    two: "متأخرة بيومين",
+    few: "متأخرة بـ {count} أيام",
+    many: "متأخرة بـ {count} يومًا",
+    other: "متأخرة بـ {count} يوم",
+  },
   "sales.invoices.overdue": "متأخرة",
 
   // المدفوعات

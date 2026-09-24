@@ -1,6 +1,7 @@
 import { enSlJobs } from "../en/slJobs";
+import type { Translation } from "../../plural";
 
-export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
+export const arSlJobs: Translation<typeof enSlJobs, "ar"> = {
   "slJobs.title": "المهام",
   "slJobs.description": "جدولة مهام خدمة محددات السرعة وتنفيذها ومتابعتها",
   "slJobs.newJob": "مهمة جديدة",
@@ -65,7 +66,14 @@ export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
   "slJobs.startedAt": "وقت البدء",
   "slJobs.completedAt": "وقت الإكمال",
   "slJobs.duration": "المدة",
-  "slJobs.durationValue": "{minutes} دقيقة",
+  "slJobs.durationValue": {
+    zero: "{count} دقيقة",
+    one: "دقيقة واحدة",
+    two: "دقيقتان",
+    few: "{count} دقائق",
+    many: "{count} دقيقة",
+    other: "{count} دقيقة",
+  },
   "slJobs.qcApprovedInfo": "اعتماد مراقبة الجودة",
   "slJobs.customerSignature": "توقيع العميل",
   "slJobs.technicianSignature": "توقيع الفني",
@@ -85,7 +93,14 @@ export const arSlJobs: Record<keyof typeof enSlJobs, string> = {
 
   // Complete modal
   "slJobs.durationMinutes": "المدة (بالدقائق)",
-  "slJobs.checklistIncomplete": "{count} من بنود قائمة التحقق غير منجزة — ملاحظة التجاوز مطلوبة.",
+  "slJobs.checklistIncomplete": {
+    zero: "{count} من بنود قائمة التحقق غير منجزة — ملاحظة التجاوز مطلوبة.",
+    one: "بند واحد من قائمة التحقق غير منجز — ملاحظة التجاوز مطلوبة.",
+    two: "بندان من قائمة التحقق غير منجزين — ملاحظة التجاوز مطلوبة.",
+    few: "{count} من بنود قائمة التحقق غير منجزة — ملاحظة التجاوز مطلوبة.",
+    many: "{count} من بنود قائمة التحقق غير منجزة — ملاحظة التجاوز مطلوبة.",
+    other: "{count} من بنود قائمة التحقق غير منجزة — ملاحظة التجاوز مطلوبة.",
+  },
   "slJobs.overrideNote": "ملاحظة التجاوز",
   "slJobs.overrideNoteHint": "وضّح سبب إكمال المهمة مع وجود بنود غير منجزة في قائمة التحقق",
   "slJobs.completeFailed": "فشل إكمال المهمة",

@@ -1,0 +1,9 @@
+{
+  "name": "fleetza-pglite-harness",
+  "private": true,
+  "type": "module",
+  "description": "Local in-process Postgres (PGlite) replica of the FleetManage schema for fast migration dry-runs.",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  }
+}

@@ -32,7 +32,7 @@ import type {
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT, type MessageKey, type Translate } from "../../i18n";
+import { useT, useTp, type MessageKey, type Translate } from "../../i18n";
 import {
   Badge, Bdi, Button, Card, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table,
 } from "../../components/ui";
@@ -674,6 +674,7 @@ function OrganizationTab() {
 
 function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
   const t = useT();
+  const tp = useTp();
   const currencySample = useMemo(() => {
     try {
       return new Intl.NumberFormat(cfg.locale, {
@@ -752,7 +753,7 @@ function CountryProfileCard({ cfg }: { cfg: CountryConfig }) {
                     <Bdi>{r.label}</Bdi>
                   </span>
                   <span className="whitespace-nowrap text-xs text-slate-500">
-                    {t("settings.everyMonths", { count: r.months })}
+                    {tp("settings.everyMonths", r.months)}
                   </span>
                 </li>
               ))}

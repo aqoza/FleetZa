@@ -91,7 +91,10 @@ export const enSettings = {
   "settings.tax": "Tax",
   "settings.noTax": "No {label}",
   "settings.renewalDefaults": "Renewal defaults",
-  "settings.everyMonths": "every {count} mo",
+  "settings.everyMonths": {
+    one: "every {count} mo",
+    other: "every {count} mo",
+  },
 
   // Members
   "settings.role": "Role",

@@ -18,9 +18,15 @@ export const enRenewals = {
 
   // Table
   "renewals.recurs": "Recurs",
-  "renewals.everyMonthsShort": "Every {count} mo",
+  "renewals.everyMonthsShort": {
+    one: "Every {count} mo",
+    other: "Every {count} mo",
+  },
   "renewals.overdue": "Overdue",
-  "renewals.dueInDays": "Due in {count} d",
+  "renewals.dueInDays": {
+    one: "Due in {count} d",
+    other: "Due in {count} d",
+  },
   "renewals.statusPending": "Pending",
   "renewals.statusCompleted": "Completed",
   "renewals.completedOn": "Completed {date}",
@@ -36,8 +42,14 @@ export const enRenewals = {
 
   // Country defaults modal
   "renewals.standardFor": "Standard renewals for {country}",
-  "renewals.everyMonthsLong": "every {count} months",
-  "renewals.addedN": "Added {count} renewals",
+  "renewals.everyMonthsLong": {
+    one: "every month",
+    other: "every {count} months",
+  },
+  "renewals.addedN": {
+    one: "Added {count} renewal",
+    other: "Added {count} renewals",
+  },
   "renewals.allExist": "All standard renewals already exist for this vehicle.",
 
   // Error messages

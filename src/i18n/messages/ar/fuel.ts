@@ -1,11 +1,19 @@
 import { enFuel } from "../en/fuel";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Fuel module — الوقود / تعبئة (fill-up). Keep terminology
 // consistent with the glossary: مركبة (vehicle), سائق (driver),
 // عداد المسافة (odometer), التكلفة (cost), الإجمالي (total).
-export const arFuel: Record<keyof typeof enFuel, string> = {
+export const arFuel: Translation<typeof enFuel, "ar"> = {
   "fuel.title": "الوقود",
-  "fuel.logCount": "{count} سجل وقود",
+  "fuel.logCount": {
+    zero: "لا توجد سجلات وقود",
+    one: "سجل وقود واحد",
+    two: "سجلان للوقود",
+    few: "{count} سجلات وقود",
+    many: "{count} سجلًا للوقود",
+    other: "{count} سجل وقود",
+  },
   "fuel.logFuel": "تسجيل تعبئة",
 
   "fuel.allVehicles": "كل المركبات",

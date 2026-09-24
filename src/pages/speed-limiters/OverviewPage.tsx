@@ -9,7 +9,7 @@ import type { SlJob, SlJobStatus, SlJobType, SpeedLimiterCertificate } from "../
 import { useModules } from "../../context/ModulesContext";
 import { Badge, Bdi, Card, EmptyState, ErrorState, LoadingState, Ltr, StatCard } from "../../components/ui";
 import type { BadgeTone } from "../../components/ui";
-import { useT, type MessageKey, type Translate } from "../../i18n";
+import { useT, useTp, type MessageKey, type Translate } from "../../i18n";
 
 type JobRow = SlJob & { vehicles: { name: string } | null };
 type CertRow = SpeedLimiterCertificate & {
@@ -152,6 +152,7 @@ function BucketCard({
   entries: CertRow[];
   t: Translate;
 }) {
+  const tp = useTp();
   return (
     <Card className={`border-t-4 p-4 ${border}`}>
       <div className="flex items-center justify-between gap-2">
@@ -176,8 +177,8 @@ function BucketCard({
                   </span>
                   <span className="shrink-0 text-xs font-medium text-ink-3 tabular-nums">
                     {days < 0
-                      ? t("speedLimiters.overview.daysOverdue", { count: Math.abs(days) })
-                      : t("speedLimiters.overview.inDays", { count: days })}
+                      ? tp("speedLimiters.overview.daysOverdue", Math.abs(days))
+                      : tp("speedLimiters.overview.inDays", days)}
                   </span>
                 </div>
                 <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-ink-3">

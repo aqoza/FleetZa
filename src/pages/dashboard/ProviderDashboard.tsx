@@ -29,7 +29,7 @@ import {
   PageHeader,
   StatCard,
 } from "../../components/ui";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import { ActivityCard, InsightsStrip, ListCard, type Insight } from "./shared";
 import {
   CURSOR_FILL,
@@ -85,6 +85,7 @@ const INSTALL_COLOR = "#1d67f1";
  */
 export default function ProviderDashboard() {
   const t = useT();
+  const tp = useTp();
   const { isEnabled } = useModules();
   const customersOn = isEnabled("customers");
   const slOn = isEnabled("speed_limiters");
@@ -276,7 +277,7 @@ export default function ProviderDashboard() {
     insights.push({
       key: "certs",
       tone: "serious",
-      text: t("insights.certsExpiring", { count: expiring30 }),
+      text: tp("insights.certsExpiring", expiring30),
       to: "/speed-limiters/certificates",
     });
   }
@@ -284,7 +285,7 @@ export default function ProviderDashboard() {
     insights.push({
       key: "qc",
       tone: "warn",
-      text: t("insights.qcBacklog", { count: jobCounts?.completed ?? 0 }),
+      text: tp("insights.qcBacklog", jobCounts?.completed ?? 0),
       to: "/speed-limiters/jobs",
     });
   }
@@ -292,7 +293,7 @@ export default function ProviderDashboard() {
     insights.push({
       key: "stock",
       tone: "serious",
-      text: t("insights.stockOut", { count: jobCounts?.scheduled ?? 0 }),
+      text: tp("insights.stockOut", jobCounts?.scheduled ?? 0),
       to: "/speed-limiters/devices",
     });
   }
@@ -583,7 +584,7 @@ export default function ProviderDashboard() {
                           <Badge tone={days <= 30 ? "red" : "yellow"}>
                             {days === 0
                               ? t("dashboard.dueToday")
-                              : t("dashboard.dueInDays", { count: days })}
+                              : tp("dashboard.dueInDays", days)}
                           </Badge>
                         </li>
                       );

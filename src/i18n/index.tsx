@@ -1,10 +1,13 @@
 /**
  * i18n + text-direction engine.
  *
- * - Type-safe: `MessageKey` is the union of every key in the English
+ * - Type-safe: `MessageKey` is the union of every string key in the English
  *   dictionaries. `t(key)` only accepts known keys, so a missing string is a
- *   compile error, and each `ar/*` file's `Record<keyof typeof en*, string>`
+ *   compile error, and each `ar/*` file's `Translation<typeof en*, "ar">`
  *   type forces every English key to have an Arabic translation.
+ * - Plurals: a message whose wording depends on a number is an object of
+ *   plural forms (see ./plural.ts), keyed by `PluralKey` and rendered with
+ *   `tp(key, count)`. Arabic plurals must define all six CLDR forms.
  * - Direction: Arabic flips `<html dir="rtl">`; Tailwind logical utilities
  *   (ps/pe/ms/me/start/end/text-start) and the `rtl:` variant do the layout.
  * - Language persists to localStorage (instant, pre-auth) and, for signed-in
@@ -126,6 +129,12 @@ import { enCompanies } from "./messages/en/companies";
 import { arCompanies } from "./messages/ar/companies";
 import { enErrors } from "./messages/en/errors";
 import { arErrors } from "./messages/ar/errors";
+import {
+  pluralCategory,
+  type PluralCategory,
+  type PluralForms,
+  type Translation,
+} from "./plural";
 
 export type Language = "en" | "ar";
 export type Direction = "ltr" | "rtl";
@@ -188,9 +197,9 @@ const en = {
   ...enSecurity,
   ...enCompanies,
   ...enErrors,
-};
+} satisfies Record<string, string | PluralForms<"en">>;
 
-const ar: Record<string, string> = {
+const ar = {
   ...arCommon,
   ...arAuth,
   ...arDashboard,
@@ -243,15 +252,25 @@ const ar: Record<string, string> = {
   ...arSecurity,
   ...arCompanies,
   ...arErrors,
-};
+} satisfies Translation<typeof en, "ar">;
 
-/** Every valid translation key. Use this to type any `labelKey` fields. */
-export type MessageKey = keyof typeof en;
+type EnMessages = typeof en;
 
-const DICTS: Record<Language, Record<string, string>> = { en, ar };
+/** Every string translation key. Use this to type any `labelKey` fields. */
+export type MessageKey = {
+  [K in keyof EnMessages]: EnMessages[K] extends string ? K : never;
+}[keyof EnMessages];
+
+/** Every plural translation key: what `tp()` accepts. */
+export type PluralKey = Exclude<keyof EnMessages, MessageKey>;
+
+type Message = string | Partial<Record<PluralCategory, string>>;
+
+const DICTS: Record<Language, Record<string, Message>> = { en, ar };
 
 export type TranslateVars = Record<string, string | number>;
 export type Translate = (key: MessageKey, vars?: TranslateVars) => string;
+export type TranslatePlural = (key: PluralKey, count: number, vars?: TranslateVars) => string;
 
 interface I18nState {
   language: Language;
@@ -259,6 +278,7 @@ interface I18nState {
   isRTL: boolean;
   setLanguage: (lang: Language) => void;
   t: Translate;
+  tp: TranslatePlural;
 }
 
 const I18nContext = createContext<I18nState | null>(null);
@@ -278,8 +298,7 @@ function initialLanguage(): Language {
 // provider; same pattern as format.ts's activeLocale.
 let activeLanguage: Language = initialLanguage();
 
-function lookup(language: Language, key: MessageKey, vars?: TranslateVars): string {
-  let str = DICTS[language][key] ?? DICTS.en[key] ?? (key as string);
+function interpolate(str: string, vars?: TranslateVars): string {
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       str = str.replaceAll(`{${k}}`, String(v));
@@ -288,9 +307,40 @@ function lookup(language: Language, key: MessageKey, vars?: TranslateVars): stri
   return str;
 }
 
+function lookup(language: Language, key: MessageKey, vars?: TranslateVars): string {
+  const msg = DICTS[language][key] ?? DICTS.en[key];
+  return interpolate(typeof msg === "string" ? msg : key, vars);
+}
+
+/**
+ * The form `count` selects, falling back to English (with English rules) the
+ * same way `lookup` does. `{count}` is filled with the number unless `vars`
+ * passes its own `count`, e.g. a pre-formatted "1,250".
+ */
+function lookupPlural(
+  language: Language,
+  key: PluralKey,
+  count: number,
+  vars?: TranslateVars,
+): string {
+  for (const lang of [language, "en"] as const) {
+    const forms = DICTS[lang][key];
+    if (forms && typeof forms !== "string") {
+      const str = forms[pluralCategory(lang, count)] ?? forms.other ?? key;
+      return interpolate(str, { count, ...vars });
+    }
+  }
+  return key;
+}
+
 /** Translate outside React components. Prefer useT() inside components. */
 export function translate(key: MessageKey, vars?: TranslateVars): string {
   return lookup(activeLanguage, key, vars);
+}
+
+/** Plural counterpart of translate(). Prefer useTp() inside components. */
+export function translatePlural(key: PluralKey, count: number, vars?: TranslateVars): string {
+  return lookupPlural(activeLanguage, key, count, vars);
 }
 
 /**
@@ -306,6 +356,16 @@ export function translateIn(
   vars?: TranslateVars,
 ): string {
   return lookup(language, key, vars);
+}
+
+/** Plural counterpart of translateIn(). */
+export function translatePluralIn(
+  language: Language,
+  key: PluralKey,
+  count: number,
+  vars?: TranslateVars,
+): string {
+  return lookupPlural(language, key, count, vars);
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
@@ -328,22 +388,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback<Translate>(
-    (key, vars) => {
-      let str = DICTS[language][key] ?? DICTS.en[key] ?? (key as string);
-      if (vars) {
-        for (const [k, v] of Object.entries(vars)) {
-          str = str.replaceAll(`{${k}}`, String(v));
-        }
-      }
-      return str;
-    },
+  const t = useCallback<Translate>((key, vars) => lookup(language, key, vars), [language]);
+  const tp = useCallback<TranslatePlural>(
+    (key, count, vars) => lookupPlural(language, key, count, vars),
     [language],
   );
 
   const value = useMemo<I18nState>(
-    () => ({ language, dir, isRTL: dir === "rtl", setLanguage, t }),
-    [language, dir, setLanguage, t],
+    () => ({ language, dir, isRTL: dir === "rtl", setLanguage, t, tp }),
+    [language, dir, setLanguage, t, tp],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
@@ -358,4 +411,9 @@ export function useI18n(): I18nState {
 /** Shorthand for the translate function. */
 export function useT(): Translate {
   return useI18n().t;
+}
+
+/** Shorthand for the plural translate function: `tp("vehicles.countInFleet", n)`. */
+export function useTp(): TranslatePlural {
+  return useI18n().tp;
 }

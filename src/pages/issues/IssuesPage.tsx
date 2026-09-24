@@ -8,7 +8,7 @@ import { issueStatus, priority } from "../../lib/labels";
 import { useVehiclePicker } from "../../lib/pickers";
 import type { Issue, Vehicle, WorkOrder } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import {
   Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -111,6 +111,7 @@ function ReportIssueForm({ onDone }: { onDone: () => void }) {
 
 export default function IssuesPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const qc = useQueryClient();
@@ -203,7 +204,7 @@ export default function IssuesPage() {
     <>
       <PageHeader
         title={t("issues.title")}
-        description={t("issues.reportedCount", { count: issues?.length ?? 0 })}
+        description={tp("issues.reportedCount", issues?.length ?? 0)}
         actions={
           isManager && (
             <Button onClick={() => setReporting(true)}>

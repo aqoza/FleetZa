@@ -1,6 +1,9 @@
 export const enFuel = {
   "fuel.title": "Fuel",
-  "fuel.logCount": "{count} fuel logs",
+  "fuel.logCount": {
+    one: "{count} fuel log",
+    other: "{count} fuel logs",
+  },
   "fuel.logFuel": "Log fuel",
 
   // Filters

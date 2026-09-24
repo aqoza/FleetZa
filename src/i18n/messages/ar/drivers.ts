@@ -1,10 +1,18 @@
 import { enDrivers } from "../en/drivers";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: سائق (driver), مركبة (vehicle), رخصة (license).
-export const arDrivers: Record<keyof typeof enDrivers, string> = {
+export const arDrivers: Translation<typeof enDrivers, "ar"> = {
   // Page
   "drivers.title": "السائقون",
-  "drivers.countDrivers": "{count} سائق",
+  "drivers.countDrivers": {
+    zero: "لا يوجد سائقون",
+    one: "سائق واحد",
+    two: "سائقان",
+    few: "{count} سائقين",
+    many: "{count} سائقًا",
+    other: "{count} سائق",
+  },
   "drivers.searchPlaceholder": "ابحث عن السائقين…",
 
   // Actions / modals

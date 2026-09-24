@@ -1,8 +1,9 @@
 import { enRenewals } from "../en/renewals";
+import type { Translation } from "../../plural";
 
 // Arabic (MSA). Glossary: تجديد (renewal), تسجيل (registration), تأمين (insurance),
 // مركبة (vehicle), تاريخ الاستحقاق (due date), متأخر (overdue).
-export const arRenewals: Record<keyof typeof enRenewals, string> = {
+export const arRenewals: Translation<typeof enRenewals, "ar"> = {
   "renewals.title": "التجديدات",
   "renewals.description": "التسجيلات والتأمين والتصاريح وغيرها من المستندات التي تنتهي صلاحيتها",
 
@@ -22,9 +23,23 @@ export const arRenewals: Record<keyof typeof enRenewals, string> = {
 
   // Table
   "renewals.recurs": "التكرار",
-  "renewals.everyMonthsShort": "كل {count} شهر",
+  "renewals.everyMonthsShort": {
+    zero: "كل {count} شهر",
+    one: "كل شهر",
+    two: "كل شهرين",
+    few: "كل {count} أشهر",
+    many: "كل {count} شهرًا",
+    other: "كل {count} شهر",
+  },
   "renewals.overdue": "متأخر",
-  "renewals.dueInDays": "خلال {count} يوم",
+  "renewals.dueInDays": {
+    zero: "اليوم",
+    one: "خلال يوم واحد",
+    two: "خلال يومين",
+    few: "خلال {count} أيام",
+    many: "خلال {count} يومًا",
+    other: "خلال {count} يوم",
+  },
   "renewals.statusPending": "قيد الانتظار",
   "renewals.statusCompleted": "مكتمل",
   "renewals.completedOn": "اكتمل في {date}",
@@ -40,8 +55,22 @@ export const arRenewals: Record<keyof typeof enRenewals, string> = {
 
   // Country defaults modal
   "renewals.standardFor": "التجديدات القياسية لـ {country}",
-  "renewals.everyMonthsLong": "كل {count} أشهر",
-  "renewals.addedN": "تمت إضافة {count} تجديد",
+  "renewals.everyMonthsLong": {
+    zero: "كل {count} شهر",
+    one: "كل شهر",
+    two: "كل شهرين",
+    few: "كل {count} أشهر",
+    many: "كل {count} شهرًا",
+    other: "كل {count} شهر",
+  },
+  "renewals.addedN": {
+    zero: "لم تتم إضافة أي تجديد",
+    one: "تمت إضافة تجديد واحد",
+    two: "تمت إضافة تجديدين",
+    few: "تمت إضافة {count} تجديدات",
+    many: "تمت إضافة {count} تجديدًا",
+    other: "تمت إضافة {count} تجديد",
+  },
   "renewals.allExist": "جميع التجديدات القياسية موجودة بالفعل لهذه المركبة.",
 
   // Error messages

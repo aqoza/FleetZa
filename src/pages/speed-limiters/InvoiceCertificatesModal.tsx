@@ -31,7 +31,7 @@ import {
 import { useProductPicker } from "../../lib/pickers";
 import type { Invoice, Product } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
-import { useT, type Translate } from "../../i18n";
+import { useT, useTp, type Translate } from "../../i18n";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
 import {
@@ -76,11 +76,12 @@ export function InvoiceCertificatesModal({
   onClose: () => void;
 }) {
   const t = useT();
+  const tp = useTp();
   const [busy, setBusy] = useState(false);
   const open = certificates !== null;
   return (
     <Modal
-      title={t("slCertificates.invoiceTitle", { count: certificates?.length ?? 0 })}
+      title={tp("slCertificates.invoiceTitle", certificates?.length ?? 0)}
       open={open}
       onClose={onClose}
       busy={busy}
@@ -119,6 +120,7 @@ function InvoiceForm({
   onBusyChange: (busy: boolean) => void;
 }) {
   const t = useT();
+  const tp = useTp();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const toast = useToast();
@@ -219,9 +221,8 @@ function InvoiceForm({
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });
       void qc.invalidateQueries({ queryKey: ["sales_report"] });
       toast.success(
-        t("slCertificates.invoiceCreated", {
+        tp("slCertificates.invoiceCreated", lines.length, {
           number: ltrText(invoice.doc_number),
-          count: lines.length,
         }),
       );
       onDone();
@@ -311,9 +312,8 @@ function InvoiceForm({
       {partition.customerId && others.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line p-3">
           <span className="text-sm text-ink-2">
-            {t("slCertificates.invoiceOthersPending", {
+            {tp("slCertificates.invoiceOthersPending", others.length, {
               name: bdiText(partition.customerName) || t("common.dash"),
-              count: others.length,
             })}
           </span>
           <Button type="button" variant="secondary" onClick={() => setIncludeOthers((v) => !v)}>
@@ -377,8 +377,7 @@ function InvoiceForm({
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="text-sm text-ink-2 tabular-nums">
-              {t("slCertificates.invoicePreview", {
-                count: lines.length,
+              {tp("slCertificates.invoicePreview", lines.length, {
                 total: ltrText(formatMoney(total, tenant.currency)),
               })}
             </span>

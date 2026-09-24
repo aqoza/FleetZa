@@ -7,7 +7,7 @@ import { ltrText } from "../../lib/bidi";
 import { driverStatus } from "../../lib/labels";
 import type { Driver } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
-import { useT, type Translate } from "../../i18n";
+import { useT, useTp, type Translate } from "../../i18n";
 import {
   Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table,
   Textarea,
@@ -128,6 +128,7 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
 
 export default function DriversPage() {
   const t = useT();
+  const tp = useTp();
   const { isManager } = useAuth();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
@@ -170,7 +171,7 @@ export default function DriversPage() {
     <>
       <PageHeader
         title={t("drivers.title")}
-        description={t("drivers.countDrivers", { count: drivers?.length ?? 0 })}
+        description={tp("drivers.countDrivers", drivers?.length ?? 0)}
         actions={
           isManager && (
             <Button onClick={() => setAdding(true)}>

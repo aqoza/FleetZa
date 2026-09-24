@@ -13,7 +13,7 @@ import { balanceDue, effectiveQuoteStatus, winRate } from "../../lib/sales";
 import type { Invoice, Quote, SalesOrder, SalesSummary } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT } from "../../i18n";
+import { useT, useTp } from "../../i18n";
 import { Badge, Card, ErrorState, LoadingState, Ltr, StatCard } from "../../components/ui";
 import { SectionCard } from "./shared";
 
@@ -23,6 +23,7 @@ const ATTENTION_LIMIT = 5;
 
 export default function OverviewPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isEnabled } = useModules();
   const billingOn = isEnabled("billing");
@@ -134,9 +135,8 @@ export default function OverviewPage() {
             value={<Ltr>{money(s.outstanding_amount)}</Ltr>}
             sub={
               s.overdue_invoices > 0
-                ? t("sales.kpi.overdueSub", {
+                ? tp("sales.kpi.overdueSub", s.overdue_invoices, {
                     amount: ltrText(money(s.overdue_amount)),
-                    count: s.overdue_invoices,
                   })
                 : t("sales.kpi.nothingOverdue")
             }
@@ -217,9 +217,7 @@ export default function OverviewPage() {
                     key={inv.id}
                     to={`/sales/invoices/${inv.id}`}
                     primary={inv.doc_number}
-                    secondary={t("sales.invoices.overdueBy", {
-                      days: Math.abs(daysUntil(inv.due_date!)),
-                    })}
+                    secondary={tp("sales.invoices.overdueBy", Math.abs(daysUntil(inv.due_date!)))}
                     amount={formatMoney(balanceDue(inv), inv.currency)}
                     badge={
                       <Badge tone="red">{t("enum.invoiceStatus.overdue")}</Badge>

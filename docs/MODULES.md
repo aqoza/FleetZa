@@ -164,9 +164,10 @@ modules cost zero requests.
 ### 8. Per-module i18n namespace
 
 Create `src/i18n/messages/en/<module>.ts` and `ar/<module>.ts` (typed
-`Record<keyof typeof en<Module>, string>` so missing Arabic fails the build),
+`Translation<typeof en<Module>, "ar">` so missing Arabic fails the build),
 register both in `src/i18n/index.tsx`, and prefix every key with the module
-name. Full recipe in `docs/I18N.md`.
+name. Count strings are plural messages rendered with `tp()`. Full recipe in
+`docs/I18N.md`.
 
 ### 9. Migration — `supabase/migrations` + MCP apply
 

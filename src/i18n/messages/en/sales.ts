@@ -21,7 +21,10 @@ export const enSales = {
   "sales.kpi.openOrders": "Open orders",
   "sales.kpi.unbilled": "{amount} not yet invoiced",
   "sales.kpi.outstanding": "Outstanding",
-  "sales.kpi.overdueSub": "{amount} overdue across {count}",
+  "sales.kpi.overdueSub": {
+    one: "{amount} overdue across {count}",
+    other: "{amount} overdue across {count}",
+  },
   "sales.kpi.nothingOverdue": "Nothing overdue",
   "sales.kpi.collected": "Collected (30 days)",
   "sales.overview.pipeline": "Needs attention",
@@ -46,7 +49,10 @@ export const enSales = {
   "sales.reports.paid": "Fully paid",
   "sales.reports.invoiced": "Invoiced",
   "sales.reports.collected": "Collected",
-  "sales.reports.invoiceCount": "{count} invoices",
+  "sales.reports.invoiceCount": {
+    one: "{count} invoice",
+    other: "{count} invoices",
+  },
   "sales.reports.invoiceCountShort": "Invoices",
   "sales.reports.pendingQuotes": "Pending quotations",
   "sales.reports.acceptedQuotes": "Approved quotations",
@@ -85,7 +91,10 @@ export const enSales = {
   "sales.reports.certificatesPendingInvoice": "Certificates pending invoice",
   "sales.reports.certificatesPendingInvoiceHint":
     "Live certificates with no invoice against them — renewals that were issued but never billed. One row per customer; create the invoice from here.",
-  "sales.reports.certificateCount": "{count} certificates",
+  "sales.reports.certificateCount": {
+    one: "{count} certificate",
+    other: "{count} certificates",
+  },
   "sales.reports.oldestIssued": "Oldest issued",
   "sales.reports.newestIssued": "Newest issued",
   "sales.reports.noPendingCertificates": "Every certificate is invoiced",
@@ -181,7 +190,10 @@ export const enSales = {
   "sales.quotes.declineReason": "Reason for declining",
   "sales.quotes.acceptedBy": "Accepted by {name}",
   "sales.quotes.acceptedOn": "Accepted {date}",
-  "sales.quotes.expiresIn": "Expires in {days} days",
+  "sales.quotes.expiresIn": {
+    one: "Expires in {count} day",
+    other: "Expires in {count} days",
+  },
   "sales.quotes.expiredOn": "Expired {date}",
   "sales.quotes.shareLink": "Customer link",
   "sales.quotes.copyLink": "Copy customer link",
@@ -239,8 +251,14 @@ export const enSales = {
   "sales.invoices.voidReason": "Reason for voiding",
   "sales.invoices.voidConfirm":
     "Void invoice {number}? It stays on record with its number, but no longer counts as receivable.",
-  "sales.invoices.dueIn": "Due in {days} days",
-  "sales.invoices.overdueBy": "Overdue by {days} days",
+  "sales.invoices.dueIn": {
+    one: "Due in {count} day",
+    other: "Due in {count} days",
+  },
+  "sales.invoices.overdueBy": {
+    one: "Overdue by {count} day",
+    other: "Overdue by {count} days",
+  },
   "sales.invoices.overdue": "Overdue",
 
   // Payments

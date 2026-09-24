@@ -9,7 +9,7 @@ import type {
   Inspection, InspectionItem, InspectionResult, InspectionTemplate, Issue, Vehicle,
 } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Bdi, Button, Card, ErrorState, Field, Input, LoadingState, PageHeader, Select, Textarea,
 } from "../../components/ui";
@@ -25,6 +25,7 @@ const resultOptions: Array<{ value: ResultValue; labelKey: MessageKey; selected:
 
 export default function NewInspectionPage() {
   const t = useT();
+  const tp = useTp();
   const tenant = useTenant();
   const { isManager } = useAuth();
   const navigate = useNavigate();
@@ -294,12 +295,7 @@ export default function NewInspectionPage() {
           <div className="flex items-center justify-end gap-3">
             {failCount > 0 && (
               <span className="me-auto text-sm text-red-600">
-                {t(
-                  failCount === 1
-                    ? "inspections.failedItemWarning"
-                    : "inspections.failedItemsWarning",
-                  { count: failCount },
-                )}
+                {tp("inspections.failedItemsWarning", failCount)}
               </span>
             )}
             <Button type="button" variant="secondary" onClick={() => navigate("/inspections")}>

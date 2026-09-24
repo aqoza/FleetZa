@@ -9,7 +9,7 @@ import { invoiceStatus, paymentMethods } from "../../lib/labels";
 import { balanceDue, effectiveInvoiceStatus, isInvoiceOverdue } from "../../lib/sales";
 import type { Invoice, Payment } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
-import { useT, type MessageKey } from "../../i18n";
+import { useT, useTp, type MessageKey } from "../../i18n";
 import {
   Bdi, Button, ErrorState, Field, Input, LoadingState, Ltr, Modal, Select, Textarea,
   type BadgeTone,
@@ -25,6 +25,7 @@ const statusMetaWithOverdue: Record<string, { labelKey: MessageKey; tone: BadgeT
 
 export default function InvoiceDetailPage() {
   const t = useT();
+  const tp = useTp();
   const { invoiceId = "" } = useParams();
   const { isManager } = useAuth();
   const [paying, setPaying] = useState(false);
@@ -142,8 +143,8 @@ export default function InvoiceDetailPage() {
                   {days !== null && (i.status === "issued" || i.status === "partially_paid") && (
                     <span className="ms-2 text-xs">
                       {days < 0
-                        ? t("sales.invoices.overdueBy", { days: Math.abs(days) })
-                        : t("sales.invoices.dueIn", { days })}
+                        ? tp("sales.invoices.overdueBy", Math.abs(days))
+                        : tp("sales.invoices.dueIn", days)}
                     </span>
                   )}
                 </span>

@@ -1,6 +1,7 @@
 import { enDashboard } from "../en/dashboard";
+import type { Translation } from "../../plural";
 
-export const arDashboard: Record<keyof typeof enDashboard, string> = {
+export const arDashboard: Translation<typeof enDashboard, "ar"> = {
   "dashboard.subtitle": "صحة الأسطول والإنفاق والأعمال القادمة في لمحة",
 
   // KPI cards
@@ -25,12 +26,54 @@ export const arDashboard: Record<keyof typeof enDashboard, string> = {
   "dashboard.nCertsExpiring": "{count} على وشك الانتهاء",
   "dashboard.ownFleet": "أسطولك الخاص",
   "insights.title": "الرؤى",
-  "insights.overdueService": "{count} من تذكيرات الصيانة متأخرة",
-  "insights.overdueRenewals": "{count} من التجديدات متأخرة",
-  "insights.certsExpiring": "{count} شهادة تنتهي خلال 30 يومًا",
-  "insights.inShop": "{count} من أصل {total} من مركبات الأسطول في الورشة",
-  "insights.qcBacklog": "{count} مهمة مكتملة بانتظار اعتماد الجودة",
-  "insights.stockOut": "لا توجد أجهزة في المخزون بينما توجد {count} مهمة مجدولة",
+  "insights.overdueService": {
+    zero: "لا توجد تذكيرات صيانة متأخرة",
+    one: "تذكير صيانة واحد متأخر",
+    two: "تذكيران للصيانة متأخران",
+    few: "{count} من تذكيرات الصيانة متأخرة",
+    many: "{count} من تذكيرات الصيانة متأخرة",
+    other: "{count} من تذكيرات الصيانة متأخرة",
+  },
+  "insights.overdueRenewals": {
+    zero: "لا توجد تجديدات متأخرة",
+    one: "تجديد واحد متأخر",
+    two: "تجديدان متأخران",
+    few: "{count} من التجديدات متأخرة",
+    many: "{count} من التجديدات متأخرة",
+    other: "{count} من التجديدات متأخرة",
+  },
+  "insights.certsExpiring": {
+    zero: "لا توجد شهادات تنتهي خلال 30 يومًا",
+    one: "شهادة واحدة تنتهي خلال 30 يومًا",
+    two: "شهادتان تنتهيان خلال 30 يومًا",
+    few: "{count} شهادات تنتهي خلال 30 يومًا",
+    many: "{count} شهادة تنتهي خلال 30 يومًا",
+    other: "{count} شهادة تنتهي خلال 30 يومًا",
+  },
+  "insights.inShop": {
+    zero: "لا توجد أي من مركبات الأسطول الـ{total} في الورشة",
+    one: "مركبة واحدة من أصل {total} من مركبات الأسطول في الورشة",
+    two: "مركبتان من أصل {total} من مركبات الأسطول في الورشة",
+    few: "{count} من أصل {total} من مركبات الأسطول في الورشة",
+    many: "{count} من أصل {total} من مركبات الأسطول في الورشة",
+    other: "{count} من أصل {total} من مركبات الأسطول في الورشة",
+  },
+  "insights.qcBacklog": {
+    zero: "لا توجد مهام مكتملة بانتظار اعتماد الجودة",
+    one: "مهمة مكتملة واحدة بانتظار اعتماد الجودة",
+    two: "مهمتان مكتملتان بانتظار اعتماد الجودة",
+    few: "{count} مهام مكتملة بانتظار اعتماد الجودة",
+    many: "{count} مهمة مكتملة بانتظار اعتماد الجودة",
+    other: "{count} مهمة مكتملة بانتظار اعتماد الجودة",
+  },
+  "insights.stockOut": {
+    zero: "لا توجد أجهزة في المخزون ولا مهام مجدولة",
+    one: "لا توجد أجهزة في المخزون بينما توجد مهمة واحدة مجدولة",
+    two: "لا توجد أجهزة في المخزون بينما توجد مهمتان مجدولتان",
+    few: "لا توجد أجهزة في المخزون بينما توجد {count} مهام مجدولة",
+    many: "لا توجد أجهزة في المخزون بينما توجد {count} مهمة مجدولة",
+    other: "لا توجد أجهزة في المخزون بينما توجد {count} مهمة مجدولة",
+  },
   "insights.allClear": "كل شيء على ما يرام — لا شيء يتطلب انتباهك الآن.",
   "dashboard.recentWorkOrders": "أوامر العمل الأخيرة",
   "dashboard.viewAll": "عرض الكل",
@@ -73,5 +116,12 @@ export const arDashboard: Record<keyof typeof enDashboard, string> = {
   "dashboard.expired": "منتهية",
   "dashboard.dueSoon": "قريبة الاستحقاق",
   "dashboard.dueToday": "مستحقة اليوم",
-  "dashboard.dueInDays": "خلال {count} يوم",
+  "dashboard.dueInDays": {
+    zero: "اليوم",
+    one: "خلال يوم واحد",
+    two: "خلال يومين",
+    few: "خلال {count} أيام",
+    many: "خلال {count} يومًا",
+    other: "خلال {count} يوم",
+  },
 };

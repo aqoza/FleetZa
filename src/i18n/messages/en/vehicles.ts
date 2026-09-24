@@ -1,7 +1,10 @@
 export const enVehicles = {
   // Page
   "vehicles.title": "Vehicles",
-  "vehicles.countInFleet": "{count} vehicles in your fleet",
+  "vehicles.countInFleet": {
+    one: "{count} vehicle in your fleet",
+    other: "{count} vehicles in your fleet",
+  },
   "vehicles.add": "Add vehicle",
 
   // Ownership (company fleet vs customer-owned)

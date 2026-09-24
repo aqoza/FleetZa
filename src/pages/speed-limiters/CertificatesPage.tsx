@@ -27,7 +27,7 @@ import type {
 } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useModules } from "../../context/ModulesContext";
-import { useT, type MessageKey, type Translate } from "../../i18n";
+import { useT, useTp, type MessageKey, type Translate, type TranslatePlural } from "../../i18n";
 import {
   Badge, Bdi, Button, EmptyState, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader,
   Pagination, Textarea,
@@ -156,12 +156,12 @@ function searchOr(term: string, vehicleIds: string[]): string {
   return clauses.join(",");
 }
 
-function statusBadge(c: CertRow, t: Translate) {
+function statusBadge(c: CertRow, t: Translate, tp: TranslatePlural) {
   const { bucket, labelKey, tone, daysLeft } = certificateStatusMeta(c);
   return (
     <Badge tone={tone}>
       {bucket === "d30" || bucket === "d60" || bucket === "d90"
-        ? t("slCertificates.expiresInDays", { count: daysLeft })
+        ? tp("slCertificates.expiresInDays", daysLeft)
         : t(labelKey)}
     </Badge>
   );
@@ -253,6 +253,7 @@ function BulkRenewForm({
   onInvoice?: (issued: InvoiceableCertificate[]) => void;
 }) {
   const t = useT();
+  const tp = useTp();
   const qc = useQueryClient();
   const eligible = certs.filter((c) => skipReason(c) === null);
   const skipped = certs
@@ -333,10 +334,9 @@ function BulkRenewForm({
       <div className="space-y-4">
         <p className="text-sm text-ink-2">
           {results.failed.length === 0
-            ? t("slCertificates.bulkDoneAll", { count: results.ok.length })
-            : t("slCertificates.bulkDonePartial", {
+            ? tp("slCertificates.bulkDoneAll", results.ok.length)
+            : tp("slCertificates.bulkDonePartial", results.ok.length + results.failed.length, {
                 done: results.ok.length,
-                total: results.ok.length + results.failed.length,
                 failed: results.failed.length,
               })}
         </p>
@@ -376,7 +376,7 @@ function BulkRenewForm({
               onClick={() => onInvoice(results.ok.map((r) => r.issued))}
             >
               <Receipt className="h-4 w-4" />
-              {t("slCertificates.invoiceAfterRenew", { count: results.ok.length })}
+              {tp("slCertificates.invoiceAfterRenew", results.ok.length)}
             </Button>
           )}
           <Button onClick={onDone}>{t("action.close")}</Button>
@@ -389,7 +389,7 @@ function BulkRenewForm({
     <div className="space-y-4">
       <div>
         <p className="text-sm text-ink-2">
-          {t("slCertificates.bulkRenewLead", { count: eligible.length })}
+          {tp("slCertificates.bulkRenewLead", eligible.length)}
         </p>
         <p className="mt-1 text-xs text-ink-3">{t("slCertificates.renewNumberHint")}</p>
       </div>
@@ -476,7 +476,7 @@ function BulkRenewForm({
               {t("action.cancel")}
             </Button>
             <Button onClick={() => run.mutate()} loading={run.isPending}>
-              {t("slCertificates.bulkConfirm", { count: eligible.length })}
+              {tp("slCertificates.bulkConfirm", eligible.length)}
             </Button>
           </div>
         </>
@@ -608,6 +608,7 @@ function SettingsForm({ settings, onDone }: { settings: SlSettings; onDone: () =
 
 export default function CertificatesPage() {
   const t = useT();
+  const tp = useTp();
   const { isManager, isAdmin } = useAuth();
   const { isEnabled } = useModules();
   const billingOn = isEnabled("billing");
@@ -880,7 +881,7 @@ export default function CertificatesPage() {
     {
       id: "status",
       header: t("common.status"),
-      cell: (c) => statusBadge(c, t),
+      cell: (c) => statusBadge(c, t, tp),
       sortValue: (c) => BUCKET_URGENCY[certificateBucket(c)],
       exportValue: (c) => t(certificateStatusMeta(c).labelKey),
     },
@@ -1047,7 +1048,7 @@ export default function CertificatesPage() {
 
       {(supersededMatches ?? 0) > 0 && (
         <div className="mb-4 rounded-xl border border-line bg-canvas px-3 py-2 text-sm text-ink-2">
-          {t("slCertificates.searchSupersededHint", { count: supersededMatches ?? 0 })}{" "}
+          {tp("slCertificates.searchSupersededHint", supersededMatches ?? 0)}{" "}
           <Link
             to={`/speed-limiters/certificates?filter=superseded&q=${encodeURIComponent(search)}`}
             className="font-medium text-brand-700 hover:underline"
@@ -1129,7 +1130,7 @@ export default function CertificatesPage() {
       />
 
       <Modal
-        title={t("slCertificates.bulkRenewTitle", { count: bulkRenewing?.length ?? 0 })}
+        title={tp("slCertificates.bulkRenewTitle", bulkRenewing?.length ?? 0)}
         open={!!bulkRenewing}
         onClose={() => setBulkRenewing(null)}
         busy={bulkBusy}

@@ -276,7 +276,7 @@ Ordered by when they bite:
 5. **Dashboard is fleet-operator-framed for everyone**: unconditional vehicles query, "Total vehicles" KPI and fleet-status pie for a tenant whose business is installing limiters; zero drill-down links (the dashboard imports no `Link` at all).
 6. **FK pickers are 55 native `<select>`s** over full-table fetches — unusable at "thousands of customer vehicles" scale; needs async combobox.
 7. **Field personas are locked out**: drivers/viewers cannot submit inspections (manager-only block on the one flow field workers should own); technicians have no login concept at all.
-8. Silent-failure mutations (vehicle assign/delete, driver delete have no `onError`), no toasts, raw PostgREST error strings shown verbatim (English-only, schema-leaking) in an otherwise fully-localized app, mile-unit odometer round-trip drift, no plural i18n ("1 fuel logs"; Arabic's 6 plural forms unrepresentable).
+8. Silent-failure mutations (vehicle assign/delete, driver delete have no `onError`), no toasts, raw PostgREST error strings shown verbatim (English-only, schema-leaking) in an otherwise fully-localized app, mile-unit odometer round-trip drift, no plural i18n ("1 fuel logs"; Arabic's 6 plural forms unrepresentable). *(Since this audit: compile-checked plural messages and `tp()` shipped — see I18N.md "Plurals".)*
 
 ## 8. Navigation problems
 
@@ -463,7 +463,7 @@ Wave-1 DB refactor + `customers` module + ownership model + ownership-aware flee
 Generated Supabase types (typed `createClient`, typed `db.ts` over `keyof Database`) · paginated `listRows` (+count) with server-side search on the big lists · report/KPI aggregation to SQL views/RPCs · error taxonomy (constraint → localized message) · `document_sequences` · Wave-2 integrity items (restrict deletes, job-transition trigger, `issue_certificate` RPC, audit columns).
 
 ### Phase 3 — Platform UI kit + registry v2 (M/L)
-DataTable (server sort/pagination) · FormModal/`useEntityForm` (kills the 15 scaffolds) · ConfirmDelete · async Combobox for FK pickers · accessible Modal rebuild (`<dialog>`) · Toast · Tabs/Drawer · registry v2 (nav/routes/widgets/panels generated; `ModuleId` literal union; per-module lazy chunks; per-language dictionary loading; plural-aware `t()`) · URL-state hook · breadcrumbs · 404 · settings tabs as routes · category-grouped sidebar · global search (post-Phase-1 so master data is searchable).
+DataTable (server sort/pagination) · FormModal/`useEntityForm` (kills the 15 scaffolds) · ConfirmDelete · async Combobox for FK pickers · accessible Modal rebuild (`<dialog>`) · Toast · Tabs/Drawer · registry v2 (nav/routes/widgets/panels generated; `ModuleId` literal union; per-module lazy chunks; per-language dictionary loading; plural-aware `t()` *(shipped as `tp()`)*) · URL-state hook · breadcrumbs · 404 · settings tabs as routes · category-grouped sidebar · global search (post-Phase-1 so master data is searchable).
 
 ### Phase 4 — Platform services (M)
 Email (Cloudflare Email Service / Resend): invitations, password reset, renewal + certificate expiry reminders · scheduled Worker (cron) for reminders/digests · attachments service (Supabase Storage + `attachments` table + upload primitive) — unlocks Renewals documents, job photos, customer contracts · observability (Sentry + structured worker logs) · CSV/XLSX export as a shared utility · bulk import (vehicles/drivers/customers).

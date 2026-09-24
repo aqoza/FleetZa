@@ -7,8 +7,10 @@ export const enSlCertificates = {
   "slCertificates.searchPlaceholder": "Certificate #, UIN, seal, vehicle or plate…",
   "slCertificates.searchNarrowHint":
     "More than {count} vehicles match this search — only the first {count} are included. Narrow the search to see the rest.",
-  "slCertificates.searchSupersededHint":
-    "{count} superseded certificates match — they were replaced by a later renewal, so they are hidden here.",
+  "slCertificates.searchSupersededHint": {
+    one: "{count} superseded certificate matches — it was replaced by a later renewal, so it is hidden here.",
+    other: "{count} superseded certificates match — they were replaced by a later renewal, so they are hidden here.",
+  },
   "slCertificates.searchSupersededLink": "Show them",
 
   // Filter chips
@@ -27,7 +29,10 @@ export const enSlCertificates = {
   "slCertificates.vehicle": "Vehicle",
   "slCertificates.issued": "Issued",
   "slCertificates.expires": "Expires",
-  "slCertificates.expiresInDays": "Expires in {count} d",
+  "slCertificates.expiresInDays": {
+    one: "Expires in {count} d",
+    other: "Expires in {count} d",
+  },
 
   // Row actions
   "slCertificates.print": "Print",
@@ -69,9 +74,14 @@ export const enSlCertificates = {
 
   // Bulk renew — one customer, several vehicles, one operation
   "slCertificates.bulkRenew": "Renew selected",
-  "slCertificates.bulkRenewTitle": "Renew {count} certificates",
-  "slCertificates.bulkRenewLead":
-    "A replacement certificate is issued for each of the {count} vehicles below, carrying over its authority and set speeds.",
+  "slCertificates.bulkRenewTitle": {
+    one: "Renew {count} certificate",
+    other: "Renew {count} certificates",
+  },
+  "slCertificates.bulkRenewLead": {
+    one: "A replacement certificate is issued for the vehicle below, carrying over its authority and set speeds.",
+    other: "A replacement certificate is issued for each of the {count} vehicles below, carrying over its authority and set speeds.",
+  },
   "slCertificates.bulkEligible": "Will be renewed ({count})",
   "slCertificates.bulkSkipped": "Skipped ({count})",
   "slCertificates.bulkSkipRevoked": "Revoked — cannot be renewed",
@@ -80,10 +90,18 @@ export const enSlCertificates = {
   "slCertificates.bulkProgress": "Issuing {done} of {total}…",
   "slCertificates.bulkCloseBlocked":
     "Certificates are being issued — this stays open until the run finishes, so you get the full report.",
-  "slCertificates.bulkConfirm": "Issue {count} certificates",
-  "slCertificates.bulkDoneAll": "Issued {count} certificates.",
-  "slCertificates.bulkDonePartial":
-    "Issued {done} of {total} certificates. {failed} failed — the ones below were not renewed.",
+  "slCertificates.bulkConfirm": {
+    one: "Issue {count} certificate",
+    other: "Issue {count} certificates",
+  },
+  "slCertificates.bulkDoneAll": {
+    one: "Issued {count} certificate.",
+    other: "Issued {count} certificates.",
+  },
+  "slCertificates.bulkDonePartial": {
+    one: "Issued {done} of {count} certificate. {failed} failed — the one below was not renewed.",
+    other: "Issued {done} of {count} certificates. {failed} failed — the ones below were not renewed.",
+  },
   "slCertificates.bulkSucceeded": "Issued",
   "slCertificates.bulkFailed": "Failed",
 
@@ -103,7 +121,10 @@ export const enSlCertificates = {
 
   // Invoice dialog — one draft invoice for a selection of certificates
   "slCertificates.createInvoice": "Create invoice",
-  "slCertificates.invoiceTitle": "Invoice {count} certificates",
+  "slCertificates.invoiceTitle": {
+    one: "Invoice {count} certificate",
+    other: "Invoice {count} certificates",
+  },
   "slCertificates.invoiceLead":
     "One draft invoice for {customer}, with a line per vehicle carrying its plate and certificate number. Lines and prices can still be adjusted before the invoice is issued.",
   "slCertificates.invoiceEligible": "Will be invoiced ({count})",
@@ -112,8 +133,10 @@ export const enSlCertificates = {
   "slCertificates.invoiceSkipOtherCustomer": "Different customer — {name}",
   "slCertificates.invoiceSkipNoCustomer": "No customer to bill",
   "slCertificates.invoiceNoneEligible": "None of the selected certificates can be invoiced.",
-  "slCertificates.invoiceOthersPending":
-    "{name} has {count} more certificates that are not invoiced yet.",
+  "slCertificates.invoiceOthersPending": {
+    one: "{name} has {count} more certificate that is not invoiced yet.",
+    other: "{name} has {count} more certificates that are not invoiced yet.",
+  },
   "slCertificates.invoiceAddOthers": "Add them to this invoice",
   "slCertificates.invoiceOnlySelected": "Only the selected ones",
   "slCertificates.invoiceCatalogItem": "Catalog item",
@@ -124,13 +147,22 @@ export const enSlCertificates = {
   "slCertificates.invoiceDefaultDescription": "Speed limiter certificate renewal",
   "slCertificates.invoiceUnitPrice": "Price per vehicle",
   "slCertificates.invoiceTaxRate": "Tax %",
-  "slCertificates.invoicePreview": "{count} lines · {total} incl. tax",
+  "slCertificates.invoicePreview": {
+    one: "{count} line · {total} incl. tax",
+    other: "{count} lines · {total} incl. tax",
+  },
   "slCertificates.invoiceConfirm": "Create draft invoice",
-  "slCertificates.invoiceCreated": "Draft invoice {number} created with {count} lines.",
+  "slCertificates.invoiceCreated": {
+    one: "Draft invoice {number} created with {count} line.",
+    other: "Draft invoice {number} created with {count} lines.",
+  },
   "slCertificates.invoiceFailed": "Could not create the invoice",
   "slCertificates.invoiceCloseBlocked":
     "The invoice is being created — this stays open until it is done.",
-  "slCertificates.invoiceAfterRenew": "Create an invoice for these {count} certificates",
+  "slCertificates.invoiceAfterRenew": {
+    one: "Create an invoice for this certificate",
+    other: "Create an invoice for these {count} certificates",
+  },
 
   // Revoke modal
   "slCertificates.revokeTitle": "Revoke certificate",

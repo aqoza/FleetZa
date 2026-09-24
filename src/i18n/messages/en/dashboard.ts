@@ -23,12 +23,30 @@ export const enDashboard = {
   "dashboard.nCertsExpiring": "{count} expiring",
   "dashboard.ownFleet": "Your own fleet",
   "insights.title": "Insights",
-  "insights.overdueService": "{count} service reminders are overdue",
-  "insights.overdueRenewals": "{count} renewals are overdue",
-  "insights.certsExpiring": "{count} certificates expire within 30 days",
-  "insights.inShop": "{count} of {total} fleet vehicles are in the shop",
-  "insights.qcBacklog": "{count} completed jobs await QC approval",
-  "insights.stockOut": "No devices in stock while {count} jobs are scheduled",
+  "insights.overdueService": {
+    one: "{count} service reminder is overdue",
+    other: "{count} service reminders are overdue",
+  },
+  "insights.overdueRenewals": {
+    one: "{count} renewal is overdue",
+    other: "{count} renewals are overdue",
+  },
+  "insights.certsExpiring": {
+    one: "{count} certificate expires within 30 days",
+    other: "{count} certificates expire within 30 days",
+  },
+  "insights.inShop": {
+    one: "{count} of {total} fleet vehicles is in the shop",
+    other: "{count} of {total} fleet vehicles are in the shop",
+  },
+  "insights.qcBacklog": {
+    one: "{count} completed job awaits QC approval",
+    other: "{count} completed jobs await QC approval",
+  },
+  "insights.stockOut": {
+    one: "No devices in stock while {count} job is scheduled",
+    other: "No devices in stock while {count} jobs are scheduled",
+  },
   "insights.allClear": "All clear — nothing needs attention right now.",
   "dashboard.recentWorkOrders": "Recent work orders",
   "dashboard.viewAll": "View all",
@@ -71,5 +89,8 @@ export const enDashboard = {
   "dashboard.expired": "Expired",
   "dashboard.dueSoon": "Due soon",
   "dashboard.dueToday": "Due today",
-  "dashboard.dueInDays": "Due in {count} d",
+  "dashboard.dueInDays": {
+    one: "Due in {count} d",
+    other: "Due in {count} d",
+  },
 } as const;
