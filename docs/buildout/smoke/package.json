@@ -1,0 +1,9 @@
+{
+  "name": "fleetmanage-smoke",
+  "private": true,
+  "type": "module",
+  "description": "Playwright smoke-test harness for the FleetManage SPA (fake Supabase backend)",
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}
