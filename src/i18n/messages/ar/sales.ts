@@ -351,7 +351,7 @@ export const arSales: Translation<typeof enSales, "ar"> = {
   "sales.print.crNumber": "رقم السجل التجاري",
   "sales.print.item": "البند",
   "sales.print.thankYou": "شكرًا لتعاملكم معنا.",
-  "sales.print.generatedBy": "أُنشئ بواسطة FleetManage",
+  "sales.print.generatedBy": "أُنشئ بواسطة FleetMaster",
   "sales.print.pageOf": "{doc} · {customer}",
 
   // صفحة عرض السعر الموجهة للعميل

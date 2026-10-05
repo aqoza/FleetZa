@@ -6,7 +6,7 @@ import type { Translation } from "../../plural";
 // أمر عمل (work order), الوقود (fuel), الفحص (inspection), عطل (issue),
 // تجديد (renewal), الضريبة (tax). The Record type enforces completeness.
 export const arCommon: Translation<typeof enCommon, "ar"> = {
-  "app.name": "FleetManage",
+  "app.name": "FleetMaster",
 
   "nav.dashboard": "لوحة المعلومات",
   "nav.vehicles": "المركبات",
