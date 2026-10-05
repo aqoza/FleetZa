@@ -245,6 +245,8 @@ reads through it:
 | `certificate_billing_status(ids[])` | The invoice behind each certificate on a page (number, status, due date, balance); the client derives the badge, adding the invoice list's "overdue" overlay (`src/lib/certificateBilling.ts`, unit-tested) |
 | `create_invoice_from_certificates(...)` | One RPC, one transaction: a draft invoice for one customer with a line per certificate. Every check runs before anything is written, so a rejection consumes no document number |
 | `sales_report_certificates_pending_invoice(customer?)` | Live certificates with no invoice — the worklist behind the KPI, grouped per customer on `/sales/reports` with the invoice one click away |
+| Customer filter on the certificates list | `?customer=<id>` composes with `?billing=unbilled`, so "this customer, not invoiced" is one shareable link |
+| Customer page *Not invoiced* card | `CustomerUnbilledCertificates` — that customer's live unbilled certificates (paged, via `billing_state`), a link into the filtered list, and *Invoice all*, which feeds the whole backlog from the report RPC into the invoice dialog |
 | `sales_report_pipeline().certificates_pending_invoice`, `sales_summary().unbilled_certificates` | The count, on the reports page and the hub overview |
 
 **Where the invoice is raised.** The certificates list (select → *Create

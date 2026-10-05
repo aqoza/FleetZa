@@ -265,4 +265,17 @@ export const enSlCertificates = {
   // Authorized-signatory block: "For <trade name>" above the signature, the
   // signatory's own name below it.
   "slCertificates.report.forCompany": "For {name}",
+
+  // Customer filter on the list, and the customer page's "Not invoiced" card
+  "slCertificates.allCustomers": "All customers",
+  "slCertificates.unbilledTitle": "Not invoiced",
+  "slCertificates.unbilledHint":
+    "Live certificates issued to this customer with no invoice against them yet.",
+  "slCertificates.unbilledCount": {
+    one: "{count} certificate",
+    other: "{count} certificates",
+  },
+  "slCertificates.unbilledNone": "Every live certificate for this customer has been invoiced.",
+  "slCertificates.unbilledViewAll": "Open in certificates",
+  "slCertificates.unbilledInvoiceAll": "Invoice all",
 } as const;
