@@ -281,14 +281,14 @@ export const enSlCertificates = {
 
   // Settled outside FleetManage (manual invoice / earlier system)
   "slCertificates.billing.external": "Paid manually",
-  "slCertificates.paidManuallyOn": "Invoiced and paid outside FleetManage on {date}",
+  "slCertificates.paidManuallyOn": "Invoiced and paid outside FleetMaster on {date}",
   "slCertificates.markPaid": "Mark as paid manually",
   "slCertificates.markPaidTitle": {
     one: "Mark {count} certificate as paid manually",
     other: "Mark {count} certificates as paid manually",
   },
   "slCertificates.markPaidLead":
-    "For certificates already invoiced and paid outside FleetManage. They stop showing as not invoiced and can't be put on an invoice here. You can undo this from the certificates list.",
+    "For certificates already invoiced and paid outside FleetMaster. They stop showing as not invoiced and can't be put on an invoice here. You can undo this from the certificates list.",
   "slCertificates.markPaidList": {
     one: "Will be marked ({count})",
     other: "Will be marked ({count})",

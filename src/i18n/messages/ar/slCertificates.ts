@@ -324,7 +324,7 @@ export const arSlCertificates: Translation<typeof enSlCertificates, "ar"> = {
   "slCertificates.unbilledInvoiceAll": "فوترة الكل",
 
   "slCertificates.billing.external": "مدفوعة يدويًا",
-  "slCertificates.paidManuallyOn": "فُوترت ودُفعت خارج FleetManage بتاريخ {date}",
+  "slCertificates.paidManuallyOn": "فُوترت ودُفعت خارج FleetMaster بتاريخ {date}",
   "slCertificates.markPaid": "تحديد كمدفوعة يدويًا",
   "slCertificates.markPaidTitle": {
     zero: "تحديد الشهادات كمدفوعة يدويًا",
@@ -335,7 +335,7 @@ export const arSlCertificates: Translation<typeof enSlCertificates, "ar"> = {
     other: "تحديد {count} شهادة كمدفوعة يدويًا",
   },
   "slCertificates.markPaidLead":
-    "للشهادات التي فُوترت ودُفعت بالفعل خارج FleetManage. لن تظهر بعد ذلك كغير مفوترة، ولا يمكن إدراجها في فاتورة هنا. يمكنك التراجع عن ذلك من قائمة الشهادات.",
+    "للشهادات التي فُوترت ودُفعت بالفعل خارج FleetMaster. لن تظهر بعد ذلك كغير مفوترة، ولا يمكن إدراجها في فاتورة هنا. يمكنك التراجع عن ذلك من قائمة الشهادات.",
   "slCertificates.markPaidList": {
     zero: "سيتم التحديد ({count})",
     one: "سيتم التحديد ({count})",
