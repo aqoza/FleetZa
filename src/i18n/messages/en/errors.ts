@@ -54,6 +54,8 @@ export const enErrors = {
   // Certificate billing (see supabase/migrations/…_certificate_billing.sql)
   "errors.certAlreadyInvoiced":
     "One of these certificates is already on an invoice. Void that invoice first if it was raised in error.",
+  "errors.certPaidExternally":
+    "One of these certificates is marked as paid manually. Undo that on the certificates list first if it is wrong.",
   "errors.certsMultipleCustomers":
     "An invoice bills one customer — select certificates that belong to a single customer.",
   "errors.certNoCustomer":

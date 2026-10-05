@@ -38,7 +38,8 @@ export interface CertificateBillingRow {
   currency: string;
 }
 
-export type CertificateBillingState = "unbilled" | "draft" | "invoiced" | "overdue" | "paid";
+export type CertificateBillingState =
+  | "unbilled" | "draft" | "invoiced" | "overdue" | "paid" | "external";
 
 /**
  * The single state to show for a certificate's billing. `now` is a
@@ -60,6 +61,21 @@ export function certificateBillingState(
 }
 
 /**
+ * The state for a certificate row, folding in the one fact the invoice lookup
+ * cannot see: a settlement recorded outside FleetManage. An invoice still
+ * wins if both exist (the database refuses that combination, so it would be
+ * stale data, and the invoice is the stronger record).
+ */
+export function certificateBillingStateFor(
+  cert: { paid_externally_on?: string | null },
+  row: CertificateBillingRow | null | undefined,
+  now?: string,
+): CertificateBillingState {
+  if (!row && cert.paid_externally_on) return "external";
+  return certificateBillingState(row, now);
+}
+
+/**
  * Label key + badge tone per state, in the shape src/lib/labels.ts uses.
  * "unbilled" is amber, not red: it is work to do, not a failure. Red is
  * reserved for an invoice that was raised and is now late.
@@ -73,6 +89,7 @@ export const certificateBillingMeta: Record<
   invoiced: { labelKey: "slCertificates.billing.invoiced", tone: "blue" },
   overdue: { labelKey: "slCertificates.billing.overdue", tone: "red" },
   paid: { labelKey: "slCertificates.billing.paid", tone: "green" },
+  external: { labelKey: "slCertificates.billing.external", tone: "green" },
 };
 
 /** Index an RPC result by certificate id, for O(1) lookups per table row. */
@@ -93,7 +110,8 @@ export type BillingFilter = "all" | "unbilled" | "invoiced" | "paid";
 export const BILLING_FILTER_STATES: Record<Exclude<BillingFilter, "all">, string[]> = {
   unbilled: ["unbilled"],
   invoiced: ["draft", "invoiced"],
-  paid: ["paid"],
+  // Settled outside FleetManage is still settled: "Paid" shows both.
+  paid: ["paid", "external"],
 };
 
 const BILLING_FILTERS = new Set<string>(["all", "unbilled", "invoiced", "paid"]);
@@ -116,11 +134,14 @@ export interface InvoiceableCertificate {
   vehicle_id: string | null;
   vehicle_name: string | null;
   license_plate: string | null;
+  /** Settled outside FleetManage — never billed again. Absent ⇒ unknown/no. */
+  paid_externally_on?: string | null;
 }
 
 /** Why the dialog will not put a certificate on the invoice. */
 export type InvoiceSkipReason =
   | { kind: "invoiced"; row: CertificateBillingRow }
+  | { kind: "external"; paidOn: string }
   | { kind: "other_customer"; customerName: string | null }
   | { kind: "no_customer" };
 
@@ -163,6 +184,8 @@ export function partitionForInvoice(
   for (const cert of certs) {
     const row = billing.get(cert.id);
     if (row) skipped.push({ cert, reason: { kind: "invoiced", row } });
+    else if (cert.paid_externally_on)
+      skipped.push({ cert, reason: { kind: "external", paidOn: cert.paid_externally_on } });
     else if (!cert.customer_id) skipped.push({ cert, reason: { kind: "no_customer" } });
     else if (cert.customer_id !== customerId)
       skipped.push({ cert, reason: { kind: "other_customer", customerName: cert.customer_name } });

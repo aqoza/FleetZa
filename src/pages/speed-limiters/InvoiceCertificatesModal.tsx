@@ -29,15 +29,18 @@ import {
   type InvoiceSkipReason,
 } from "../../lib/certificateBilling";
 import { useProductPicker } from "../../lib/pickers";
+import { formatDate } from "../../lib/format";
 import type { Invoice, Product } from "../../lib/types";
 import { useTenant } from "../../context/AuthContext";
 import { useT, useTp, type Translate } from "../../i18n";
+import { X } from "lucide-react";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
 import {
   Bdi, Button, ErrorState, Field, Input, LoadingState, Ltr, Modal,
 } from "../../components/ui";
 import { useDefaultTaxRate } from "../sales/shared";
+import { MarkPaidExternallyForm } from "./MarkPaidExternallyModal";
 
 /** One row of sales_report_certificates_pending_invoice(). */
 interface PendingCertificateRow {
@@ -100,6 +103,8 @@ function skipLabel(t: Translate, reason: InvoiceSkipReason): string {
   switch (reason.kind) {
     case "invoiced":
       return t("slCertificates.invoiceSkipInvoiced", { number: ltrText(reason.row.doc_number) });
+    case "external":
+      return t("slCertificates.invoiceSkipExternal", { date: ltrText(formatDate(reason.paidOn)) });
     case "other_customer":
       return t("slCertificates.invoiceSkipOtherCustomer", {
         name: bdiText(reason.customerName) || t("common.dash"),
@@ -175,7 +180,25 @@ function InvoiceForm({
   const [taxRate, setTaxRate] = useState(() => String(defaultTax));
   const [error, setError] = useState("");
 
-  const lines = includeOthers ? [...partition.eligible, ...others] : partition.eligible;
+  // Taken off this invoice by the operator — typically ones already billed
+  // by hand. Kept out of `lines`; offered to be marked paid outside so they
+  // stop coming back. Marked ones leave the dialog entirely.
+  const [removed, setRemoved] = useState<Set<string>>(() => new Set());
+  const [marked, setMarked] = useState<Set<string>>(() => new Set());
+  const [markingRemoved, setMarkingRemoved] = useState(false);
+
+  const candidates = includeOthers ? [...partition.eligible, ...others] : partition.eligible;
+  const lines = candidates.filter((c) => !removed.has(c.id) && !marked.has(c.id));
+  const removedCerts = candidates.filter((c) => removed.has(c.id) && !marked.has(c.id));
+
+  function toggleRemoved(id: string, remove: boolean) {
+    setRemoved((prev) => {
+      const next = new Set(prev);
+      if (remove) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
 
   // Every line is identical, so the document total is one line's total (rounded
   // the way the DB rounds it) times the line count — re-rounded to strip float
@@ -265,22 +288,90 @@ function InvoiceForm({
           </h3>
           <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto text-sm text-ink-2">
             {lines.map((c) => (
-              <li key={c.id} className="flex justify-between gap-4">
+              <li key={c.id} className="flex items-center justify-between gap-4">
                 <span className="font-medium text-ink"><Ltr>{c.certificate_number}</Ltr></span>
-                {/* <Ltr>: a plate is digits + Latin letters and would be
-                    reordered inside an RTL paragraph. */}
-                <span className="text-end text-ink-3">
-                  {c.license_plate ? (
-                    <Ltr>{c.license_plate}</Ltr>
-                  ) : c.vehicle_name ? (
-                    <Bdi>{c.vehicle_name}</Bdi>
-                  ) : (
-                    t("common.dash")
-                  )}
+                <span className="flex items-center gap-2">
+                  {/* <Ltr>: a plate is digits + Latin letters and would be
+                      reordered inside an RTL paragraph. */}
+                  <span className="text-end text-ink-3">
+                    {c.license_plate ? (
+                      <Ltr>{c.license_plate}</Ltr>
+                    ) : c.vehicle_name ? (
+                      <Bdi>{c.vehicle_name}</Bdi>
+                    ) : (
+                      t("common.dash")
+                    )}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toggleRemoved(c.id, true)}
+                    disabled={busy}
+                    className="rounded p-0.5 text-ink-3 hover:bg-surface hover:text-serious"
+                    aria-label={t("slCertificates.invoiceRemove", { number: c.certificate_number })}
+                    title={t("slCertificates.invoiceRemove", { number: c.certificate_number })}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </span>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {removedCerts.length > 0 && (
+        <div className="rounded-lg border border-line p-3">
+          {markingRemoved ? (
+            <MarkPaidExternallyForm
+              embedded
+              certs={removedCerts}
+              onCancel={() => setMarkingRemoved(false)}
+              onDone={(ids) => {
+                setMarked((prev) => new Set([...prev, ...ids]));
+                setMarkingRemoved(false);
+              }}
+            />
+          ) : (
+            <>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-sm text-ink-2">
+                  {tp("slCertificates.invoiceRemoved", removedCerts.length)}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setRemoved(new Set())}
+                    disabled={busy}
+                  >
+                    {t("slCertificates.invoiceRestore")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => setMarkingRemoved(true)}
+                    disabled={busy}
+                  >
+                    {t("slCertificates.invoiceMarkRemovedPaid")}
+                  </Button>
+                </div>
+              </div>
+              <ul className="mt-2 flex flex-wrap gap-1.5 text-xs">
+                {removedCerts.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => toggleRemoved(c.id, false)}
+                      className="rounded-full border border-line bg-surface px-2 py-0.5 font-medium text-ink-2 hover:bg-canvas"
+                      title={t("slCertificates.invoiceRestore")}
+                    >
+                      <Ltr>{c.certificate_number}</Ltr>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       )}
 
@@ -326,7 +417,10 @@ function InvoiceForm({
 
       {lines.length === 0 ? (
         <>
-          <ErrorState message={t("slCertificates.invoiceNoneEligible")} />
+          {/* Everything was taken off by hand — that is a choice, not an error. */}
+          {removedCerts.length === 0 && (
+            <ErrorState message={t("slCertificates.invoiceNoneEligible")} />
+          )}
           <div className="flex justify-end">
             <Button type="button" variant="secondary" onClick={onDone}>
               {t("action.close")}

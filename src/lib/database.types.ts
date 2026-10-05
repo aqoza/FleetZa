@@ -1801,6 +1801,7 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           kind: string
@@ -1812,10 +1813,12 @@ export type Database = {
           unit: string
           unit_price: number
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           active?: boolean
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           kind?: string
@@ -1827,10 +1830,12 @@ export type Database = {
           unit?: string
           unit_price?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           active?: boolean
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           kind?: string
@@ -1842,6 +1847,7 @@ export type Database = {
           unit?: string
           unit_price?: number
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -2984,6 +2990,7 @@ export type Database = {
           customer_id: string | null
           device_id: string | null
           expires_at: string
+          external_invoice_ref: string | null
           id: string
           installation_id: string | null
           issued_at: string
@@ -2991,6 +2998,7 @@ export type Database = {
           job_id: string | null
           limiter_type: string | null
           notes: string | null
+          paid_externally_on: string | null
           renewed_from: string | null
           revoked_at: string | null
           revoked_reason: string | null
@@ -3013,6 +3021,7 @@ export type Database = {
           customer_id?: string | null
           device_id?: string | null
           expires_at: string
+          external_invoice_ref?: string | null
           id?: string
           installation_id?: string | null
           issued_at?: string
@@ -3020,6 +3029,7 @@ export type Database = {
           job_id?: string | null
           limiter_type?: string | null
           notes?: string | null
+          paid_externally_on?: string | null
           renewed_from?: string | null
           revoked_at?: string | null
           revoked_reason?: string | null
@@ -3042,6 +3052,7 @@ export type Database = {
           customer_id?: string | null
           device_id?: string | null
           expires_at?: string
+          external_invoice_ref?: string | null
           id?: string
           installation_id?: string | null
           issued_at?: string
@@ -3049,6 +3060,7 @@ export type Database = {
           job_id?: string | null
           limiter_type?: string | null
           notes?: string | null
+          paid_externally_on?: string | null
           renewed_from?: string | null
           revoked_at?: string | null
           revoked_reason?: string | null
@@ -4505,6 +4517,7 @@ export type Database = {
           customer_id: string | null
           device_id: string | null
           expires_at: string
+          external_invoice_ref: string | null
           id: string
           installation_id: string | null
           issued_at: string
@@ -4512,6 +4525,7 @@ export type Database = {
           job_id: string | null
           limiter_type: string | null
           notes: string | null
+          paid_externally_on: string | null
           renewed_from: string | null
           revoked_at: string | null
           revoked_reason: string | null
@@ -4741,6 +4755,14 @@ export type Database = {
           unbilled_certificates: number
           unbilled_order_value: number
         }[]
+      }
+      set_certificates_paid_externally: {
+        Args: {
+          p_certificate_ids: string[]
+          p_paid_on: string
+          p_reference?: string
+        }
+        Returns: number
       }
       set_document_prefix: {
         Args: { p_doc_type: string; p_prefix: string }

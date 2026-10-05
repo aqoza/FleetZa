@@ -332,6 +332,15 @@ export interface SpeedLimiterCertificate {
    * chains can cross installation_id. Read it through src/lib/certificateStatus.ts.
    */
   superseded_by: string | null;
+  /**
+   * Set when the certificate was invoiced and paid OUTSIDE FleetManage (a
+   * manual invoice before the billing module, or another system). A stored
+   * fact — there is no invoice row to derive it from. Billed for every
+   * purpose: never offered for invoicing again. See src/lib/certificateBilling.ts.
+   */
+  paid_externally_on: string | null;
+  /** The manual invoice / receipt number that settled it. Requires the date. */
+  external_invoice_ref: string | null;
   customer_id: string | null;
   job_id: string | null;
   device_id: string | null;

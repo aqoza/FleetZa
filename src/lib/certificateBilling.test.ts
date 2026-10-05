@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   BILLING_FILTER_STATES,
   certificateBillingState,
+  certificateBillingStateFor,
   indexBillingRows,
   parseBillingFilter,
   partitionForInvoice,
@@ -79,7 +80,7 @@ describe("billing filter", () => {
   it("maps 'invoiced' onto drafts too, since a draft is already a claim", () => {
     expect(BILLING_FILTER_STATES.invoiced).toEqual(["draft", "invoiced"]);
     expect(BILLING_FILTER_STATES.unbilled).toEqual(["unbilled"]);
-    expect(BILLING_FILTER_STATES.paid).toEqual(["paid"]);
+    expect(BILLING_FILTER_STATES.paid).toEqual(["paid", "external"]);
   });
 });
 
@@ -132,5 +133,45 @@ describe("partitionForInvoice", () => {
     expect(p.customerId).toBeNull();
     expect(p.eligible).toEqual([]);
     expect(p.skipped).toHaveLength(1);
+  });
+});
+
+describe("certificateBillingStateFor", () => {
+  it("reads a certificate settled outside FleetManage as external", () => {
+    expect(certificateBillingStateFor({ paid_externally_on: "2025-10-01" }, null, TODAY)).toBe(
+      "external",
+    );
+  });
+
+  it("falls through to the invoice when nothing was settled outside", () => {
+    expect(certificateBillingStateFor({ paid_externally_on: null }, null, TODAY)).toBe("unbilled");
+    expect(certificateBillingStateFor({}, row({ status: "paid" }), TODAY)).toBe("paid");
+  });
+
+  it("lets an invoice win over a stale external mark", () => {
+    expect(
+      certificateBillingStateFor({ paid_externally_on: "2025-10-01" }, row(), TODAY),
+    ).toBe("invoiced");
+  });
+});
+
+describe("partitionForInvoice — settled outside", () => {
+  it("skips a certificate already paid outside FleetManage", () => {
+    const certs: InvoiceableCertificate[] = [
+      {
+        id: "a", certificate_number: "SLC-1", customer_id: "cu1", customer_name: "Acme",
+        vehicle_id: "v1", vehicle_name: "Truck", license_plate: "1 AB",
+      },
+      {
+        id: "b", certificate_number: "SLC-2", customer_id: "cu1", customer_name: "Acme",
+        vehicle_id: "v2", vehicle_name: "Van", license_plate: "2 AB",
+        paid_externally_on: "2025-10-01",
+      },
+    ];
+    const p = partitionForInvoice(certs, new Map());
+    expect(p.eligible.map((c) => c.id)).toEqual(["a"]);
+    expect(p.skipped).toEqual([
+      { cert: certs[1], reason: { kind: "external", paidOn: "2025-10-01" } },
+    ]);
   });
 });

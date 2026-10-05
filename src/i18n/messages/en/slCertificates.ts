@@ -278,4 +278,38 @@ export const enSlCertificates = {
   "slCertificates.unbilledNone": "Every live certificate for this customer has been invoiced.",
   "slCertificates.unbilledViewAll": "Open in certificates",
   "slCertificates.unbilledInvoiceAll": "Invoice all",
+
+  // Settled outside FleetManage (manual invoice / earlier system)
+  "slCertificates.billing.external": "Paid manually",
+  "slCertificates.paidManuallyOn": "Invoiced and paid outside FleetManage on {date}",
+  "slCertificates.markPaid": "Mark as paid manually",
+  "slCertificates.markPaidTitle": {
+    one: "Mark {count} certificate as paid manually",
+    other: "Mark {count} certificates as paid manually",
+  },
+  "slCertificates.markPaidLead":
+    "For certificates already invoiced and paid outside FleetManage. They stop showing as not invoiced and can't be put on an invoice here. You can undo this from the certificates list.",
+  "slCertificates.markPaidList": {
+    one: "Will be marked ({count})",
+    other: "Will be marked ({count})",
+  },
+  "slCertificates.markPaidDate": "Paid on",
+  "slCertificates.markPaidDateRequired": "Enter the date it was paid.",
+  "slCertificates.markPaidRef": "Manual invoice or receipt #",
+  "slCertificates.markPaidRefHint": "Optional — shown on the certificates list.",
+  "slCertificates.markPaidConfirm": "Mark as paid",
+  "slCertificates.markPaidDone": {
+    one: "{count} certificate marked as paid manually",
+    other: "{count} certificates marked as paid manually",
+  },
+  "slCertificates.undoPaid": "Undo",
+  "slCertificates.undoPaidDone": "{number} is back to not invoiced",
+  "slCertificates.invoiceSkipExternal": "Paid manually on {date}",
+  "slCertificates.invoiceRemove": "Remove {number} from this invoice",
+  "slCertificates.invoiceRemoved": {
+    one: "{count} certificate removed from this invoice",
+    other: "{count} certificates removed from this invoice",
+  },
+  "slCertificates.invoiceRestore": "Put back",
+  "slCertificates.invoiceMarkRemovedPaid": "Mark removed as paid manually",
 } as const;

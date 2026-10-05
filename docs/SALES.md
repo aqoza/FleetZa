@@ -247,6 +247,7 @@ reads through it:
 | `sales_report_certificates_pending_invoice(customer?)` | Live certificates with no invoice — the worklist behind the KPI, grouped per customer on `/sales/reports` with the invoice one click away |
 | Customer filter on the certificates list | `?customer=<id>` composes with `?billing=unbilled`, so "this customer, not invoiced" is one shareable link |
 | Customer page *Not invoiced* card | `CustomerUnbilledCertificates` — that customer's live unbilled certificates (paged, via `billing_state`), a link into the filtered list, and *Invoice all*, which feeds the whole backlog from the report RPC into the invoice dialog |
+| Paid manually (`paid_externally_on`, `external_invoice_ref`) | A certificate invoiced and paid **outside** FleetManage (paper register, manual invoice). Stored fact, set/cleared in bulk by `set_certificates_paid_externally(ids, date \| null, ref)`. `billing_state` reads `external` (the list's *Paid* chip shows it); every pending report and KPI skips it; the invoice RPC and both line/header guards refuse it (`CERT_PAID_EXTERNALLY`); marking one that a FleetManage invoice already bills is refused (`CERT_ALREADY_INVOICED`). Reachable from the list's bulk actions, the customer card's selection, and the invoice dialog (remove lines → *Mark removed as paid manually*); *Undo* on the list row |
 | `sales_report_pipeline().certificates_pending_invoice`, `sales_summary().unbilled_certificates` | The count, on the reports page and the hub overview |
 
 **Where the invoice is raised.** The certificates list (select → *Create

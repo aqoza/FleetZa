@@ -968,7 +968,7 @@ export default function CustomerDetailPage() {
       {unbilledEnabled && (
         <div className="mb-4">
           <Suspense fallback={<LoadingState />}>
-            <CustomerUnbilledCertificates customerId={customerId} />
+            <CustomerUnbilledCertificates customerId={customerId} customerName={customer.name} />
           </Suspense>
         </div>
       )}
