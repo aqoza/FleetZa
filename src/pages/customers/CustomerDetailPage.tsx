@@ -32,6 +32,10 @@ import { CustomerForm, customerStatusMeta } from "./CustomersPage";
 // Contributed by the sales module — kept in its own chunk so customers pages
 // stay lean for tenants that do not sell.
 const CustomerSalesPanel = lazy(() => import("../sales/CustomerSalesPanel"));
+// Certificates + billing: the live certificates nobody has invoiced yet.
+const CustomerUnbilledCertificates = lazy(
+  () => import("../speed-limiters/CustomerUnbilledCertificates"),
+);
 
 type JobRow = SlJob & { vehicles: Pick<Vehicle, "name"> | null };
 type CertRow = SpeedLimiterCertificate & {
@@ -292,6 +296,7 @@ export default function CustomerDetailPage() {
   const slEnabled = isEnabled("speed_limiters");
   const salesEnabled = isEnabled("sales");
   const certificatesEnabled = slEnabled && isEnabled("sl_certificates");
+  const unbilledEnabled = certificatesEnabled && isEnabled("billing");
 
   const [editing, setEditing] = useState(false);
   const [addingContact, setAddingContact] = useState(false);
@@ -960,6 +965,14 @@ export default function CustomerDetailPage() {
         </div>
       )}
 
+      {unbilledEnabled && (
+        <div className="mb-4">
+          <Suspense fallback={<LoadingState />}>
+            <CustomerUnbilledCertificates customerId={customerId} />
+          </Suspense>
+        </div>
+      )}
+
       {slEnabled && (
       <div className={`grid gap-4 ${certificatesEnabled ? "lg:grid-cols-2" : ""}`}>
         <Card className="p-5">
@@ -1045,7 +1058,7 @@ export default function CustomerDetailPage() {
                   {t("customers.certsIncludeHistory")}
                 </button>
                 <Link
-                  to="/speed-limiters/certificates"
+                  to={`/speed-limiters/certificates?customer=${encodeURIComponent(customerId)}`}
                   className="text-xs font-medium text-brand-700 hover:underline"
                 >
                   {t("customers.viewAllCertificates")}

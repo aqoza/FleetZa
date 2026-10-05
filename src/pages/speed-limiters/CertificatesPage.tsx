@@ -33,7 +33,7 @@ import {
   Pagination, Textarea,
 } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
-import { useTechnicianPicker } from "../../lib/pickers";
+import { useCustomerPicker, useTechnicianPicker } from "../../lib/pickers";
 import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import {
   RenewCertificateModal, defaultRenewalDates, renewCertificate,
@@ -623,6 +623,10 @@ export default function CertificatesPage() {
   // Only meaningful with billing on; a stale ?billing= in a shared link is
   // ignored rather than filtering on a column nobody can see.
   const billing: BillingFilter = billingOn ? parseBillingFilter(params.get("billing")) : "all";
+  // A customer id, so "Al Emtiaz, not invoiced" is one shareable link — and
+  // the customer page's "Not invoiced" card can deep-link straight into it.
+  const customerId = params.get("customer") ?? "";
+  const customerPicker = useCustomerPicker(customerId);
   const search = params.get("q") ?? "";
   const pageParam = Number(params.get("page"));
   const page = Number.isFinite(pageParam) && pageParam >= 2 ? Math.floor(pageParam) - 1 : 0;
@@ -630,7 +634,9 @@ export default function CertificatesPage() {
   /** Narrowing the result set always returns to page 1 — in one navigation, so
    *  the list never fires a query for a page the new filter cannot have. */
   function patchParams(
-    next: { filter?: FilterId; billing?: BillingFilter; q?: string; page?: number },
+    next: {
+      filter?: FilterId; billing?: BillingFilter; customer?: string; q?: string; page?: number;
+    },
     replace: boolean,
   ) {
     const p = new URLSearchParams(params);
@@ -642,6 +648,11 @@ export default function CertificatesPage() {
     if (next.billing !== undefined) {
       if (next.billing === "all") p.delete("billing");
       else p.set("billing", next.billing);
+      p.delete("page");
+    }
+    if (next.customer !== undefined) {
+      if (next.customer === "") p.delete("customer");
+      else p.set("customer", next.customer);
       p.delete("page");
     }
     if (next.q !== undefined) {
@@ -692,7 +703,9 @@ export default function CertificatesPage() {
   const searchReady = term === "" || vehicleMatch.isSuccess;
 
   const { data, isPlaceholderData, error } = useQuery({
-    queryKey: ["speed_limiter_certificates", "list", page, filter, billing, term, vehicleIds],
+    queryKey: [
+      "speed_limiter_certificates", "list", page, filter, billing, customerId, term, vehicleIds,
+    ],
     enabled: searchReady,
     // Typing a plate re-runs a two-step search; keep the previous rows on
     // screen (dimmed) instead of tearing the table down on every keystroke.
@@ -727,13 +740,15 @@ export default function CertificatesPage() {
         // Billing is a computed column, so "not invoiced" composes with the
         // expiry chips and the search instead of needing a list of its own.
         if (billing !== "all") query = query.in("billing_state", BILLING_FILTER_STATES[billing]);
+        if (customerId) query = query.eq("customer_id", customerId);
         if (term) query = query.or(searchOr(term, vehicleIds));
         return query;
       }),
   });
   const certs = data?.rows ?? [];
   const total = data?.total ?? 0;
-  const hasFilters = filter !== "all" || billing !== "all" || term !== "";
+  const hasFilters =
+    filter !== "all" || billing !== "all" || customerId !== "" || term !== "";
 
   // A technician typing an old certificate number finds nothing, because the
   // default view hides the predecessors a renewal replaced. Rather than let
@@ -1021,24 +1036,34 @@ export default function CertificatesPage() {
         </div>
       </div>
 
-      {billingOn && (
-        <div className="mb-4 flex flex-wrap items-center gap-1.5" aria-label={t("slCertificates.billing")}>
-          {BILLING_FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => patchParams({ billing: f.id }, false)}
-              aria-pressed={billing === f.id}
-              className={
-                billing === f.id
-                  ? "rounded-full bg-brand-600 px-3 py-1 text-xs font-medium text-white"
-                  : "rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-2 hover:bg-canvas"
-              }
-            >
-              {t(f.labelKey)}
-            </button>
-          ))}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="w-full sm:w-72">
+          <Combobox
+            {...customerPicker}
+            value={customerId}
+            onChange={(v) => patchParams({ customer: v }, false)}
+            placeholder={t("slCertificates.allCustomers")}
+          />
         </div>
-      )}
+        {billingOn && (
+          <div className="flex flex-wrap items-center gap-1.5" aria-label={t("slCertificates.billing")}>
+            {BILLING_FILTERS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => patchParams({ billing: f.id }, false)}
+                aria-pressed={billing === f.id}
+                className={
+                  billing === f.id
+                    ? "rounded-full bg-brand-600 px-3 py-1 text-xs font-medium text-white"
+                    : "rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-2 hover:bg-canvas"
+                }
+              >
+                {t(f.labelKey)}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {vehicleMatchTruncated && (
         <div className="mb-4 rounded-xl border border-warn/30 bg-warn-soft px-3 py-2 text-sm text-warn">

@@ -306,4 +306,20 @@ export const arSlCertificates: Translation<typeof enSlCertificates, "ar"> = {
   "slCertificates.report.signature": "التوقيع المعتمد",
   "slCertificates.report.stamp": "ختم الشركة",
   "slCertificates.report.forCompany": "عن {name}",
+
+  "slCertificates.allCustomers": "كل العملاء",
+  "slCertificates.unbilledTitle": "غير مفوترة",
+  "slCertificates.unbilledHint":
+    "الشهادات السارية الصادرة لهذا العميل والتي لم تُصدر لها فاتورة بعد.",
+  "slCertificates.unbilledCount": {
+    zero: "لا توجد شهادات",
+    one: "شهادة واحدة",
+    two: "شهادتان",
+    few: "{count} شهادات",
+    many: "{count} شهادة",
+    other: "{count} شهادة",
+  },
+  "slCertificates.unbilledNone": "جميع الشهادات السارية لهذا العميل مفوترة.",
+  "slCertificates.unbilledViewAll": "فتح في الشهادات",
+  "slCertificates.unbilledInvoiceAll": "فوترة الكل",
 };
