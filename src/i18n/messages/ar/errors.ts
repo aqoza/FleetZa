@@ -53,6 +53,8 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   // فوترة الشهادات
   "errors.certAlreadyInvoiced":
     "إحدى هذه الشهادات مدرجة بالفعل في فاتورة. ألغِ تلك الفاتورة أولًا إن كانت قد أُنشئت بالخطأ.",
+  "errors.certPaidExternally":
+    "إحدى هذه الشهادات محددة كمدفوعة يدويًا. تراجع عن ذلك من قائمة الشهادات أولًا إن كان خطأً.",
   "errors.certsMultipleCustomers":
     "الفاتورة تُصدَر لعميل واحد — اختر شهادات تخص عميلًا واحدًا.",
   "errors.certNoCustomer":

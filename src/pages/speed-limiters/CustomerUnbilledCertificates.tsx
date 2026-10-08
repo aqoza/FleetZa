@@ -14,7 +14,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
-import { Receipt } from "lucide-react";
+import { BadgeCheck, Receipt } from "lucide-react";
 import { listPage, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { formatDate } from "../../lib/format";
@@ -24,9 +24,11 @@ import type { SpeedLimiterCertificate, Vehicle } from "../../lib/types";
 import { useAuth } from "../../context/AuthContext";
 import { useT, useTp } from "../../i18n";
 import {
-  Badge, Bdi, Button, Card, ErrorState, LoadingState, Ltr, Pagination, Table,
+  Badge, Bdi, Button, Card, ErrorState, LoadingState, Ltr, Pagination,
 } from "../../components/ui";
+import { DataTable, type DataTableColumn } from "../../components/DataTable";
 import { InvoiceCertificatesModal } from "./InvoiceCertificatesModal";
+import { MarkPaidExternallyModal } from "./MarkPaidExternallyModal";
 
 const PAGE_SIZE = 8;
 
@@ -46,12 +48,19 @@ interface PendingRow {
   license_plate: string | null;
 }
 
-export default function CustomerUnbilledCertificates({ customerId }: { customerId: string }) {
+export default function CustomerUnbilledCertificates({
+  customerId,
+  customerName,
+}: {
+  customerId: string;
+  customerName: string | null;
+}) {
   const t = useT();
   const tp = useTp();
   const { isManager } = useAuth();
   const [page, setPage] = useState(0);
   const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+  const [markingPaid, setMarkingPaid] = useState<InvoiceableCertificate[] | null>(null);
 
   const listQ = useQuery({
     queryKey: ["speed_limiter_certificates", "customer", customerId, "unbilled", page],
@@ -99,6 +108,67 @@ export default function CustomerUnbilledCertificates({ customerId }: { customerI
       ),
   });
 
+  const toInvoiceable = (c: UnbilledRow): InvoiceableCertificate => ({
+    id: c.id,
+    certificate_number: c.certificate_number,
+    customer_id: customerId,
+    customer_name: customerName,
+    vehicle_id: null,
+    vehicle_name: c.vehicles?.name ?? null,
+    license_plate: c.vehicles?.license_plate ?? null,
+  });
+
+  const columns: Array<DataTableColumn<UnbilledRow>> = [
+    {
+      id: "number",
+      header: t("slCertificates.number"),
+      cell: (c) => (
+        <Link
+          to={`/speed-limiters/certificates?q=${encodeURIComponent(c.certificate_number)}`}
+          className="font-medium text-brand-700 hover:underline"
+        >
+          <Ltr>{c.certificate_number}</Ltr>
+        </Link>
+      ),
+      sortValue: (c) => c.certificate_number,
+    },
+    {
+      id: "vehicle",
+      header: t("field.vehicle"),
+      cell: (c) => (
+        <>
+          <div className="text-ink-2"><Bdi>{c.vehicles?.name ?? t("common.dash")}</Bdi></div>
+          {c.vehicles?.license_plate && (
+            <div className="text-xs text-ink-3"><Ltr>{c.vehicles.license_plate}</Ltr></div>
+          )}
+        </>
+      ),
+      sortValue: (c) => c.vehicles?.license_plate ?? null,
+    },
+    {
+      id: "issued",
+      header: t("slCertificates.issued"),
+      cell: (c) => <span className="text-ink-2">{formatDate(c.issued_at)}</span>,
+      sortValue: (c) => c.issued_at,
+      minBreakpoint: "md",
+      dir: "ltr",
+    },
+    {
+      id: "expires",
+      header: t("slCertificates.expires"),
+      cell: (c) => {
+        const meta = certificateStatusMeta(c);
+        return (
+          <div className="flex items-center gap-2">
+            <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
+            <span className="text-xs text-ink-3"><Ltr>{formatDate(c.expires_at)}</Ltr></span>
+          </div>
+        );
+      },
+      sortValue: (c) => c.expires_at,
+    },
+  ];
+
   const listHref =
     `/speed-limiters/certificates?customer=${encodeURIComponent(customerId)}&billing=unbilled`;
 
@@ -139,53 +209,31 @@ export default function CustomerUnbilledCertificates({ customerId }: { customerI
       ) : total === 0 ? (
         <p className="py-6 text-center text-sm text-ink-3">{t("slCertificates.unbilledNone")}</p>
       ) : (
-        <>
-          <Table
-            headers={[
-              t("slCertificates.number"),
-              t("field.vehicle"),
-              t("slCertificates.issued"),
-              t("slCertificates.expires"),
-            ]}
-          >
-            {rows.map((c) => {
-              const meta = certificateStatusMeta(c);
-              return (
-                <tr key={c.id} className="transition-colors hover:bg-canvas">
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/speed-limiters/certificates?q=${encodeURIComponent(c.certificate_number)}`}
-                      className="font-medium text-brand-700 hover:underline"
-                    >
-                      <Ltr>{c.certificate_number}</Ltr>
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-ink-2">
-                    <div><Bdi>{c.vehicles?.name ?? t("common.dash")}</Bdi></div>
-                    {c.vehicles?.license_plate && (
-                      <div className="text-xs text-ink-3">
-                        <Ltr>{c.vehicles.license_plate}</Ltr>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-2">
-                    <Ltr>{formatDate(c.issued_at)}</Ltr>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
-                      <span className="text-xs text-ink-3"><Ltr>{formatDate(c.expires_at)}</Ltr></span>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </Table>
-          <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
-        </>
+        <DataTable<UnbilledRow>
+          tableId="customer_unbilled_certificates"
+          columns={columns}
+          rows={rows}
+          rowKey={(c) => c.id}
+          selectable={isManager}
+          bulkActions={(selected) => (
+            <>
+              <Button onClick={() => setInvoicing(selected.map(toInvoiceable))}>
+                <Receipt className="h-4 w-4" /> {t("slCertificates.createInvoice")}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setMarkingPaid(selected.map(toInvoiceable))}
+              >
+                <BadgeCheck className="h-4 w-4" /> {t("slCertificates.markPaid")}
+              </Button>
+            </>
+          )}
+          footer={<Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />}
+        />
       )}
 
       <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
+      <MarkPaidExternallyModal certificates={markingPaid} onClose={() => setMarkingPaid(null)} />
     </Card>
   );
 }

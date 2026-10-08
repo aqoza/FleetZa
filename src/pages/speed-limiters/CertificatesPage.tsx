@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addDays, format } from "date-fns";
 import {
-  Ban, Check, Copy, Printer, Receipt, RefreshCw, Settings, ShieldCheck, Trash2,
+  Ban, BadgeCheck, Check, Copy, Printer, Receipt, RefreshCw, Settings, ShieldCheck, Trash2,
 } from "lucide-react";
 import {
   countRows, deleteRow, listPage, listRows, sanitizeSearch, updateRow, wrapDbError,
@@ -15,7 +15,7 @@ import {
   certificateBucket, certificateStatusMeta, type CertificateBucket,
 } from "../../lib/certificateStatus";
 import {
-  BILLING_FILTER_STATES, certificateBillingMeta, certificateBillingState, indexBillingRows,
+  BILLING_FILTER_STATES, certificateBillingMeta, certificateBillingStateFor, indexBillingRows,
   parseBillingFilter, type BillingFilter, type InvoiceableCertificate,
 } from "../../lib/certificateBilling";
 import type {
@@ -40,6 +40,8 @@ import {
   resolveDefaultTechnicianName, useActiveTechnicians,
 } from "./RenewCertificateModal";
 import { InvoiceCertificatesModal, useCertificateBilling } from "./InvoiceCertificatesModal";
+import { MarkPaidExternallyModal, useSetPaidExternally } from "./MarkPaidExternallyModal";
+import { useToast } from "../../components/Toast";
 
 type CertRow = SpeedLimiterCertificate & {
   vehicles: Pick<Vehicle, "name" | "license_plate" | "chassis_number" | "vin"> | null;
@@ -101,6 +103,7 @@ function toInvoiceable(c: CertRow): InvoiceableCertificate {
     vehicle_id: c.vehicle_id,
     vehicle_name: c.vehicles?.name ?? null,
     license_plate: c.vehicles?.license_plate ?? null,
+    paid_externally_on: c.paid_externally_on,
   };
 }
 
@@ -672,6 +675,9 @@ export default function CertificatesPage() {
   const [bulkRenewing, setBulkRenewing] = useState<CertRow[] | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [invoicing, setInvoicing] = useState<InvoiceableCertificate[] | null>(null);
+  const [markingPaid, setMarkingPaid] = useState<InvoiceableCertificate[] | null>(null);
+  const undoPaid = useSetPaidExternally();
+  const toast = useToast();
   const [revoking, setRevoking] = useState<CertRow | null>(null);
   const [deleting, setDeleting] = useState<CertRow | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -908,10 +914,51 @@ export default function CertificatesPage() {
             minBreakpoint: "md",
             cell: (c) => {
               const row = billingById.get(c.id);
-              const meta = certificateBillingMeta[certificateBillingState(row)];
+              const state = certificateBillingStateFor(c, row);
+              const meta = certificateBillingMeta[state];
               return (
                 <div className="flex flex-col items-start gap-0.5">
                   <Badge tone={meta.tone}>{t(meta.labelKey)}</Badge>
+                  {state === "external" && (
+                    <span
+                      className="text-xs text-ink-3"
+                      title={t("slCertificates.paidManuallyOn", {
+                        date: ltrText(formatDate(c.paid_externally_on)),
+                      })}
+                    >
+                      {c.external_invoice_ref ? (
+                        <Ltr>{c.external_invoice_ref}</Ltr>
+                      ) : (
+                        <Ltr>{formatDate(c.paid_externally_on)}</Ltr>
+                      )}
+                      {isManager && (
+                        <>
+                          {" · "}
+                          <button
+                            type="button"
+                            className="font-medium text-brand-700 hover:underline"
+                            disabled={undoPaid.isPending}
+                            onClick={() =>
+                              undoPaid.mutate(
+                                { ids: [c.id], paidOn: null },
+                                {
+                                  onSuccess: () =>
+                                    toast.success(
+                                      t("slCertificates.undoPaidDone", {
+                                        number: ltrText(c.certificate_number),
+                                      }),
+                                    ),
+                                  onError: (err) => toast.error(err),
+                                },
+                              )
+                            }
+                          >
+                            {t("slCertificates.undoPaid")}
+                          </button>
+                        </>
+                      )}
+                    </span>
+                  )}
                   {row && (
                     <Link
                       to={`/sales/invoices/${row.invoice_id}`}
@@ -925,7 +972,7 @@ export default function CertificatesPage() {
               );
             },
             sortValue: (c) =>
-              t(certificateBillingMeta[certificateBillingState(billingById.get(c.id))].labelKey),
+              t(certificateBillingMeta[certificateBillingStateFor(c, billingById.get(c.id))].labelKey),
           } satisfies DataTableColumn<CertRow>,
         ]
       : []),
@@ -1118,6 +1165,15 @@ export default function CertificatesPage() {
                     {t("slCertificates.createInvoice")}
                   </Button>
                 )}
+                {billingOn && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => setMarkingPaid(selected.map(toInvoiceable))}
+                  >
+                    <BadgeCheck className="h-4 w-4" />
+                    {t("slCertificates.markPaid")}
+                  </Button>
+                )}
               </>
             )}
             empty={
@@ -1183,6 +1239,7 @@ export default function CertificatesPage() {
       </Modal>
 
       <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
+      <MarkPaidExternallyModal certificates={markingPaid} onClose={() => setMarkingPaid(null)} />
 
       <Modal title={t("slCertificates.revokeTitle")} open={!!revoking} onClose={() => setRevoking(null)}>
         {revoking && <RevokeForm cert={revoking} onDone={() => setRevoking(null)} />}

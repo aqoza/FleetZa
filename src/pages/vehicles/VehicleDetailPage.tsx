@@ -10,7 +10,7 @@ import { formatDate, formatDistance, formatMoney } from "../../lib/format";
 import { bdiText, ltrText } from "../../lib/bidi";
 import { certificateStatusMeta } from "../../lib/certificateStatus";
 import {
-  certificateBillingMeta, certificateBillingState, type InvoiceableCertificate,
+  certificateBillingMeta, certificateBillingStateFor, type InvoiceableCertificate,
 } from "../../lib/certificateBilling";
 import { fuelTypes, vehicleStatus, vehicleTypes, workOrderStatus, issueStatus } from "../../lib/labels";
 import { useDriverPicker } from "../../lib/pickers";
@@ -282,7 +282,8 @@ export default function VehicleDetailPage() {
   // Billing of the current certificate: derived from the invoice that bills
   // it, or "not invoiced" when there is none.
   const certBillingRow = certBillingRows?.[0] ?? null;
-  const certBillingMeta = certificateBillingMeta[certificateBillingState(certBillingRow)];
+  const certBillingMeta =
+    certificateBillingMeta[certificateBillingStateFor(currentCert ?? {}, certBillingRow)];
   const invoiceable = (c: SpeedLimiterCertificate): InvoiceableCertificate => ({
     id: c.id,
     certificate_number: c.certificate_number,
@@ -291,6 +292,7 @@ export default function VehicleDetailPage() {
     vehicle_id: vehicle.id,
     vehicle_name: vehicle.name,
     license_plate: vehicle.license_plate,
+    paid_externally_on: c.paid_externally_on,
   });
 
   return (
@@ -530,6 +532,9 @@ export default function VehicleDetailPage() {
                               <Ltr>{certBillingRow.doc_number}</Ltr>
                             </Link>
                           )}
+                          {!certBillingRow && currentCert.external_invoice_ref && (
+                            <span className="text-ink-3"><Ltr>{currentCert.external_invoice_ref}</Ltr></span>
+                          )}
                         </span>
                       </div>
                     )}
@@ -552,7 +557,7 @@ export default function VehicleDetailPage() {
                       {/* The renewal is the work the customer pays for; if
                           nothing bills this certificate yet, the invoice
                           starts here — one vehicle, one line. */}
-                      {billingOn && isManager && !certBillingRow && (
+                      {billingOn && isManager && !certBillingRow && !currentCert.paid_externally_on && (
                         <button
                           type="button"
                           onClick={() => setInvoicing([invoiceable(currentCert)])}

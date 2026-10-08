@@ -48,6 +48,7 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   NOTHING_TO_INVOICE: "errors.nothingToInvoice",
   // Certificate billing (…_certificate_billing.sql)
   CERT_ALREADY_INVOICED: "errors.certAlreadyInvoiced",
+  CERT_PAID_EXTERNALLY: "errors.certPaidExternally",
   CERTS_MULTIPLE_CUSTOMERS: "errors.certsMultipleCustomers",
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
