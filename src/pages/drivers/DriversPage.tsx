@@ -13,6 +13,9 @@ import {
   Textarea,
 } from "../../components/ui";
 import { useToast } from "../../components/Toast";
+import { Combobox } from "../../components/Combobox";
+import { useModules } from "../../context/ModulesContext";
+import { useBranchPicker } from "../companies/hooks";
 
 function licenseBadge(expiry: string | null, t: Translate) {
   if (!expiry) return <span className="text-slate-400">—</span>;
@@ -27,6 +30,8 @@ function licenseBadge(expiry: string | null, t: Translate) {
 function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void }) {
   const t = useT();
   const qc = useQueryClient();
+  const { isEnabled } = useModules();
+  const branchesEnabled = isEnabled("multi_company");
   const [form, setForm] = useState({
     first_name: driver?.first_name ?? "",
     last_name: driver?.last_name ?? "",
@@ -38,8 +43,10 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
     hire_date: driver?.hire_date ?? "",
     status: driver?.status ?? "active",
     notes: driver?.notes ?? "",
+    branch_id: driver?.branch_id ?? "",
   });
   const [error, setError] = useState("");
+  const branchPicker = useBranchPicker(form.branch_id, branchesEnabled);
   const toast = useToast();
 
   function set<K extends keyof typeof form>(key: K, value: string) {
@@ -48,7 +55,7 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
 
   const mutation = useMutation({
     mutationFn: () => {
-      const values = {
+      const values: Record<string, unknown> = {
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         email: form.email.trim() || null,
@@ -60,6 +67,8 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
         status: form.status,
         notes: form.notes.trim() || null,
       };
+      // Never clear a branch the form could not show.
+      if (branchesEnabled) values.branch_id = form.branch_id || null;
       return driver
         ? updateRow<Driver>("drivers", driver.id, values)
         : insertRow<Driver>("drivers", values);
@@ -112,6 +121,16 @@ function DriverForm({ driver, onDone }: { driver?: Driver; onDone: () => void })
             ))}
           </Select>
         </Field>
+        {branchesEnabled && (
+          <Field label={t("companies.branch")}>
+            <Combobox
+              {...branchPicker}
+              value={form.branch_id}
+              onChange={(v) => set("branch_id", v)}
+              placeholder={t("companies.noBranch")}
+            />
+          </Field>
+        )}
       </div>
       <Field label={t("field.notes")}>
         <Textarea value={form.notes} onChange={(e) => set("notes", e.target.value)} />

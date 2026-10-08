@@ -1,0 +1,107 @@
+{
+ "tables": {
+  "companies": [
+   {
+    "id": "c0000000-0000-4000-8000-000000000001",
+    "legal_name": "Acme Logistics LLC",
+    "trade_name": "Acme Logistics",
+    "name_ar": "أكمي للخدمات اللوجستية",
+    "cr_number": "1234567",
+    "tax_number": "OM1100223344",
+    "email": "info@acme.example",
+    "phone": "+968 2400 1000",
+    "address": null,
+    "city": "Muscat",
+    "country": "Oman",
+    "currency": "OMR",
+    "is_default": true,
+    "active": true
+   },
+   {
+    "id": "c0000000-0000-4000-8000-000000000002",
+    "legal_name": "Acme Rentals SPC",
+    "trade_name": null,
+    "name_ar": null,
+    "cr_number": "7654321",
+    "tax_number": null,
+    "email": null,
+    "phone": null,
+    "address": null,
+    "city": "Sohar",
+    "country": "Oman",
+    "currency": null,
+    "is_default": false,
+    "active": true
+   }
+  ],
+  "branches": [
+   {
+    "id": "b0000000-0000-4000-8000-000000000001",
+    "name": "Muscat HQ",
+    "name_ar": "المقر الرئيسي - مسقط",
+    "code": "MCT",
+    "company_id": "c0000000-0000-4000-8000-000000000001",
+    "city": "Muscat",
+    "country": "Oman",
+    "phone": "+968 2400 1000",
+    "address": "Ghala Industrial Area",
+    "manager_employee_id": null,
+    "active": true,
+    "manager": null
+   },
+   {
+    "id": "b0000000-0000-4000-8000-000000000002",
+    "name": "Sohar depot",
+    "name_ar": "مستودع صحار",
+    "code": "SOH",
+    "company_id": "c0000000-0000-4000-8000-000000000002",
+    "city": "Sohar",
+    "country": "Oman",
+    "phone": null,
+    "address": null,
+    "manager_employee_id": null,
+    "active": true,
+    "manager": null
+   },
+   {
+    "id": "b0000000-0000-4000-8000-000000000003",
+    "name": "Salalah office",
+    "name_ar": null,
+    "code": "SLL",
+    "company_id": "c0000000-0000-4000-8000-000000000001",
+    "city": "Salalah",
+    "country": "Oman",
+    "phone": null,
+    "address": null,
+    "manager_employee_id": null,
+    "active": true,
+    "manager": null
+   }
+  ]
+ },
+ "rpc": {
+  "branch_stats": [
+   {
+    "branch_id": "b0000000-0000-4000-8000-000000000001",
+    "vehicle_count": 12,
+    "driver_count": 9,
+    "employee_count": 21,
+    "warehouse_count": 1
+   },
+   {
+    "branch_id": "b0000000-0000-4000-8000-000000000002",
+    "vehicle_count": 4,
+    "driver_count": 3,
+    "employee_count": 6,
+    "warehouse_count": 1
+   },
+   {
+    "branch_id": "b0000000-0000-4000-8000-000000000003",
+    "vehicle_count": 0,
+    "driver_count": 0,
+    "employee_count": 2,
+    "warehouse_count": 0
+   }
+  ]
+ }
+}

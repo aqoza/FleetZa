@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getRow, listRows, sanitizeSearch, type DbFilter, type TableName } from "./db";
 import type { ComboboxOption } from "../components/Combobox";
 import type {
-  Contact, Customer, Driver, Product, SlDevice, SlTechnician, Vehicle,
+  Contact, Customer, Driver, Product, SlDevice, SlTechnician, Supplier, SupplierType, Vehicle,
 } from "./types";
 
 /** Rows per search. Small on purpose — a combobox is read at a glance, and a
@@ -164,6 +164,28 @@ export function useCustomerPicker(
     toOption: (c) => ({ value: c.id, label: c.name, meta: c.cr_number ?? undefined }),
     filter: activeOnly ? (q) => q.eq("status", "active") : undefined,
     scope: ["customers", activeOnly],
+    enabled,
+  });
+}
+
+export function useSupplierPicker(
+  selectedId: string,
+  opts: { activeOnly?: boolean; supplierType?: SupplierType; enabled?: boolean } = {},
+): Picker {
+  const { activeOnly = false, supplierType, enabled } = opts;
+  return useEntityPicker<Supplier>({
+    table: "suppliers",
+    selectedId,
+    searchColumns: ["name", "name_ar", "doc_number", "cr_number", "phone", "email"],
+    orderBy: "name",
+    toOption: (s) => ({ value: s.id, label: s.name, meta: s.doc_number ?? undefined }),
+    filter: (q) => {
+      let b = q;
+      if (activeOnly) b = b.eq("status", "active");
+      if (supplierType) b = b.eq("supplier_type", supplierType);
+      return b;
+    },
+    scope: ["suppliers", activeOnly, supplierType],
     enabled,
   });
 }

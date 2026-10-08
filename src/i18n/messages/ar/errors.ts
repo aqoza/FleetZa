@@ -72,4 +72,13 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "لا يوجد عميل مرتبط بهذه الشهادة لفوترته. حدّد مالك المركبة أولًا.",
   "errors.certificateNotFound": "لم يتم العثور على الشهادة.",
   "errors.noCertificates": "اختر شهادة واحدة على الأقل لفوترتها.",
+
+  "errors.insufficientStock": "لا يوجد مخزون كافٍ في هذا المستودع لهذه الحركة.",
+  "errors.invalidQuantity": "أدخل كمية أكبر من صفر.",
+  "errors.invalidUnitCost": "لا يمكن أن تكون تكلفة الوحدة سالبة.",
+  "errors.inventoryItemNotFound": "صنف المخزون هذا لم يعد موجودًا.",
+  "errors.warehouseNotFound": "هذا المستودع لم يعد موجودًا.",
+  "errors.transferSameWarehouse": "اختر مستودعين مختلفين للتحويل بينهما.",
+  "errors.moduleDisabled": "هذه الوحدة غير مفعّلة لمؤسستك. يمكن للمسؤول تفعيلها من الإعدادات.",
+  "errors.crossTenantReference": "أحد السجلات المرتبطة لا يتبع مؤسستك.",
 };

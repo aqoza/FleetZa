@@ -1,0 +1,486 @@
+{
+ "tables": {
+  "inventory_items": [
+   {
+    "id": "b1000000-0000-4000-8000-000000000001",
+    "sku": "OF-1001",
+    "name": "Oil filter",
+    "name_ar": "فلتر زيت",
+    "description": null,
+    "category": "Filters",
+    "item_type": "part",
+    "uom": "unit",
+    "barcode": null,
+    "cost_price": 4.25,
+    "sale_price": 5.53,
+    "product_id": null,
+    "preferred_supplier_id": null,
+    "reorder_point": 20,
+    "reorder_qty": 50,
+    "track_stock": true,
+    "active": true,
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-01T08:00:00Z"
+   },
+   {
+    "id": "b1000000-0000-4000-8000-000000000002",
+    "sku": "EO-15W40",
+    "name": "Engine oil 15W-40",
+    "name_ar": "زيت محرك 15W-40",
+    "description": null,
+    "category": "Lubricants",
+    "item_type": "fluid",
+    "uom": "litre",
+    "barcode": null,
+    "cost_price": 2.1,
+    "sale_price": 2.73,
+    "product_id": null,
+    "preferred_supplier_id": null,
+    "reorder_point": 100,
+    "reorder_qty": 200,
+    "track_stock": true,
+    "active": true,
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-01T08:00:00Z"
+   },
+   {
+    "id": "b1000000-0000-4000-8000-000000000003",
+    "sku": "BP-220",
+    "name": "Brake pads (set)",
+    "name_ar": "فحمات فرامل (طقم)",
+    "description": null,
+    "category": "Brakes",
+    "item_type": "part",
+    "uom": "set",
+    "barcode": null,
+    "cost_price": 38.0,
+    "sale_price": 49.4,
+    "product_id": null,
+    "preferred_supplier_id": null,
+    "reorder_point": 4,
+    "reorder_qty": 10,
+    "track_stock": true,
+    "active": true,
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-01T08:00:00Z"
+   },
+   {
+    "id": "b1000000-0000-4000-8000-000000000004",
+    "sku": "TY-31580",
+    "name": "Tyre 315/80 R22.5",
+    "name_ar": "إطار 315/80 R22.5",
+    "description": null,
+    "category": "Tyres",
+    "item_type": "tire",
+    "uom": "unit",
+    "barcode": null,
+    "cost_price": 145.0,
+    "sale_price": 188.5,
+    "product_id": null,
+    "preferred_supplier_id": null,
+    "reorder_point": 6,
+    "reorder_qty": 12,
+    "track_stock": true,
+    "active": true,
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-01T08:00:00Z"
+   },
+   {
+    "id": "b1000000-0000-4000-8000-000000000005",
+    "sku": "SL-CBL",
+    "name": "Speed limiter harness",
+    "name_ar": "ضفيرة محدد السرعة",
+    "description": null,
+    "category": "Electrical",
+    "item_type": "part",
+    "uom": "unit",
+    "barcode": null,
+    "cost_price": 22.5,
+    "sale_price": 29.25,
+    "product_id": null,
+    "preferred_supplier_id": null,
+    "reorder_point": 5,
+    "reorder_qty": null,
+    "track_stock": true,
+    "active": true,
+    "created_at": "2026-09-01T08:00:00Z",
+    "updated_at": "2026-09-01T08:00:00Z"
+   }
+  ],
+  "warehouses": [
+   {
+    "id": "a1000000-0000-4000-8000-000000000001",
+    "name": "Main store",
+    "name_ar": "المخزن الرئيسي",
+    "code": "MS",
+    "address": "Ghala Industrial Area, Muscat",
+    "branch_id": null,
+    "is_default": true,
+    "active": true
+   },
+   {
+    "id": "a1000000-0000-4000-8000-000000000002",
+    "name": "Service van 1",
+    "name_ar": "سيارة الخدمة 1",
+    "code": "VAN1",
+    "address": null,
+    "branch_id": null,
+    "is_default": false,
+    "active": true
+   }
+  ],
+  "stock_levels": [
+   {
+    "id": "c1000000-0000-4000-8000-000000000001",
+    "item_id": "b1000000-0000-4000-8000-000000000001",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "on_hand": 21.0,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000012",
+    "item_id": "b1000000-0000-4000-8000-000000000001",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "on_hand": 9.0,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000003",
+    "item_id": "b1000000-0000-4000-8000-000000000002",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "on_hand": 126.0,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000014",
+    "item_id": "b1000000-0000-4000-8000-000000000002",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "on_hand": 54.0,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000005",
+    "item_id": "b1000000-0000-4000-8000-000000000003",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "on_hand": 3,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000006",
+    "item_id": "b1000000-0000-4000-8000-000000000005",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "on_hand": 9.8,
+    "updated_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "c1000000-0000-4000-8000-000000000017",
+    "item_id": "b1000000-0000-4000-8000-000000000005",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "on_hand": 4.2,
+    "updated_at": "2026-10-01T08:00:00Z"
+   }
+  ],
+  "stock_moves": [
+   {
+    "id": "d1000000-0000-4000-8000-000000000019",
+    "item_id": "b1000000-0000-4000-8000-000000000005",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "adjustment",
+    "quantity": -1,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-10-04T16:00:00Z",
+    "created_at": "2026-10-04T16:00:00Z",
+    "notes": "Counted on shelf B",
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Speed limiter harness",
+     "name_ar": "ضفيرة محدد السرعة",
+     "sku": "SL-CBL",
+     "uom": "unit"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000018",
+    "item_id": "b1000000-0000-4000-8000-000000000004",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "issue",
+    "quantity": -4,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-10-02T09:00:00Z",
+    "created_at": "2026-10-02T09:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Tyre 315/80 R22.5",
+     "name_ar": "إطار 315/80 R22.5",
+     "sku": "TY-31580",
+     "uom": "unit"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000016",
+    "item_id": "b1000000-0000-4000-8000-000000000003",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "consumption",
+    "quantity": -5,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-09-28T14:00:00Z",
+    "created_at": "2026-09-28T14:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Brake pads (set)",
+     "name_ar": "فحمات فرامل (طقم)",
+     "sku": "BP-220",
+     "uom": "set"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000011",
+    "item_id": "b1000000-0000-4000-8000-000000000001",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "issue",
+    "quantity": -19,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-09-20T11:00:00Z",
+    "created_at": "2026-09-20T11:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Oil filter",
+     "name_ar": "فلتر زيت",
+     "sku": "OF-1001",
+     "uom": "unit"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000013",
+    "item_id": "b1000000-0000-4000-8000-000000000002",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "transfer_out",
+    "quantity": -54,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-09-10T10:00:00Z",
+    "created_at": "2026-09-10T10:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Engine oil 15W-40",
+     "name_ar": "زيت محرك 15W-40",
+     "sku": "EO-15W40",
+     "uom": "litre"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000014",
+    "item_id": "b1000000-0000-4000-8000-000000000002",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "move_type": "transfer_in",
+    "quantity": 54,
+    "unit_cost": null,
+    "on_hand_after": null,
+    "moved_at": "2026-09-10T10:00:00Z",
+    "created_at": "2026-09-10T10:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Engine oil 15W-40",
+     "name_ar": "زيت محرك 15W-40",
+     "sku": "EO-15W40",
+     "uom": "litre"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000017",
+    "item_id": "b1000000-0000-4000-8000-000000000004",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "receipt",
+    "quantity": 4,
+    "unit_cost": 145,
+    "on_hand_after": null,
+    "moved_at": "2026-09-06T09:00:00Z",
+    "created_at": "2026-09-06T09:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Tyre 315/80 R22.5",
+     "name_ar": "إطار 315/80 R22.5",
+     "sku": "TY-31580",
+     "uom": "unit"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000015",
+    "item_id": "b1000000-0000-4000-8000-000000000003",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "receipt",
+    "quantity": 8,
+    "unit_cost": 38,
+    "on_hand_after": null,
+    "moved_at": "2026-09-05T09:00:00Z",
+    "created_at": "2026-09-05T09:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Brake pads (set)",
+     "name_ar": "فحمات فرامل (طقم)",
+     "sku": "BP-220",
+     "uom": "set"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000012",
+    "item_id": "b1000000-0000-4000-8000-000000000002",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "receipt",
+    "quantity": 200,
+    "unit_cost": 2.1,
+    "on_hand_after": null,
+    "moved_at": "2026-09-03T09:00:00Z",
+    "created_at": "2026-09-03T09:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Engine oil 15W-40",
+     "name_ar": "زيت محرك 15W-40",
+     "sku": "EO-15W40",
+     "uom": "litre"
+    }
+   },
+   {
+    "id": "d1000000-0000-4000-8000-000000000010",
+    "item_id": "b1000000-0000-4000-8000-000000000001",
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "move_type": "receipt",
+    "quantity": 40,
+    "unit_cost": 4.25,
+    "on_hand_after": null,
+    "moved_at": "2026-09-02T09:00:00Z",
+    "created_at": "2026-09-02T09:00:00Z",
+    "notes": null,
+    "reference_type": null,
+    "reference_id": null,
+    "inventory_items": {
+     "name": "Oil filter",
+     "name_ar": "فلتر زيت",
+     "sku": "OF-1001",
+     "uom": "unit"
+    }
+   }
+  ]
+ },
+ "rpc": {
+  "inventory_summary": [
+   {
+    "item_count": 5,
+    "tracked_item_count": 5,
+    "warehouse_count": 2,
+    "stock_value": 934.5,
+    "low_stock_count": 2,
+    "out_of_stock_count": 1
+   }
+  ],
+  "inventory_low_stock": [
+   {
+    "item_id": "b1000000-0000-4000-8000-000000000004",
+    "sku": "TY-31580",
+    "name": "Tyre 315/80 R22.5",
+    "name_ar": "إطار 315/80 R22.5",
+    "uom": "unit",
+    "category": "Tyres",
+    "on_hand": 0,
+    "reorder_point": 6,
+    "reorder_qty": 12,
+    "suggested_qty": 12,
+    "cost_price": 145.0,
+    "preferred_supplier_id": null
+   },
+   {
+    "item_id": "b1000000-0000-4000-8000-000000000003",
+    "sku": "BP-220",
+    "name": "Brake pads (set)",
+    "name_ar": "فحمات فرامل (طقم)",
+    "uom": "set",
+    "category": "Brakes",
+    "on_hand": 3,
+    "reorder_point": 4,
+    "reorder_qty": 10,
+    "suggested_qty": 10,
+    "cost_price": 38.0,
+    "preferred_supplier_id": null
+   }
+  ],
+  "inventory_valuation": [
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "warehouse_name": "Main store",
+    "category": "Filters",
+    "item_count": 1,
+    "on_hand": 21,
+    "stock_value": 89.25
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "warehouse_name": "Main store",
+    "category": "Lubricants",
+    "item_count": 1,
+    "on_hand": 126,
+    "stock_value": 264.6
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "warehouse_name": "Main store",
+    "category": "Brakes",
+    "item_count": 1,
+    "on_hand": 3,
+    "stock_value": 114
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000001",
+    "warehouse_name": "Main store",
+    "category": "Electrical",
+    "item_count": 1,
+    "on_hand": 9.8,
+    "stock_value": 220.5
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "warehouse_name": "Service van 1",
+    "category": "Filters",
+    "item_count": 1,
+    "on_hand": 9,
+    "stock_value": 38.25
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "warehouse_name": "Service van 1",
+    "category": "Lubricants",
+    "item_count": 1,
+    "on_hand": 54,
+    "stock_value": 113.4
+   },
+   {
+    "warehouse_id": "a1000000-0000-4000-8000-000000000002",
+    "warehouse_name": "Service van 1",
+    "category": "Electrical",
+    "item_count": 1,
+    "on_hand": 4.2,
+    "stock_value": 94.5
+   }
+  ]
+ }
+}

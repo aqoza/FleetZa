@@ -1,3 +1,5 @@
+import type { Tables } from "./database.types";
+
 export type Role = "owner" | "admin" | "manager" | "viewer";
 export type DistanceUnit = "km" | "mi";
 export type VolumeUnit = "L" | "gal";
@@ -99,6 +101,8 @@ export type FuelType =
 export interface Vehicle {
   id: string;
   tenant_id: string;
+  /** Companies & branches module; null when unassigned. */
+  branch_id?: string | null;
   name: string;
   vin: string | null;
   /** 'company' = the tenant's own fleet; 'customer' requires customer_id. */
@@ -126,6 +130,8 @@ export interface Vehicle {
 export interface Driver {
   id: string;
   tenant_id: string;
+  /** Companies & branches module; null when unassigned. */
+  branch_id?: string | null;
   first_name: string;
   last_name: string;
   email: string | null;
@@ -729,3 +735,17 @@ export interface Renewal {
   created_at: string;
   updated_at: string;
 }
+
+// --- Suppliers (master data; tables from the platform foundation) ---
+
+export type SupplierType =
+  | "parts" | "fuel" | "service" | "insurance" | "carrier" | "leasing"
+  | "utilities" | "equipment" | "other";
+export type SupplierStatus = "active" | "inactive" | "blocked";
+
+export type Supplier = Omit<Tables<"suppliers">, "supplier_type" | "status"> & {
+  supplier_type: SupplierType;
+  status: SupplierStatus;
+};
+export type SupplierContact = Tables<"supplier_contacts">;
+export type InventoryItem = Tables<"inventory_items">;

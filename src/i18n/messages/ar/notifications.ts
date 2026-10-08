@@ -1,6 +1,91 @@
 import { enNotifications } from "../en/notifications";
+import type { Translation } from "../../plural";
 
-export const arNotifications: Record<keyof typeof enNotifications, string> = {
+export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.title": "الإشعارات",
-  "notifications.subtitle": "التنبيهات والتذكيرات عبر وحداتك.",
+  "notifications.subtitle": "التنبيهات والتذكيرات من جميع الوحدات.",
+
+  "notifications.tab.inbox": "الوارد",
+  "notifications.tab.preferences": "التفضيلات",
+
+  "notifications.bell": "الإشعارات",
+  "notifications.bellUnread": {
+    zero: "لا توجد إشعارات غير مقروءة",
+    one: "إشعار واحد غير مقروء",
+    two: "إشعاران غير مقروءين",
+    few: "{count} إشعارات غير مقروءة",
+    many: "{count} إشعارًا غير مقروء",
+    other: "{count} إشعار غير مقروء",
+  },
+  "notifications.viewAll": "عرض الكل",
+  "notifications.markAllRead": "تعليم الكل كمقروء",
+  "notifications.allCaughtUp": "لا جديد لديك.",
+
+  "notifications.filterUnread": "غير المقروءة",
+  "notifications.filterAll": "الكل",
+  "notifications.allSeverities": "أي مستوى",
+  "notifications.severity.info": "معلومة",
+  "notifications.severity.warning": "تحذير",
+  "notifications.severity.critical": "حرج",
+  "notifications.markRead": "تعليم كمقروء",
+  "notifications.markUnread": "تعليم كغير مقروء",
+  "notifications.delete": "حذف",
+  "notifications.open": "فتح",
+  "notifications.emptyTitle": "لا توجد إشعارات",
+  "notifications.emptyDesc": "ستظهر هنا التذكيرات والتنبيهات الصادرة من وحداتك.",
+  "notifications.emptyUnreadTitle": "لا شيء غير مقروء",
+  "notifications.emptyUnreadDesc": "اختر «الكل» لعرض الإشعارات السابقة.",
+  "notifications.unreadCount": {
+    zero: "لا شيء غير مقروء",
+    one: "واحد غير مقروء",
+    two: "اثنان غير مقروءين",
+    few: "{count} غير مقروءة",
+    many: "{count} غير مقروء",
+    other: "{count} غير مقروء",
+  },
+  "notifications.actionFailed": "تعذّر تحديث الإشعارات.",
+
+  "notifications.prefsHint": "أوقف أنواع الإشعارات التي لا تريدها. ينطبق الإيقاف عليك وحدك.",
+  "notifications.prefsEmpty": "لا ترسل أي من وحداتك المفعّلة إشعارات بعد.",
+  "notifications.receive": "استلام",
+  "notifications.muted": "موقوف",
+  "notifications.prefSaved": "تم حفظ التفضيل",
+
+  "notifications.kind.inventory.low_stock": "انخفاض المخزون",
+  "notifications.kind.inventory.low_stock.desc": "عندما تنخفض كمية صنف إلى حد إعادة الطلب أو أقل.",
+  "notifications.kind.employees.document_expiring": "انتهاء وثائق الموظفين",
+  "notifications.kind.employees.document_expiring.desc":
+    "عندما يقترب انتهاء جواز سفر أو إقامة أو تصريح عمل بـ60 أو 30 أو 7 أيام، أو عند انتهائه.",
+  "notifications.kind.documents.expiring": "انتهاء المستندات",
+  "notifications.kind.documents.expiring.desc": "عندما يقترب انتهاء مستند محفوظ بـ30 أو 7 أيام، أو عند انتهائه.",
+  "notifications.kind.automation.rule": "قواعد الأتمتة",
+  "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
+
+  "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
+  "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
+  "notifications.msg.employeeDoc.expired": "{employee}: انتهت صلاحية {document}",
+  "notifications.msg.employeeDoc.today": "{employee}: تنتهي صلاحية {document} اليوم",
+  "notifications.msg.employeeDoc.expiresIn": {
+    zero: "{employee}: تنتهي صلاحية {document} اليوم",
+    one: "{employee}: تنتهي صلاحية {document} غدًا",
+    two: "{employee}: تنتهي صلاحية {document} خلال يومين",
+    few: "{employee}: تنتهي صلاحية {document} خلال {count} أيام",
+    many: "{employee}: تنتهي صلاحية {document} خلال {count} يومًا",
+    other: "{employee}: تنتهي صلاحية {document} خلال {count} يوم",
+  },
+  "notifications.msg.document.expired": "انتهت صلاحية {document}",
+  "notifications.msg.document.today": "تنتهي صلاحية {document} اليوم",
+  "notifications.msg.document.expiresIn": {
+    zero: "تنتهي صلاحية {document} اليوم",
+    one: "تنتهي صلاحية {document} غدًا",
+    two: "تنتهي صلاحية {document} خلال يومين",
+    few: "تنتهي صلاحية {document} خلال {count} أيام",
+    many: "تنتهي صلاحية {document} خلال {count} يومًا",
+    other: "تنتهي صلاحية {document} خلال {count} يوم",
+  },
+  "notifications.msg.expiryDate": "تاريخ الانتهاء: {date}",
+  "notifications.msg.automationRule.body": "من القاعدة: {rule}",
+  "notifications.doc.passport": "جواز السفر",
+  "notifications.doc.residence_permit": "الإقامة",
+  "notifications.doc.work_permit": "تصريح العمل",
 };
