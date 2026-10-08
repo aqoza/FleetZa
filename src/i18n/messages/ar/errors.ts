@@ -5,7 +5,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.referenced": "هذا السجل مرتبط بسجلات أخرى ولا يمكن تغييره بهذه الطريقة.",
   "errors.forbidden": "ليست لديك صلاحية للقيام بذلك.",
   "errors.automationInvalidRule": "هذه القاعدة غير مكتملة: راجع كل شرط وإجراء.",
-  "errors.moduleDisabled": "هذه الوحدة معطّلة في مؤسستك.",
   "errors.apiKeyName": "أدخل اسمًا للمفتاح لا يتجاوز 100 حرف.",
   "errors.apiKeyScope": "اختر صلاحية واحدة على الأقل للمفتاح.",
   "errors.apiKeyExpiry": "يجب أن يكون تاريخ الانتهاء في المستقبل.",

@@ -28,7 +28,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
   AUTOMATION_INVALID_RULE: "errors.automationInvalidRule",
-  MODULE_DISABLED: "errors.moduleDisabled",
   // Integrations (foundation API keys + 20261008000007 webhooks)
   INVALID_API_KEY_NAME: "errors.apiKeyName",
   INVALID_API_SCOPE: "errors.apiKeyScope",

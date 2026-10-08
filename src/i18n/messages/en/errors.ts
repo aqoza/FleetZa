@@ -6,7 +6,6 @@ export const enErrors = {
   "errors.referenced": "This record is referenced by other records and cannot be changed this way.",
   "errors.forbidden": "You don't have permission to do this.",
   "errors.automationInvalidRule": "This rule is incomplete: check every condition and action.",
-  "errors.moduleDisabled": "This module is turned off for your organization.",
   "errors.apiKeyName": "Give the key a name of up to 100 characters.",
   "errors.apiKeyScope": "Choose at least one permission for the key.",
   "errors.apiKeyExpiry": "The expiry date must be in the future.",
