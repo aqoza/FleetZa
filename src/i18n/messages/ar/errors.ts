@@ -84,4 +84,13 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.illegalShipmentTransition": "لا يمكن نقل هذه الشحنة إلى تلك الحالة من حالتها الحالية.",
+  "errors.shipmentCarrierRequired": "اختر مركبة (أسطول خاص) أو ناقلًا (طرف ثالث) قبل الإرسال.",
+  "errors.shipmentPodRequired": "أدخل اسم مستلم الشحنة لتسجيلها كمسلَّمة.",
+  "errors.invalidPodTime": "لا يمكن أن يكون وقت التسليم في المستقبل أو قبل الإرسال.",
+  "errors.shipmentLocked": "لا يمكن تعديل الشحنات المغلقة أو الملغاة باستثناء الملاحظات.",
+  "errors.shipmentNotDeletable": "يمكن حذف الشحنات المسودة فقط. ألغِها بدلًا من ذلك.",
+  "errors.shipmentNotFound": "هذه الشحنة لم تعد موجودة.",
+  "errors.shipmentNotInvoiceable": "يمكن فوترة الشحنات المسلَّمة أو المغلقة ذات الرسوم فقط.",
+  "errors.shipmentAlreadyInvoiced": "لهذه الشحنة فاتورة بالفعل. ألغِ الفاتورة أولًا لإعادة الفوترة.",
 };

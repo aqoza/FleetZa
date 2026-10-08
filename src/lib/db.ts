@@ -8,6 +8,22 @@ export type TableName = keyof Database["public"]["Tables"];
 
 type AnyFilter = PostgrestFilterBuilder<any, any, any, any[], any>;
 
+/**
+ * supabase.from() over the whole TableName union makes TypeScript instantiate
+ * every table's types at once, which fails with TS2589 ("excessively deep")
+ * past ~55 tables. Every call site below casts the builder anyway, so take it
+ * untyped; table names stay compile-checked through TableName.
+ */
+type AnyQuery = {
+  select: (...args: any[]) => any;
+  insert: (...args: any[]) => any;
+  update: (...args: any[]) => any;
+  delete: (...args: any[]) => any;
+};
+function fromTable(table: TableName): AnyQuery {
+  return (supabase.from as unknown as (t: string) => AnyQuery)(table);
+}
+
 /** The builder handed to every `build` callback — exported for shared helpers
  *  that compose filters (e.g. the picker hooks) rather than inlining them. */
 export type DbFilter = AnyFilter;
@@ -69,6 +85,15 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   MEMBER_NOT_FOUND: "errors.memberNotFound",
   CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
+  ILLEGAL_SHIPMENT_TRANSITION: "errors.illegalShipmentTransition",
+  SHIPMENT_CARRIER_REQUIRED: "errors.shipmentCarrierRequired",
+  SHIPMENT_POD_REQUIRED: "errors.shipmentPodRequired",
+  INVALID_POD_TIME: "errors.invalidPodTime",
+  SHIPMENT_LOCKED: "errors.shipmentLocked",
+  SHIPMENT_NOT_DELETABLE: "errors.shipmentNotDeletable",
+  SHIPMENT_NOT_FOUND: "errors.shipmentNotFound",
+  SHIPMENT_NOT_INVOICEABLE: "errors.shipmentNotInvoiceable",
+  SHIPMENT_ALREADY_INVOICED: "errors.shipmentAlreadyInvoiced",
   // Stock ledger (…_platform_foundation.sql)
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",
@@ -109,7 +134,7 @@ export async function listRows<T>(
   table: TableName,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<T[]> {
-  let q = supabase.from(table).select("*") as unknown as AnyFilter;
+  let q = fromTable(table).select("*") as unknown as AnyFilter;
   if (build) q = build(q);
   const { data, error } = await q;
   if (error) throw wrapDbError(error);
@@ -133,8 +158,7 @@ export async function listPage<T>(
   pageSize: number,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<Page<T>> {
-  let q = supabase
-    .from(table)
+  let q = fromTable(table)
     .select("*", { count: "exact" }) as unknown as AnyFilter;
   if (build) q = build(q);
   const from = page * pageSize;
@@ -148,8 +172,7 @@ export async function countRows(
   table: TableName,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<number> {
-  let q = supabase
-    .from(table)
+  let q = fromTable(table)
     .select("*", { count: "exact", head: true }) as unknown as AnyFilter;
   if (build) q = build(q);
   const { count, error } = await q;
@@ -158,7 +181,7 @@ export async function countRows(
 }
 
 export async function getRow<T>(table: TableName, id: string): Promise<T | null> {
-  const { data, error } = await (supabase.from(table).select("*") as unknown as AnyFilter)
+  const { data, error } = await (fromTable(table).select("*") as unknown as AnyFilter)
     .eq("id", id)
     .maybeSingle();
   if (error) throw wrapDbError(error);
@@ -166,7 +189,7 @@ export async function getRow<T>(table: TableName, id: string): Promise<T | null>
 }
 
 export async function insertRow<T>(table: TableName, values: Record<string, unknown>): Promise<T> {
-  const { data, error } = await supabase.from(table).insert(values as never).select().single();
+  const { data, error } = await fromTable(table).insert(values as never).select().single();
   if (error) throw wrapDbError(error);
   return data as T;
 }
@@ -176,8 +199,7 @@ export async function updateRow<T>(
   id: string,
   values: Record<string, unknown>,
 ): Promise<T> {
-  const { data, error } = await (supabase
-    .from(table)
+  const { data, error } = await (fromTable(table)
     .update(values as never) as unknown as AnyFilter)
     .eq("id", id)
     .select()
@@ -187,6 +209,6 @@ export async function updateRow<T>(
 }
 
 export async function deleteRow(table: TableName, id: string): Promise<void> {
-  const { error } = await (supabase.from(table).delete() as unknown as AnyFilter).eq("id", id);
+  const { error } = await (fromTable(table).delete() as unknown as AnyFilter).eq("id", id);
   if (error) throw wrapDbError(error);
 }
