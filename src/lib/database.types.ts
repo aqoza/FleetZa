@@ -109,6 +109,101 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_rules: {
+        Row: {
+          actions: Json
+          active: boolean
+          conditions: Json
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event: string
+          id: string
+          last_run_at: string | null
+          name: string
+          run_count: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          actions?: Json
+          active?: boolean
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event: string
+          id?: string
+          last_run_at?: string | null
+          name: string
+          run_count?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          actions?: Json
+          active?: boolean
+          conditions?: Json
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event?: string
+          id?: string
+          last_run_at?: string | null
+          name?: string
+          run_count?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      automation_runs: {
+        Row: {
+          actions_run: number
+          created_at: string
+          detail: string | null
+          event: string
+          event_id: number | null
+          id: string
+          rule_id: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          actions_run?: number
+          created_at?: string
+          detail?: string | null
+          event: string
+          event_id?: number | null
+          id?: string
+          rule_id: string
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          actions_run?: number
+          created_at?: string
+          detail?: string | null
+          event?: string
+          event_id?: number | null
+          id?: string
+          rule_id?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_runs_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       branches: {
         Row: {
           active: boolean
@@ -4860,6 +4955,10 @@ export type Database = {
           p_to_warehouse: string
         }
         Returns: string
+      }
+      test_automation_rule: {
+        Args: { p_conditions: Json; p_payload: Json }
+        Returns: Json
       }
     }
     Enums: {

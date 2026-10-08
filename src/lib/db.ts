@@ -27,6 +27,7 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   JOB_NOT_FOUND: "errors.jobNotFound",
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
+  AUTOMATION_INVALID_RULE: "errors.automationInvalidRule",
   CUSTOMER_HAS_INVOICES: "errors.customerHasInvoices",
   DOC_NOT_EDITABLE: "errors.docNotEditable",
   DOC_NOT_DELETABLE: "errors.docNotDeletable",

@@ -1,0 +1,166 @@
+{
+ "tables": {
+  "automation_rules": [
+   {
+    "id": "a0000000-0000-4000-8000-000000000001",
+    "name": "High-priority issue alert",
+    "description": "Tell managers the moment a driver reports something serious.",
+    "event": "issue.created",
+    "conditions": [
+     {
+      "field": "priority",
+      "op": "in",
+      "value": [
+       "high",
+       "critical"
+      ]
+     }
+    ],
+    "actions": [
+     {
+      "type": "notify",
+      "audience": "managers",
+      "severity": "warning",
+      "message": "{title} reported ({priority})"
+     }
+    ],
+    "active": true,
+    "run_count": 14,
+    "last_run_at": "2026-10-07T09:12:00.000Z",
+    "created_at": "2026-09-01T08:00:00.000Z",
+    "updated_at": "2026-09-20T08:00:00.000Z"
+   },
+   {
+    "id": "a0000000-0000-4000-8000-000000000002",
+    "name": "Failed inspection opens an issue",
+    "description": null,
+    "event": "inspection.failed",
+    "conditions": [],
+    "actions": [
+     {
+      "type": "create_issue",
+      "title": "Follow up failed inspection",
+      "priority": "high"
+     },
+     {
+      "type": "notify",
+      "audience": "all",
+      "severity": "critical",
+      "message": "Inspection failed at {odometer} km"
+     }
+    ],
+    "active": true,
+    "run_count": 3,
+    "last_run_at": "2026-10-02T15:40:00.000Z",
+    "created_at": "2026-09-05T08:00:00.000Z",
+    "updated_at": "2026-09-05T08:00:00.000Z"
+   },
+   {
+    "id": "a0000000-0000-4000-8000-000000000003",
+    "name": "تنبيه دفعات كبيرة",
+    "description": "دفعات تتجاوز ٥٠٠",
+    "event": "payment.received",
+    "conditions": [
+     {
+      "field": "amount",
+      "op": "gte",
+      "value": 500
+     }
+    ],
+    "actions": [
+     {
+      "type": "notify",
+      "audience": "admins",
+      "severity": "info",
+      "message": "Payment of {amount} received"
+     }
+    ],
+    "active": false,
+    "run_count": 0,
+    "last_run_at": null,
+    "created_at": "2026-09-10T08:00:00.000Z",
+    "updated_at": "2026-09-10T08:00:00.000Z"
+   }
+  ],
+  "automation_runs": [
+   {
+    "id": "d0000000-0000-4000-8000-000000000001",
+    "rule_id": "a0000000-0000-4000-8000-000000000001",
+    "event_id": 100,
+    "event": "issue.created",
+    "status": "success",
+    "actions_run": 1,
+    "detail": null,
+    "created_at": "2026-10-07T09:00:00.000Z",
+    "rule": {
+     "name": "High-priority issue alert"
+    }
+   },
+   {
+    "id": "d0000000-0000-4000-8000-000000000002",
+    "rule_id": "a0000000-0000-4000-8000-000000000001",
+    "event_id": 101,
+    "event": "issue.created",
+    "status": "skipped",
+    "actions_run": 0,
+    "detail": "conditions not met",
+    "created_at": "2026-10-06T09:00:00.000Z",
+    "rule": {
+     "name": "High-priority issue alert"
+    }
+   },
+   {
+    "id": "d0000000-0000-4000-8000-000000000003",
+    "rule_id": "a0000000-0000-4000-8000-000000000002",
+    "event_id": 102,
+    "event": "inspection.failed",
+    "status": "success",
+    "actions_run": 2,
+    "detail": null,
+    "created_at": "2026-10-05T09:00:00.000Z",
+    "rule": {
+     "name": "Failed inspection opens an issue"
+    }
+   },
+   {
+    "id": "d0000000-0000-4000-8000-000000000004",
+    "rule_id": "a0000000-0000-4000-8000-000000000002",
+    "event_id": 103,
+    "event": "inspection.failed",
+    "status": "failed",
+    "actions_run": 1,
+    "detail": "create_issue: ISSUES_MODULE_DISABLED",
+    "created_at": "2026-10-04T09:00:00.000Z",
+    "rule": {
+     "name": "Failed inspection opens an issue"
+    }
+   },
+   {
+    "id": "d0000000-0000-4000-8000-000000000005",
+    "rule_id": "a0000000-0000-4000-8000-000000000001",
+    "event_id": 104,
+    "event": "issue.created",
+    "status": "success",
+    "actions_run": 1,
+    "detail": null,
+    "created_at": "2026-10-03T09:00:00.000Z",
+    "rule": {
+     "name": "High-priority issue alert"
+    }
+   }
+  ]
+ },
+ "rpc": {
+  "test_automation_rule": {
+   "matched": true,
+   "conditions": [
+    {
+     "field": "priority",
+     "op": "in",
+     "actual": "high",
+     "matched": true
+    }
+   ]
+  }
+ }
+}

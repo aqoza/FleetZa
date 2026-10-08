@@ -4,6 +4,7 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.duplicate": "هذا السجل يتعارض مع سجل موجود بالفعل (قيمة مكررة).",
   "errors.referenced": "هذا السجل مرتبط بسجلات أخرى ولا يمكن تغييره بهذه الطريقة.",
   "errors.forbidden": "ليست لديك صلاحية للقيام بذلك.",
+  "errors.automationInvalidRule": "هذه القاعدة غير مكتملة: راجع كل شرط وإجراء.",
   "errors.vehicleHasCertificates":
     "لهذه المركبة شهادات صادرة ولا يمكن حذفها. قم بإخراجها من الخدمة بدلًا من ذلك.",
   "errors.vehicleHasCompletedJobs":
