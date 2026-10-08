@@ -158,4 +158,5 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
   "automation.ev.geofence.entered": "دخول مركبة إلى نطاق جغرافي",
   "automation.ev.geofence.exited": "خروج مركبة من نطاق جغرافي",
+  "automation.ev.driving_event.created": "تسجيل حدث قيادة",
 };

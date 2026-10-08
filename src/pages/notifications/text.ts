@@ -83,6 +83,18 @@ export function useNotificationText() {
           body: t("notifications.msg.geofence.body", { at: ltrText(formatDateTime(strParam(p, "at"))) }),
         };
       }
+      case "driver_behavior.critical_event": {
+        const who = bdiText(strParam(p, "driver") || strParam(p, "vehicle"));
+        return {
+          title: strParam(p, "event_type") === "collision_warning"
+            ? t("notifications.msg.drivingCritical.collision", { who })
+            : t("notifications.msg.drivingCritical.fatigue", { who }),
+          body: t("notifications.msg.drivingCritical.body", {
+            vehicle: bdiText(strParam(p, "vehicle")),
+            at: ltrText(formatDateTime(strParam(p, "at"))),
+          }),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

@@ -53,6 +53,8 @@ export const enNotifications = {
   "notifications.kind.integrations.webhook_failed.desc": "A webhook delivery fails after every retry. Sent to admins.",
   "notifications.kind.gps.geofence_alert": "Geofence alerts",
   "notifications.kind.gps.geofence_alert.desc": "A vehicle enters or leaves a geofence that has alerts turned on.",
+  "notifications.kind.driver_behavior.critical_event": "Critical driving events",
+  "notifications.kind.driver_behavior.critical_event.desc": "A high-severity fatigue or collision warning is reported.",
 
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
@@ -76,6 +78,9 @@ export const enNotifications = {
   "notifications.msg.geofence.enter": "{vehicle} entered {geofence}",
   "notifications.msg.geofence.exit": "{vehicle} left {geofence}",
   "notifications.msg.geofence.body": "At {at}",
+  "notifications.msg.drivingCritical.collision": "Collision warning: {who}",
+  "notifications.msg.drivingCritical.fatigue": "Fatigue alert: {who}",
+  "notifications.msg.drivingCritical.body": "{vehicle} at {at}",
   "notifications.doc.passport": "passport",
   "notifications.doc.residence_permit": "residence permit",
   "notifications.doc.work_permit": "work permit",

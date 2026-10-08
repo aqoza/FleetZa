@@ -87,6 +87,9 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
   // GPS tracking (20261008000014)
   INVALID_POSITION_TIME: "errors.invalidPositionTime",
+  // Driver behavior (20261008000015)
+  INVALID_EVENT_TIME: "errors.invalidEventTime",
+  INVALID_PERIOD: "errors.invalidPeriod",
   // Stock ledger (…_platform_foundation.sql)
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",

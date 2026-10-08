@@ -156,4 +156,5 @@ export const enAutomation = {
   "automation.ev.stock.below_reorder": "Stock falls below its reorder point",
   "automation.ev.geofence.entered": "A vehicle enters a geofence",
   "automation.ev.geofence.exited": "A vehicle leaves a geofence",
+  "automation.ev.driving_event.created": "A driving event is recorded",
 } as const;
