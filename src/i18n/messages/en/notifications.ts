@@ -51,6 +51,8 @@ export const enNotifications = {
   "notifications.kind.automation.rule.desc": "An automation rule sends you a notification.",
   "notifications.kind.integrations.webhook_failed": "Webhook delivery failures",
   "notifications.kind.integrations.webhook_failed.desc": "A webhook delivery fails after every retry. Sent to admins.",
+  "notifications.kind.gps.geofence_alert": "Geofence alerts",
+  "notifications.kind.gps.geofence_alert.desc": "A vehicle enters or leaves a geofence that has alerts turned on.",
 
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
@@ -71,6 +73,9 @@ export const enNotifications = {
   "notifications.msg.webhookFailed.title": "Webhook delivery failed: {name}",
   "notifications.msg.webhookFailed.bodyCode": "{event}, response code {code}",
   "notifications.msg.webhookFailed.bodyError": "{event}: {error}",
+  "notifications.msg.geofence.enter": "{vehicle} entered {geofence}",
+  "notifications.msg.geofence.exit": "{vehicle} left {geofence}",
+  "notifications.msg.geofence.body": "At {at}",
   "notifications.doc.passport": "passport",
   "notifications.doc.residence_permit": "residence permit",
   "notifications.doc.work_permit": "work permit",

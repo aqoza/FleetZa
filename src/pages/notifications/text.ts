@@ -1,5 +1,5 @@
 import { bdiText, ltrText } from "../../lib/bidi";
-import { formatDate } from "../../lib/format";
+import { formatDate, formatDateTime } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
@@ -72,6 +72,15 @@ export function useNotificationText() {
             : error
               ? t("notifications.msg.webhookFailed.bodyError", { event, error: bdiText(error) })
               : event,
+        };
+      }
+      case "gps.geofence_alert": {
+        const vars = { vehicle: bdiText(strParam(p, "vehicle")), geofence: bdiText(strParam(p, "geofence")) };
+        return {
+          title: strParam(p, "event") === "exit"
+            ? t("notifications.msg.geofence.exit", vars)
+            : t("notifications.msg.geofence.enter", vars),
+          body: t("notifications.msg.geofence.body", { at: ltrText(formatDateTime(strParam(p, "at"))) }),
         };
       }
       default:

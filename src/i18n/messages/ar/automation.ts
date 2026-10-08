@@ -156,4 +156,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.payment.received": "استلام دفعة",
   "automation.ev.certificate.issued": "إصدار شهادة محدد سرعة",
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
+  "automation.ev.geofence.entered": "دخول مركبة إلى نطاق جغرافي",
+  "automation.ev.geofence.exited": "خروج مركبة من نطاق جغرافي",
 };

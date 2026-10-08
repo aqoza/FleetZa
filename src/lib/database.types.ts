@@ -1051,6 +1051,212 @@ export type Database = {
           },
         ]
       }
+      geofence_events: {
+        Row: {
+          at: string
+          created_at: string
+          event: string
+          geofence_id: string
+          id: string
+          position_id: string | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          at: string
+          created_at?: string
+          event: string
+          geofence_id: string
+          id?: string
+          position_id?: string | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Update: {
+          at?: string
+          created_at?: string
+          event?: string
+          geofence_id?: string
+          id?: string
+          position_id?: string | null
+          tenant_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_events_geofence_id_fkey"
+            columns: ["geofence_id"]
+            isOneToOne: false
+            referencedRelation: "geofences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "gps_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofences: {
+        Row: {
+          active: boolean
+          alert_on_enter: boolean
+          alert_on_exit: boolean
+          center_lat: number | null
+          center_lng: number | null
+          color: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          name: string
+          notes: string | null
+          polygon: Json | null
+          radius_m: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          alert_on_enter?: boolean
+          alert_on_exit?: boolean
+          center_lat?: number | null
+          center_lng?: number | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name: string
+          notes?: string | null
+          polygon?: Json | null
+          radius_m?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          alert_on_enter?: boolean
+          alert_on_exit?: boolean
+          center_lat?: number | null
+          center_lng?: number | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          notes?: string | null
+          polygon?: Json | null
+          radius_m?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofences_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gps_positions: {
+        Row: {
+          altitude_m: number | null
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          heading: number | null
+          id: string
+          ignition: boolean | null
+          lat: number
+          lng: number
+          odometer_km: number | null
+          recorded_at: string
+          source: string
+          speed_kmh: number | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          altitude_m?: number | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          heading?: number | null
+          id?: string
+          ignition?: boolean | null
+          lat: number
+          lng: number
+          odometer_km?: number | null
+          recorded_at: string
+          source?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          vehicle_id: string
+        }
+        Update: {
+          altitude_m?: number | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          heading?: number | null
+          id?: string
+          ignition?: boolean | null
+          lat?: number
+          lng?: number
+          odometer_km?: number | null
+          recorded_at?: string
+          source?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gps_positions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_positions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_positions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_templates: {
         Row: {
           active: boolean
@@ -3864,6 +4070,77 @@ export type Database = {
           },
           {
             foreignKeyName: "vehicle_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_last_positions: {
+        Row: {
+          driver_id: string | null
+          heading: number | null
+          ignition: boolean | null
+          lat: number
+          lng: number
+          position_id: string
+          recorded_at: string
+          speed_kmh: number | null
+          tenant_id: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          driver_id?: string | null
+          heading?: number | null
+          ignition?: boolean | null
+          lat: number
+          lng: number
+          position_id: string
+          recorded_at: string
+          speed_kmh?: number | null
+          tenant_id: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          driver_id?: string | null
+          heading?: number | null
+          ignition?: boolean | null
+          lat?: number
+          lng?: number
+          position_id?: string
+          recorded_at?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_last_positions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "gps_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
