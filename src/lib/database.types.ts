@@ -507,6 +507,227 @@ export type Database = {
           },
         ]
       }
+      deliveries: {
+        Row: {
+          address: string
+          attempts: number
+          city: string | null
+          cod_amount: number
+          cod_collected: number | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          doc_number: string | null
+          failed_at: string | null
+          failure_note: string | null
+          failure_reason: string | null
+          id: string
+          instructions: string | null
+          lat: number | null
+          lng: number | null
+          number: number | null
+          parcels: number
+          pod_name: string | null
+          pod_photo_path: string | null
+          pod_signature: string | null
+          recipient_name: string
+          recipient_phone: string | null
+          reference: string | null
+          returned_at: string | null
+          route_id: string | null
+          sequence: number | null
+          status: string
+          tenant_id: string
+          tracking_token: string
+          updated_at: string
+          updated_by: string | null
+          weight_kg: number | null
+        }
+        Insert: {
+          address: string
+          attempts?: number
+          city?: string | null
+          cod_amount?: number
+          cod_collected?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          doc_number?: string | null
+          failed_at?: string | null
+          failure_note?: string | null
+          failure_reason?: string | null
+          id?: string
+          instructions?: string | null
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          parcels?: number
+          pod_name?: string | null
+          pod_photo_path?: string | null
+          pod_signature?: string | null
+          recipient_name: string
+          recipient_phone?: string | null
+          reference?: string | null
+          returned_at?: string | null
+          route_id?: string | null
+          sequence?: number | null
+          status?: string
+          tenant_id?: string
+          tracking_token?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_kg?: number | null
+        }
+        Update: {
+          address?: string
+          attempts?: number
+          city?: string | null
+          cod_amount?: number
+          cod_collected?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          doc_number?: string | null
+          failed_at?: string | null
+          failure_note?: string | null
+          failure_reason?: string | null
+          id?: string
+          instructions?: string | null
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          parcels?: number
+          pod_name?: string | null
+          pod_photo_path?: string | null
+          pod_signature?: string | null
+          recipient_name?: string
+          recipient_phone?: string | null
+          reference?: string | null
+          returned_at?: string | null
+          route_id?: string | null
+          sequence?: number | null
+          status?: string
+          tenant_id?: string
+          tracking_token?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_routes: {
+        Row: {
+          canceled_at: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          depot_lat: number | null
+          depot_lng: number | null
+          depot_name: string | null
+          doc_number: string | null
+          driver_id: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          route_date: string
+          started_at: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          depot_lat?: number | null
+          depot_lng?: number | null
+          depot_name?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          route_date: string
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          depot_lat?: number | null
+          depot_lng?: number | null
+          depot_name?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          route_date?: string
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_routes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_routes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_routes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           code: string | null
@@ -4796,6 +5017,11 @@ export type Database = {
       create_webhook_subscription: {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
+      }
+      deliveries_import: { Args: { p_rows: Json }; Returns: number }
+      delivery_route_plan: {
+        Args: { p_delivery_ids: string[]; p_route_id: string }
+        Returns: undefined
       }
       fuel_summary: {
         Args: { p_vehicle_id?: string }

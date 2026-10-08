@@ -122,6 +122,21 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "delivery.delivered", module: "logistics_delivery", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "city", kind: "text" }, { name: "reference", kind: "text" },
+      { name: "attempts", kind: "number" }, { name: "cod_amount", kind: "number" }, { name: "cod_collected", kind: "number" },
+      { name: "pod_name", kind: "text" }],
+    sample: { delivery_id: "00000000-0000-4000-8000-000000000020", doc_number: "DLV-00042", city: "Muscat", reference: "SO-1042",
+      attempts: 1, cod_amount: 12.5, cod_collected: 12.5, pod_name: "Aisha" },
+  },
+  {
+    event: "delivery.failed", module: "logistics_delivery", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "city", kind: "text" }, { name: "reference", kind: "text" },
+      { name: "attempts", kind: "number" }, { name: "failure_reason", kind: "text" }],
+    sample: { delivery_id: "00000000-0000-4000-8000-000000000020", doc_number: "DLV-00042", city: "Muscat", reference: "SO-1042",
+      attempts: 1, failure_reason: "not_home" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {
