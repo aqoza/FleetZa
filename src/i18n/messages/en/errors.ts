@@ -62,4 +62,14 @@ export const enErrors = {
     "This certificate has no customer to bill. Set the vehicle's owner first.",
   "errors.certificateNotFound": "Certificate not found.",
   "errors.noCertificates": "Select at least one certificate to invoice.",
+
+  // Stock ledger (see supabase/migrations/…_platform_foundation.sql)
+  "errors.insufficientStock": "There is not enough stock in that warehouse for this movement.",
+  "errors.invalidQuantity": "Enter a quantity greater than zero.",
+  "errors.invalidUnitCost": "The unit cost cannot be negative.",
+  "errors.inventoryItemNotFound": "That inventory item no longer exists.",
+  "errors.warehouseNotFound": "That warehouse no longer exists.",
+  "errors.transferSameWarehouse": "Pick two different warehouses to transfer between.",
+  "errors.moduleDisabled": "This module is switched off for your organization. An admin can turn it on in Settings.",
+  "errors.crossTenantReference": "One of the linked records does not belong to your organization.",
 } as const;

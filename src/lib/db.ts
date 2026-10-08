@@ -53,6 +53,15 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
   NO_CERTIFICATES: "errors.noCertificates",
+  // Stock ledger (…_platform_foundation.sql)
+  INSUFFICIENT_STOCK: "errors.insufficientStock",
+  INVALID_QUANTITY: "errors.invalidQuantity",
+  INVALID_UNIT_COST: "errors.invalidUnitCost",
+  INVENTORY_ITEM_NOT_FOUND: "errors.inventoryItemNotFound",
+  WAREHOUSE_NOT_FOUND: "errors.warehouseNotFound",
+  TRANSFER_SAME_WAREHOUSE: "errors.transferSameWarehouse",
+  MODULE_DISABLED: "errors.moduleDisabled",
+  CROSS_TENANT_REFERENCE: "errors.crossTenantReference",
 };
 
 /**

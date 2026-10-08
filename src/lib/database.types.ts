@@ -4503,6 +4503,45 @@ export type Database = {
           total_liters: number
         }[]
       }
+      inventory_low_stock: {
+        Args: { p_limit?: number }
+        Returns: {
+          category: string
+          cost_price: number
+          item_id: string
+          name: string
+          name_ar: string
+          on_hand: number
+          preferred_supplier_id: string
+          reorder_point: number
+          reorder_qty: number
+          sku: string
+          suggested_qty: number
+          uom: string
+        }[]
+      }
+      inventory_summary: {
+        Args: never
+        Returns: {
+          item_count: number
+          low_stock_count: number
+          out_of_stock_count: number
+          stock_value: number
+          tracked_item_count: number
+          warehouse_count: number
+        }[]
+      }
+      inventory_valuation: {
+        Args: never
+        Returns: {
+          category: string
+          item_count: number
+          on_hand: number
+          stock_value: number
+          warehouse_id: string
+          warehouse_name: string
+        }[]
+      }
       issue_certificate: {
         Args: {
           p_expires_at?: string
