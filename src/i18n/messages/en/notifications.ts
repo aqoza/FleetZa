@@ -51,7 +51,11 @@ export const enNotifications = {
   "notifications.kind.automation.rule.desc": "An automation rule sends you a notification.",
   "notifications.kind.integrations.webhook_failed": "Webhook delivery failures",
   "notifications.kind.integrations.webhook_failed.desc": "A webhook delivery fails after every retry. Sent to admins.",
+  "notifications.kind.dispatch.urgent_job": "Urgent dispatch jobs",
+  "notifications.kind.dispatch.urgent_job.desc": "A new job is created with urgent priority.",
 
+  "notifications.msg.urgentJob.title": "Urgent job {number}: {title}",
+  "notifications.msg.urgentJob.body": "Needs a vehicle before {time}.",
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
   "notifications.msg.employeeDoc.expired": "{employee}: {document} expired",

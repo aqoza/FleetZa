@@ -62,7 +62,11 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
   "notifications.kind.integrations.webhook_failed": "فشل تسليم الويب هوك",
   "notifications.kind.integrations.webhook_failed.desc": "يفشل تسليم ويب هوك بعد كل المحاولات. يُرسل إلى المسؤولين.",
+  "notifications.kind.dispatch.urgent_job": "مهام الإرسال العاجلة",
+  "notifications.kind.dispatch.urgent_job.desc": "تُنشأ مهمة جديدة بأولوية عاجلة.",
 
+  "notifications.msg.urgentJob.title": "مهمة عاجلة {number}: {title}",
+  "notifications.msg.urgentJob.body": "تحتاج إلى مركبة قبل {time}.",
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
   "notifications.msg.employeeDoc.expired": "{employee}: انتهت صلاحية {document}",
