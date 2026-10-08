@@ -4214,6 +4214,16 @@ export type Database = {
         }
         Returns: string
       }
+      branch_stats: {
+        Args: never
+        Returns: {
+          branch_id: string
+          driver_count: number
+          employee_count: number
+          vehicle_count: number
+          warehouse_count: number
+        }[]
+      }
       certificate_billing_status: {
         Args: { p_certificate_ids: string[] }
         Returns: {

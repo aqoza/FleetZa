@@ -101,6 +101,8 @@ export type FuelType =
 export interface Vehicle {
   id: string;
   tenant_id: string;
+  /** Companies & branches module; null when unassigned. */
+  branch_id?: string | null;
   name: string;
   vin: string | null;
   /** 'company' = the tenant's own fleet; 'customer' requires customer_id. */
@@ -128,6 +130,8 @@ export interface Vehicle {
 export interface Driver {
   id: string;
   tenant_id: string;
+  /** Companies & branches module; null when unassigned. */
+  branch_id?: string | null;
   first_name: string;
   last_name: string;
   email: string | null;
