@@ -4,14 +4,14 @@
  * Every delivery is a POST with a JSON envelope
  *   { id, event, entity_type, entity_id, occurred_at, data }
  * and these headers:
- *   X-FleetManage-Event      the event name ("vehicle.created", "webhook.test", …)
- *   X-FleetManage-Delivery   the delivery id (stable across retries; dedupe on it)
- *   X-FleetManage-Signature  "t=<unix seconds>,v1=<hex HMAC-SHA256(secret, `${t}.${body}`)>"
+ *   X-FleetMaster-Event      the event name ("vehicle.created", "webhook.test", …)
+ *   X-FleetMaster-Delivery   the delivery id (stable across retries; dedupe on it)
+ *   X-FleetMaster-Signature  "t=<unix seconds>,v1=<hex HMAC-SHA256(secret, `${t}.${body}`)>"
  */
 
-export const SIGNATURE_HEADER = "X-FleetManage-Signature";
-export const EVENT_HEADER = "X-FleetManage-Event";
-export const DELIVERY_HEADER = "X-FleetManage-Delivery";
+export const SIGNATURE_HEADER = "X-FleetMaster-Signature";
+export const EVENT_HEADER = "X-FleetMaster-Event";
+export const DELIVERY_HEADER = "X-FleetMaster-Delivery";
 export const DELIVERY_TIMEOUT_MS = 10_000;
 export const MAX_ATTEMPTS = 6;
 
