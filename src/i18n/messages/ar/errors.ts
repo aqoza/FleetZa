@@ -84,4 +84,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.illegalPredictionTransition": "هذا التنبؤ مغلق بالفعل. حدّث الصفحة لرؤية حالته الحالية.",
+  "errors.workOrderRequired": "اربط أولًا أمر العمل الذي أُنشئ لهذا التنبؤ.",
 };

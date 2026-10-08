@@ -1695,6 +1695,94 @@ export type Database = {
           },
         ]
       }
+      maintenance_predictions: {
+        Row: {
+          avg_daily_km: number | null
+          band: string
+          closed_at: string | null
+          closed_by: string | null
+          computed_at: string
+          created_at: string
+          created_by: string | null
+          days_to_service: number | null
+          factors: Json
+          id: string
+          note: string | null
+          predicted_service_date: string | null
+          risk_score: number
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+          work_order_id: string | null
+        }
+        Insert: {
+          avg_daily_km?: number | null
+          band: string
+          closed_at?: string | null
+          closed_by?: string | null
+          computed_at?: string
+          created_at?: string
+          created_by?: string | null
+          days_to_service?: number | null
+          factors?: Json
+          id?: string
+          note?: string | null
+          predicted_service_date?: string | null
+          risk_score: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+          work_order_id?: string | null
+        }
+        Update: {
+          avg_daily_km?: number | null
+          band?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          computed_at?: string
+          created_at?: string
+          created_by?: string | null
+          days_to_service?: number | null
+          factors?: Json
+          id?: string
+          note?: string | null
+          predicted_service_date?: string | null
+          risk_score?: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_predictions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_predictions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_predictions_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           created_at: string
@@ -4894,6 +4982,30 @@ export type Database = {
         Returns: number
       }
       next_certificate_number: { Args: never; Returns: string }
+      predictive_snapshot: { Args: never; Returns: number }
+      predictive_vehicle_health: {
+        Args: never
+        Returns: {
+          age_years: number | null
+          avg_daily_km: number | null
+          band: string
+          cost_90d: number
+          cost_prev_90d: number
+          days_since_inspection: number | null
+          days_to_service: number | null
+          factors: Json
+          issue_rate: number
+          issues_180d: number
+          issues_90d: number
+          odometer: number
+          open_critical: number
+          open_high: number
+          predicted_service_date: string | null
+          risk_score: number
+          service_overdue: boolean
+          vehicle_id: string
+        }[]
+      }
       record_webhook_attempt: {
         Args: {
           p_error?: string

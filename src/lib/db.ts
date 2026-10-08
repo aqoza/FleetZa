@@ -69,6 +69,9 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   MEMBER_NOT_FOUND: "errors.memberNotFound",
   CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
+  // Predictive maintenance (20261008000017)
+  ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
+  WORK_ORDER_REQUIRED: "errors.workOrderRequired",
   // Stock ledger (…_platform_foundation.sql)
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",
