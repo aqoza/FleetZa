@@ -122,6 +122,19 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "incident.reported", module: "incidents", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" },
+      { name: "incident_type", kind: "text", options: ["collision", "theft", "vandalism", "injury", "near_miss", "breakdown", "fire", "weather", "other"] },
+      { name: "severity", kind: "text", options: ["minor", "moderate", "major", "critical"] },
+      { name: "injuries", kind: "number" }, { name: "fatalities", kind: "number" },
+      { name: "at_fault", kind: "text", options: ["our_driver", "third_party", "shared", "unknown", "none"] },
+      { name: "estimated_damage", kind: "number" }],
+    sample: { incident_id: "00000000-0000-4000-8000-000000000015", doc_number: "INC-00007",
+      vehicle_id: "00000000-0000-4000-8000-000000000001", driver_id: "00000000-0000-4000-8000-000000000002",
+      incident_type: "collision", severity: "major", injuries: 1, fatalities: 0, at_fault: "third_party",
+      vehicle_drivable: false, estimated_damage: 3500, occurred_at: "2026-10-08T07:40:00Z" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {
