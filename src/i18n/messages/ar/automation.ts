@@ -156,4 +156,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.payment.received": "استلام دفعة",
   "automation.ev.certificate.issued": "إصدار شهادة محدد سرعة",
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
+  "automation.ev.dispatch_job.assigned": "تخصيص مهمة إرسال",
+  "automation.ev.dispatch_job.completed": "اكتمال مهمة إرسال",
 };

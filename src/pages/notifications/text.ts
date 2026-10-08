@@ -1,5 +1,5 @@
 import { bdiText, ltrText } from "../../lib/bidi";
-import { formatDate } from "../../lib/format";
+import { formatDate, formatDateTime } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
@@ -72,6 +72,13 @@ export function useNotificationText() {
             : error
               ? t("notifications.msg.webhookFailed.bodyError", { event, error: bdiText(error) })
               : event,
+        };
+      }
+      case "dispatch.urgent_job": {
+        const end = strParam(p, "window_end");
+        return {
+          title: t("notifications.msg.urgentJob.title", { number: ltrText(strParam(p, "doc_number")), title: bdiText(strParam(p, "title")) }),
+          body: end ? t("notifications.msg.urgentJob.body", { time: ltrText(formatDateTime(end)) }) : null,
         };
       }
       default:

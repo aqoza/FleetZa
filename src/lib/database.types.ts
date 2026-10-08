@@ -571,6 +571,143 @@ export type Database = {
           },
         ]
       }
+      dispatch_jobs: {
+        Row: {
+          assigned_at: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          completed_at: string | null
+          completion_notes: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          doc_number: string | null
+          driver_id: string | null
+          dropoff_address: string | null
+          dropoff_lat: number | null
+          dropoff_lng: number | null
+          en_route_at: string | null
+          id: string
+          job_type: string
+          notes: string | null
+          number: number | null
+          on_site_at: string | null
+          pickup_address: string | null
+          pickup_lat: number | null
+          pickup_lng: number | null
+          priority: string
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          completion_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          en_route_at?: string | null
+          id?: string
+          job_type?: string
+          notes?: string | null
+          number?: number | null
+          on_site_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          priority?: string
+          status?: string
+          tenant_id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          assigned_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          completion_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          en_route_at?: string | null
+          id?: string
+          job_type?: string
+          notes?: string | null
+          number?: number | null
+          on_site_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          priority?: string
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatch_jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_sequences: {
         Row: {
           doc_type: string
@@ -4796,6 +4933,20 @@ export type Database = {
       create_webhook_subscription: {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
+      }
+      dispatch_assign: {
+        Args: { p_driver_id?: string | null; p_job_id: string; p_vehicle_id: string }
+        Returns: undefined
+      }
+      dispatch_busy: {
+        Args: { p_end: string; p_exclude?: string | null; p_start: string }
+        Returns: {
+          doc_number: string | null
+          job_id: string
+          kind: string
+          resource_id: string
+          status: string
+        }[]
       }
       fuel_summary: {
         Args: { p_vehicle_id?: string }

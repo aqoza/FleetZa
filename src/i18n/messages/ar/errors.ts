@@ -84,4 +84,12 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.illegalDispatchTransition": "لا يمكن نقل هذه المهمة إلى تلك الحالة.",
+  "errors.dispatchJobLocked": "هذه المهمة مكتملة أو ملغاة ولم يعد بالإمكان تعديلها.",
+  "errors.dispatchNotDeletable": "يمكن حذف المهام الجديدة فقط. ألغِ المهمة بدلًا من ذلك.",
+  "errors.dispatchNotAssigned": "خصص مركبة لهذه المهمة أولًا.",
+  "errors.dispatchVehicleUnavailable": "يمكن تخصيص المهام للمركبات النشطة فقط.",
+  "errors.dispatchVehicleBusy": "لهذه المركبة مهمة أخرى في الفترة الزمنية نفسها.",
+  "errors.dispatchDriverBusy": "لهذا السائق مهمة أخرى في الفترة الزمنية نفسها.",
+  "errors.dispatchJobNotFound": "هذه المهمة لم تعد موجودة.",
 };

@@ -86,4 +86,12 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.illegalDispatchTransition": "This job can't move to that status.",
+  "errors.dispatchJobLocked": "This job is completed or canceled and can no longer be changed.",
+  "errors.dispatchNotDeletable": "Only new jobs can be deleted. Cancel it instead.",
+  "errors.dispatchNotAssigned": "Assign a vehicle to this job first.",
+  "errors.dispatchVehicleUnavailable": "Only active vehicles can take jobs.",
+  "errors.dispatchVehicleBusy": "This vehicle already has another job in that time window.",
+  "errors.dispatchDriverBusy": "This driver already has another job in that time window.",
+  "errors.dispatchJobNotFound": "This job no longer exists.",
 } as const;
