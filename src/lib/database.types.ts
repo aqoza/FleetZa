@@ -76,6 +76,69 @@ export type Database = {
           },
         ]
       }
+      attendance_records: {
+        Row: {
+          check_in: string | null
+          check_out: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          hours: number | null
+          id: string
+          note: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_date: string
+        }
+        Insert: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          hours?: number | null
+          id?: string
+          note?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_date: string
+        }
+        Update: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          hours?: number | null
+          id?: string
+          note?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -1051,6 +1114,53 @@ export type Database = {
           },
         ]
       }
+      hr_settings: {
+        Row: {
+          id: string
+          overtime_multiplier: number
+          social_employee_pct: number
+          social_employer_pct: number
+          social_nationals_only: boolean
+          standard_daily_hours: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          weekend_days: number[]
+        }
+        Insert: {
+          id?: string
+          overtime_multiplier?: number
+          social_employee_pct?: number
+          social_employer_pct?: number
+          social_nationals_only?: boolean
+          standard_daily_hours?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekend_days?: number[]
+        }
+        Update: {
+          id?: string
+          overtime_multiplier?: number
+          social_employee_pct?: number
+          social_employer_pct?: number
+          social_nationals_only?: boolean
+          standard_daily_hours?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekend_days?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_templates: {
         Row: {
           active: boolean
@@ -1695,6 +1805,141 @@ export type Database = {
           },
         ]
       }
+      leave_requests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type_id: string
+          reason?: string | null
+          start_date: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type_id?: string
+          reason?: string | null
+          start_date?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_types: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          days_per_year: number | null
+          id: string
+          name: string
+          name_ar: string | null
+          paid: boolean
+          sort_order: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          days_per_year?: number | null
+          id?: string
+          name: string
+          name_ar?: string | null
+          paid?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          days_per_year?: number | null
+          id?: string
+          name?: string
+          name_ar?: string | null
+          paid?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_types_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_preferences: {
         Row: {
           created_at: string
@@ -1885,6 +2130,234 @@ export type Database = {
           },
           {
             foreignKeyName: "payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payroll_runs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          currency_decimals?: number
+          doc_number?: string | null
+          employee_count?: number
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_at?: string | null
+          pay_date?: string | null
+          period_end: string
+          period_start: string
+          status?: string
+          tenant_id?: string
+          total_deductions?: number
+          total_employer_cost?: number
+          total_gross?: number
+          total_net?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          currency_decimals?: number
+          doc_number?: string | null
+          employee_count?: number
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_at?: string | null
+          pay_date?: string | null
+          period_end?: string
+          period_start?: string
+          status?: string
+          tenant_id?: string
+          total_deductions?: number
+          total_employer_cost?: number
+          total_gross?: number
+          total_net?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payslips: {
+        Row: {
+          bank_name: string | null
+          basic: number
+          bonus: number
+          created_at: string
+          currency: string | null
+          deduction_note: string | null
+          deductions: number
+          employee_id: string
+          employee_name: string
+          employee_number: string | null
+          gross: number
+          hourly_rate: number
+          housing: number
+          iban: string | null
+          id: string
+          job_title: string | null
+          net: number
+          other_allowances: number
+          overtime_amount: number
+          overtime_hours: number
+          overtime_multiplier: number
+          paid_days: number
+          pay_date: string | null
+          period_days: number
+          period_end: string
+          period_start: string
+          run_id: string
+          run_number: string | null
+          social_insurance_employee: number
+          social_insurance_employer: number
+          tenant_id: string
+          transport: number
+          unpaid_leave_days: number
+          unpaid_leave_deduction: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bank_name?: string | null
+          basic?: number
+          bonus?: number
+          created_at?: string
+          currency?: string | null
+          deduction_note?: string | null
+          deductions?: number
+          employee_id: string
+          employee_name: string
+          employee_number?: string | null
+          gross?: number
+          hourly_rate?: number
+          housing?: number
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          net?: number
+          other_allowances?: number
+          overtime_amount?: number
+          overtime_hours?: number
+          overtime_multiplier?: number
+          paid_days?: number
+          pay_date?: string | null
+          period_days?: number
+          period_end: string
+          period_start: string
+          run_id: string
+          run_number?: string | null
+          social_insurance_employee?: number
+          social_insurance_employer?: number
+          tenant_id: string
+          transport?: number
+          unpaid_leave_days?: number
+          unpaid_leave_deduction?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bank_name?: string | null
+          basic?: number
+          bonus?: number
+          created_at?: string
+          currency?: string | null
+          deduction_note?: string | null
+          deductions?: number
+          employee_id?: string
+          employee_name?: string
+          employee_number?: string | null
+          gross?: number
+          hourly_rate?: number
+          housing?: number
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          net?: number
+          other_allowances?: number
+          overtime_amount?: number
+          overtime_hours?: number
+          overtime_multiplier?: number
+          paid_days?: number
+          pay_date?: string | null
+          period_days?: number
+          period_end?: string
+          period_start?: string
+          run_id?: string
+          run_number?: string | null
+          social_insurance_employee?: number
+          social_insurance_employer?: number
+          tenant_id?: string
+          transport?: number
+          unpaid_leave_days?: number
+          unpaid_leave_deduction?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payslips_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payslips_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payslips_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -4484,6 +4957,7 @@ export type Database = {
       }
     }
     Functions: {
+      attendance_set: { Args: { p_date: string; p_rows: Json }; Returns: number }
       audit_tables: { Args: never; Returns: string[] }
       billing_state: {
         Args: {
@@ -4805,6 +5279,7 @@ export type Database = {
           total_liters: number
         }[]
       }
+      hr_seed: { Args: { p_weekend_days?: number[] }; Returns: number }
       inventory_low_stock: {
         Args: { p_limit?: number }
         Returns: {
@@ -4889,11 +5364,202 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      leave_balances: {
+        Args: { p_employee?: string; p_year: number }
+        Returns: {
+          employee_id: string
+          entitled: number
+          leave_type_id: string
+          pending: number
+          remaining: number
+          taken: number
+        }[]
+      }
+      leave_transition: {
+        Args: {
+          p_id: string
+          p_note?: string | null
+          p_to: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leave_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       mark_notifications_read: {
         Args: { p_ids?: string[]; p_read?: boolean }
         Returns: number
       }
       next_certificate_number: { Args: never; Returns: string }
+      payroll_approve: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_calculate: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_cancel: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_mark_paid: {
+        Args: {
+          p_paid_at?: string
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       record_webhook_attempt: {
         Args: {
           p_error?: string
@@ -4925,6 +5591,39 @@ export type Database = {
           vehicle_id: string
           vehicle_name: string
         }[]
+      }
+      request_leave: {
+        Args: {
+          p_employee: string | null
+          p_end: string
+          p_leave_type: string
+          p_reason?: string | null
+          p_start: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leave_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       retry_webhook_delivery: { Args: { p_id: string }; Returns: undefined }
       revise_quote: {
@@ -5112,6 +5811,34 @@ export type Database = {
           unbilled_certificates: number
           unbilled_order_value: number
         }[]
+      }
+      save_hr_settings: {
+        Args: {
+          p_overtime_multiplier: number
+          p_social_employee_pct: number
+          p_social_employer_pct: number
+          p_social_nationals_only: boolean
+          p_standard_daily_hours: number
+          p_weekend_days: number[]
+        }
+        Returns: {
+          id: string
+          overtime_multiplier: number
+          social_employee_pct: number
+          social_employer_pct: number
+          social_nationals_only: boolean
+          standard_daily_hours: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          weekend_days: number[]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "hr_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       save_security_settings: {
         Args: {

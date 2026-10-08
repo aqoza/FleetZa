@@ -155,5 +155,8 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.invoice.issued": "إصدار فاتورة",
   "automation.ev.payment.received": "استلام دفعة",
   "automation.ev.certificate.issued": "إصدار شهادة محدد سرعة",
+  "automation.ev.leave_request.approved": "الموافقة على طلب إجازة",
+  "automation.ev.payroll_run.approved": "اعتماد مسير رواتب",
+  "automation.ev.payroll_run.paid": "صرف مسير رواتب",
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
 };

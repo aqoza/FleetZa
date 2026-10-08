@@ -44,7 +44,7 @@ export interface EventSpec {
 
 const PRIORITY = ["low", "normal", "high", "critical"];
 
-/** Every event the server raises (migration 20261008000006 + the foundation's stock alert). */
+/** Every event the server raises (migration 20261008000006, payroll_hr's 20261008000009 and the foundation's stock alert). */
 export const EVENT_CATALOG: EventSpec[] = [
   {
     event: "vehicle.created", module: "fleet", hasVehicle: true,
@@ -114,6 +114,27 @@ export const EVENT_CATALOG: EventSpec[] = [
     fields: [{ name: "certificate_number", kind: "text" }, { name: "expires_at", kind: "date" }, { name: "status", kind: "text" }],
     sample: { certificate_id: "00000000-0000-4000-8000-000000000009", certificate_number: "GOM-2026-0101",
       vehicle_id: "00000000-0000-4000-8000-000000000001", expires_at: "2027-10-08", status: "active" },
+  },
+  {
+    event: "leave_request.approved", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "employee", kind: "text" }, { name: "leave_type", kind: "text" },
+      { name: "start_date", kind: "date" }, { name: "end_date", kind: "date" }, { name: "days", kind: "number" }],
+    sample: { id: "00000000-0000-4000-8000-000000000011", employee_id: "00000000-0000-4000-8000-000000000012",
+      employee: "Sara Al Harthy", leave_type: "Annual leave", start_date: "2026-11-01", end_date: "2026-11-05", days: 5 },
+  },
+  {
+    event: "payroll_run.approved", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "period_start", kind: "date" }, { name: "period_end", kind: "date" },
+      { name: "employee_count", kind: "number" }, { name: "total_net", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000013", doc_number: "PAY-00012", period_start: "2026-10-01",
+      period_end: "2026-10-31", employee_count: 24, total_net: 61250, currency: "OMR" },
+  },
+  {
+    event: "payroll_run.paid", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "paid_at", kind: "date" },
+      { name: "employee_count", kind: "number" }, { name: "total_net", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000013", doc_number: "PAY-00012", paid_at: "2026-10-28",
+      employee_count: 24, total_net: 61250, currency: "OMR" },
   },
   {
     event: "stock.below_reorder", module: "inventory", hasVehicle: false,

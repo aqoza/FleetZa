@@ -45,6 +45,10 @@ export const enNotifications = {
   "notifications.kind.employees.document_expiring": "Employee documents expiring",
   "notifications.kind.employees.document_expiring.desc":
     "A passport, residence permit or work permit expires in 60, 30 or 7 days, or has expired.",
+  "notifications.kind.hr.leave_requested": "Leave requests",
+  "notifications.kind.hr.leave_requested.desc": "An employee asks for leave and it needs a decision.",
+  "notifications.kind.hr.leave_decided": "Leave decisions",
+  "notifications.kind.hr.leave_decided.desc": "Your own leave request is approved or rejected.",
   "notifications.kind.documents.expiring": "Documents expiring",
   "notifications.kind.documents.expiring.desc": "A stored document expires in 30 or 7 days, or has expired.",
   "notifications.kind.automation.rule": "Automation rules",
@@ -60,6 +64,13 @@ export const enNotifications = {
     one: "{employee}: {document} expires tomorrow",
     other: "{employee}: {document} expires in {count} days",
   },
+  "notifications.msg.leaveRequested": {
+    one: "{employee} requested {count} day of {type}",
+    other: "{employee} requested {count} days of {type}",
+  },
+  "notifications.msg.leaveApproved": "Your {type} request was approved",
+  "notifications.msg.leaveRejected": "Your {type} request was rejected",
+  "notifications.msg.leaveDates": "{start} – {end}",
   "notifications.msg.document.expired": "{document} expired",
   "notifications.msg.document.today": "{document} expires today",
   "notifications.msg.document.expiresIn": {
