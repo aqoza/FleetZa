@@ -11,6 +11,7 @@ import { useT } from "../../i18n";
 import { Button, ErrorState, Field, Input, Select, Textarea } from "../../components/ui";
 import { Combobox } from "../../components/Combobox";
 import { useToast } from "../../components/Toast";
+import { useBranchPicker } from "../companies/hooks";
 
 export function VehicleForm({
   vehicle,
@@ -24,6 +25,7 @@ export function VehicleForm({
   const qc = useQueryClient();
   const { isEnabled } = useModules();
   const customersEnabled = isEnabled("customers");
+  const branchesEnabled = isEnabled("multi_company");
 
   const [form, setForm] = useState({
     ownership: vehicle?.ownership ?? "company",
@@ -46,6 +48,7 @@ export function VehicleForm({
     engine_number: vehicle?.engine_number ?? "",
     fleet_number: vehicle?.fleet_number ?? "",
     notes: vehicle?.notes ?? "",
+    branch_id: vehicle?.branch_id ?? "",
   });
   const [error, setError] = useState("");
   const toast = useToast();
@@ -53,6 +56,8 @@ export function VehicleForm({
     activeOnly: true,
     enabled: customersEnabled,
   });
+
+  const branchPicker = useBranchPicker(form.branch_id, branchesEnabled);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -85,6 +90,8 @@ export function VehicleForm({
         values.ownership = form.ownership;
         values.customer_id = form.ownership === "customer" ? form.customer_id || null : null;
       }
+      // Same rule for the branch: only when the branch control is shown.
+      if (branchesEnabled) values.branch_id = form.branch_id || null;
       return vehicle
         ? updateRow<Vehicle>("vehicles", vehicle.id, values)
         : insertRow<Vehicle>("vehicles", values);
@@ -175,6 +182,16 @@ export function VehicleForm({
               required
               clearable={false}
               placeholder={t("vehicles.selectCustomer")}
+            />
+          </Field>
+        )}
+        {branchesEnabled && (
+          <Field label={t("companies.branch")}>
+            <Combobox
+              {...branchPicker}
+              value={form.branch_id}
+              onChange={(v) => set("branch_id", v)}
+              placeholder={t("companies.noBranch")}
             />
           </Field>
         )}
