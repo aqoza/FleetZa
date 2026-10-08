@@ -64,6 +64,11 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
   NO_CERTIFICATES: "errors.noCertificates",
+  // Audit & security (20261008000008)
+  SECURITY_INVALID_SETTING: "errors.securityInvalidSetting",
+  MEMBER_NOT_FOUND: "errors.memberNotFound",
+  CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
+  CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
   // Stock ledger (…_platform_foundation.sql)
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",

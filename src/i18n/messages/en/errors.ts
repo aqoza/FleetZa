@@ -82,4 +82,8 @@ export const enErrors = {
   "errors.transferSameWarehouse": "Pick two different warehouses to transfer between.",
   "errors.moduleDisabled": "This module is switched off for your organization. An admin can turn it on in Settings.",
   "errors.crossTenantReference": "One of the linked records does not belong to your organization.",
+  "errors.securityInvalidSetting": "Idle sign-out must be 5 to 1,440 minutes and audit retention 90 to 3,650 days.",
+  "errors.memberNotFound": "This member is no longer in your organization.",
+  "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
+  "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
 } as const;
