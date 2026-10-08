@@ -58,6 +58,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     "عندما يقترب انتهاء جواز سفر أو إقامة أو تصريح عمل بـ60 أو 30 أو 7 أيام، أو عند انتهائه.",
   "notifications.kind.documents.expiring": "انتهاء المستندات",
   "notifications.kind.documents.expiring.desc": "عندما يقترب انتهاء مستند محفوظ بـ30 أو 7 أيام، أو عند انتهائه.",
+  "notifications.kind.automation.rule": "قواعد الأتمتة",
+  "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
 
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
@@ -82,6 +84,7 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     other: "تنتهي صلاحية {document} خلال {count} يوم",
   },
   "notifications.msg.expiryDate": "تاريخ الانتهاء: {date}",
+  "notifications.msg.automationRule.body": "من القاعدة: {rule}",
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",

@@ -53,6 +53,14 @@ export function useNotificationText() {
         const expiry = strParam(p, "expiry");
         return { title, body: expiry ? t("notifications.msg.expiryDate", { date: ltrText(formatDate(expiry)) }) : null };
       }
+      case "automation.rule": {
+        // The message is written by whoever set up the rule, not translated.
+        const rule = strParam(p, "rule");
+        return {
+          title: bdiText(strParam(p, "message") || n.title),
+          body: rule ? t("notifications.msg.automationRule.body", { rule: bdiText(rule) }) : null,
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

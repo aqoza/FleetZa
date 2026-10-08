@@ -30,6 +30,7 @@ describe("notifications helpers", () => {
 
   it("knows the emitted kinds", () => {
     expect(isKnownKind("documents.expiring")).toBe(true);
+    expect(isKnownKind("automation.rule")).toBe(true);
     expect(isKnownKind("something.else")).toBe(false);
   });
 });

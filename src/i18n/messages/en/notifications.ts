@@ -47,6 +47,8 @@ export const enNotifications = {
     "A passport, residence permit or work permit expires in 60, 30 or 7 days, or has expired.",
   "notifications.kind.documents.expiring": "Documents expiring",
   "notifications.kind.documents.expiring.desc": "A stored document expires in 30 or 7 days, or has expired.",
+  "notifications.kind.automation.rule": "Automation rules",
+  "notifications.kind.automation.rule.desc": "An automation rule sends you a notification.",
 
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
@@ -63,6 +65,7 @@ export const enNotifications = {
     other: "{document} expires in {count} days",
   },
   "notifications.msg.expiryDate": "Expiry date: {date}",
+  "notifications.msg.automationRule.body": "From rule: {rule}",
   "notifications.doc.passport": "passport",
   "notifications.doc.residence_permit": "residence permit",
   "notifications.doc.work_permit": "work permit",
