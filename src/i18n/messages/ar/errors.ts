@@ -84,4 +84,9 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.assetNotFound": "لم يعد هذا الأصل موجودًا.",
+  "errors.assetDisposed": "تم التخلص من هذا الأصل، لذا لم يعد بالإمكان تغييره.",
+  "errors.assetAssigneeRequired": "اختر موظفًا أو مركبة لتسليم الأصل إليها.",
+  "errors.assetNotAssigned": "هذا الأصل غير مسلَّم لأحد.",
+  "errors.invalidAssetStatus": "استخدم \"التخلص\" لإخراج أصل من الخدمة.",
 };

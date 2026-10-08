@@ -86,4 +86,9 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.assetNotFound": "This asset no longer exists.",
+  "errors.assetDisposed": "This asset is disposed, so it can no longer be changed.",
+  "errors.assetAssigneeRequired": "Pick an employee or a vehicle to assign the asset to.",
+  "errors.assetNotAssigned": "This asset isn't assigned to anyone.",
+  "errors.invalidAssetStatus": "Use Dispose to retire an asset.",
 } as const;

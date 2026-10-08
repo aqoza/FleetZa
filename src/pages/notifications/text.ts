@@ -74,6 +74,19 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "assets.warranty_expiring": {
+        const days = numParam(p, "days") ?? 0;
+        const asset = bdiText(strParam(p, "asset"));
+        return {
+          title:
+            strParam(p, "stage") === "expired" || days < 0
+              ? t("notifications.msg.warranty.expired", { asset })
+              : days === 0
+                ? t("notifications.msg.warranty.endsToday", { asset })
+                : tp("notifications.msg.warranty.endsIn", days, { asset }),
+          body: t("notifications.msg.warranty.body", { date: ltrText(formatDate(strParam(p, "expiry"))) }),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

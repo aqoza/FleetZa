@@ -76,6 +76,225 @@ export type Database = {
           },
         ]
       }
+      asset_events: {
+        Row: {
+          asset_id: string
+          at: string
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          detail: string | null
+          employee_id: string | null
+          event_type: string
+          id: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          asset_id: string
+          at?: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          employee_id?: string | null
+          event_type: string
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          asset_id?: string
+          at?: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          employee_id?: string | null
+          event_type?: string
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_events_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_employee_id?: string | null
+          assigned_vehicle_id?: string | null
+          branch_id?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method?: string
+          disposal_value?: number | null
+          disposed_at?: string | null
+          doc_number?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          number?: number | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          salvage_value?: number
+          serial_number?: string | null
+          status?: string
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number | null
+          warehouse_id?: string | null
+          warranty_expiry?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_employee_id?: string | null
+          assigned_vehicle_id?: string | null
+          branch_id?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method?: string
+          disposal_value?: number | null
+          disposed_at?: string | null
+          doc_number?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          number?: number | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          salvage_value?: number
+          serial_number?: string | null
+          status?: string
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number | null
+          warehouse_id?: string | null
+          warranty_expiry?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_assigned_employee_id_fkey"
+            columns: ["assigned_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_assigned_vehicle_id_fkey"
+            columns: ["assigned_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -4484,6 +4703,145 @@ export type Database = {
       }
     }
     Functions: {
+      asset_assign: {
+        Args: {
+          p_asset: string
+          p_employee?: string
+          p_location?: string
+          p_note?: string
+          p_vehicle?: string
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      asset_dispose: {
+        Args: {
+          p_asset: string
+          p_disposed_at?: string
+          p_note?: string
+          p_value?: number
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      asset_return: {
+        Args: {
+          p_asset: string
+          p_location?: string
+          p_note?: string
+          p_warehouse?: string
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       audit_tables: { Args: never; Returns: string[] }
       billing_state: {
         Args: {
