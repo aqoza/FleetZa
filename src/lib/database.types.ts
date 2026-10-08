@@ -4548,6 +4548,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      mark_notifications_read: {
+        Args: { p_ids?: string[]; p_read?: boolean }
+        Returns: number
+      }
       next_certificate_number: { Args: never; Returns: string }
       refresh_notifications: { Args: { p_force?: boolean }; Returns: number }
       report_cost_by_vehicle: {

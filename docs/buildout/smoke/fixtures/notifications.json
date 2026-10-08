@@ -1,0 +1,120 @@
+{
+ "tables": {
+  "notifications": [
+   {
+    "id": "e1000000-0000-4000-8000-000000000001",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "recipient_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "documents.expiring",
+    "severity": "critical",
+    "params": {
+     "document": "Mulkiya — Truck 7",
+     "days": 4,
+     "stage": "d7",
+     "expiry": "2026-10-12"
+    },
+    "title": "Mulkiya — Truck 7 expires in 4 days",
+    "body": "Expiry date: 2026-10-12",
+    "link": "/documents/expiring",
+    "created_at": "2026-10-08T07:55:00Z",
+    "read_at": null,
+    "entity_type": null,
+    "entity_id": null,
+    "dedupe_key": null
+   },
+   {
+    "id": "e1000000-0000-4000-8000-000000000002",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "recipient_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "inventory.low_stock",
+    "severity": "warning",
+    "params": {
+     "name": "Brake pads (set)",
+     "on_hand": 3,
+     "uom": "set",
+     "reorder_point": 4
+    },
+    "title": "Low stock: Brake pads (set)",
+    "body": "On hand 3 set",
+    "link": "/inventory",
+    "created_at": "2026-10-08T05:10:00Z",
+    "read_at": null,
+    "entity_type": null,
+    "entity_id": null,
+    "dedupe_key": null
+   },
+   {
+    "id": "e1000000-0000-4000-8000-000000000003",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "recipient_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "employees.document_expiring",
+    "severity": "warning",
+    "params": {
+     "employee": "Aisha Al Harthy",
+     "document": "passport",
+     "days": 25,
+     "stage": "d30",
+     "expiry": "2026-11-02"
+    },
+    "title": "Aisha Al Harthy: passport expires in 25 days",
+    "body": null,
+    "link": "/employees",
+    "created_at": "2026-10-07T09:00:00Z",
+    "read_at": "2026-10-07T10:00:00Z",
+    "entity_type": null,
+    "entity_id": null,
+    "dedupe_key": null
+   },
+   {
+    "id": "e1000000-0000-4000-8000-000000000004",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "recipient_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "documents.expiring",
+    "severity": "critical",
+    "params": {
+     "document": "Transport contract — Al Emtiaz",
+     "days": -7,
+     "stage": "expired",
+     "expiry": "2026-10-01"
+    },
+    "title": "Transport contract expired",
+    "body": null,
+    "link": "/documents/expiring",
+    "created_at": "2026-10-01T08:00:00Z",
+    "read_at": "2026-10-02T08:00:00Z",
+    "entity_type": null,
+    "entity_id": null,
+    "dedupe_key": null
+   },
+   {
+    "id": "e1000000-0000-4000-8000-000000000005",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "recipient_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "custom.unknown",
+    "severity": "info",
+    "params": {},
+    "title": "Weekly summary is ready",
+    "body": "12 vehicles checked this week.",
+    "link": null,
+    "created_at": "2026-09-29T08:00:00Z",
+    "read_at": "2026-09-29T09:00:00Z",
+    "entity_type": null,
+    "entity_id": null,
+    "dedupe_key": null
+   }
+  ],
+  "notification_preferences": [
+   {
+    "id": "e2000000-0000-4000-8000-000000000001",
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "user_id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "kind": "inventory.low_stock",
+    "muted": true
+   }
+  ]
+ },
+ "rpc": {
+  "refresh_notifications": 0,
+  "mark_notifications_read": 1
+ }
+}

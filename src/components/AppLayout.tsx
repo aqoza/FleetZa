@@ -6,6 +6,7 @@ import { useModules } from "../context/ModulesContext";
 import { LANGUAGES, useI18n } from "../i18n";
 import { NAV_ITEMS, NAV_SECTIONS } from "../modules/nav";
 import { useTheme } from "../lib/theme";
+import { NotificationBell } from "../pages/notifications/NotificationBell";
 import { GlobalSearch } from "./GlobalSearch";
 import { ContextPanel } from "./ContextPanel";
 
@@ -208,6 +209,7 @@ export default function AppLayout() {
           </button>
           <GlobalSearch />
           <div className="ms-auto flex shrink-0 items-center gap-2">
+            {isEnabled("notifications") && <NotificationBell />}
             <button
               onClick={toggle}
               aria-label={t("theme.toggle")}
