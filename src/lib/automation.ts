@@ -122,6 +122,28 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "purchase_order.sent", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" }, { name: "order_date", kind: "date" },
+      { name: "expected_date", kind: "date" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "purchase_order.received", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "vendor_bill.paid", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "supplier_invoice_number", kind: "text" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000017", doc_number: "BILL-00007", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", supplier_invoice_number: "GP-7781", total: 1250.5, currency: "OMR",
+      purchase_order_id: "00000000-0000-4000-8000-000000000015" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

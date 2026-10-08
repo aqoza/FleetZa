@@ -1,5 +1,5 @@
 import { bdiText, ltrText } from "../../lib/bidi";
-import { formatDate } from "../../lib/format";
+import { formatDate, formatMoney } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
@@ -74,6 +74,32 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "purchasing.bill_due": {
+        const days = numParam(p, "days") ?? 0;
+        const vars = { number: ltrText(strParam(p, "number")), supplier: bdiText(strParam(p, "supplier")) };
+        const title =
+          strParam(p, "stage") === "overdue" || days < 0
+            ? t("notifications.msg.billOverdue.title", vars)
+            : days === 0
+              ? t("notifications.msg.billDueToday.title", vars)
+              : tp("notifications.msg.billDueIn.title", days, vars);
+        const balance = numParam(p, "balance");
+        const currency = strParam(p, "currency");
+        return {
+          title,
+          body: balance != null && currency
+            ? t("notifications.msg.billBalance", { amount: ltrText(formatMoney(balance, currency)) })
+            : null,
+        };
+      }
+      case "purchasing.po_late":
+        return {
+          title: t("notifications.msg.poLate.title", {
+            number: ltrText(strParam(p, "number")),
+            supplier: bdiText(strParam(p, "supplier")),
+          }),
+          body: t("notifications.msg.poLate.body", { date: ltrText(formatDate(strParam(p, "expected_date"))) }),
+        };
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
