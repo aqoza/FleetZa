@@ -66,6 +66,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.purchasing.bill_due.desc": "تستحق فاتورة مورد خلال 3 أيام، أو تأخر سدادها.",
   "notifications.kind.purchasing.po_late": "أوامر الشراء المتأخرة",
   "notifications.kind.purchasing.po_late.desc": "يتجاوز أمر شراء تاريخ التسليم المتوقع قبل استلامه بالكامل.",
+  "notifications.kind.vendor_portal.po_acknowledged": "أوامر أكّدها الموردون",
+  "notifications.kind.vendor_portal.po_acknowledged.desc": "يؤكد مورد أمر شراء عبر بوابة الموردين.",
 
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
@@ -107,6 +109,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.billBalance": "الرصيد {amount}",
   "notifications.msg.poLate.title": "تأخر {number} من {supplier}",
   "notifications.msg.poLate.body": "التاريخ المتوقع {date}",
+  "notifications.msg.poAcknowledged.title": "أكّد {supplier} الأمر {number}",
+  "notifications.msg.poAcknowledged.expected": "التسليم المتوقع {date}",
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",

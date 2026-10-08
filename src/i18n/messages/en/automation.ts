@@ -157,4 +157,5 @@ export const enAutomation = {
   "automation.ev.purchase_order.sent": "A purchase order is sent",
   "automation.ev.purchase_order.received": "A purchase order is fully received",
   "automation.ev.vendor_bill.paid": "A vendor bill is paid",
+  "automation.ev.purchase_order.acknowledged": "A supplier acknowledges a purchase order",
 } as const;

@@ -144,6 +144,13 @@ export const EVENT_CATALOG: EventSpec[] = [
       supplier: "Gulf Parts LLC", supplier_invoice_number: "GP-7781", total: 1250.5, currency: "OMR",
       purchase_order_id: "00000000-0000-4000-8000-000000000015" },
   },
+  {
+    event: "purchase_order.acknowledged", module: "vendor_portal", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "vendor_expected_date", kind: "date" }, { name: "vendor_ack_note", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", vendor_expected_date: "2026-10-15", vendor_ack_note: "Ships Monday" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

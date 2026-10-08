@@ -3939,6 +3939,72 @@ export type Database = {
           },
         ]
       }
+      supplier_portal_access: {
+        Row: {
+          access_count: number
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          last_accessed_at: string | null
+          revoked_at: string | null
+          supplier_id: string
+          tenant_id: string
+          token: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          access_count?: number
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          supplier_id: string
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          access_count?: number
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          supplier_id?: string
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_portal_access_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_portal_access_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppliers: {
         Row: {
           address: string | null
@@ -5896,6 +5962,16 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      vendor_portal_acknowledge: {
+        Args: {
+          p_expected_date?: string
+          p_note?: string
+          p_po: string
+          p_token: string
+        }
+        Returns: Json
+      }
+      vendor_portal_view: { Args: { p_token: string }; Returns: Json }
     }
     Enums: {
       [_ in never]: never
