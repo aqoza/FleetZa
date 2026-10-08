@@ -86,4 +86,13 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.policyCanceled": "This policy is canceled. Reinstate it first.",
+  "errors.invalidPolicyCancel": "The cancellation date must be between the policy start and today.",
+  "errors.policyNotFound": "That policy no longer exists.",
+  "errors.illegalClaimTransition": "The claim can't move to that status from where it is now.",
+  "errors.claimOutsidePolicy": "The date of loss is outside the policy's cover.",
+  "errors.claimVehicleNotCovered": "That vehicle wasn't on this policy on the date of loss.",
+  "errors.claimAmountRequired": "Enter the approved amount before approving the claim.",
+  "errors.claimLocked": "This claim is closed. Only its notes can change.",
+  "errors.claimNotDeletable": "Only draft claims can be deleted. Withdraw it instead.",
 } as const;

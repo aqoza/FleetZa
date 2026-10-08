@@ -1172,6 +1172,275 @@ export type Database = {
           },
         ]
       }
+      insurance_claims: {
+        Row: {
+          adjuster_name: string | null
+          adjuster_phone: string | null
+          amount_approved: number | null
+          amount_claimed: number
+          amount_paid: number | null
+          claim_date: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          decided_at: string | null
+          deductible_applied: number | null
+          description: string
+          doc_number: string | null
+          id: string
+          incident_id: string | null
+          insurer_reference: string | null
+          loss_date: string
+          notes: string | null
+          number: number | null
+          policy_id: string
+          rejection_reason: string | null
+          settled_at: string | null
+          status: string
+          submitted_at: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          withdrawn_at: string | null
+        }
+        Insert: {
+          adjuster_name?: string | null
+          adjuster_phone?: string | null
+          amount_approved?: number | null
+          amount_claimed?: number
+          amount_paid?: number | null
+          claim_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          decided_at?: string | null
+          deductible_applied?: number | null
+          description: string
+          doc_number?: string | null
+          id?: string
+          incident_id?: string | null
+          insurer_reference?: string | null
+          loss_date: string
+          notes?: string | null
+          number?: number | null
+          policy_id: string
+          rejection_reason?: string | null
+          settled_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Update: {
+          adjuster_name?: string | null
+          adjuster_phone?: string | null
+          amount_approved?: number | null
+          amount_claimed?: number
+          amount_paid?: number | null
+          claim_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          decided_at?: string | null
+          deductible_applied?: number | null
+          description?: string
+          doc_number?: string | null
+          id?: string
+          incident_id?: string | null
+          insurer_reference?: string | null
+          loss_date?: string
+          notes?: string | null
+          number?: number | null
+          policy_id?: string
+          rejection_reason?: string | null
+          settled_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_policies: {
+        Row: {
+          auto_renew: boolean
+          broker: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          coverage_amount: number | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          deductible: number | null
+          end_date: string
+          id: string
+          insurer_name: string | null
+          insurer_supplier_id: string | null
+          notes: string | null
+          policy_number: string
+          policy_type: string
+          premium: number
+          premium_frequency: string
+          start_date: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto_renew?: boolean
+          broker?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          coverage_amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deductible?: number | null
+          end_date: string
+          id?: string
+          insurer_name?: string | null
+          insurer_supplier_id?: string | null
+          notes?: string | null
+          policy_number: string
+          policy_type?: string
+          premium?: number
+          premium_frequency?: string
+          start_date: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto_renew?: boolean
+          broker?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          coverage_amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deductible?: number | null
+          end_date?: string
+          id?: string
+          insurer_name?: string | null
+          insurer_supplier_id?: string | null
+          notes?: string | null
+          policy_number?: string
+          policy_type?: string
+          premium?: number
+          premium_frequency?: string
+          start_date?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_policies_insurer_supplier_id_fkey"
+            columns: ["insurer_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policies_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_policy_vehicles: {
+        Row: {
+          added_on: string
+          created_at: string
+          created_by: string | null
+          id: string
+          policy_id: string
+          removed_on: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          added_on?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id: string
+          removed_on?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          added_on?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id?: string
+          removed_on?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_policy_vehicles_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policy_vehicles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policy_vehicles_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_items: {
         Row: {
           active: boolean
@@ -4803,6 +5072,19 @@ export type Database = {
           fill_count: number
           total_cost: number
           total_liters: number
+        }[]
+      }
+      insurance_renew_policy: {
+        Args: { p_policy_id: string }
+        Returns: string
+      }
+      insurance_uninsured_vehicles: {
+        Args: { p_on?: string }
+        Returns: {
+          id: string
+          license_plate: string
+          name: string
+          status: string
         }[]
       }
       inventory_low_stock: {

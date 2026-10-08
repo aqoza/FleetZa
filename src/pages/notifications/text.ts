@@ -74,6 +74,22 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "insurance.policy_expiring": {
+        const days = numParam(p, "days") ?? 0;
+        const policy = ltrText(strParam(p, "policy"));
+        return {
+          title:
+            strParam(p, "stage") === "expired" || days < 0
+              ? t("notifications.msg.policy.expired", { policy })
+              : days === 0
+                ? t("notifications.msg.policy.endsToday", { policy })
+                : tp("notifications.msg.policy.endsIn", days, { policy }),
+          body: t("notifications.msg.policy.body", {
+            insurer: bdiText(strParam(p, "insurer")),
+            date: ltrText(formatDate(strParam(p, "expiry"))),
+          }),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
