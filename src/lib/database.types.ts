@@ -4012,6 +4012,149 @@ export type Database = {
           },
         ]
       }
+      webhook_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          event: string
+          event_id: number | null
+          id: string
+          last_attempt_at: string | null
+          last_error: string | null
+          next_attempt_at: string
+          payload: Json
+          response_code: number | null
+          status: string
+          subscription_id: string
+          tenant_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event: string
+          event_id?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          next_attempt_at?: string
+          payload: Json
+          response_code?: number | null
+          status?: string
+          subscription_id: string
+          tenant_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          event?: string
+          event_id?: number | null
+          id?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          response_code?: number | null
+          status?: string
+          subscription_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "domain_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_deliveries_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_secrets: {
+        Row: {
+          rotated_at: string
+          secret: string
+          subscription_id: string
+          tenant_id: string
+        }
+        Insert: {
+          rotated_at?: string
+          secret: string
+          subscription_id: string
+          tenant_id: string
+        }
+        Update: {
+          rotated_at?: string
+          secret?: string
+          subscription_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_secrets_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: true
+            referencedRelation: "webhook_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_subscriptions: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          events: string[]
+          failure_count: number
+          id: string
+          last_delivery_at: string | null
+          last_success_at: string | null
+          name: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          events: string[]
+          failure_count?: number
+          id?: string
+          last_delivery_at?: string | null
+          last_success_at?: string | null
+          name: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          url: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          events?: string[]
+          failure_count?: number
+          id?: string
+          last_delivery_at?: string | null
+          last_success_at?: string | null
+          name?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       work_order_lines: {
         Row: {
           category: string
@@ -4335,6 +4478,17 @@ export type Database = {
           valid_until: string
         }[]
       }
+      claim_webhook_deliveries: {
+        Args: { p_limit?: number; p_tenant: string }
+        Returns: {
+          attempts: number
+          event: string
+          id: string
+          payload: Json
+          secret: string
+          url: string
+        }[]
+      }
       complete_sl_job: {
         Args: {
           p_customer_signed?: boolean
@@ -4590,6 +4744,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      create_webhook_subscription: {
+        Args: { p_events: string[]; p_name: string; p_url: string }
+        Returns: Json
+      }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
@@ -4644,6 +4802,15 @@ export type Database = {
         }
       }
       next_certificate_number: { Args: never; Returns: string }
+      record_webhook_attempt: {
+        Args: {
+          p_error?: string
+          p_id: string
+          p_ok: boolean
+          p_response_code?: number
+        }
+        Returns: string
+      }
       refresh_notifications: { Args: { p_force?: boolean }; Returns: number }
       report_cost_by_vehicle: {
         Args: { p_from: string; p_ownership?: string; p_to: string }
@@ -4667,6 +4834,7 @@ export type Database = {
           vehicle_name: string
         }[]
       }
+      retry_webhook_delivery: { Args: { p_id: string }; Returns: undefined }
       revise_quote: {
         Args: { p_quote_id: string }
         Returns: {
@@ -4715,6 +4883,7 @@ export type Database = {
         }
       }
       revoke_api_key: { Args: { p_id: string }; Returns: undefined }
+      rotate_webhook_secret: { Args: { p_id: string }; Returns: string }
       sales_order_line_balance: {
         Args: { p_order_id: string }
         Returns: {
@@ -4851,6 +5020,7 @@ export type Database = {
           unbilled_order_value: number
         }[]
       }
+      send_test_webhook: { Args: { p_id: string }; Returns: string }
       set_certificates_paid_externally: {
         Args: {
           p_certificate_ids: string[]

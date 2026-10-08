@@ -70,6 +70,7 @@ export const enAutomation = {
   "automation.issuePriority": "Priority",
   "automation.webhookUnavailable": "Webhooks arrive with the Integrations module.",
   "automation.webhookSubscription": "Webhook subscription",
+  "automation.chooseWebhook": "Choose a webhook…",
   "automation.saveRule": "Save rule",
   "automation.createRule": "Create rule",
   "automation.saveFailed": "Couldn't save the rule.",
