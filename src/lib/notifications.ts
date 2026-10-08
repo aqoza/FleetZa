@@ -16,6 +16,8 @@ export const NOTIFICATION_KINDS = [
   { kind: "documents.expiring", module: "documents" },
   { kind: "automation.rule", module: "workflow_automation" },
   { kind: "integrations.webhook_failed", module: "integrations" },
+  { kind: "purchasing.bill_due", module: "purchasing" },
+  { kind: "purchasing.po_late", module: "purchasing" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

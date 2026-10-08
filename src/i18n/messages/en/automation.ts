@@ -154,4 +154,7 @@ export const enAutomation = {
   "automation.ev.payment.received": "A payment is received",
   "automation.ev.certificate.issued": "A speed limiter certificate is issued",
   "automation.ev.stock.below_reorder": "Stock falls below its reorder point",
+  "automation.ev.purchase_order.sent": "A purchase order is sent",
+  "automation.ev.purchase_order.received": "A purchase order is fully received",
+  "automation.ev.vendor_bill.paid": "A vendor bill is paid",
 } as const;
