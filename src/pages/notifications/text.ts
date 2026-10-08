@@ -61,6 +61,19 @@ export function useNotificationText() {
           body: rule ? t("notifications.msg.automationRule.body", { rule: bdiText(rule) }) : null,
         };
       }
+      case "integrations.webhook_failed": {
+        const event = ltrText(strParam(p, "event"));
+        const code = strParam(p, "code");
+        const error = strParam(p, "error");
+        return {
+          title: t("notifications.msg.webhookFailed.title", { name: bdiText(strParam(p, "name")) }),
+          body: code
+            ? t("notifications.msg.webhookFailed.bodyCode", { event, code: ltrText(code) })
+            : error
+              ? t("notifications.msg.webhookFailed.bodyError", { event, error: bdiText(error) })
+              : event,
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

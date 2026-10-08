@@ -60,6 +60,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.documents.expiring.desc": "عندما يقترب انتهاء مستند محفوظ بـ30 أو 7 أيام، أو عند انتهائه.",
   "notifications.kind.automation.rule": "قواعد الأتمتة",
   "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
+  "notifications.kind.integrations.webhook_failed": "فشل تسليم الويب هوك",
+  "notifications.kind.integrations.webhook_failed.desc": "يفشل تسليم ويب هوك بعد كل المحاولات. يُرسل إلى المسؤولين.",
 
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
@@ -85,6 +87,9 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   },
   "notifications.msg.expiryDate": "تاريخ الانتهاء: {date}",
   "notifications.msg.automationRule.body": "من القاعدة: {rule}",
+  "notifications.msg.webhookFailed.title": "فشل تسليم الويب هوك: {name}",
+  "notifications.msg.webhookFailed.bodyCode": "{event}، رمز الاستجابة {code}",
+  "notifications.msg.webhookFailed.bodyError": "{event}: {error}",
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",
