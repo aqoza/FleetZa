@@ -1,5 +1,5 @@
 import { bdiText, ltrText } from "../../lib/bidi";
-import { formatDate } from "../../lib/format";
+import { formatDate, formatDateTime } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
@@ -74,6 +74,21 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "field.task_assigned": {
+        const due = strParam(p, "due_at");
+        return {
+          title: t("notifications.msg.fieldAssigned.title", { title: bdiText(strParam(p, "title")) }),
+          body: due ? t("notifications.msg.fieldDue", { date: ltrText(formatDateTime(due)) }) : null,
+        };
+      }
+      case "field.task_overdue":
+        return {
+          title: t("notifications.msg.fieldOverdue.title", { title: bdiText(strParam(p, "title")) }),
+          body: t("notifications.msg.fieldOverdue.body", {
+            employee: bdiText(strParam(p, "employee")),
+            date: ltrText(formatDateTime(strParam(p, "due_at"))),
+          }),
+        };
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

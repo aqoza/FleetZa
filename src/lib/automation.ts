@@ -122,6 +122,15 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "field_task.completed", module: "mobile_workforce", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" }, { name: "employee", kind: "text" },
+      { name: "priority", kind: "text", options: ["low", "medium", "high", "urgent"] }, { name: "completed_at", kind: "date" }],
+    sample: { id: "00000000-0000-4000-8000-000000000014", doc_number: "TSK-00031", title: "Install speed limiter",
+      employee_id: "00000000-0000-4000-8000-000000000012", employee: "Sara Al Harthy",
+      customer_id: null, vehicle_id: "00000000-0000-4000-8000-000000000001", priority: "high",
+      completed_at: "2026-10-08T10:42:00Z", signed: true },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

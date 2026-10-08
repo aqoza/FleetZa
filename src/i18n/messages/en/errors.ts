@@ -86,4 +86,11 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.fieldTaskNotFound": "This task no longer exists or isn't assigned to you.",
+  "errors.illegalFieldTaskTransition": "This task can't move to that status from where it is now.",
+  "errors.fieldInvalidChecklist": "Check the checklist: up to 50 steps, each with a name of at most 200 characters.",
+  "errors.fieldInvalidSignature": "The signature couldn't be saved. Clear it and sign again.",
+  "errors.fieldInvalidLocation": "The location reading is invalid. Try checking in again.",
+  "errors.fieldNoEmployeeProfile": "Your account isn't linked to an employee record yet, so there is no one to check in.",
+  "errors.fieldEmployeeNotFound": "This employee is not in your organization.",
 } as const;

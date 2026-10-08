@@ -84,4 +84,11 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.fieldTaskNotFound": "هذه المهمة لم تعد موجودة أو غير مسندة إليك.",
+  "errors.illegalFieldTaskTransition": "لا يمكن نقل هذه المهمة إلى هذه الحالة من وضعها الحالي.",
+  "errors.fieldInvalidChecklist": "راجع قائمة التحقق: 50 خطوة كحد أقصى، واسم كل خطوة لا يتجاوز 200 حرف.",
+  "errors.fieldInvalidSignature": "تعذّر حفظ التوقيع. امسحه ثم وقّع مرة أخرى.",
+  "errors.fieldInvalidLocation": "قراءة الموقع غير صالحة. حاول تسجيل الحضور مرة أخرى.",
+  "errors.fieldNoEmployeeProfile": "حسابك غير مرتبط بسجل موظف بعد، لذا لا يوجد من يُسجَّل حضوره.",
+  "errors.fieldEmployeeNotFound": "هذا الموظف ليس ضمن مؤسستك.",
 };
