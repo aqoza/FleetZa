@@ -1606,6 +1606,308 @@ export type Database = {
           },
         ]
       }
+      iot_alert_rules: {
+        Row: {
+          active: boolean
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          device_id: string | null
+          device_type: string | null
+          id: string
+          metric: string
+          name: string
+          notes: string | null
+          notify: boolean
+          op: string
+          severity: string
+          tenant_id: string
+          threshold: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          device_type?: string | null
+          id?: string
+          metric: string
+          name: string
+          notes?: string | null
+          notify?: boolean
+          op: string
+          severity?: string
+          tenant_id?: string
+          threshold: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          device_type?: string | null
+          id?: string
+          metric?: string
+          name?: string
+          notes?: string | null
+          notify?: boolean
+          op?: string
+          severity?: string
+          tenant_id?: string
+          threshold?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_alert_rules_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alert_rules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          device_id: string
+          id: string
+          metric: string
+          note: string | null
+          op: string
+          reading_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          rule_id: string | null
+          rule_name: string
+          severity: string
+          status: string
+          tenant_id: string
+          threshold: number
+          triggered_at: string
+          unit: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          device_id: string
+          id?: string
+          metric: string
+          note?: string | null
+          op: string
+          reading_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          rule_name: string
+          severity: string
+          status?: string
+          tenant_id: string
+          threshold: number
+          triggered_at: string
+          unit?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          device_id?: string
+          id?: string
+          metric?: string
+          note?: string | null
+          op?: string
+          reading_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          rule_name?: string
+          severity?: string
+          status?: string
+          tenant_id?: string
+          threshold?: number
+          triggered_at?: string
+          unit?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_alerts_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "iot_readings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "iot_alert_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_devices: {
+        Row: {
+          asset_id: string | null
+          asset_label: string | null
+          created_at: string
+          created_by: string | null
+          device_type: string
+          id: string
+          last_reading: Json
+          last_seen_at: string | null
+          name: string
+          notes: string | null
+          serial: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          asset_id?: string | null
+          asset_label?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_type?: string
+          id?: string
+          last_reading?: Json
+          last_seen_at?: string | null
+          name: string
+          notes?: string | null
+          serial: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          asset_id?: string | null
+          asset_label?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_type?: string
+          id?: string
+          last_reading?: Json
+          last_seen_at?: string | null
+          name?: string
+          notes?: string | null
+          serial?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_devices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_devices_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_readings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          device_id: string
+          id: string
+          metric: string
+          recorded_at: string
+          source: string
+          tenant_id: string
+          unit: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          device_id: string
+          id?: string
+          metric: string
+          recorded_at: string
+          source?: string
+          tenant_id?: string
+          unit?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          device_id?: string
+          id?: string
+          metric?: string
+          recorded_at?: string
+          source?: string
+          tenant_id?: string
+          unit?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_readings_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_readings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
           created_at: string
