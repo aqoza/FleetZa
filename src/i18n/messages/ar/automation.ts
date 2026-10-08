@@ -78,6 +78,7 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.issuePriority": "الأولوية",
   "automation.webhookUnavailable": "تتوفر خطافات الويب مع وحدة التكاملات.",
   "automation.webhookSubscription": "اشتراك خطاف الويب",
+  "automation.chooseWebhook": "اختر خطاف ويب…",
   "automation.saveRule": "حفظ القاعدة",
   "automation.createRule": "إنشاء القاعدة",
   "automation.saveFailed": "تعذّر حفظ القاعدة.",

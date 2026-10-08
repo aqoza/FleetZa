@@ -5,6 +5,15 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.referenced": "هذا السجل مرتبط بسجلات أخرى ولا يمكن تغييره بهذه الطريقة.",
   "errors.forbidden": "ليست لديك صلاحية للقيام بذلك.",
   "errors.automationInvalidRule": "هذه القاعدة غير مكتملة: راجع كل شرط وإجراء.",
+  "errors.apiKeyName": "أدخل اسمًا للمفتاح لا يتجاوز 100 حرف.",
+  "errors.apiKeyScope": "اختر صلاحية واحدة على الأقل للمفتاح.",
+  "errors.apiKeyExpiry": "يجب أن يكون تاريخ الانتهاء في المستقبل.",
+  "errors.apiKeyNotFound": "مفتاح API هذا لم يعد موجودًا.",
+  "errors.webhookName": "أدخل اسمًا لخطاف الويب لا يتجاوز 100 حرف.",
+  "errors.webhookUrl": "استخدم عنوان https:// عامًا. العناوين المحلية وعناوين الشبكات الخاصة غير مسموحة.",
+  "errors.webhookEvents": "اختر حدثًا واحدًا على الأقل.",
+  "errors.webhookNotFound": "خطاف الويب هذا لم يعد موجودًا.",
+  "errors.webhookDeliveryNotFound": "لا يمكن إعادة محاولة هذا الإرسال.",
   "errors.vehicleHasCertificates":
     "لهذه المركبة شهادات صادرة ولا يمكن حذفها. قم بإخراجها من الخدمة بدلًا من ذلك.",
   "errors.vehicleHasCompletedJobs":

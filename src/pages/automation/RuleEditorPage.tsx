@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, CheckCircle2, FlaskConical, Plus, Trash2, XCircle } from "lucide-react";
-import { getRow, insertRow, updateRow, wrapDbError } from "../../lib/db";
+import { getRow, insertRow, listRows, updateRow, wrapDbError } from "../../lib/db";
 import { supabase } from "../../lib/supabase";
 import { formatDateTime } from "../../lib/format";
 import {
@@ -97,6 +97,15 @@ function RuleForm({ rule, canEdit }: { rule: AutomationRule | null; canEdit: boo
   const qc = useQueryClient();
   const toast = useToast();
   const { isEnabled } = useModules();
+  const { isAdmin } = useAuth();
+  // Subscriptions are admin-only data, so only admins can pick one.
+  const webhooksOn = isEnabled("integrations") && isAdmin;
+  const subsQ = useQuery({
+    queryKey: ["webhook_subscriptions", "options"],
+    queryFn: () =>
+      listRows<{ id: string; name: string }>("webhook_subscriptions", (q) => q.select("id, name").order("name").limit(200)),
+    enabled: webhooksOn,
+  });
   const [name, setName] = useState(rule?.name ?? "");
   const [description, setDescription] = useState(rule?.description ?? "");
   const [event, setEvent] = useState(rule?.event ?? "");
@@ -283,7 +292,7 @@ function RuleForm({ rule, canEdit }: { rule: AutomationRule | null; canEdit: boo
             <Card className="space-y-3 p-4">
               <div>
                 <h2 className="text-sm font-semibold text-ink">{t("automation.actions")}</h2>
-                <p className="text-xs text-ink-3">{t("automation.webhookUnavailable")}</p>
+                {!isEnabled("integrations") && <p className="text-xs text-ink-3">{t("automation.webhookUnavailable")}</p>}
               </div>
               {actions.map((a, i) => (
                 <div key={i} className="space-y-3 rounded-lg border border-line p-3">
@@ -298,7 +307,7 @@ function RuleForm({ rule, canEdit }: { rule: AutomationRule | null; canEdit: boo
                         <option value="create_issue" disabled={!isEnabled("issues") || (spec && !spec.hasVehicle)}>
                           {t(actionKey("create_issue"))}
                         </option>
-                        <option value="webhook" disabled={a.type !== "webhook"}>
+                        <option value="webhook" disabled={!webhooksOn && a.type !== "webhook"}>
                           {t(actionKey("webhook"))}
                         </option>
                       </Select>
@@ -359,8 +368,17 @@ function RuleForm({ rule, canEdit }: { rule: AutomationRule | null; canEdit: boo
                     </div>
                   )}
                   {a.type === "webhook" && (
-                    <Field label={t("automation.webhookSubscription")}>
-                      <Input value={a.subscription_id} readOnly dir="ltr" />
+                    <Field label={t("automation.webhookSubscription")} required>
+                      {webhooksOn ? (
+                        <Select value={a.subscription_id} onChange={(e) => setAction(i, { ...a, subscription_id: e.target.value })}>
+                          <option value="" disabled>{t("automation.chooseWebhook")}</option>
+                          {(subsQ.data ?? []).map((s) => (
+                            <option key={s.id} value={s.id}>{s.name}</option>
+                          ))}
+                        </Select>
+                      ) : (
+                        <Input value={a.subscription_id} readOnly dir="ltr" />
+                      )}
                     </Field>
                   )}
                 </div>

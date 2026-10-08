@@ -1,0 +1,180 @@
+{
+ "tables": {
+  "webhook_subscriptions": [
+   {
+    "id": "e0000000-0000-4000-8000-000000000001",
+    "name": "ERP sync",
+    "url": "https://erp.example.com/hooks/fleetmaster",
+    "events": [
+     "vehicle.created",
+     "invoice.issued",
+     "payment.received"
+    ],
+    "active": true,
+    "failure_count": 0,
+    "last_delivery_at": "2026-10-08T07:00:00.000Z",
+    "last_success_at": "2026-10-08T07:00:00.000Z",
+    "created_at": "2026-09-01T08:00:00.000Z"
+   },
+   {
+    "id": "e0000000-0000-4000-8000-000000000002",
+    "name": "منصة التنبيهات",
+    "url": "https://alerts.example.net/in/very/long/path/that/needs/truncating/for/the/table?token=abc",
+    "events": [
+     "*"
+    ],
+    "active": true,
+    "failure_count": 3,
+    "last_delivery_at": "2026-10-08T07:10:00.000Z",
+    "last_success_at": null,
+    "created_at": "2026-09-10T08:00:00.000Z"
+   }
+  ],
+  "webhook_deliveries": [
+   {
+    "id": "f0000000-0000-4000-8000-000000000001",
+    "subscription_id": "e0000000-0000-4000-8000-000000000001",
+    "event_id": 200,
+    "event": "vehicle.created",
+    "status": "delivered",
+    "attempts": 1,
+    "next_attempt_at": "2026-10-08T09:16:00.000Z",
+    "last_attempt_at": "2026-10-08T09:00:00.000Z",
+    "response_code": 200,
+    "last_error": null,
+    "delivered_at": "2026-10-08T09:00:01.000Z",
+    "created_at": "2026-10-08T09:00:00.000Z",
+    "subscription": {
+     "name": "ERP sync"
+    }
+   },
+   {
+    "id": "f0000000-0000-4000-8000-000000000002",
+    "subscription_id": "e0000000-0000-4000-8000-000000000002",
+    "event_id": 201,
+    "event": "issue.created",
+    "status": "pending",
+    "attempts": 2,
+    "next_attempt_at": "2026-10-08T09:16:00.000Z",
+    "last_attempt_at": "2026-10-08T09:00:00.000Z",
+    "response_code": 503,
+    "last_error": "Service Unavailable",
+    "delivered_at": null,
+    "created_at": "2026-10-07T09:00:00.000Z",
+    "subscription": {
+     "name": "منصة التنبيهات"
+    }
+   },
+   {
+    "id": "f0000000-0000-4000-8000-000000000003",
+    "subscription_id": "e0000000-0000-4000-8000-000000000002",
+    "event_id": 202,
+    "event": "inspection.failed",
+    "status": "failed",
+    "attempts": 6,
+    "next_attempt_at": "2026-10-08T09:16:00.000Z",
+    "last_attempt_at": "2026-10-08T09:00:00.000Z",
+    "response_code": null,
+    "last_error": "No response within 10s",
+    "delivered_at": null,
+    "created_at": "2026-10-06T09:00:00.000Z",
+    "subscription": {
+     "name": "منصة التنبيهات"
+    }
+   },
+   {
+    "id": "f0000000-0000-4000-8000-000000000004",
+    "subscription_id": "e0000000-0000-4000-8000-000000000001",
+    "event_id": 203,
+    "event": "webhook.test",
+    "status": "delivered",
+    "attempts": 1,
+    "next_attempt_at": "2026-10-08T09:16:00.000Z",
+    "last_attempt_at": "2026-10-08T09:00:00.000Z",
+    "response_code": 204,
+    "last_error": null,
+    "delivered_at": "2026-10-08T09:00:01.000Z",
+    "created_at": "2026-10-05T09:00:00.000Z",
+    "subscription": {
+     "name": "ERP sync"
+    }
+   },
+   {
+    "id": "f0000000-0000-4000-8000-000000000005",
+    "subscription_id": "e0000000-0000-4000-8000-000000000001",
+    "event_id": 204,
+    "event": "invoice.issued",
+    "status": "pending",
+    "attempts": 0,
+    "next_attempt_at": "2026-10-08T09:16:00.000Z",
+    "last_attempt_at": null,
+    "response_code": null,
+    "last_error": null,
+    "delivered_at": null,
+    "created_at": "2026-10-04T09:00:00.000Z",
+    "subscription": {
+     "name": "ERP sync"
+    }
+   }
+  ],
+  "api_keys": [
+   {
+    "id": "a0000000-0000-4000-8000-000000000001",
+    "name": "Teltonika GPS",
+    "key_prefix": "fm_3f9a1c2b7",
+    "scopes": [
+     "telematics:write",
+     "vehicles:read"
+    ],
+    "active": true,
+    "expires_at": null,
+    "last_used_at": "2026-10-08T09:20:00.000Z",
+    "revoked_at": null,
+    "created_at": "2026-09-02T08:00:00.000Z"
+   },
+   {
+    "id": "a0000000-0000-4000-8000-000000000022",
+    "name": "Cold-chain sensors",
+    "key_prefix": "fm_77de02aa1",
+    "scopes": [
+     "iot:write"
+    ],
+    "active": true,
+    "expires_at": "2026-09-30T23:59:59.000Z",
+    "last_used_at": "2026-09-29T11:00:00.000Z",
+    "revoked_at": null,
+    "created_at": "2026-06-02T08:00:00.000Z"
+   },
+   {
+    "id": "a0000000-0000-4000-8000-000000000033",
+    "name": "Old vendor",
+    "key_prefix": "fm_0011aabbc",
+    "scopes": [
+     "telematics:write"
+    ],
+    "active": false,
+    "expires_at": null,
+    "last_used_at": null,
+    "revoked_at": "2026-08-01T08:00:00.000Z",
+    "created_at": "2026-01-02T08:00:00.000Z"
+   }
+  ]
+ },
+ "rpc": {
+  "create_webhook_subscription": {
+   "id": "e0000000-0000-4000-8000-000000000001",
+   "secret": "whsec_abababababababababababababababababababababababab"
+  },
+  "rotate_webhook_secret": "whsec_cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+  "create_api_key": "fm_121212121212121212121212121212121212121212121212",
+  "send_test_webhook": "f0000000-0000-4000-8000-000000000009"
+ },
+ "api": {
+  "POST /api/integrations/dispatch": {
+   "claimed": 0,
+   "delivered": 0,
+   "retrying": 0,
+   "failed": 0
+  }
+ }
+}

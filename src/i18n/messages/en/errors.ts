@@ -6,6 +6,15 @@ export const enErrors = {
   "errors.referenced": "This record is referenced by other records and cannot be changed this way.",
   "errors.forbidden": "You don't have permission to do this.",
   "errors.automationInvalidRule": "This rule is incomplete: check every condition and action.",
+  "errors.apiKeyName": "Give the key a name of up to 100 characters.",
+  "errors.apiKeyScope": "Choose at least one permission for the key.",
+  "errors.apiKeyExpiry": "The expiry date must be in the future.",
+  "errors.apiKeyNotFound": "This API key no longer exists.",
+  "errors.webhookName": "Give the webhook a name of up to 100 characters.",
+  "errors.webhookUrl": "Use a public https:// address. Local and private-network addresses aren't allowed.",
+  "errors.webhookEvents": "Choose at least one event.",
+  "errors.webhookNotFound": "This webhook no longer exists.",
+  "errors.webhookDeliveryNotFound": "This delivery can't be retried.",
   "errors.vehicleHasCertificates":
     "This vehicle has issued certificates and cannot be deleted. Retire it instead.",
   "errors.vehicleHasCompletedJobs":
