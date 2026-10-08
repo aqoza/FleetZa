@@ -356,7 +356,9 @@ create trigger work_order_labor_stamp_actor before insert or update on public.wo
   for each row execute function app.stamp_actor();
 create trigger work_order_labor_same_tenant before insert or update of work_order_id, employee_id on public.work_order_labor
   for each row execute function app.assert_same_tenant('work_order_id', 'work_orders', 'employee_id', 'employees');
-create trigger work_order_labor_sync after insert or update of hours, hourly_rate or delete on public.work_order_labor
+-- started_at/ended_at are listed too: clock-off and time edits only set those, and the
+-- guard recomputes hours in a BEFORE trigger, which an "update of hours" filter never sees.
+create trigger work_order_labor_sync after insert or update of hours, hourly_rate, started_at, ended_at or delete on public.work_order_labor
   for each row execute function app.work_order_labor_sync_line();
 create trigger work_order_labor_audit after insert or update or delete on public.work_order_labor
   for each row execute function app.log_audit();
