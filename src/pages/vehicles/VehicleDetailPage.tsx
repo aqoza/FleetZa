@@ -28,6 +28,7 @@ import {
 import { Combobox } from "../../components/Combobox";
 import { VehicleForm } from "./VehicleForm";
 import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
+import { EntityDocuments } from "../documents/EntityDocuments";
 import {
   InvoiceCertificatesModal, useCertificateBilling,
 } from "../speed-limiters/InvoiceCertificatesModal";
@@ -73,6 +74,7 @@ export default function VehicleDetailPage() {
   const speedLimitersOn = isEnabled("speed_limiters");
   const slCertsOn = speedLimitersOn && isEnabled("sl_certificates");
   const billingOn = slCertsOn && isEnabled("billing");
+  const documentsOn = isEnabled("documents");
   const [editing, setEditing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -642,6 +644,8 @@ export default function VehicleDetailPage() {
           </Card>
         )}
       </div>
+
+      {documentsOn && <EntityDocuments type="vehicle" id={vehicle.id} />}
 
       {billingOn && (
         <InvoiceCertificatesModal certificates={invoicing} onClose={() => setInvoicing(null)} />
