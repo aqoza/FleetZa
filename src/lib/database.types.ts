@@ -2699,6 +2699,44 @@ export type Database = {
           },
         ]
       }
+      security_settings: {
+        Row: {
+          audit_retention_days: number | null
+          id: string
+          require_strong_passwords: boolean
+          session_idle_minutes: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          audit_retention_days?: number | null
+          id?: string
+          require_strong_passwords?: boolean
+          session_idle_minutes?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          audit_retention_days?: number | null
+          id?: string
+          require_strong_passwords?: boolean
+          session_idle_minutes?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_reminders: {
         Row: {
           active: boolean
@@ -4303,6 +4341,7 @@ export type Database = {
       }
     }
     Functions: {
+      audit_tables: { Args: never; Returns: string[] }
       billing_state: {
         Args: {
           c: Database["public"]["Tables"]["speed_limiter_certificates"]["Row"]
@@ -4768,6 +4807,7 @@ export type Database = {
         }
       }
       revoke_api_key: { Args: { p_id: string }; Returns: undefined }
+      revoke_member_sessions: { Args: { p_user: string }; Returns: number }
       sales_order_line_balance: {
         Args: { p_order_id: string }
         Returns: {
@@ -4904,6 +4944,42 @@ export type Database = {
           unbilled_order_value: number
         }[]
       }
+      save_security_settings: {
+        Args: {
+          p_audit_retention_days: number
+          p_require_strong_passwords: boolean
+          p_session_idle_minutes: number
+        }
+        Returns: {
+          audit_retention_days: number | null
+          id: string
+          require_strong_passwords: boolean
+          session_idle_minutes: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "security_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      security_members: {
+        Args: never
+        Returns: {
+          banned_until: string
+          created_at: string
+          email: string
+          email_confirmed_at: string
+          full_name: string
+          id: string
+          last_sign_in_at: string
+          role: string
+        }[]
+      }
+      security_posture: { Args: never; Returns: Json }
       set_certificates_paid_externally: {
         Args: {
           p_certificate_ids: string[]

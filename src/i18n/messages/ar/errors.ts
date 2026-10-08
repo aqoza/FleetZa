@@ -71,4 +71,8 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.transferSameWarehouse": "اختر مستودعين مختلفين للتحويل بينهما.",
   "errors.moduleDisabled": "هذه الوحدة غير مفعّلة لمؤسستك. يمكن للمسؤول تفعيلها من الإعدادات.",
   "errors.crossTenantReference": "أحد السجلات المرتبطة لا يتبع مؤسستك.",
+  "errors.securityInvalidSetting": "يجب أن تكون مهلة الخمول بين 5 و1440 دقيقة، ومدة الاحتفاظ بسجل التدقيق بين 90 و3650 يومًا.",
+  "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
+  "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
+  "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
 };

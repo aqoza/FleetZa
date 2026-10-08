@@ -9,6 +9,7 @@ import { useTheme } from "../lib/theme";
 import { NotificationBell } from "../pages/notifications/NotificationBell";
 import { GlobalSearch } from "./GlobalSearch";
 import { ContextPanel } from "./ContextPanel";
+import { IdleGuard } from "./IdleGuard";
 
 function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
   const { language, t } = useI18n();
@@ -207,6 +208,7 @@ export default function AppLayout() {
           >
             <Menu className="h-5 w-5" />
           </button>
+          {isEnabled("audit_security") && <IdleGuard />}
           <GlobalSearch />
           <div className="ms-auto flex shrink-0 items-center gap-2">
             {isEnabled("notifications") && <NotificationBell />}

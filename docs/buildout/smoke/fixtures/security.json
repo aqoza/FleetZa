@@ -1,0 +1,169 @@
+{
+ "tables": {
+  "audit_events": [
+   {
+    "id": 105,
+    "table_name": "vehicles",
+    "row_id": "a7e1c0de-0003-4b2c-9d3e-4f5a6b7c8d03",
+    "action": "update",
+    "actor": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "at": "2026-10-08T09:10:00.000Z",
+    "diff": {
+     "status": {
+      "old": "active",
+      "new": "in_shop"
+     },
+     "odometer": {
+      "old": 60100,
+      "new": 60210
+     },
+     "updated_at": {
+      "old": "x",
+      "new": "y"
+     }
+    }
+   },
+   {
+    "id": 104,
+    "table_name": "customers",
+    "row_id": "c1a0e5f2-3b4d-4e6f-8a9b-0c1d2e3f4a51",
+    "action": "insert",
+    "actor": "5ec00000-0000-4000-8000-000000000002",
+    "at": "2026-10-08T08:00:00.000Z",
+    "diff": {
+     "name": "شركة الخليج للشحن",
+     "status": "active",
+     "city": "Muscat"
+    }
+   },
+   {
+    "id": 103,
+    "table_name": "security_settings",
+    "row_id": "5ec00000-0000-4000-8000-0000000000aa",
+    "action": "update",
+    "actor": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "at": "2026-10-07T08:00:00.000Z",
+    "diff": {
+     "session_idle_minutes": {
+      "old": null,
+      "new": 30
+     },
+     "audit_retention_days": {
+      "old": null,
+      "new": 365
+     },
+     "require_strong_passwords": {
+      "old": false,
+      "new": true
+     },
+     "updated_by": {
+      "old": null,
+      "new": "129bbbae-fdfc-4d21-8a86-8949fec2403b"
+     },
+     "updated_at": {
+      "old": "a",
+      "new": "b"
+     }
+    }
+   },
+   {
+    "id": 102,
+    "table_name": "auth_sessions",
+    "row_id": "5ec00000-0000-4000-8000-000000000003",
+    "action": "delete",
+    "actor": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "at": "2026-10-06T08:00:00.000Z",
+    "diff": {
+     "sessions_revoked": 2
+    }
+   },
+   {
+    "id": 101,
+    "table_name": "work_orders",
+    "row_id": "0d0d0000-0000-4000-8000-000000000001",
+    "action": "delete",
+    "actor": null,
+    "at": "2026-10-05T08:00:00.000Z",
+    "diff": {
+     "title": "Old order",
+     "number": 12
+    }
+   }
+  ],
+  "security_settings": [
+   {
+    "tenant_id": "170d2d86-5c22-4bcb-9d74-420c879419b2",
+    "session_idle_minutes": null,
+    "require_strong_passwords": true,
+    "audit_retention_days": 365,
+    "updated_at": "2026-10-07T08:00:00.000Z"
+   }
+  ]
+ },
+ "rpc": {
+  "security_members": [
+   {
+    "id": "129bbbae-fdfc-4d21-8a86-8949fec2403b",
+    "full_name": "Demo Owner",
+    "email": "demo@fleetmanage.test",
+    "role": "owner",
+    "created_at": "2026-07-01T08:00:00.000Z",
+    "last_sign_in_at": "2026-10-08T08:00:00.000Z",
+    "email_confirmed_at": "2026-07-01T08:00:00.000Z",
+    "banned_until": null
+   },
+   {
+    "id": "5ec00000-0000-4000-8000-000000000002",
+    "full_name": "سارة البلوشي",
+    "email": "sara@acme.example",
+    "role": "admin",
+    "created_at": "2026-07-10T08:00:00.000Z",
+    "last_sign_in_at": "2026-10-07T12:00:00.000Z",
+    "email_confirmed_at": "2026-07-10T08:00:00.000Z",
+    "banned_until": null
+   },
+   {
+    "id": "5ec00000-0000-4000-8000-000000000003",
+    "full_name": "Omar Haddad",
+    "email": "omar@acme.example",
+    "role": "manager",
+    "created_at": "2026-08-01T08:00:00.000Z",
+    "last_sign_in_at": "2026-05-01T12:00:00.000Z",
+    "email_confirmed_at": "2026-08-01T08:00:00.000Z",
+    "banned_until": null
+   },
+   {
+    "id": "5ec00000-0000-4000-8000-000000000004",
+    "full_name": "",
+    "email": "newhire@acme.example",
+    "role": "viewer",
+    "created_at": "2026-10-01T08:00:00.000Z",
+    "last_sign_in_at": null,
+    "email_confirmed_at": null,
+    "banned_until": null
+   }
+  ],
+  "audit_tables": [
+   "auth_sessions",
+   "customers",
+   "security_settings",
+   "vehicles",
+   "work_orders"
+  ],
+  "security_posture": {
+   "members": 4,
+   "admins": 2,
+   "stale_members": 2,
+   "unconfirmed_members": 1,
+   "api_keys_active": 2,
+   "api_keys_no_expiry": 1,
+   "api_keys_unused": 0,
+   "audit_events_30d": 1284,
+   "webhooks_failing": 1,
+   "session_idle_minutes": null,
+   "audit_retention_days": 365
+  },
+  "revoke_member_sessions": 2,
+  "save_security_settings": {}
+ }
+}
