@@ -978,6 +978,189 @@ export type Database = {
           },
         ]
       }
+      field_checkins: {
+        Row: {
+          accuracy_m: number | null
+          at: string
+          created_by: string | null
+          employee_id: string
+          id: string
+          kind: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          task_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          accuracy_m?: number | null
+          at?: string
+          created_by?: string | null
+          employee_id: string
+          id?: string
+          kind: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          task_id?: string | null
+          tenant_id?: string
+        }
+        Update: {
+          accuracy_m?: number | null
+          at?: string
+          created_by?: string | null
+          employee_id?: string
+          id?: string
+          kind?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          task_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_checkins_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_checkins_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "field_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_checkins_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      field_tasks: {
+        Row: {
+          accepted_at: string | null
+          address: string | null
+          canceled_at: string | null
+          checklist: Json
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          doc_number: string | null
+          due_at: string | null
+          employee_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          number: number | null
+          priority: string
+          scheduled_start: string | null
+          signature_data: string | null
+          started_at: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          address?: string | null
+          canceled_at?: string | null
+          checklist?: Json
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          doc_number?: string | null
+          due_at?: string | null
+          employee_id: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          priority?: string
+          scheduled_start?: string | null
+          signature_data?: string | null
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          address?: string | null
+          canceled_at?: string | null
+          checklist?: Json
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          doc_number?: string | null
+          due_at?: string | null
+          employee_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          priority?: string
+          scheduled_start?: string | null
+          signature_data?: string | null
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_tasks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuel_logs: {
         Row: {
           created_at: string
@@ -4796,6 +4979,78 @@ export type Database = {
       create_webhook_subscription: {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
+      }
+      field_checkin: {
+        Args: {
+          p_accuracy?: number | null
+          p_employee?: string | null
+          p_kind: string
+          p_lat?: number | null
+          p_lng?: number | null
+          p_note?: string | null
+          p_task?: string | null
+        }
+        Returns: {
+          accuracy_m: number | null
+          at: string
+          created_by: string | null
+          employee_id: string
+          id: string
+          kind: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          task_id: string | null
+          tenant_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "field_checkins"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      field_task_transition: {
+        Args: {
+          p_payload?: Json
+          p_task: string
+          p_to: string | null
+        }
+        Returns: {
+          accepted_at: string | null
+          address: string | null
+          canceled_at: string | null
+          checklist: Json
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          doc_number: string | null
+          due_at: string | null
+          employee_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          number: number | null
+          priority: string
+          scheduled_start: string | null
+          signature_data: string | null
+          started_at: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "field_tasks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
