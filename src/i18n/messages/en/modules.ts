@@ -14,8 +14,8 @@ export const enModules = {
   "modules.gps_tracking.description": "See live vehicle locations, routes, and telematics data in real time.",
   "modules.driver_behavior.name": "Driver Behavior & Scoring",
   "modules.driver_behavior.description": "Monitor speeding, harsh braking, and other events to score and coach drivers.",
-  "modules.trip_planning.name": "Trip & Route Planning",
-  "modules.trip_planning.description": "Plan trips and optimize routes to save time and fuel.",
+  "modules.trip_planning.name": "Trip Planning",
+  "modules.trip_planning.description": "Plan multi-stop trips, avoid double-booking vehicles and drivers, and compare plan with actuals.",
   "modules.dispatch.name": "Dispatch Management",
   "modules.dispatch.description": "Assign jobs to drivers and vehicles and follow their progress in real time.",
 
