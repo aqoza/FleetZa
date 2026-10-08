@@ -152,7 +152,7 @@ export default function PolicyDetailPage() {
       {actionError && <ErrorState message={actionError} />}
 
       <div className="grid gap-4 lg:grid-cols-5">
-        <div className="space-y-4 lg:col-span-2">
+        <div className="min-w-0 space-y-4 lg:col-span-2">
           <Card className="p-4">
             <dl>
               <Row label={t("insurance.d.type")}>{t(`insurance.type.${p.policy_type}`)}</Row>
@@ -185,7 +185,7 @@ export default function PolicyDetailPage() {
           </Card>
         </div>
 
-        <div className="space-y-4 lg:col-span-3">
+        <div className="min-w-0 space-y-4 lg:col-span-3">
           <Card className="p-4">
             <div className="mb-2 flex items-center justify-between gap-3">
               <h2 className="text-sm font-semibold text-ink">{t("insurance.cover.title")}</h2>
