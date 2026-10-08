@@ -12,6 +12,8 @@ import {
 import { priority, workOrderStatus } from "../../lib/labels";
 import type { WorkOrder, WorkOrderLine } from "../../lib/types";
 import { useAuth, useTenant } from "../../context/AuthContext";
+import { useModules } from "../../context/ModulesContext";
+import { WorkOrderWorkshopPanel } from "../workshop/WorkOrderWorkshopPanel";
 import {
   Badge, Bdi, Button, Card, ErrorState, Field, Input, LoadingState, Ltr, Modal, PageHeader, Select, Table, Textarea,
 } from "../../components/ui";
@@ -146,6 +148,7 @@ export default function WorkOrderDetailPage() {
   const { id = "" } = useParams();
   const tenant = useTenant();
   const { isManager } = useAuth();
+  const { isEnabled } = useModules();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
@@ -514,6 +517,7 @@ export default function WorkOrderDetailPage() {
             </form>
           )}
         </Card>
+        {isEnabled("workshop") && <WorkOrderWorkshopPanel workOrderId={workOrder.id} status={workOrder.status} />}
       </div>
 
       <Modal title={t("maintenance.editWorkOrder")} open={editing} onClose={() => setEditing(false)} wide>

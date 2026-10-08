@@ -4193,6 +4193,89 @@ export type Database = {
         }
         Relationships: []
       }
+      work_order_labor: {
+        Row: {
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          ended_at: string | null
+          hourly_rate: number
+          hours: number | null
+          id: string
+          notes: string | null
+          started_at: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_order_id: string
+          work_order_line_id: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          ended_at?: string | null
+          hourly_rate?: number
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id: string
+          work_order_line_id?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          ended_at?: string | null
+          hourly_rate?: number
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id?: string
+          work_order_line_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_order_labor_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_work_order_line_id_fkey"
+            columns: ["work_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "work_order_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_order_lines: {
         Row: {
           category: string
@@ -4338,6 +4421,132 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workshop_bays: {
+        Row: {
+          active: boolean
+          bay_type: string
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          bay_type?: string
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          bay_type?: string
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_bays_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workshop_bookings: {
+        Row: {
+          bay_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          finished_at: string | null
+          id: string
+          notes: string | null
+          started_at: string | null
+          starts_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_order_id: string
+        }
+        Insert: {
+          bay_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string | null
+          starts_at: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id: string
+        }
+        Update: {
+          bay_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string | null
+          starts_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_bookings_bay_id_fkey"
+            columns: ["bay_id"]
+            isOneToOne: false
+            referencedRelation: "workshop_bays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workshop_bookings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workshop_bookings_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -5205,6 +5414,23 @@ export type Database = {
       test_automation_rule: {
         Args: { p_conditions: Json; p_payload: Json }
         Returns: Json
+      }
+      workshop_clock_off: {
+        Args: { p_labor_id: string; p_notes?: string }
+        Returns: number
+      }
+      workshop_clock_on: {
+        Args: { p_employee_id: string; p_work_order_id: string }
+        Returns: string
+      }
+      workshop_issue_part: {
+        Args: {
+          p_item_id: string
+          p_qty: number
+          p_warehouse_id: string
+          p_work_order_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
