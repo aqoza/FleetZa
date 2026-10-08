@@ -1051,6 +1051,267 @@ export type Database = {
           },
         ]
       }
+      incident_events: {
+        Row: {
+          at: string
+          created_by: string | null
+          id: string
+          incident_id: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          at?: string
+          created_by?: string | null
+          id?: string
+          incident_id: string
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          at?: string
+          created_by?: string | null
+          id?: string
+          incident_id?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_events_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_parties: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          incident_id: string
+          insurance_policy_number: string | null
+          insurer: string | null
+          name: string
+          party_type: string
+          phone: string | null
+          statement: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_plate: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incident_id: string
+          insurance_policy_number?: string | null
+          insurer?: string | null
+          name: string
+          party_type?: string
+          phone?: string | null
+          statement?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_plate?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incident_id?: string
+          insurance_policy_number?: string | null
+          insurer?: string | null
+          name?: string
+          party_type?: string
+          phone?: string | null
+          statement?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_plate?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_parties_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_parties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          actual_cost: number | null
+          at_fault: string
+          claim_id: string | null
+          closed_at: string | null
+          corrective_actions: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          doc_number: string | null
+          driver_id: string | null
+          driving_event_id: string | null
+          estimated_damage: number | null
+          fatalities: number
+          id: string
+          incident_type: string
+          injuries: number
+          issue_id: string | null
+          lat: number | null
+          lng: number | null
+          location: string | null
+          notes: string | null
+          number: number | null
+          occurred_at: string
+          police_report_number: string | null
+          police_station: string | null
+          resolved_at: string | null
+          root_cause: string | null
+          severity: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_drivable: boolean
+          vehicle_id: string
+          work_order_id: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          at_fault?: string
+          claim_id?: string | null
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description: string
+          doc_number?: string | null
+          driver_id?: string | null
+          driving_event_id?: string | null
+          estimated_damage?: number | null
+          fatalities?: number
+          id?: string
+          incident_type?: string
+          injuries?: number
+          issue_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          notes?: string | null
+          number?: number | null
+          occurred_at: string
+          police_report_number?: string | null
+          police_station?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_drivable?: boolean
+          vehicle_id: string
+          work_order_id?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          at_fault?: string
+          claim_id?: string | null
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          doc_number?: string | null
+          driver_id?: string | null
+          driving_event_id?: string | null
+          estimated_damage?: number | null
+          fatalities?: number
+          id?: string
+          incident_type?: string
+          injuries?: number
+          issue_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          notes?: string | null
+          number?: number | null
+          occurred_at?: string
+          police_report_number?: string | null
+          police_station?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_drivable?: boolean
+          vehicle_id?: string
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inspection_templates: {
         Row: {
           active: boolean
@@ -4804,6 +5065,14 @@ export type Database = {
           total_cost: number
           total_liters: number
         }[]
+      }
+      incident_create_claim: {
+        Args: { p_incident_id: string; p_policy_id: string }
+        Returns: string
+      }
+      incident_create_work_order: {
+        Args: { p_incident_id: string }
+        Returns: string
       }
       inventory_low_stock: {
         Args: { p_limit?: number }

@@ -84,4 +84,12 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.illegalIncidentTransition": "لا يمكن نقل الحادث إلى هذه الحالة من حالته الحالية.",
+  "errors.incidentRootCauseRequired": "سجّل السبب الجذري قبل إغلاق حادث كبير أو حرج.",
+  "errors.invalidIncidentTime": "لا يمكن أن يكون وقت الحادث في المستقبل.",
+  "errors.incidentLocked": "هذا الحادث مغلق. يمكن تعديل الملاحظات فقط.",
+  "errors.incidentNotDeletable": "يمكن حذف الحوادث المبلّغ عنها فقط قبل بدء التحقيق.",
+  "errors.incidentNotFound": "لم يعد هذا الحادث موجودًا.",
+  "errors.incidentHasWorkOrder": "لهذا الحادث أمر عمل بالفعل.",
+  "errors.incidentHasClaim": "لهذا الحادث مطالبة تأمين بالفعل.",
 };

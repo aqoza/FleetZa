@@ -1,6 +1,7 @@
 import { bdiText, ltrText } from "../../lib/bidi";
 import { formatDate } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
+import { INCIDENT_TYPES, type IncidentType } from "../../../shared/incidents";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
 
@@ -72,6 +73,18 @@ export function useNotificationText() {
             : error
               ? t("notifications.msg.webhookFailed.bodyError", { event, error: bdiText(error) })
               : event,
+        };
+      }
+      case "incidents.major": {
+        const injuries = numParam(p, "injuries") ?? 0;
+        const raw = strParam(p, "incident_type");
+        const type = (INCIDENT_TYPES as readonly string[]).includes(raw) ? t(`incidents.type.${raw as IncidentType}`) : raw;
+        const vars = { number: ltrText(strParam(p, "doc_number")), vehicle: bdiText(strParam(p, "vehicle")) };
+        return {
+          title: strParam(p, "severity") === "critical"
+            ? t("notifications.msg.incident.critical", vars)
+            : t("notifications.msg.incident.major", vars),
+          body: injuries > 0 ? tp("notifications.msg.incident.bodyInjured", injuries, { type }) : t("notifications.msg.incident.body", { type }),
         };
       }
       default:
