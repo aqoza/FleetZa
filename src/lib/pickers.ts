@@ -48,7 +48,7 @@ interface PickerConfig<T> {
   enabled?: boolean;
 }
 
-function useEntityPicker<T extends { id: string }>({
+export function useEntityPicker<T extends { id: string }>({
   table,
   selectedId,
   searchColumns,
