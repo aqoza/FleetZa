@@ -3810,6 +3810,203 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_stops: {
+        Row: {
+          actual_arrival: string | null
+          actual_departure: string | null
+          address: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          notes: string | null
+          planned_arrival: string | null
+          sequence: number
+          status: string
+          tenant_id: string
+          trip_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          notes?: string | null
+          planned_arrival?: string | null
+          sequence?: number
+          status?: string
+          tenant_id?: string
+          trip_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          notes?: string | null
+          planned_arrival?: string | null
+          sequence?: number
+          status?: string
+          tenant_id?: string
+          trip_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stops_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          actual_distance_km: number | null
+          actual_end: string | null
+          actual_start: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          dispatched_at: string | null
+          doc_number: string | null
+          driver_id: string | null
+          end_odometer: number | null
+          estimated_cost: number | null
+          estimated_fuel_l: number | null
+          id: string
+          notes: string | null
+          number: number | null
+          planned_distance_km: number | null
+          planned_end: string
+          planned_start: string
+          purpose: string
+          start_odometer: number | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          actual_distance_km?: number | null
+          actual_end?: string | null
+          actual_start?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          end_odometer?: number | null
+          estimated_cost?: number | null
+          estimated_fuel_l?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          planned_distance_km?: number | null
+          planned_end: string
+          planned_start: string
+          purpose: string
+          start_odometer?: number | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          actual_distance_km?: number | null
+          actual_end?: string | null
+          actual_start?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          end_odometer?: number | null
+          estimated_cost?: number | null
+          estimated_fuel_l?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          planned_distance_km?: number | null
+          planned_end?: string
+          planned_start?: string
+          purpose?: string
+          start_odometer?: number | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_assignments: {
         Row: {
           created_at: string
@@ -5205,6 +5402,29 @@ export type Database = {
       test_automation_rule: {
         Args: { p_conditions: Json; p_payload: Json }
         Returns: Json
+      }
+      trip_conflicts: {
+        Args: {
+          p_driver_id: string | null
+          p_end: string
+          p_exclude?: string | null
+          p_start: string
+          p_vehicle_id: string
+        }
+        Returns: {
+          doc_number: string | null
+          driver_clash: boolean
+          planned_end: string
+          planned_start: string
+          purpose: string
+          status: string
+          trip_id: string
+          vehicle_clash: boolean
+        }[]
+      }
+      trip_stops_reorder: {
+        Args: { p_stop_ids: string[]; p_trip_id: string }
+        Returns: undefined
       }
     }
     Enums: {
