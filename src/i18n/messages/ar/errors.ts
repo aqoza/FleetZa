@@ -84,4 +84,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.invalidReadingTime": "يجب أن يكون وقت القراءة بعد عام 2000 وألا يكون في المستقبل.",
+  "errors.illegalAlertTransition": "تغيرت حالة هذا التنبيه بالفعل. حدّث الصفحة لرؤية حالته الحالية.",
 };

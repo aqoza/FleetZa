@@ -62,6 +62,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
   "notifications.kind.integrations.webhook_failed": "فشل تسليم الويب هوك",
   "notifications.kind.integrations.webhook_failed.desc": "يفشل تسليم ويب هوك بعد كل المحاولات. يُرسل إلى المسؤولين.",
+  "notifications.kind.iot.alert": "تنبيهات المستشعرات",
+  "notifications.kind.iot.alert.desc": "تتجاوز قراءة مستشعر قاعدة تنبيه مفعّلة إشعاراتها.",
 
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
@@ -90,6 +92,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.webhookFailed.title": "فشل تسليم الويب هوك: {name}",
   "notifications.msg.webhookFailed.bodyCode": "{event}، رمز الاستجابة {code}",
   "notifications.msg.webhookFailed.bodyError": "{event}: {error}",
+  "notifications.msg.iotAlert.title": "{rule}: {device}",
+  "notifications.msg.iotAlert.body": "قراءة {metric} بلغت {value} (الحد {limit})",
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",

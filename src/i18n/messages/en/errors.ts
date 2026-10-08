@@ -86,4 +86,6 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.invalidReadingTime": "The reading time must be after 2000 and not in the future.",
+  "errors.illegalAlertTransition": "This alert has already moved on. Refresh to see its current status.",
 } as const;

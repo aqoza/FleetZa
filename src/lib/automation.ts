@@ -122,6 +122,16 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "iot.alert", module: "iot_devices", hasVehicle: true,
+    fields: [{ name: "rule", kind: "text" }, { name: "severity", kind: "text", options: ["info", "warning", "critical"] },
+      { name: "device", kind: "text" }, { name: "serial", kind: "text" }, { name: "metric", kind: "text" },
+      { name: "value", kind: "number" }, { name: "threshold", kind: "number" }],
+    sample: { rule_id: "00000000-0000-4000-8000-000000000012", rule: "Reefer too warm", severity: "critical",
+      device_id: "00000000-0000-4000-8000-000000000013", device: "Reefer probe", serial: "TMP-001",
+      vehicle_id: "00000000-0000-4000-8000-000000000001", metric: "temperature", value: 9.5, unit: "C",
+      threshold: 8, op: "gt", at: "2026-10-08T09:30:00Z" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

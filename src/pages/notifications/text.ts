@@ -74,6 +74,19 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "iot.alert": {
+        const unit = strParam(p, "unit");
+        const value = `${strParam(p, "value")}${unit ? ` ${unit}` : ""}`;
+        const op = ({ gt: ">", gte: "≥", lt: "<", lte: "≤", eq: "=" } as Record<string, string>)[strParam(p, "op")] ?? "";
+        return {
+          title: t("notifications.msg.iotAlert.title", {
+            rule: bdiText(strParam(p, "rule")), device: bdiText(strParam(p, "device")),
+          }),
+          body: t("notifications.msg.iotAlert.body", {
+            metric: ltrText(strParam(p, "metric")), value: ltrText(value), limit: ltrText(`${op} ${strParam(p, "threshold")}`),
+          }),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
