@@ -15,6 +15,7 @@ import { useI18n, useT, useTp } from "../../i18n";
 import {
   Badge, Bdi, Button, Card, EmptyState, ErrorState, LoadingState, Ltr, Modal, PageHeader,
 } from "../../components/ui";
+import { GratuityCard } from "../hr/GratuityCard";
 import { EmployeeForm } from "./EmployeeForm";
 import { DocumentBadge, todayIso } from "./shared";
 import { documentKinds, employeeStatus, employmentTypes, genders } from "./labels";
@@ -307,6 +308,15 @@ export default function EmployeeDetailPage() {
             <h3 className="mb-2 text-sm font-semibold text-ink">{t("employees.section.compensation")}</h3>
             <p className="text-sm text-ink-3">{t("employees.compensationHidden")}</p>
           </Card>
+        )}
+
+        {isManager && isEnabled("payroll_hr") && (
+          <GratuityCard
+            hireDate={employee.hire_date}
+            terminationDate={employee.termination_date}
+            basicSalary={employee.basic_salary}
+            housingAllowance={employee.housing_allowance}
+          />
         )}
 
         <SectionCard title={t("employees.section.links")}>
