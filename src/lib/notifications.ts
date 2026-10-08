@@ -18,6 +18,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "integrations.webhook_failed", module: "integrations" },
   { kind: "purchasing.bill_due", module: "purchasing" },
   { kind: "purchasing.po_late", module: "purchasing" },
+  { kind: "vendor_portal.po_acknowledged", module: "vendor_portal" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

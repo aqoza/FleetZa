@@ -100,6 +100,19 @@ export function useNotificationText() {
           }),
           body: t("notifications.msg.poLate.body", { date: ltrText(formatDate(strParam(p, "expected_date"))) }),
         };
+      case "vendor_portal.po_acknowledged": {
+        const expected = strParam(p, "expected_date");
+        const note = strParam(p, "note");
+        return {
+          title: t("notifications.msg.poAcknowledged.title", {
+            number: ltrText(strParam(p, "number")),
+            supplier: bdiText(strParam(p, "supplier")),
+          }),
+          body: expected
+            ? t("notifications.msg.poAcknowledged.expected", { date: ltrText(formatDate(expected)) })
+            : note ? bdiText(note) : null,
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

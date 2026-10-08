@@ -55,6 +55,8 @@ export const enNotifications = {
   "notifications.kind.purchasing.bill_due.desc": "A vendor bill is due within 3 days, or is overdue.",
   "notifications.kind.purchasing.po_late": "Late purchase orders",
   "notifications.kind.purchasing.po_late.desc": "A purchase order passes its expected date before it is fully received.",
+  "notifications.kind.vendor_portal.po_acknowledged": "Orders acknowledged by suppliers",
+  "notifications.kind.vendor_portal.po_acknowledged.desc": "A supplier confirms a purchase order through the vendor portal.",
 
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
@@ -84,6 +86,8 @@ export const enNotifications = {
   "notifications.msg.billBalance": "Balance {amount}",
   "notifications.msg.poLate.title": "{number} from {supplier} is late",
   "notifications.msg.poLate.body": "Expected {date}",
+  "notifications.msg.poAcknowledged.title": "{supplier} confirmed {number}",
+  "notifications.msg.poAcknowledged.expected": "Expected delivery {date}",
   "notifications.doc.passport": "passport",
   "notifications.doc.residence_permit": "residence permit",
   "notifications.doc.work_permit": "work permit",
