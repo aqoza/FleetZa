@@ -122,6 +122,16 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "insurance_claim.status_changed", module: "insurance_mgmt", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "policy_id", kind: "id" },
+      { name: "from_status", kind: "text", options: ["draft", "submitted", "under_review", "approved", "rejected", "settled", "withdrawn"] },
+      { name: "to_status", kind: "text", options: ["draft", "submitted", "under_review", "approved", "rejected", "settled", "withdrawn"] },
+      { name: "amount_claimed", kind: "number" }, { name: "amount_approved", kind: "number" }, { name: "amount_paid", kind: "number" }],
+    sample: { claim_id: "00000000-0000-4000-8000-000000000013", doc_number: "CLM-00004",
+      policy_id: "00000000-0000-4000-8000-000000000014", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      from_status: "under_review", to_status: "approved", amount_claimed: 4200, amount_approved: 3950, amount_paid: null },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {
