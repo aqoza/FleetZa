@@ -1,0 +1,47 @@
+{
+  "tables": {
+    "suppliers": [
+      {
+        "id": "5a000000-0000-4000-8000-000000000001", "number": 1, "doc_number": "SUP-00001",
+        "name": "Gulf Auto Parts LLC", "name_ar": "قطع غيار الخليج", "supplier_type": "parts",
+        "cr_number": "1234567", "tax_number": "OM1100223344", "email": "sales@gulfparts.example",
+        "phone": "+968 2450 1122", "website": "gulfparts.example", "address": "Way 3501, Ghala",
+        "city": "Muscat", "country": "OM", "payment_terms_days": 30, "currency": "OMR",
+        "bank_name": "Bank Muscat", "iban": "OM810180000001299123456", "rating": 4, "status": "active",
+        "notes": "Preferred for filters and brake pads."
+      },
+      {
+        "id": "5a000000-0000-4000-8000-000000000002", "number": 2, "doc_number": "SUP-00002",
+        "name": "Al Noor Fuel Station", "name_ar": null, "supplier_type": "fuel",
+        "phone": "+968 9911 2233", "city": "Sohar", "country": "OM", "payment_terms_days": 0,
+        "rating": 5, "status": "active"
+      },
+      {
+        "id": "5a000000-0000-4000-8000-000000000003", "number": 3, "doc_number": "SUP-00003",
+        "name": "Oman Insurance Co.", "name_ar": "العمانية للتأمين", "supplier_type": "insurance",
+        "email": "fleet@omins.example", "city": "Muscat", "country": "OM", "payment_terms_days": 60,
+        "rating": null, "status": "inactive"
+      },
+      {
+        "id": "5a000000-0000-4000-8000-000000000004", "number": 4, "doc_number": "SUP-00004",
+        "name": "Fast Freight Carriers", "supplier_type": "carrier", "payment_terms_days": 45,
+        "rating": 2, "status": "blocked"
+      }
+    ],
+    "supplier_contacts": [
+      { "id": "5c000000-0000-4000-8000-000000000001", "supplier_id": "5a000000-0000-4000-8000-000000000001",
+        "name": "Rashid Al Balushi", "title": "Sales manager", "phone": "+968 9200 1001",
+        "email": "rashid@gulfparts.example", "is_primary": true },
+      { "id": "5c000000-0000-4000-8000-000000000002", "supplier_id": "5a000000-0000-4000-8000-000000000001",
+        "name": "Priya Nair", "title": "Accounts", "email": "ap@gulfparts.example", "is_primary": false }
+    ],
+    "inventory_items": [
+      { "id": "5e000000-0000-4000-8000-000000000001", "sku": "FLT-OIL-200", "name": "Oil filter",
+        "name_ar": "فلتر زيت", "item_type": "part", "uom": "unit", "cost_price": 3.25,
+        "reorder_point": 20, "preferred_supplier_id": "5a000000-0000-4000-8000-000000000001", "active": true, "track_stock": true },
+      { "id": "5e000000-0000-4000-8000-000000000002", "sku": "BRK-PAD-11", "name": "Brake pad set",
+        "item_type": "part", "uom": "set", "cost_price": 18.5, "reorder_point": 6,
+        "preferred_supplier_id": "5a000000-0000-4000-8000-000000000001", "active": true, "track_stock": true }
+    ]
+  }
+}

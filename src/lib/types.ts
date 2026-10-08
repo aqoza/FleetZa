@@ -1,3 +1,5 @@
+import type { Tables } from "./database.types";
+
 export type Role = "owner" | "admin" | "manager" | "viewer";
 export type DistanceUnit = "km" | "mi";
 export type VolumeUnit = "L" | "gal";
@@ -729,3 +731,17 @@ export interface Renewal {
   created_at: string;
   updated_at: string;
 }
+
+// --- Suppliers (master data; tables from the platform foundation) ---
+
+export type SupplierType =
+  | "parts" | "fuel" | "service" | "insurance" | "carrier" | "leasing"
+  | "utilities" | "equipment" | "other";
+export type SupplierStatus = "active" | "inactive" | "blocked";
+
+export type Supplier = Omit<Tables<"suppliers">, "supplier_type" | "status"> & {
+  supplier_type: SupplierType;
+  status: SupplierStatus;
+};
+export type SupplierContact = Tables<"supplier_contacts">;
+export type InventoryItem = Tables<"inventory_items">;
