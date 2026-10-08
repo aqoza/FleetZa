@@ -86,4 +86,13 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.illegalShipmentTransition": "This shipment can't move to that status from where it is now.",
+  "errors.shipmentCarrierRequired": "Pick a vehicle (own fleet) or a carrier (third party) before dispatching.",
+  "errors.shipmentPodRequired": "Enter who received the shipment to mark it delivered.",
+  "errors.invalidPodTime": "The delivery time can't be in the future or before dispatch.",
+  "errors.shipmentLocked": "Closed and canceled shipments can't be changed, except their notes.",
+  "errors.shipmentNotDeletable": "Only draft shipments can be deleted. Cancel it instead.",
+  "errors.shipmentNotFound": "That shipment no longer exists.",
+  "errors.shipmentNotInvoiceable": "Only delivered or closed shipments with charges can be invoiced.",
+  "errors.shipmentAlreadyInvoiced": "This shipment already has an invoice. Void it first to invoice again.",
 } as const;

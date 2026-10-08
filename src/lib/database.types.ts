@@ -978,6 +978,78 @@ export type Database = {
           },
         ]
       }
+      freight_rates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          destination_city: string
+          id: string
+          min_charge: number
+          mode: string
+          notes: string | null
+          origin_city: string
+          rate_per_kg: number | null
+          rate_per_trip: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          valid_from: string
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          destination_city: string
+          id?: string
+          min_charge?: number
+          mode: string
+          notes?: string | null
+          origin_city: string
+          rate_per_kg?: number | null
+          rate_per_trip?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          destination_city?: string
+          id?: string
+          min_charge?: number
+          mode?: string
+          notes?: string | null
+          origin_city?: string
+          rate_per_kg?: number | null
+          rate_per_trip?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freight_rates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freight_rates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuel_logs: {
         Row: {
           created_at: string
@@ -2802,6 +2874,280 @@ export type Database = {
           },
           {
             foreignKeyName: "service_reminders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_events: {
+        Row: {
+          at: string
+          created_at: string
+          created_by: string | null
+          id: string
+          location: string | null
+          note: string | null
+          shipment_id: string
+          status: string | null
+          tenant_id: string
+        }
+        Insert: {
+          at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          shipment_id: string
+          status?: string | null
+          tenant_id?: string
+        }
+        Update: {
+          at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          shipment_id?: string
+          status?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          bol_number: string | null
+          booked_at: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          cargo_description: string | null
+          carrier_cost: number | null
+          carrier_supplier_id: string | null
+          carrier_type: string
+          closed_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string
+          customer_ref: string | null
+          delivered_at: string | null
+          delivery_window_end: string | null
+          delivery_window_start: string | null
+          destination_address: string | null
+          destination_city: string
+          destination_country: string | null
+          destination_lat: number | null
+          destination_lng: number | null
+          destination_name: string | null
+          dispatched_at: string | null
+          doc_number: string | null
+          driver_id: string | null
+          freight_charge: number
+          fuel_surcharge: number
+          hazardous: boolean
+          id: string
+          invoice_id: string | null
+          margin: number | null
+          mode: string
+          notes: string | null
+          number: number | null
+          origin_address: string | null
+          origin_city: string
+          origin_country: string | null
+          origin_lat: number | null
+          origin_lng: number | null
+          origin_name: string | null
+          other_charges: number
+          picked_up_at: string | null
+          pickup_window_end: string | null
+          pickup_window_start: string | null
+          pieces: number | null
+          pod_notes: string | null
+          received_by: string | null
+          service_level: string
+          status: string
+          tenant_id: string
+          total_charge: number | null
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          volume_m3: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          bol_number?: string | null
+          booked_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          cargo_description?: string | null
+          carrier_cost?: number | null
+          carrier_supplier_id?: string | null
+          carrier_type?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id: string
+          customer_ref?: string | null
+          delivered_at?: string | null
+          delivery_window_end?: string | null
+          delivery_window_start?: string | null
+          destination_address?: string | null
+          destination_city: string
+          destination_country?: string | null
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          freight_charge?: number
+          fuel_surcharge?: number
+          hazardous?: boolean
+          id?: string
+          invoice_id?: string | null
+          margin?: number | null
+          mode?: string
+          notes?: string | null
+          number?: number | null
+          origin_address?: string | null
+          origin_city: string
+          origin_country?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          origin_name?: string | null
+          other_charges?: number
+          picked_up_at?: string | null
+          pickup_window_end?: string | null
+          pickup_window_start?: string | null
+          pieces?: number | null
+          pod_notes?: string | null
+          received_by?: string | null
+          service_level?: string
+          status?: string
+          tenant_id?: string
+          total_charge?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          volume_m3?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          bol_number?: string | null
+          booked_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          cargo_description?: string | null
+          carrier_cost?: number | null
+          carrier_supplier_id?: string | null
+          carrier_type?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string
+          customer_ref?: string | null
+          delivered_at?: string | null
+          delivery_window_end?: string | null
+          delivery_window_start?: string | null
+          destination_address?: string | null
+          destination_city?: string
+          destination_country?: string | null
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          freight_charge?: number
+          fuel_surcharge?: number
+          hazardous?: boolean
+          id?: string
+          invoice_id?: string | null
+          margin?: number | null
+          mode?: string
+          notes?: string | null
+          number?: number | null
+          origin_address?: string | null
+          origin_city?: string
+          origin_country?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          origin_name?: string | null
+          other_charges?: number
+          picked_up_at?: string | null
+          pickup_window_end?: string | null
+          pickup_window_start?: string | null
+          pieces?: number | null
+          pod_notes?: string | null
+          received_by?: string | null
+          service_level?: string
+          status?: string
+          tenant_id?: string
+          total_charge?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          volume_m3?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_carrier_supplier_id_fkey"
+            columns: ["carrier_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -4894,6 +5240,21 @@ export type Database = {
         Returns: number
       }
       next_certificate_number: { Args: never; Returns: string }
+      quote_freight: {
+        Args: {
+          p_customer_id?: string
+          p_destination_city: string
+          p_mode: string
+          p_on?: string
+          p_origin_city: string
+          p_weight_kg: number
+        }
+        Returns: {
+          customer_specific: boolean
+          price: number
+          rate_id: string
+        }[]
+      }
       record_webhook_attempt: {
         Args: {
           p_error?: string
@@ -5162,6 +5523,7 @@ export type Database = {
         Args: { p_doc_type: string; p_prefix: string }
         Returns: undefined
       }
+      shipment_create_invoice: { Args: { p_shipment_id: string }; Returns: string }
       stock_adjust: {
         Args: {
           p_item: string
