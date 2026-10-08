@@ -1,4 +1,4 @@
-# FleetManage
+# FleetMaster
 
 Multi-tenant fleet management SaaS — vehicles, drivers, maintenance, fuel, inspections,
 issues, renewals, and cost reporting. Self-serve onboarding for tenants anywhere in the
@@ -42,7 +42,7 @@ entry in that file.
 
 ## Modular architecture
 
-FleetManage is modular (Zoho/Odoo-style): tenants subscribe to the modules they need
+FleetMaster is modular (Zoho/Odoo-style): tenants subscribe to the modules they need
 and the whole app adapts. `shared/modules.ts` is the module registry — the single
 source of truth for every module (category, status, dependencies, owned routes),
 shared by the SPA and the Worker. Subscriptions live in the `tenant_modules` table

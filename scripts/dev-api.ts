@@ -27,5 +27,5 @@ serve(
     fetch: (req) => app.fetch(req, bindings),
     port: 8788,
   },
-  (info) => console.log(`FleetManage API (Node host) on http://127.0.0.1:${info.port}/api/health`),
+  (info) => console.log(`FleetMaster API (Node host) on http://127.0.0.1:${info.port}/api/health`),
 );

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /**
- * Design tokens — the single source of truth for the FleetManage look
+ * Design tokens — the single source of truth for the FleetMaster look
  * (docs/DESIGN_SYSTEM.md). Pages and components consume these via the
  * generated utilities (bg-surface, text-ink, border-line, …); never hardcode
  * raw palette classes for surfaces, text, or borders in new code.

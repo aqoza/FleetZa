@@ -2,7 +2,7 @@
 // Keys are flat dotted strings. Arabic lives in ../ar/common.ts and MUST
 // stay complete (its type enforces every key here has a translation).
 export const enCommon = {
-  "app.name": "FleetManage",
+  "app.name": "FleetMaster",
 
   // Navigation
   "nav.dashboard": "Dashboard",
