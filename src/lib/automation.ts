@@ -134,6 +134,18 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { geofence_id: "00000000-0000-4000-8000-000000000011", geofence: "Main yard",
       vehicle_id: "00000000-0000-4000-8000-000000000001", vehicle: "Truck 7", lat: 23.61, lng: 58.41, at: "2026-10-08T11:05:00Z" },
   },
+  {
+    event: "driving_event.created", module: "driver_behavior", hasVehicle: true,
+    fields: [
+      { name: "event_type", kind: "text", options: ["harsh_braking", "harsh_acceleration", "harsh_cornering", "speeding", "idling", "seatbelt", "phone_use", "fatigue", "collision_warning"] },
+      { name: "severity", kind: "text", options: ["low", "medium", "high"] },
+      { name: "speed_kmh", kind: "number" }, { name: "speed_limit_kmh", kind: "number" },
+      { name: "driver", kind: "text" }, { name: "vehicle", kind: "text" },
+    ],
+    sample: { driving_event_id: "00000000-0000-4000-8000-000000000012", event_type: "speeding", severity: "high",
+      vehicle_id: "00000000-0000-4000-8000-000000000001", vehicle: "Truck 7", driver_id: null, driver: "Omar Said",
+      speed_kmh: 118, speed_limit_kmh: 80, occurred_at: "2026-10-08T09:31:12Z" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

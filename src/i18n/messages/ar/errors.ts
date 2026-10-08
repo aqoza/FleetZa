@@ -84,5 +84,7 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.invalidEventTime": "هذا الوقت في المستقبل أو بعيد جدًا في الماضي بالنسبة لحدث قيادة.",
+  "errors.invalidPeriod": "اختر فترة تنتهي بعد بدايتها، بحد أقصى 400 يوم.",
   "errors.invalidPositionTime": "هذا الوقت في المستقبل أو بعيد جدًا في الماضي بالنسبة لموقع GPS.",
 };

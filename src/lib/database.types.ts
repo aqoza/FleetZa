@@ -709,6 +709,79 @@ export type Database = {
           },
         ]
       }
+      driver_coaching_sessions: {
+        Row: {
+          coach_id: string | null
+          created_at: string
+          created_by: string | null
+          driver_id: string
+          event_ids: string[]
+          follow_up_date: string | null
+          id: string
+          notes: string | null
+          session_date: string
+          status: string
+          tenant_id: string
+          topics: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          coach_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id: string
+          event_ids?: string[]
+          follow_up_date?: string | null
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          tenant_id?: string
+          topics?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          coach_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string
+          event_ids?: string[]
+          follow_up_date?: string | null
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          tenant_id?: string
+          topics?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_coaching_sessions_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_coaching_sessions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_coaching_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           branch_id: string | null
@@ -780,6 +853,91 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driving_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          duration_s: number | null
+          event_type: string
+          id: string
+          lat: number | null
+          lng: number | null
+          notes: string | null
+          occurred_at: string
+          severity: string
+          source: string
+          speed_kmh: number | null
+          speed_limit_kmh: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          duration_s?: number | null
+          event_type: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          occurred_at: string
+          severity?: string
+          source?: string
+          speed_kmh?: number | null
+          speed_limit_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          duration_s?: number | null
+          event_type?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          occurred_at?: string
+          severity?: string
+          source?: string
+          speed_kmh?: number | null
+          speed_limit_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driving_events_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driving_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driving_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -5073,6 +5231,18 @@ export type Database = {
       create_webhook_subscription: {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
+      }
+      driver_scores: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          distance_km: number
+          driver_id: string
+          events: number
+          grade: string
+          high_events: number
+          penalty: number
+          score: number
+        }[]
       }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
