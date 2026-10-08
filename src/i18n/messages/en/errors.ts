@@ -5,6 +5,7 @@ export const enErrors = {
   "errors.duplicate": "This record conflicts with one that already exists (duplicate value).",
   "errors.referenced": "This record is referenced by other records and cannot be changed this way.",
   "errors.forbidden": "You don't have permission to do this.",
+  "errors.automationInvalidRule": "This rule is incomplete: check every condition and action.",
   "errors.vehicleHasCertificates":
     "This vehicle has issued certificates and cannot be deleted. Retire it instead.",
   "errors.vehicleHasCompletedJobs":
