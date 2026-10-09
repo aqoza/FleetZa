@@ -1,7 +1,7 @@
 import { bdiText, ltrText } from "../../lib/bidi";
 import { formatDate } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
-import { useT, useTp, type MessageKey } from "../../i18n";
+import { useI18n, useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
 
 const EMPLOYEE_DOCS: Record<string, MessageKey> = {
@@ -17,6 +17,7 @@ const EMPLOYEE_DOCS: Record<string, MessageKey> = {
 export function useNotificationText() {
   const t = useT();
   const tp = useTp();
+  const { language } = useI18n();
   return (n: Pick<NotificationRow, "kind" | "params" | "title" | "body">): { title: string; body: string | null } => {
     const p = n.params;
     switch (n.kind) {
@@ -73,6 +74,15 @@ export function useNotificationText() {
               ? t("notifications.msg.webhookFailed.bodyError", { event, error: bdiText(error) })
               : event,
         };
+      }
+      case "regulatory.obligation_due": {
+        const count = numParam(p, "count") ?? 1;
+        const stage = strParam(p, "stage");
+        const vars = { requirement: bdiText((language === "ar" && strParam(p, "requirement_ar")) || strParam(p, "requirement")) };
+        const key = stage === "overdue" ? "notifications.msg.obligation.overdue"
+          : stage === "d0" ? "notifications.msg.obligation.today" : "notifications.msg.obligation.soon";
+        const due = strParam(p, "due");
+        return { title: tp(key, count, vars), body: due ? t("notifications.msg.obligation.body", { date: ltrText(formatDate(due)) }) : null };
       }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.

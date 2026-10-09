@@ -84,4 +84,12 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.requirementNotFound": "هذا المتطلب لم يعد موجودًا.",
+  "errors.requirementInactive": "هذا المتطلب غير مفعّل. فعّله قبل إنشاء الالتزامات.",
+  "errors.requirementInUse": "لهذا المتطلب التزامات. أوقف تفعيله بدلًا من ذلك، أو احذف التزاماته أولًا.",
+  "errors.obligationNotFound": "هذا الالتزام لم يعد موجودًا.",
+  "errors.obligationSubjectMismatch": "ينطبق هذا المتطلب على نوع مختلف من الجهات.",
+  "errors.obligationSubjectNotFound": "لم يتم العثور على المركبة أو السائق أو الموظف.",
+  "errors.obligationLocked": "لا يمكن تغيير متطلب الالتزام أو جهته. أنشئ التزامًا جديدًا بدلًا من ذلك.",
+  "errors.invalidCompletionDate": "لا يمكن أن يكون تاريخ الإنجاز في المستقبل.",
 };

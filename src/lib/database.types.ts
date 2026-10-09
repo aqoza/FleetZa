@@ -357,6 +357,156 @@ export type Database = {
           },
         ]
       }
+      compliance_obligations: {
+        Row: {
+          completed_on: string | null
+          created_at: string
+          created_by: string | null
+          due_date: string
+          evidence_document_id: string | null
+          id: string
+          notes: string | null
+          requirement_id: string
+          responsible_user: string | null
+          status: string
+          subject_id: string | null
+          subject_type: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          completed_on?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date: string
+          evidence_document_id?: string | null
+          id?: string
+          notes?: string | null
+          requirement_id: string
+          responsible_user?: string | null
+          status?: string
+          subject_id?: string | null
+          subject_type: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          completed_on?: string | null
+          created_at?: string
+          created_by?: string | null
+          due_date?: string
+          evidence_document_id?: string | null
+          id?: string
+          notes?: string | null
+          requirement_id?: string
+          responsible_user?: string | null
+          status?: string
+          subject_id?: string | null
+          subject_type?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_obligations_requirement_id_fkey"
+            columns: ["requirement_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_requirements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_obligations_responsible_user_fkey"
+            columns: ["responsible_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_obligations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_requirements: {
+        Row: {
+          active: boolean
+          applies_to: string
+          authority: string | null
+          category: string
+          code: string
+          country: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          frequency_months: number | null
+          id: string
+          lead_days: number
+          reference_url: string | null
+          tenant_id: string
+          title: string
+          title_ar: string | null
+          updated_at: string
+          updated_by: string | null
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          applies_to: string
+          authority?: string | null
+          category?: string
+          code: string
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          frequency_months?: number | null
+          id?: string
+          lead_days?: number
+          reference_url?: string | null
+          tenant_id?: string
+          title: string
+          title_ar?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          authority?: string | null
+          category?: string
+          code?: string
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          frequency_months?: number | null
+          id?: string
+          lead_days?: number
+          reference_url?: string | null
+          tenant_id?: string
+          title?: string
+          title_ar?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          verified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_requirements_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contacts: {
         Row: {
           created_at: string
@@ -4894,6 +5044,15 @@ export type Database = {
         Returns: number
       }
       next_certificate_number: { Args: never; Returns: string }
+      obligation_complete: {
+        Args: {
+          p_completed_on?: string
+          p_evidence_document_id?: string
+          p_notes?: string
+          p_obligation_id: string
+        }
+        Returns: string
+      }
       record_webhook_attempt: {
         Args: {
           p_error?: string
@@ -4904,6 +5063,14 @@ export type Database = {
         Returns: string
       }
       refresh_notifications: { Args: { p_force?: boolean }; Returns: number }
+      regulatory_generate_obligations: {
+        Args: { p_due_date: string; p_requirement_id: string }
+        Returns: number
+      }
+      regulatory_seed_templates: {
+        Args: { p_country?: string }
+        Returns: number
+      }
       report_cost_by_vehicle: {
         Args: { p_from: string; p_ownership?: string; p_to: string }
         Returns: {
