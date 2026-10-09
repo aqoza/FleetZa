@@ -978,6 +978,168 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          category_account_id: string
+          created_at: string
+          created_by: string | null
+          description: string
+          doc_number: string | null
+          expense_date: string
+          id: string
+          journal_entry_id: string | null
+          number: number | null
+          payment_account_id: string
+          receipt_document_id: string | null
+          reference: string | null
+          rejection_reason: string | null
+          status: string
+          supplier_id: string | null
+          tax_amount: number
+          tenant_id: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category_account_id: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          doc_number?: string | null
+          expense_date?: string
+          id?: string
+          journal_entry_id?: string | null
+          number?: number | null
+          payment_account_id: string
+          receipt_document_id?: string | null
+          reference?: string | null
+          rejection_reason?: string | null
+          status?: string
+          supplier_id?: string | null
+          tax_amount?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          category_account_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          doc_number?: string | null
+          expense_date?: string
+          id?: string
+          journal_entry_id?: string | null
+          number?: number | null
+          payment_account_id?: string
+          receipt_document_id?: string | null
+          reference?: string | null
+          rejection_reason?: string | null
+          status?: string
+          supplier_id?: string | null
+          tax_amount?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_account_id_fkey"
+            columns: ["category_account_id"]
+            isOneToOne: false
+            referencedRelation: "gl_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_journal_entry_id_fkey"
+            columns: ["journal_entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_payment_account_id_fkey"
+            columns: ["payment_account_id"]
+            isOneToOne: false
+            referencedRelation: "gl_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_settings: {
+        Row: {
+          accounts: Json
+          fiscal_year_start_month: number
+          id: string
+          lock_date: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          accounts?: Json
+          fiscal_year_start_month?: number
+          id?: string
+          lock_date?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          accounts?: Json
+          fiscal_year_start_month?: number
+          id?: string
+          lock_date?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuel_logs: {
         Row: {
           created_at: string
@@ -1047,6 +1209,72 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gl_accounts: {
+        Row: {
+          account_type: string
+          active: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_system: boolean
+          name: string
+          name_ar: string | null
+          parent_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_type: string
+          active?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          name: string
+          name_ar?: string | null
+          parent_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_type?: string
+          active?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_system?: boolean
+          name?: string
+          name_ar?: string | null
+          parent_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gl_accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "gl_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gl_accounts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -1691,6 +1919,188 @@ export type Database = {
             columns: ["work_order_id"]
             isOneToOne: false
             referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_entries: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          doc_number: string | null
+          entry_date: string
+          id: string
+          memo: string | null
+          number: number | null
+          posted_at: string | null
+          posted_by: string | null
+          reversal_of: string | null
+          reversed_by: string | null
+          source_id: string | null
+          source_type: string
+          status: string
+          tenant_id: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          entry_date?: string
+          id?: string
+          memo?: string | null
+          number?: number | null
+          posted_at?: string | null
+          posted_by?: string | null
+          reversal_of?: string | null
+          reversed_by?: string | null
+          source_id?: string | null
+          source_type?: string
+          status?: string
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          entry_date?: string
+          id?: string
+          memo?: string | null
+          number?: number | null
+          posted_at?: string | null
+          posted_by?: string | null
+          reversal_of?: string | null
+          reversed_by?: string | null
+          source_id?: string | null
+          source_type?: string
+          status?: string
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entries_reversal_of_fkey"
+            columns: ["reversal_of"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_reversed_by_fkey"
+            columns: ["reversed_by"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_lines: {
+        Row: {
+          account_id: string
+          created_at: string
+          created_by: string | null
+          credit: number
+          customer_id: string | null
+          debit: number
+          description: string | null
+          entry_id: string
+          id: string
+          sort_order: number
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          created_by?: string | null
+          credit?: number
+          customer_id?: string | null
+          debit?: number
+          description?: string | null
+          entry_id: string
+          id?: string
+          sort_order?: number
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          created_by?: string | null
+          credit?: number
+          customer_id?: string | null
+          debit?: number
+          description?: string | null
+          entry_id?: string
+          id?: string
+          sort_order?: number
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "gl_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_lines_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -4797,6 +5207,43 @@ export type Database = {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
       }
+      finance_balances: {
+        Args: { p_from?: string; p_to?: string }
+        Returns: { account_id: string; credit: number; debit: number; opening: number }[]
+      }
+      finance_ledger: {
+        Args: { p_account_id: string; p_from: string; p_limit?: number; p_to: string }
+        Returns: {
+          balance: number
+          credit: number
+          debit: number
+          description: string
+          doc_number: string
+          entry_date: string
+          entry_id: string
+          line_id: string
+          memo: string
+          source_type: string
+        }[]
+      }
+      finance_monthly: {
+        Args: { p_from: string; p_to: string }
+        Returns: { account_type: string; amount: number; month: string }[]
+      }
+      finance_pending_counts: { Args: never; Returns: Json }
+      finance_post_entry: { Args: { p_entry_id: string }; Returns: string }
+      finance_post_expense: { Args: { p_expense_id: string }; Returns: string }
+      finance_post_invoice: { Args: { p_invoice_id: string }; Returns: string }
+      finance_post_payment: { Args: { p_payment_id: string }; Returns: string }
+      finance_post_payroll: { Args: { p_run_id: string }; Returns: string }
+      finance_post_vendor_bill: { Args: { p_bill_id: string }; Returns: string }
+      finance_post_vendor_payment: { Args: { p_payment_id: string }; Returns: string }
+      finance_reverse_entry: {
+        Args: { p_date?: string; p_entry_id: string; p_memo?: string }
+        Returns: string
+      }
+      finance_setup: { Args: never; Returns: number }
+      finance_sync: { Args: never; Returns: Json }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
