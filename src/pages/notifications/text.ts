@@ -74,6 +74,19 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "contracts.expiring": {
+        const days = numParam(p, "days") ?? 0;
+        const vars = { number: ltrText(strParam(p, "doc_number")) };
+        const bodyVars = { customer: bdiText(strParam(p, "customer")), title: bdiText(strParam(p, "title")) };
+        return {
+          title: days <= 0 ? t("notifications.msg.contractEnding.today", vars) : tp("notifications.msg.contractEnding.title", days, vars),
+          body: strParam(p, "auto_renew") === "true"
+            ? t("notifications.msg.contractEnding.bodyRenews", bodyVars)
+            : t("notifications.msg.contractEnding.body", bodyVars),
+        };
+      }
+      case "contracts.billing_due":
+        return { title: tp("notifications.msg.contractBilling.title", numParam(p, "count") ?? 1), body: null };
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
