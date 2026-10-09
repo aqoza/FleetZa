@@ -433,6 +433,314 @@ export type Database = {
           },
         ]
       }
+      crm_activities: {
+        Row: {
+          activity_type: string
+          body: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          done_at: string | null
+          due_at: string | null
+          id: string
+          lead_id: string | null
+          opportunity_id: string | null
+          owner_id: string | null
+          subject: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          activity_type?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          done_at?: string | null
+          due_at?: string | null
+          id?: string
+          lead_id?: string | null
+          opportunity_id?: string | null
+          owner_id?: string | null
+          subject: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          activity_type?: string
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          done_at?: string | null
+          due_at?: string | null
+          id?: string
+          lead_id?: string | null
+          opportunity_id?: string | null
+          owner_id?: string | null
+          subject?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_leads: {
+        Row: {
+          company_name: string | null
+          converted_at: string | null
+          converted_customer_id: string | null
+          converted_opportunity_id: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          doc_number: string | null
+          email: string | null
+          estimated_value: number | null
+          fleet_size: number | null
+          id: string
+          interest: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          owner_id: string | null
+          phone: string | null
+          source: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          converted_at?: string | null
+          converted_customer_id?: string | null
+          converted_opportunity_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          doc_number?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          fleet_size?: number | null
+          id?: string
+          interest?: string | null
+          name: string
+          notes?: string | null
+          number?: number | null
+          owner_id?: string | null
+          phone?: string | null
+          source?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          converted_at?: string | null
+          converted_customer_id?: string | null
+          converted_opportunity_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          doc_number?: string | null
+          email?: string | null
+          estimated_value?: number | null
+          fleet_size?: number | null
+          id?: string
+          interest?: string | null
+          name?: string
+          notes?: string | null
+          number?: number | null
+          owner_id?: string | null
+          phone?: string | null
+          source?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_leads_converted_customer_id_fkey"
+            columns: ["converted_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_converted_opportunity_id_fkey"
+            columns: ["converted_opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "crm_opportunities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_leads_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_opportunities: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string | null
+          doc_number: string | null
+          expected_close_date: string | null
+          id: string
+          lead_id: string | null
+          lost_at: string | null
+          lost_reason: string | null
+          notes: string | null
+          number: number | null
+          owner_id: string | null
+          probability: number
+          quote_id: string | null
+          stage: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          won_at: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          doc_number?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          notes?: string | null
+          number?: number | null
+          owner_id?: string | null
+          probability?: number
+          quote_id?: string | null
+          stage?: string
+          tenant_id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          won_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string | null
+          doc_number?: string | null
+          expected_close_date?: string | null
+          id?: string
+          lead_id?: string | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          notes?: string | null
+          number?: number | null
+          owner_id?: string | null
+          probability?: number
+          quote_id?: string | null
+          stage?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          won_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_opportunities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "crm_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_opportunities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -4795,6 +5103,10 @@ export type Database = {
       }
       create_webhook_subscription: {
         Args: { p_events: string[]; p_name: string; p_url: string }
+        Returns: Json
+      }
+      crm_convert_lead: {
+        Args: { p_create_opportunity?: boolean; p_lead_id: string }
         Returns: Json
       }
       fuel_summary: {

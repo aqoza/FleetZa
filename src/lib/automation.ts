@@ -122,6 +122,29 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "crm_lead.converted", module: "crm", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "estimated_value", kind: "number" }, { name: "fleet_size", kind: "number" },
+      { name: "source", kind: "text", options: ["website", "referral", "walk_in", "phone", "email", "social", "event", "partner", "other"] }],
+    sample: { lead_id: "00000000-0000-4000-8000-000000000020", doc_number: "LEAD-00012",
+      customer_id: "00000000-0000-4000-8000-000000000021", opportunity_id: "00000000-0000-4000-8000-000000000022",
+      owner_id: "00000000-0000-4000-8000-000000000023", estimated_value: 12000, fleet_size: 40, source: "referral" },
+  },
+  {
+    event: "crm_opportunity.won", module: "crm", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" }, { name: "amount", kind: "number" }],
+    sample: { opportunity_id: "00000000-0000-4000-8000-000000000022", doc_number: "OPP-00008", title: "Speed limiters for 40 trucks",
+      customer_id: "00000000-0000-4000-8000-000000000021", lead_id: null, amount: 12000, currency: "OMR",
+      owner_id: "00000000-0000-4000-8000-000000000023", quote_id: null, lost_reason: null },
+  },
+  {
+    event: "crm_opportunity.lost", module: "crm", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" }, { name: "amount", kind: "number" },
+      { name: "lost_reason", kind: "text" }],
+    sample: { opportunity_id: "00000000-0000-4000-8000-000000000022", doc_number: "OPP-00008", title: "Speed limiters for 40 trucks",
+      customer_id: "00000000-0000-4000-8000-000000000021", lead_id: null, amount: 12000, currency: "OMR",
+      owner_id: "00000000-0000-4000-8000-000000000023", quote_id: null, lost_reason: "Chose a cheaper supplier" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

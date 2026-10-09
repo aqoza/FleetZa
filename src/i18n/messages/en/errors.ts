@@ -86,4 +86,11 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.illegalLeadTransition": "That lead can't move to this status.",
+  "errors.leadLocked": "A converted lead can't be changed, except its owner and notes.",
+  "errors.leadNotDeletable": "A converted lead can't be deleted.",
+  "errors.leadNotFound": "That lead no longer exists.",
+  "errors.leadAlreadyConverted": "This lead has already been converted to a customer.",
+  "errors.illegalOpportunityTransition": "A closed opportunity can only be reopened to an open stage.",
+  "errors.opportunityLostReasonRequired": "Give a reason before marking the opportunity lost.",
 } as const;
