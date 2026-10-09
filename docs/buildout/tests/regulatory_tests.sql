@@ -144,7 +144,8 @@ grant all on _next to authenticated;
 insert into _next select public.obligation_complete((select id from _o), null, 'a7e1c0de-0025-4b2c-9d3e-4f5a6b7c8f01', 'Passed');
 insert into _t select 'completion stamps today, evidence and notes',
   exists (select 1 from public.compliance_obligations where id = (select id from _o) and status = 'compliant'
-          and completed_on = current_date and evidence_document_id = 'a7e1c0de-0025-4b2c-9d3e-4f5a6b7c8f01' and notes = 'Passed'), null;
+          and completed_on = (now() at time zone (select coalesce(timezone, 'UTC') from public.tenants where id = '170d2d86-5c22-4bcb-9d74-420c879419b2'))::date
+          and evidence_document_id = 'a7e1c0de-0025-4b2c-9d3e-4f5a6b7c8f01' and notes = 'Passed'), null;
 insert into _t select 'early completion schedules the next from the due date',
   (select due_date = ((select due_date from _o) + interval '12 months')::date and status = 'pending'
    from public.compliance_obligations where id = (select id from _next)), null;
@@ -156,7 +157,7 @@ insert into _next select public.obligation_complete((select o.id from public.com
                                                      join public.compliance_requirements r on r.id = o.requirement_id
                                                      where r.code = 'CO-VAT' and o.status = 'pending'));
 insert into _t select 'late completion schedules the next from completion',
-  (select due_date = (current_date + interval '3 months')::date from public.compliance_obligations where id = (select id from _next)), null;
+  (select due_date = ((now() at time zone (select coalesce(timezone, 'UTC') from public.tenants where id = '170d2d86-5c22-4bcb-9d74-420c879419b2'))::date + interval '3 months')::date from public.compliance_obligations where id = (select id from _next)), null;
 insert into _t select 'one-off requirement schedules nothing',
   public.obligation_complete((select id from public.compliance_obligations
                               where subject_id = 'a7e1c0de-0025-4b2c-9d3e-4f5a6b7c8d01')) is null, null;
