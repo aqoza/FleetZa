@@ -86,4 +86,7 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.biUnknownMetric": "This chart uses a measure that does not exist.",
+  "errors.biInvalidDimension": "This measure cannot be broken down that way.",
+  "errors.biInvalidPeriod": "Pick a period of up to three years, with the start before the end.",
 } as const;

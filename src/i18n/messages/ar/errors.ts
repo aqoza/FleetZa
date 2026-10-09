@@ -84,4 +84,7 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.biUnknownMetric": "يستخدم هذا الرسم مقياسًا غير موجود.",
+  "errors.biInvalidDimension": "لا يمكن تقسيم هذا المقياس بهذه الطريقة.",
+  "errors.biInvalidPeriod": "اختر فترة لا تتجاوز ثلاث سنوات، تبدأ قبل أن تنتهي.",
 };

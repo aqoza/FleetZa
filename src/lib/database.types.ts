@@ -204,6 +204,132 @@ export type Database = {
           },
         ]
       }
+      bi_dashboards: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_shared: boolean
+          name: string
+          owner_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_shared?: boolean
+          name: string
+          owner_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_shared?: boolean
+          name?: string
+          owner_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bi_dashboards_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bi_dashboards_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bi_widgets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          dashboard_id: string
+          date_from: string | null
+          date_to: string | null
+          dimension: string
+          id: string
+          metric: string
+          period: string
+          position: number
+          size: string
+          tenant_id: string
+          title: string | null
+          updated_at: string
+          updated_by: string | null
+          widget_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          dashboard_id: string
+          date_from?: string | null
+          date_to?: string | null
+          dimension?: string
+          id?: string
+          metric: string
+          period?: string
+          position?: number
+          size?: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          widget_type?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          dashboard_id?: string
+          date_from?: string | null
+          date_to?: string | null
+          dimension?: string
+          id?: string
+          metric?: string
+          period?: string
+          position?: number
+          size?: string
+          tenant_id?: string
+          title?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          widget_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bi_widgets_dashboard_id_fkey"
+            columns: ["dashboard_id"]
+            isOneToOne: false
+            referencedRelation: "bi_dashboards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bi_widgets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       branches: {
         Row: {
           active: boolean
@@ -4485,6 +4611,11 @@ export type Database = {
     }
     Functions: {
       audit_tables: { Args: never; Returns: string[] }
+      bi_create_default_dashboard: { Args: { p_name?: string }; Returns: string }
+      bi_metric: {
+        Args: { p_dimension: string; p_from: string; p_metric: string; p_to: string }
+        Returns: { key: string; label: string; value: number }[]
+      }
       billing_state: {
         Args: {
           c: Database["public"]["Tables"]["speed_limiter_certificates"]["Row"]
