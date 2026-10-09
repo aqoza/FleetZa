@@ -62,6 +62,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.automation.rule.desc": "ترسل إليك قاعدة أتمتة إشعارًا.",
   "notifications.kind.integrations.webhook_failed": "فشل تسليم الويب هوك",
   "notifications.kind.integrations.webhook_failed.desc": "يفشل تسليم ويب هوك بعد كل المحاولات. يُرسل إلى المسؤولين.",
+  "notifications.kind.customer_portal.request": "طلبات خدمة العملاء",
+  "notifications.kind.customer_portal.request.desc": "يرسل عميل طلب خدمة من البوابة. يُرسل إلى المديرين.",
 
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
@@ -90,6 +92,9 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.webhookFailed.title": "فشل تسليم الويب هوك: {name}",
   "notifications.msg.webhookFailed.bodyCode": "{event}، رمز الاستجابة {code}",
   "notifications.msg.webhookFailed.bodyError": "{event}: {error}",
+  "notifications.msg.portalRequest.title": "طلب جديد {number} من {customer}",
+  "notifications.msg.portalRequest.body": "{type}",
+  "notifications.msg.portalRequest.bodyVehicle": "{type} للمركبة {vehicle}",
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",

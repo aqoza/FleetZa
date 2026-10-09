@@ -433,6 +433,90 @@ export type Database = {
           },
         ]
       }
+      customer_portal_access: {
+        Row: {
+          access_count: number
+          active: boolean
+          allow_requests: boolean
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          expires_at: string | null
+          id: string
+          label: string | null
+          last_accessed_at: string | null
+          revoked_at: string | null
+          show_certificates: boolean
+          show_contracts: boolean
+          show_invoices: boolean
+          show_quotes: boolean
+          show_vehicles: boolean
+          tenant_id: string
+          token: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          access_count?: number
+          active?: boolean
+          allow_requests?: boolean
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          show_certificates?: boolean
+          show_contracts?: boolean
+          show_invoices?: boolean
+          show_quotes?: boolean
+          show_vehicles?: boolean
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          access_count?: number
+          active?: boolean
+          allow_requests?: boolean
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          show_certificates?: boolean
+          show_contracts?: boolean
+          show_invoices?: boolean
+          show_quotes?: boolean
+          show_vehicles?: boolean
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_portal_access_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_portal_access_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -1888,6 +1972,114 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      portal_service_requests: {
+        Row: {
+          access_id: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string
+          doc_number: string | null
+          handled_by: string | null
+          id: string
+          internal_notes: string | null
+          number: number | null
+          preferred_date: string | null
+          request_type: string
+          resolved_at: string | null
+          scheduled_for: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          access_id?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          description: string
+          doc_number?: string | null
+          handled_by?: string | null
+          id?: string
+          internal_notes?: string | null
+          number?: number | null
+          preferred_date?: string | null
+          request_type?: string
+          resolved_at?: string | null
+          scheduled_for?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          access_id?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          description?: string
+          doc_number?: string | null
+          handled_by?: string | null
+          id?: string
+          internal_notes?: string | null
+          number?: number | null
+          preferred_date?: string | null
+          request_type?: string
+          resolved_at?: string | null
+          scheduled_for?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "portal_service_requests_access_id_fkey"
+            columns: ["access_id"]
+            isOneToOne: false
+            referencedRelation: "customer_portal_access"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_service_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_service_requests_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_service_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "portal_service_requests_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -4797,6 +4989,19 @@ export type Database = {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
       }
+      customer_portal_request: {
+        Args: {
+          p_contact_name?: string
+          p_contact_phone?: string
+          p_description: string
+          p_preferred_date?: string
+          p_request_type: string
+          p_token: string
+          p_vehicle_id?: string
+        }
+        Returns: Json
+      }
+      customer_portal_view: { Args: { p_token: string }; Returns: Json }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
