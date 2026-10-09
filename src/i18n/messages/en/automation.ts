@@ -154,4 +154,7 @@ export const enAutomation = {
   "automation.ev.payment.received": "A payment is received",
   "automation.ev.certificate.issued": "A speed limiter certificate is issued",
   "automation.ev.stock.below_reorder": "Stock falls below its reorder point",
+  "automation.ev.crm_lead.converted": "A lead is converted to a customer",
+  "automation.ev.crm_opportunity.won": "An opportunity is won",
+  "automation.ev.crm_opportunity.lost": "An opportunity is lost",
 } as const;

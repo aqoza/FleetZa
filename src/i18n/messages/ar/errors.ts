@@ -84,4 +84,11 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.illegalLeadTransition": "لا يمكن نقل هذا العميل المحتمل إلى هذه الحالة.",
+  "errors.leadLocked": "لا يمكن تعديل عميل محتمل تم تحويله، باستثناء المسؤول والملاحظات.",
+  "errors.leadNotDeletable": "لا يمكن حذف عميل محتمل تم تحويله.",
+  "errors.leadNotFound": "هذا العميل المحتمل لم يعد موجودًا.",
+  "errors.leadAlreadyConverted": "تم تحويل هذا العميل المحتمل إلى عميل بالفعل.",
+  "errors.illegalOpportunityTransition": "لا يمكن إعادة فتح فرصة مغلقة إلا إلى مرحلة مفتوحة.",
+  "errors.opportunityLostReasonRequired": "اذكر سببًا قبل تسجيل الفرصة كخاسرة.",
 };
