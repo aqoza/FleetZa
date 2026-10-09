@@ -84,4 +84,8 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.portalLinkInvalid": "رابط البوابة هذا لم يعد صالحًا.",
+  "errors.portalRequestsDisabled": "لا يمكن إرسال طلبات من رابط البوابة هذا.",
+  "errors.portalRequestInvalid": "تحقق من تفاصيل الطلب وحاول مرة أخرى.",
+  "errors.illegalRequestTransition": "لا يمكن نقل هذا الطلب إلى هذه الحالة.",
 };

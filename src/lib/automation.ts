@@ -122,6 +122,15 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "service_request.created", module: "customer_portal", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "customer", kind: "text" },
+      { name: "request_type", kind: "text", options: ["service", "inspection", "installation", "renewal", "support", "other"] },
+      { name: "vehicle", kind: "text" }, { name: "preferred_date", kind: "date" }, { name: "description", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000040", doc_number: "SRQ-00012", customer_id: "00000000-0000-4000-8000-000000000031",
+      customer: "Gulf Freight Co.", request_type: "inspection", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      vehicle: "Truck 07", preferred_date: "2026-10-20", description: "Annual inspection before the permit renewal" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

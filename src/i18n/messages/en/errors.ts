@@ -86,4 +86,8 @@ export const enErrors = {
   "errors.memberNotFound": "This member is no longer in your organization.",
   "errors.cannotSignOutSelf": "You can't sign yourself out from here. Use Sign out instead.",
   "errors.cannotSignOutOwner": "The owner's sessions can't be revoked by another member.",
+  "errors.portalLinkInvalid": "This portal link is no longer valid.",
+  "errors.portalRequestsDisabled": "This portal link can't send requests.",
+  "errors.portalRequestInvalid": "Check the request details and try again.",
+  "errors.illegalRequestTransition": "That request can't move to this status.",
 } as const;

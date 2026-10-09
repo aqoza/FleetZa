@@ -74,6 +74,14 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "customer_portal.request": {
+        const type = strParam(p, "type") || "other";
+        const vars = { type: t(`customerPortal.type.${type}` as MessageKey), vehicle: bdiText(strParam(p, "vehicle")) };
+        return {
+          title: t("notifications.msg.portalRequest.title", { number: ltrText(strParam(p, "number")), customer: bdiText(strParam(p, "customer")) }),
+          body: strParam(p, "vehicle") ? t("notifications.msg.portalRequest.bodyVehicle", vars) : t("notifications.msg.portalRequest.body", vars),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
