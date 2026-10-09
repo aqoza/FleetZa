@@ -122,6 +122,32 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
   },
+  {
+    event: "contract.activated", module: "contracts", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" },
+      { name: "contract_type", kind: "text", options: ["lease", "rental", "service", "maintenance", "sla", "speed_limiter_service", "other"] },
+      { name: "billing_frequency", kind: "text", options: ["monthly", "quarterly", "semi_annual", "annual", "one_time"] },
+      { name: "recurring_amount", kind: "number" }, { name: "start_date", kind: "date" }, { name: "end_date", kind: "date" }],
+    sample: { contract_id: "00000000-0000-4000-8000-000000000030", doc_number: "CTR-00004", customer_id: "00000000-0000-4000-8000-000000000031",
+      contract_type: "maintenance", title: "Fleet maintenance", start_date: "2026-10-01", end_date: "2027-09-30",
+      billing_frequency: "monthly", recurring_amount: 1000, currency: "OMR", termination_reason: null, renewed_from: null },
+  },
+  {
+    event: "contract.terminated", module: "contracts", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" }, { name: "termination_reason", kind: "text" },
+      { name: "recurring_amount", kind: "number" }],
+    sample: { contract_id: "00000000-0000-4000-8000-000000000030", doc_number: "CTR-00004", customer_id: "00000000-0000-4000-8000-000000000031",
+      contract_type: "maintenance", title: "Fleet maintenance", start_date: "2026-10-01", end_date: "2027-09-30",
+      billing_frequency: "monthly", recurring_amount: 1000, currency: "OMR", termination_reason: "Customer sold the fleet", renewed_from: null },
+  },
+  {
+    event: "contract.renewed", module: "contracts", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "start_date", kind: "date" }, { name: "end_date", kind: "date" },
+      { name: "recurring_amount", kind: "number" }],
+    sample: { contract_id: "00000000-0000-4000-8000-000000000030", doc_number: "CTR-00004", renewed_to: "00000000-0000-4000-8000-000000000032",
+      customer_id: "00000000-0000-4000-8000-000000000031", start_date: "2027-10-01", end_date: "2028-09-30",
+      recurring_amount: 1100, currency: "OMR" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

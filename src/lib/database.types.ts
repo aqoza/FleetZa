@@ -433,6 +433,247 @@ export type Database = {
           },
         ]
       }
+      contract_invoices: {
+        Row: {
+          contract_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_id: string
+          period_end: string
+          period_start: string
+          tenant_id: string
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id: string
+          period_end: string
+          period_start: string
+          tenant_id: string
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id?: string
+          period_end?: string
+          period_start?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_invoices_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_invoices_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_invoices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contract_vehicles: {
+        Row: {
+          contract_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          rate_override: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          contract_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          rate_override?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          contract_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          rate_override?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_vehicles_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_vehicles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contract_vehicles_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          activated_at: string | null
+          auto_renew: boolean
+          billing_frequency: string
+          contract_type: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string
+          doc_number: string | null
+          end_date: string | null
+          id: string
+          next_billing_date: string | null
+          notes: string | null
+          notice_days: number
+          number: number | null
+          recurring_amount: number
+          renewed_from: string | null
+          renewed_to: string | null
+          signed_at: string | null
+          signed_by_name: string | null
+          start_date: string
+          status: string
+          tax_rate: number | null
+          tenant_id: string
+          terminated_at: string | null
+          termination_reason: string | null
+          terms: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          auto_renew?: boolean
+          billing_frequency?: string
+          contract_type?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id: string
+          doc_number?: string | null
+          end_date?: string | null
+          id?: string
+          next_billing_date?: string | null
+          notes?: string | null
+          notice_days?: number
+          number?: number | null
+          recurring_amount?: number
+          renewed_from?: string | null
+          renewed_to?: string | null
+          signed_at?: string | null
+          signed_by_name?: string | null
+          start_date: string
+          status?: string
+          tax_rate?: number | null
+          tenant_id?: string
+          terminated_at?: string | null
+          termination_reason?: string | null
+          terms?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          auto_renew?: boolean
+          billing_frequency?: string
+          contract_type?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string
+          doc_number?: string | null
+          end_date?: string | null
+          id?: string
+          next_billing_date?: string | null
+          notes?: string | null
+          notice_days?: number
+          number?: number | null
+          recurring_amount?: number
+          renewed_from?: string | null
+          renewed_to?: string | null
+          signed_at?: string | null
+          signed_by_name?: string | null
+          start_date?: string
+          status?: string
+          tax_rate?: number | null
+          tenant_id?: string
+          terminated_at?: string | null
+          termination_reason?: string | null
+          terms?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_renewed_from_fkey"
+            columns: ["renewed_from"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_renewed_to_fkey"
+            columns: ["renewed_to"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contracts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
@@ -4551,6 +4792,16 @@ export type Database = {
         }
         Returns: undefined
       }
+      contract_bill_period: { Args: { p_contract_id: string }; Returns: string }
+      contract_renew: {
+        Args: {
+          p_contract_id: string
+          p_end_date?: string
+          p_recurring_amount?: number
+        }
+        Returns: string
+      }
+      contracts_bill_due: { Args: never; Returns: number }
       convert_quote_to_order: {
         Args: { p_quote_id: string }
         Returns: {
