@@ -190,6 +190,19 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   SHIPMENT_NOT_FOUND: "errors.shipmentNotFound",
   SHIPMENT_NOT_INVOICEABLE: "errors.shipmentNotInvoiceable",
   SHIPMENT_ALREADY_INVOICED: "errors.shipmentAlreadyInvoiced",
+  WORKSHOP_BAY_CONFLICT: "errors.workshopBayConflict",
+  WORKSHOP_BAY_UNAVAILABLE: "errors.workshopBayUnavailable",
+  WORKSHOP_BAY_BUSY: "errors.workshopBayBusy",
+  WORK_ORDER_CLOSED: "errors.workOrderClosed",
+  ILLEGAL_BOOKING_TRANSITION: "errors.illegalBookingTransition",
+  BOOKING_LOCKED: "errors.bookingLocked",
+  BOOKING_NOT_DELETABLE: "errors.bookingNotDeletable",
+  LABOR_ALREADY_CLOCKED_ON: "errors.laborAlreadyClockedOn",
+  INVALID_LABOR_TIME: "errors.invalidLaborTime",
+  EMPLOYEE_NOT_ACTIVE: "errors.employeeNotActive",
+  WORK_ORDER_NOT_FOUND: "errors.workOrderNotFound",
+  LABOR_NOT_FOUND: "errors.laborNotFound",
+  INVENTORY_DISABLED: "errors.inventoryDisabled",
 };
 
 /**
