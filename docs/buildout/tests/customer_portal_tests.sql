@@ -206,7 +206,11 @@ set local role service_role;
 create temp table _view3 as
   select public.customer_portal_view((select token from public.customer_portal_access where id = (select id from _ids where k = 'link'))) as v;
 insert into _t select 'view: active contracts only', (select (v->'sections'->>'contracts')::boolean
-  and jsonb_array_length(v->'contracts') = 1 and v->'contracts'->0->>'doc_number' = 'CTR-T1' from _view3),
+  and jsonb_array_length(v->'contracts') = 1
+  and v->'contracts'->0->>'id' = (select id::text from public.contracts where title = 'Active one'
+    and customer_id = 'a7e1c0de-0028-4b2c-9d3e-4f5a6b7c8d01')
+  and v->'contracts'->0->>'doc_number' = (select doc_number from public.contracts where title = 'Active one'
+    and customer_id = 'a7e1c0de-0028-4b2c-9d3e-4f5a6b7c8d01') from _view3),
   (select (v->'contracts')::text from _view3);
 reset role;
 set local role authenticated;

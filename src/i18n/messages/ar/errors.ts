@@ -251,4 +251,7 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.expenseAccountInvalid": "اختر حساب مصروفات نشطاً للفئة.",
   "errors.paymentAccountInvalid": "اختر حساب النقدية أو البنك أو الالتزام النشط الذي دُفع منه المصروف.",
   "errors.financeSourceNotFound": "لا يوجد ما يُرحّل لهذا السجل: قد يكون مسودة أو ملغى أو محذوفاً.",
+  "errors.biUnknownMetric": "يستخدم هذا الرسم مقياسًا غير موجود.",
+  "errors.biInvalidDimension": "لا يمكن تقسيم هذا المقياس بهذه الطريقة.",
+  "errors.biInvalidPeriod": "اختر فترة لا تتجاوز ثلاث سنوات، تبدأ قبل أن تنتهي.",
 };

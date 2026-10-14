@@ -252,4 +252,7 @@ export const enErrors = {
   "errors.expenseAccountInvalid": "Pick an active expense account for the category.",
   "errors.paymentAccountInvalid": "Pick the active cash, bank or liability account the expense was paid from.",
   "errors.financeSourceNotFound": "There's nothing to post for that record: it may be a draft, voided or deleted.",
+  "errors.biUnknownMetric": "This chart uses a measure that does not exist.",
+  "errors.biInvalidDimension": "This measure cannot be broken down that way.",
+  "errors.biInvalidPeriod": "Pick a period of up to three years, with the start before the end.",
 } as const;

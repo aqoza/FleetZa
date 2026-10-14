@@ -262,6 +262,9 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   EXPENSE_ACCOUNT_INVALID: "errors.expenseAccountInvalid",
   PAYMENT_ACCOUNT_INVALID: "errors.paymentAccountInvalid",
   FINANCE_SOURCE_NOT_FOUND: "errors.financeSourceNotFound",
+  BI_UNKNOWN_METRIC: "errors.biUnknownMetric",
+  BI_INVALID_DIMENSION: "errors.biInvalidDimension",
+  BI_INVALID_PERIOD: "errors.biInvalidPeriod",
 };
 
 /**
