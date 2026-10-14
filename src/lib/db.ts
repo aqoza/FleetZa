@@ -181,6 +181,15 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   DELIVERY_LOCKED: "errors.deliveryLocked",
   DELIVERY_NOT_DELETABLE: "errors.deliveryNotDeletable",
   IMPORT_TOO_LARGE: "errors.importTooLarge",
+  ILLEGAL_SHIPMENT_TRANSITION: "errors.illegalShipmentTransition",
+  SHIPMENT_CARRIER_REQUIRED: "errors.shipmentCarrierRequired",
+  SHIPMENT_POD_REQUIRED: "errors.shipmentPodRequired",
+  INVALID_POD_TIME: "errors.invalidPodTime",
+  SHIPMENT_LOCKED: "errors.shipmentLocked",
+  SHIPMENT_NOT_DELETABLE: "errors.shipmentNotDeletable",
+  SHIPMENT_NOT_FOUND: "errors.shipmentNotFound",
+  SHIPMENT_NOT_INVOICEABLE: "errors.shipmentNotInvoiceable",
+  SHIPMENT_ALREADY_INVOICED: "errors.shipmentAlreadyInvoiced",
 };
 
 /**

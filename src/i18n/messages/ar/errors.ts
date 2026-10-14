@@ -170,4 +170,13 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.deliveryLocked": "انتهت عملية التوصيل هذه، لذا لم يعد بالإمكان تعديلها.",
   "errors.deliveryNotDeletable": "يمكن حذف عمليات التوصيل التي ما زالت بالانتظار فقط.",
   "errors.importTooLarge": "استورد 500 عملية توصيل كحد أقصى في المرة الواحدة.",
+  "errors.illegalShipmentTransition": "لا يمكن نقل هذه الشحنة إلى تلك الحالة من حالتها الحالية.",
+  "errors.shipmentCarrierRequired": "اختر مركبة (أسطول خاص) أو ناقلًا (طرف ثالث) قبل الإرسال.",
+  "errors.shipmentPodRequired": "أدخل اسم مستلم الشحنة لتسجيلها كمسلَّمة.",
+  "errors.invalidPodTime": "لا يمكن أن يكون وقت التسليم في المستقبل أو قبل الإرسال.",
+  "errors.shipmentLocked": "لا يمكن تعديل الشحنات المغلقة أو الملغاة باستثناء الملاحظات.",
+  "errors.shipmentNotDeletable": "يمكن حذف الشحنات المسودة فقط. ألغِها بدلًا من ذلك.",
+  "errors.shipmentNotFound": "هذه الشحنة لم تعد موجودة.",
+  "errors.shipmentNotInvoiceable": "يمكن فوترة الشحنات المسلَّمة أو المغلقة ذات الرسوم فقط.",
+  "errors.shipmentAlreadyInvoiced": "لهذه الشحنة فاتورة بالفعل. ألغِ الفاتورة أولًا لإعادة الفوترة.",
 };

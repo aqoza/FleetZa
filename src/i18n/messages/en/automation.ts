@@ -156,4 +156,5 @@ export const enAutomation = {
   "automation.ev.dispatch_job.completed": "A dispatch job is completed",
   "automation.ev.delivery.delivered": "A delivery is delivered",
   "automation.ev.delivery.failed": "A delivery attempt fails",
+  "automation.ev.shipment.status_changed": "A shipment changes status",
 } as const;

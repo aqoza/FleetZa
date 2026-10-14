@@ -166,4 +166,5 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.dispatch_job.completed": "اكتمال مهمة إرسال",
   "automation.ev.delivery.delivered": "تسليم عملية توصيل",
   "automation.ev.delivery.failed": "تعذر محاولة توصيل",
+  "automation.ev.shipment.status_changed": "تغيّر حالة شحنة",
 };

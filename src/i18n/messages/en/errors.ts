@@ -171,4 +171,13 @@ export const enErrors = {
   "errors.deliveryLocked": "This delivery is finished, so it can no longer be changed.",
   "errors.deliveryNotDeletable": "Only deliveries that are still waiting can be deleted.",
   "errors.importTooLarge": "Import at most 500 deliveries at a time.",
+  "errors.illegalShipmentTransition": "This shipment can't move to that status from where it is now.",
+  "errors.shipmentCarrierRequired": "Pick a vehicle (own fleet) or a carrier (third party) before dispatching.",
+  "errors.shipmentPodRequired": "Enter who received the shipment to mark it delivered.",
+  "errors.invalidPodTime": "The delivery time can't be in the future or before dispatch.",
+  "errors.shipmentLocked": "Closed and canceled shipments can't be changed, except their notes.",
+  "errors.shipmentNotDeletable": "Only draft shipments can be deleted. Cancel it instead.",
+  "errors.shipmentNotFound": "That shipment no longer exists.",
+  "errors.shipmentNotInvoiceable": "Only delivered or closed shipments with charges can be invoiced.",
+  "errors.shipmentAlreadyInvoiced": "This shipment already has an invoice. Void it first to invoice again.",
 } as const;

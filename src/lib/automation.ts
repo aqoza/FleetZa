@@ -260,6 +260,15 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { delivery_id: "00000000-0000-4000-8000-000000000020", doc_number: "DLV-00042", city: "Muscat", reference: "SO-1042",
       attempts: 1, failure_reason: "not_home" },
   },
+  {
+    event: "shipment.status_changed", module: "tms", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "customer_id", kind: "id" }, { name: "from_status", kind: "text" },
+      { name: "to_status", kind: "text" }, { name: "mode", kind: "text" }, { name: "origin_city", kind: "text" },
+      { name: "destination_city", kind: "text" }, { name: "total_charge", kind: "number" }],
+    sample: { shipment_id: "00000000-0000-4000-8000-000000000011", doc_number: "SHP-00012",
+      customer_id: "00000000-0000-4000-8000-000000000012", from_status: "in_transit", to_status: "delivered",
+      mode: "road_ftl", origin_city: "Muscat", destination_city: "Sohar", total_charge: 325, on_time: true },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {
