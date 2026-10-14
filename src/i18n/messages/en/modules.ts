@@ -14,8 +14,8 @@ export const enModules = {
   "modules.gps_tracking.description": "See live vehicle locations, routes, and telematics data in real time.",
   "modules.driver_behavior.name": "Driver Behavior & Scoring",
   "modules.driver_behavior.description": "Monitor speeding, harsh braking, and other events to score and coach drivers.",
-  "modules.trip_planning.name": "Trip & Route Planning",
-  "modules.trip_planning.description": "Plan trips and optimize routes to save time and fuel.",
+  "modules.trip_planning.name": "Trip Planning",
+  "modules.trip_planning.description": "Plan multi-stop trips, avoid double-booking vehicles and drivers, and compare plan with actuals.",
   "modules.dispatch.name": "Dispatch Management",
   "modules.dispatch.description": "Assign jobs to vehicles and drivers, follow each one to completion and watch time windows.",
 
@@ -30,8 +30,8 @@ export const enModules = {
   "modules.issues.description": "Report vehicle problems and track them from discovery to resolution.",
   "modules.workshop.name": "Workshop Management",
   "modules.workshop.description": "Manage work orders, mechanics, and repair jobs in your own workshop.",
-  "modules.predictive_ai.name": "AI Assistant & Predictive Maintenance",
-  "modules.predictive_ai.description": "Let AI predict failures and suggest maintenance before breakdowns occur.",
+  "modules.predictive_ai.name": "Predictive Maintenance",
+  "modules.predictive_ai.description": "Explainable risk scores that flag vehicles likely to need maintenance before they break down.",
 
   // --- Compliance & certification ---
   "modules.renewals.name": "Renewals & Documents Expiry",
