@@ -245,6 +245,10 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CONTRACT_NOTHING_TO_BILL: "errors.contractNothingToBill",
   CONTRACT_NOT_RENEWABLE: "errors.contractNotRenewable",
   CONTRACT_NO_END_DATE: "errors.contractNoEndDate",
+  PORTAL_LINK_INVALID: "errors.portalLinkInvalid",
+  PORTAL_REQUESTS_DISABLED: "errors.portalRequestsDisabled",
+  PORTAL_REQUEST_INVALID: "errors.portalRequestInvalid",
+  ILLEGAL_REQUEST_TRANSITION: "errors.illegalRequestTransition",
 };
 
 /**

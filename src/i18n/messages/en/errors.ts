@@ -235,4 +235,8 @@ export const enErrors = {
   "errors.contractNothingToBill": "This contract has nothing left to bill.",
   "errors.contractNotRenewable": "Only active or expired contracts that haven't been renewed can be renewed.",
   "errors.contractNoEndDate": "Give the contract an end date before renewing it.",
+  "errors.portalLinkInvalid": "This portal link is no longer valid.",
+  "errors.portalRequestsDisabled": "This portal link can't send requests.",
+  "errors.portalRequestInvalid": "Check the request details and try again.",
+  "errors.illegalRequestTransition": "That request can't move to this status.",
 } as const;

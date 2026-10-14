@@ -154,4 +154,9 @@ export const enNotifications = {
   "notifications.msg.contractEnding.body": "{customer}: {title}",
   "notifications.msg.contractEnding.bodyRenews": "{customer}: {title}. Renews automatically.",
   "notifications.msg.contractBilling.title": { one: "{count} contract is due for billing", other: "{count} contracts are due for billing" },
+  "notifications.kind.customer_portal.request": "Customer service requests",
+  "notifications.kind.customer_portal.request.desc": "A customer sends a service request from the portal. Sent to managers.",
+  "notifications.msg.portalRequest.title": "New request {number} from {customer}",
+  "notifications.msg.portalRequest.body": "{type}",
+  "notifications.msg.portalRequest.bodyVehicle": "{type} for {vehicle}",
 } as const;

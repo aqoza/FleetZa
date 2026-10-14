@@ -34,6 +34,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "crm.activities_overdue", module: "crm" },
   { kind: "contracts.expiring", module: "contracts" },
   { kind: "contracts.billing_due", module: "contracts" },
+  { kind: "customer_portal.request", module: "customer_portal" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

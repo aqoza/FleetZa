@@ -341,6 +341,15 @@ export const EVENT_CATALOG: EventSpec[] = [
       customer_id: "00000000-0000-4000-8000-000000000031", start_date: "2027-10-01", end_date: "2028-09-30",
       recurring_amount: 1100, currency: "OMR" },
   },
+  {
+    event: "service_request.created", module: "customer_portal", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "customer", kind: "text" },
+      { name: "request_type", kind: "text", options: ["service", "inspection", "installation", "renewal", "support", "other"] },
+      { name: "vehicle", kind: "text" }, { name: "preferred_date", kind: "date" }, { name: "description", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000040", doc_number: "SRQ-00012", customer_id: "00000000-0000-4000-8000-000000000031",
+      customer: "Gulf Freight Co.", request_type: "inspection", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      vehicle: "Truck 07", preferred_date: "2026-10-20", description: "Annual inspection before the permit renewal" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

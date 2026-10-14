@@ -165,4 +165,5 @@ export const enAutomation = {
   "automation.ev.contract.activated": "A contract is activated",
   "automation.ev.contract.terminated": "A contract is terminated",
   "automation.ev.contract.renewed": "A contract is renewed",
+  "automation.ev.service_request.created": "A customer sends a service request",
 } as const;

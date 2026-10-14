@@ -249,4 +249,9 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     many: "{count} عقدًا مستحق الفوترة",
     other: "{count} عقد مستحق الفوترة",
   },
+  "notifications.kind.customer_portal.request": "طلبات خدمة العملاء",
+  "notifications.kind.customer_portal.request.desc": "يرسل عميل طلب خدمة من البوابة. يُرسل إلى المديرين.",
+  "notifications.msg.portalRequest.title": "طلب جديد {number} من {customer}",
+  "notifications.msg.portalRequest.body": "{type}",
+  "notifications.msg.portalRequest.bodyVehicle": "{type} للمركبة {vehicle}",
 };

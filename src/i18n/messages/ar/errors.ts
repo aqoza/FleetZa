@@ -234,4 +234,8 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.contractNothingToBill": "لم يتبقَّ ما يُفوتر في هذا العقد.",
   "errors.contractNotRenewable": "لا يمكن تجديد إلا العقود السارية أو المنتهية التي لم تُجدَّد بعد.",
   "errors.contractNoEndDate": "حدّد تاريخ انتهاء للعقد قبل تجديده.",
+  "errors.portalLinkInvalid": "رابط البوابة هذا لم يعد صالحًا.",
+  "errors.portalRequestsDisabled": "لا يمكن إرسال طلبات من رابط البوابة هذا.",
+  "errors.portalRequestInvalid": "تحقق من تفاصيل الطلب وحاول مرة أخرى.",
+  "errors.illegalRequestTransition": "لا يمكن نقل هذا الطلب إلى هذه الحالة.",
 };
