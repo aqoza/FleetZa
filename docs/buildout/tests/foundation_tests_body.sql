@@ -101,8 +101,11 @@ begin
             and table_name = 'document_sequences' and column_name = 'prefix'),
     (select pg_get_constraintdef(oid) from pg_constraint where conname = 'document_sequences_doc_type_check'));
 
-  perform pg_temp.ok('00f no scanners exist yet',
-    not exists (select 1 from pg_proc where pronamespace = 'app'::regnamespace and proname like 'scan\_due\_%'),
+  -- This suite also runs after the module migrations, which install scanners.
+  perform pg_temp.ok('00f installed scanners implement the discovery contract',
+    not exists (select 1 from pg_proc where pronamespace = 'app'::regnamespace
+      and proname like 'scan\_due\_%'
+      and (pronargs <> 1 or proargtypes[0] <> 'uuid'::regtype or prorettype <> 'integer'::regtype)),
     null);
 
   -- F4: FOR UPDATE would conflict with the KEY SHARE lock a caller's FK insert holds (deadlock)
@@ -314,7 +317,10 @@ begin
     v_err := 'allowed';
   exception when others then v_err := sqlstate;
   end;
-  perform pg_temp.ok('02x-f company with branches cannot be deleted', v_err = '23503', v_err);
+  perform pg_temp.ok('02x-f company with branches cannot be deleted',
+    v_err in ('23503', '23001')
+    and exists(select 1 from public.companies where id = v_c1)
+    and exists(select 1 from public.branches where id = v_br), v_err);
 
   -- HR data: a viewer sees no directory; a viewer linked to an employee sees only themself
   perform pg_temp.become('a0000000-0000-4000-8000-00000000000a', 'viewer');
@@ -808,11 +814,13 @@ begin
   perform pg_temp.ok('07f notifications module off -> 0', v5 = 0, 'result=' || v5);
 end $$;
 
--- 07g F15: a scanner killed by the statement timeout stops the run but the call
--- returns, the throttle claim is kept, and later scanners are skipped
+-- 07g F15: query cancellation stops the scan, preserves its claim and skips
+-- later scanners. Inject the PostgreSQL exception deterministically because
+-- PGlite does not deliver statement_timeout interrupts during pg_sleep.
+-- The real timer is verified separately in production_notification_timeout.sql.
 reset role;
 create function app.scan_due_a_slow(p_tenant uuid) returns integer
-language plpgsql as $$ begin perform pg_sleep(1); return 5; end $$;
+language plpgsql as $$ begin raise query_canceled using message = 'test scanner cancellation'; end $$;
 create function app.scan_due_b_marker(p_tenant uuid) returns integer
 language plpgsql as $$ begin insert into _ctx values ('b_marker_ran', p_tenant); return 1; end $$;
 update public.notification_state set last_scan_at = now() - interval '1 hour', last_scan_count = -1
@@ -828,7 +836,7 @@ begin
   exception when query_canceled then v_err := 'cancelled';
   end;
   reset role;
-  perform pg_temp.ok('07g scanner timeout: call returns, claim kept, rest skipped',
+  perform pg_temp.ok('07g scanner cancellation: call returns, claim kept, rest skipped',
     v_err = 'ok' and v = 0
     and (select last_scan_at = now() and last_scan_count = 0 from public.notification_state
          where tenant_id = '170d2d86-5c22-4bcb-9d74-420c879419b2')
