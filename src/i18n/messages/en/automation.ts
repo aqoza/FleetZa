@@ -148,4 +148,5 @@ export const enAutomation = {
   "automation.ev.purchase_order.acknowledged": "A supplier acknowledges a purchase order",
   "automation.ev.geofence.entered": "A vehicle enters a geofence",
   "automation.ev.geofence.exited": "A vehicle leaves a geofence",
+  "automation.ev.driving_event.created": "A driving event is recorded",
 } as const;

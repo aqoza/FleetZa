@@ -149,4 +149,9 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.geofence.enter": "دخلت {vehicle} نطاق {geofence}",
   "notifications.msg.geofence.exit": "خرجت {vehicle} من نطاق {geofence}",
   "notifications.msg.geofence.body": "في {at}",
+  "notifications.kind.driver_behavior.critical_event": "أحداث القيادة الحرجة",
+  "notifications.kind.driver_behavior.critical_event.desc": "يُبلَّغ عن إرهاق أو تحذير تصادم بدرجة خطورة عالية.",
+  "notifications.msg.drivingCritical.collision": "تحذير تصادم: {who}",
+  "notifications.msg.drivingCritical.fatigue": "تنبيه إرهاق: {who}",
+  "notifications.msg.drivingCritical.body": "{vehicle} في {at}",
 };

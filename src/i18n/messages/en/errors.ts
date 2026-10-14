@@ -130,4 +130,6 @@ export const enErrors = {
   "errors.assetNotAssigned": "This asset isn't assigned to anyone.",
   "errors.invalidAssetStatus": "Use Dispose to retire an asset.",
   "errors.invalidPositionTime": "That time is in the future or too far in the past for a GPS position.",
+  "errors.invalidEventTime": "That time is in the future or too far in the past for a driving event.",
+  "errors.invalidPeriod": "Pick a period whose end is after its start, up to 400 days long.",
 } as const;

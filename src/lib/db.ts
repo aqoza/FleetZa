@@ -140,6 +140,8 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   ASSET_NOT_ASSIGNED: "errors.assetNotAssigned",
   INVALID_ASSET_STATUS: "errors.invalidAssetStatus",
   INVALID_POSITION_TIME: "errors.invalidPositionTime",
+  INVALID_EVENT_TIME: "errors.invalidEventTime",
+  INVALID_PERIOD: "errors.invalidPeriod",
 };
 
 /**

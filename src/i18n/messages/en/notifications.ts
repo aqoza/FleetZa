@@ -110,4 +110,9 @@ export const enNotifications = {
   "notifications.msg.geofence.enter": "{vehicle} entered {geofence}",
   "notifications.msg.geofence.exit": "{vehicle} left {geofence}",
   "notifications.msg.geofence.body": "At {at}",
+  "notifications.kind.driver_behavior.critical_event": "Critical driving events",
+  "notifications.kind.driver_behavior.critical_event.desc": "A high-severity fatigue or collision warning is reported.",
+  "notifications.msg.drivingCritical.collision": "Collision warning: {who}",
+  "notifications.msg.drivingCritical.fatigue": "Fatigue alert: {who}",
+  "notifications.msg.drivingCritical.body": "{vehicle} at {at}",
 } as const;
