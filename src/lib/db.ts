@@ -249,6 +249,19 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PORTAL_REQUESTS_DISABLED: "errors.portalRequestsDisabled",
   PORTAL_REQUEST_INVALID: "errors.portalRequestInvalid",
   ILLEGAL_REQUEST_TRANSITION: "errors.illegalRequestTransition",
+  FINANCE_NOT_SET_UP: "errors.financeNotSetUp",
+  JOURNAL_UNBALANCED: "errors.journalUnbalanced",
+  JOURNAL_LOCKED: "errors.journalLocked",
+  PERIOD_LOCKED: "errors.periodLocked",
+  ENTRY_NOT_REVERSIBLE: "errors.entryNotReversible",
+  ACCOUNT_INACTIVE: "errors.accountInactive",
+  SYSTEM_ACCOUNT: "errors.systemAccount",
+  ACCOUNT_IN_USE: "errors.accountInUse",
+  ILLEGAL_EXPENSE_TRANSITION: "errors.illegalExpenseTransition",
+  EXPENSE_LOCKED: "errors.expenseLocked",
+  EXPENSE_ACCOUNT_INVALID: "errors.expenseAccountInvalid",
+  PAYMENT_ACCOUNT_INVALID: "errors.paymentAccountInvalid",
+  FINANCE_SOURCE_NOT_FOUND: "errors.financeSourceNotFound",
 };
 
 /**
