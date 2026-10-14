@@ -56,6 +56,10 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.employees.document_expiring": "انتهاء وثائق الموظفين",
   "notifications.kind.employees.document_expiring.desc":
     "عندما يقترب انتهاء جواز سفر أو إقامة أو تصريح عمل بـ60 أو 30 أو 7 أيام، أو عند انتهائه.",
+  "notifications.kind.hr.leave_requested": "طلبات الإجازة",
+  "notifications.kind.hr.leave_requested.desc": "عندما يطلب موظف إجازة وتحتاج إلى قرار.",
+  "notifications.kind.hr.leave_decided": "قرارات الإجازة",
+  "notifications.kind.hr.leave_decided.desc": "عند الموافقة على طلب إجازتك أو رفضه.",
   "notifications.kind.documents.expiring": "انتهاء المستندات",
   "notifications.kind.documents.expiring.desc": "عندما يقترب انتهاء مستند محفوظ بـ30 أو 7 أيام، أو عند انتهائه.",
   "notifications.kind.automation.rule": "قواعد الأتمتة",
@@ -75,6 +79,17 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     many: "{employee}: تنتهي صلاحية {document} خلال {count} يومًا",
     other: "{employee}: تنتهي صلاحية {document} خلال {count} يوم",
   },
+  "notifications.msg.leaveRequested": {
+    zero: "{employee} طلب إجازة {type}",
+    one: "{employee} طلب يوم إجازة واحدًا ({type})",
+    two: "{employee} طلب يومي إجازة ({type})",
+    few: "{employee} طلب {count} أيام إجازة ({type})",
+    many: "{employee} طلب {count} يومًا إجازة ({type})",
+    other: "{employee} طلب {count} يوم إجازة ({type})",
+  },
+  "notifications.msg.leaveApproved": "تمت الموافقة على طلب {type}",
+  "notifications.msg.leaveRejected": "تم رفض طلب {type}",
+  "notifications.msg.leaveDates": "{start} – {end}",
   "notifications.msg.document.expired": "انتهت صلاحية {document}",
   "notifications.msg.document.today": "تنتهي صلاحية {document} اليوم",
   "notifications.msg.document.expiresIn": {
