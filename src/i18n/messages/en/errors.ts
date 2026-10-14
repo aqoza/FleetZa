@@ -129,4 +129,5 @@ export const enErrors = {
   "errors.assetAssigneeRequired": "Pick an employee or a vehicle to assign the asset to.",
   "errors.assetNotAssigned": "This asset isn't assigned to anyone.",
   "errors.invalidAssetStatus": "Use Dispose to retire an asset.",
+  "errors.invalidPositionTime": "That time is in the future or too far in the past for a GPS position.",
 } as const;

@@ -181,6 +181,18 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
       supplier: "Gulf Parts LLC", vendor_expected_date: "2026-10-15", vendor_ack_note: "Ships Monday" },
   },
+  {
+    event: "geofence.entered", module: "gps_tracking", hasVehicle: true,
+    fields: [{ name: "geofence", kind: "text" }, { name: "vehicle", kind: "text" }],
+    sample: { geofence_id: "00000000-0000-4000-8000-000000000011", geofence: "Main yard",
+      vehicle_id: "00000000-0000-4000-8000-000000000001", vehicle: "Truck 7", lat: 23.588, lng: 58.3829, at: "2026-10-08T09:30:00Z" },
+  },
+  {
+    event: "geofence.exited", module: "gps_tracking", hasVehicle: true,
+    fields: [{ name: "geofence", kind: "text" }, { name: "vehicle", kind: "text" }],
+    sample: { geofence_id: "00000000-0000-4000-8000-000000000011", geofence: "Main yard",
+      vehicle_id: "00000000-0000-4000-8000-000000000001", vehicle: "Truck 7", lat: 23.61, lng: 58.41, at: "2026-10-08T11:05:00Z" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

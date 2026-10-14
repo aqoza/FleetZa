@@ -164,6 +164,15 @@ export function useNotificationText() {
           body: t("notifications.msg.warranty.body", { date: ltrText(formatDate(strParam(p, "expiry"))) }),
         };
       }
+      case "gps.geofence_alert": {
+        const vars = { vehicle: bdiText(strParam(p, "vehicle")), geofence: bdiText(strParam(p, "geofence")) };
+        return {
+          title: strParam(p, "event") === "exit"
+            ? t("notifications.msg.geofence.exit", vars)
+            : t("notifications.msg.geofence.enter", vars),
+          body: t("notifications.msg.geofence.body", { at: ltrText(formatDateTime(strParam(p, "at"))) }),
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

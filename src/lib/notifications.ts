@@ -24,6 +24,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "purchasing.po_late", module: "purchasing" },
   { kind: "vendor_portal.po_acknowledged", module: "vendor_portal" },
   { kind: "assets.warranty_expiring", module: "assets" },
+  { kind: "gps.geofence_alert", module: "gps_tracking" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

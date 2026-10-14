@@ -144,4 +144,9 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   },
   "notifications.msg.warranty.endsToday": "ينتهي الضمان اليوم: {asset}",
   "notifications.msg.warranty.body": "تاريخ انتهاء الضمان {date}",
+  "notifications.kind.gps.geofence_alert": "تنبيهات النطاقات الجغرافية",
+  "notifications.kind.gps.geofence_alert.desc": "تدخل مركبة نطاقًا جغرافيًا مفعّلة تنبيهاته أو تخرج منه.",
+  "notifications.msg.geofence.enter": "دخلت {vehicle} نطاق {geofence}",
+  "notifications.msg.geofence.exit": "خرجت {vehicle} من نطاق {geofence}",
+  "notifications.msg.geofence.body": "في {at}",
 };

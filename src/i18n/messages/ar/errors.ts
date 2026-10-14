@@ -128,4 +128,5 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.assetAssigneeRequired": "اختر موظفًا أو مركبة لتسليم الأصل إليها.",
   "errors.assetNotAssigned": "هذا الأصل غير مسلَّم لأحد.",
   "errors.invalidAssetStatus": "استخدم \"التخلص\" لإخراج أصل من الخدمة.",
+  "errors.invalidPositionTime": "هذا الوقت في المستقبل أو بعيد جدًا في الماضي بالنسبة لموقع GPS.",
 };

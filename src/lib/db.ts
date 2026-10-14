@@ -139,6 +139,7 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   ASSET_ASSIGNEE_REQUIRED: "errors.assetAssigneeRequired",
   ASSET_NOT_ASSIGNED: "errors.assetNotAssigned",
   INVALID_ASSET_STATUS: "errors.invalidAssetStatus",
+  INVALID_POSITION_TIME: "errors.invalidPositionTime",
 };
 
 /**
@@ -247,4 +248,24 @@ export async function updateRow<T>(
 export async function deleteRow(table: TableName, id: string): Promise<void> {
   const { error } = await (fromTable(table).delete() as unknown as AnyFilter).eq("id", id);
   if (error) throw wrapDbError(error);
+}
+
+/**
+ * Bulk insert (imports). With `skipDuplicatesOn` rows that hit that unique
+ * key are skipped (ON CONFLICT DO NOTHING) instead of failing the batch.
+ * Returns how many rows were actually inserted.
+ */
+export async function insertMany(
+  table: TableName,
+  rows: Array<Record<string, unknown>>,
+  opts: { skipDuplicatesOn?: string } = {},
+): Promise<number> {
+  if (rows.length === 0) return 0;
+  const q = (supabase.from as unknown as (t: string) => { upsert: (...a: unknown[]) => AnyFilter; insert: (...a: unknown[]) => AnyFilter })(table);
+  const builder = opts.skipDuplicatesOn
+    ? q.upsert(rows, { onConflict: opts.skipDuplicatesOn, ignoreDuplicates: true })
+    : q.insert(rows);
+  const { data, error } = await builder.select("id");
+  if (error) throw wrapDbError(error);
+  return (data ?? []).length;
 }

@@ -105,4 +105,9 @@ export const enNotifications = {
   "notifications.msg.warranty.endsIn": { one: "Warranty ends tomorrow: {asset}", other: "Warranty ends in {count} days: {asset}" },
   "notifications.msg.warranty.endsToday": "Warranty ends today: {asset}",
   "notifications.msg.warranty.body": "Warranty end date {date}",
+  "notifications.kind.gps.geofence_alert": "Geofence alerts",
+  "notifications.kind.gps.geofence_alert.desc": "A vehicle enters or leaves a geofence that has alerts turned on.",
+  "notifications.msg.geofence.enter": "{vehicle} entered {geofence}",
+  "notifications.msg.geofence.exit": "{vehicle} left {geofence}",
+  "notifications.msg.geofence.body": "At {at}",
 } as const;

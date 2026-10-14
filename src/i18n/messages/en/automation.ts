@@ -146,4 +146,6 @@ export const enAutomation = {
   "automation.ev.purchase_order.received": "A purchase order is fully received",
   "automation.ev.vendor_bill.paid": "A vendor bill is paid",
   "automation.ev.purchase_order.acknowledged": "A supplier acknowledges a purchase order",
+  "automation.ev.geofence.entered": "A vehicle enters a geofence",
+  "automation.ev.geofence.exited": "A vehicle leaves a geofence",
 } as const;
