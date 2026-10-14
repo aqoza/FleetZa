@@ -159,7 +159,7 @@ export function OrderModal({ id, onClose, onOpen }: { id: string | null; onClose
   const submit = onSubmit(() => run(async () => {
     const { data, error: e } = await supabase.rpc("pos_refund", { p_order_id: id ?? "", p_reason: textOrNull(reason) ?? undefined });
     if (e) throw wrapDbError(e);
-    return data as string;
+    return (data as { order_id: string }).order_id;
   }));
   const money = (v: unknown) => <Ltr>{formatMoney(n(v), o?.currency ?? "USD")}</Ltr>;
   const canRefund = isManager && o && o.status === "completed" && !o.refund_of;
