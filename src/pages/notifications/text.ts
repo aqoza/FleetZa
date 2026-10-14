@@ -41,6 +41,29 @@ export function useNotificationText() {
         const expiry = strParam(p, "expiry");
         return { title, body: expiry ? t("notifications.msg.expiryDate", { date: ltrText(formatDate(expiry)) }) : null };
       }
+      case "hr.leave_requested": {
+        const vars = { employee: bdiText(strParam(p, "employee")), type: bdiText(strParam(p, "type")) };
+        return {
+          title: tp("notifications.msg.leaveRequested", numParam(p, "days") ?? 0, vars),
+          body: t("notifications.msg.leaveDates", {
+            start: ltrText(formatDate(strParam(p, "start"))),
+            end: ltrText(formatDate(strParam(p, "end"))),
+          }),
+        };
+      }
+      case "hr.leave_decided": {
+        const vars = { type: bdiText(strParam(p, "type")) };
+        return {
+          title:
+            strParam(p, "decision") === "approved"
+              ? t("notifications.msg.leaveApproved", vars)
+              : t("notifications.msg.leaveRejected", vars),
+          body: t("notifications.msg.leaveDates", {
+            start: ltrText(formatDate(strParam(p, "start"))),
+            end: ltrText(formatDate(strParam(p, "end"))),
+          }),
+        };
+      }
       case "documents.expiring": {
         const days = numParam(p, "days") ?? 0;
         const vars = { document: bdiText(strParam(p, "document")) };
