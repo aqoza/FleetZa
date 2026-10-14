@@ -14,6 +14,7 @@ import {
 import { GRID_STROKE, TICK_STYLE, TOOLTIP_CONTENT_STYLE, TOOLTIP_ITEM_STYLE, TOOLTIP_LABEL_STYLE, CURSOR_FILL } from "../../lib/chart";
 import { getCountry } from "../../../shared/countries";
 import { wrapDbError } from "../../lib/db";
+import { downloadCsv } from "../../lib/csv";
 import {
   computeEfficiency,
   efficiencyLabel,
@@ -44,24 +45,6 @@ interface EfficiencyRow {
   name: string;
   liters: number;
   avgEfficiency: number | null;
-}
-
-function csvEscape(value: string | number): string {
-  const s = String(value);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
-
-function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
-  const csv = rows.map((r) => r.map(csvEscape).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
 }
 
 export default function ReportsPage() {

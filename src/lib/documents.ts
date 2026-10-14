@@ -53,6 +53,16 @@ export function defaultDocumentName(fileName: string): string {
   return (dot > 0 ? fileName.slice(0, dot) : fileName).trim().slice(0, 255);
 }
 
+/** Display names omit extensions; downloads must retain the uploaded file type. */
+export function documentDownloadName(name: string, path: string): string {
+  const original = path.split("/").pop() ?? "";
+  const extension = original.match(/\.[\p{L}\p{N}]{1,10}$/u)?.[0] ?? "";
+  const title = name.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-")
+    .replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 180) || "file";
+  return extension && !title.toLowerCase().endsWith(extension.toLowerCase())
+    ? `${title}${extension}` : title;
+}
+
 export function formatBytes(n: number | null | undefined): string {
   if (n == null) return "—";
   if (n < 1024) return `${n} B`;

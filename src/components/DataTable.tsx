@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Download, Columns3 } from "lucide-react";
 import { Bdi, Button, Ltr } from "./ui";
 import { useT } from "../i18n";
+import { downloadCsv } from "../lib/csv";
 
 export interface DataTableColumn<T> {
   id: string;
@@ -32,13 +33,6 @@ const BREAKPOINT_CLASS: Record<string, string> = {
   lg: "hidden lg:table-cell",
   xl: "hidden xl:table-cell",
 };
-
-function csvEscape(value: string | number): string {
-  let s = String(value);
-  // Neutralize spreadsheet formula injection (=, +, -, @ starters).
-  if (/^[=+\-@]/.test(s)) s = `'${s}`;
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 /**
  * The platform table (docs/DESIGN_SYSTEM.md): tokenized, sortable on the
@@ -150,22 +144,13 @@ export function DataTable<T>({
 
   function exportCsv() {
     const cols = visible.filter((c) => c.exportValue ?? c.sortValue);
-    const lines = [
-      cols.map((c) => csvEscape(c.header)).join(","),
+    const values = [
+      cols.map((c) => c.header),
       ...sorted.map((r) =>
-        cols.map((c) => csvEscape((c.exportValue ?? c.sortValue)!(r) ?? "")).join(","),
+        cols.map((c) => (c.exportValue ?? c.sortValue)!(r) ?? ""),
       ),
     ];
-    // BOM so Excel decodes UTF-8 (Arabic headers/values) correctly.
-    const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${exportName ?? tableId}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+    downloadCsv(`${exportName ?? tableId}.csv`, values);
   }
 
   const allSelected = rows.length > 0 && selected.size === rows.length;

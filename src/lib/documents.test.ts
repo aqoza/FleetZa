@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  daysBetween, defaultDocumentName, expiryState, formatBytes, parseTags, safeFileName, storagePath,
+  daysBetween, defaultDocumentName, documentDownloadName, expiryState, formatBytes, parseTags, safeFileName, storagePath,
 } from "./documents";
 
 describe("documents helpers", () => {
@@ -35,6 +35,19 @@ describe("documents helpers", () => {
   it("derives a default name", () => {
     expect(defaultDocumentName("Insurance card.jpeg")).toBe("Insurance card");
     expect(defaultDocumentName(".env")).toBe(".env");
+  });
+
+  it("DOC-DOWNLOAD-001 retains the stored extension when the display title omits it", () => {
+    expect(documentDownloadName("Audit Document", "tenant/id/original.txt")).toBe("Audit Document.txt");
+    expect(documentDownloadName("Insurance", "tenant/id/scan.pdf")).toBe("Insurance.pdf");
+    expect(documentDownloadName("عقد الإيجار", "tenant/id/lease.pdf")).toBe("عقد الإيجار.pdf");
+  });
+
+  it("avoids duplicate extensions and unsafe download path characters", () => {
+    expect(documentDownloadName("SCAN.PDF", "tenant/id/scan.pdf")).toBe("SCAN.PDF");
+    expect(documentDownloadName("../report:copy", "tenant/id/report.csv")).toBe("-report-copy.csv");
+    expect(documentDownloadName("  ", "tenant/id/report.txt")).toBe("file.txt");
+    expect(documentDownloadName("Read me", "tenant/id/README")).toBe("Read me");
   });
 
   it("formats sizes", () => {
