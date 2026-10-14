@@ -13,9 +13,16 @@ export type Severity = "info" | "warning" | "critical";
 export const NOTIFICATION_KINDS = [
   { kind: "inventory.low_stock", module: "inventory" },
   { kind: "employees.document_expiring", module: "employees" },
+  { kind: "hr.leave_requested", module: "payroll_hr" },
+  { kind: "hr.leave_decided", module: "payroll_hr" },
   { kind: "documents.expiring", module: "documents" },
   { kind: "automation.rule", module: "workflow_automation" },
   { kind: "integrations.webhook_failed", module: "integrations" },
+  { kind: "field.task_assigned", module: "mobile_workforce" },
+  { kind: "field.task_overdue", module: "mobile_workforce" },
+  { kind: "purchasing.bill_due", module: "purchasing" },
+  { kind: "purchasing.po_late", module: "purchasing" },
+  { kind: "vendor_portal.po_acknowledged", module: "vendor_portal" },
   { kind: "assets.warranty_expiring", module: "assets" },
 ] as const;
 

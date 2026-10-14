@@ -44,7 +44,7 @@ export interface EventSpec {
 
 const PRIORITY = ["low", "normal", "high", "critical"];
 
-/** Every event the server raises (migration 20261008000006 + the foundation's stock alert). */
+/** Every event the server raises (migration 20261008000006, payroll_hr's 20261008000009 and the foundation's stock alert). */
 export const EVENT_CATALOG: EventSpec[] = [
   {
     event: "vehicle.created", module: "fleet", hasVehicle: true,
@@ -116,11 +116,70 @@ export const EVENT_CATALOG: EventSpec[] = [
       vehicle_id: "00000000-0000-4000-8000-000000000001", expires_at: "2027-10-08", status: "active" },
   },
   {
+    event: "leave_request.approved", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "employee", kind: "text" }, { name: "leave_type", kind: "text" },
+      { name: "start_date", kind: "date" }, { name: "end_date", kind: "date" }, { name: "days", kind: "number" }],
+    sample: { id: "00000000-0000-4000-8000-000000000011", employee_id: "00000000-0000-4000-8000-000000000012",
+      employee: "Sara Al Harthy", leave_type: "Annual leave", start_date: "2026-11-01", end_date: "2026-11-05", days: 5 },
+  },
+  {
+    event: "payroll_run.approved", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "period_start", kind: "date" }, { name: "period_end", kind: "date" },
+      { name: "employee_count", kind: "number" }, { name: "total_net", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000013", doc_number: "PAY-00012", period_start: "2026-10-01",
+      period_end: "2026-10-31", employee_count: 24, total_net: 61250, currency: "OMR" },
+  },
+  {
+    event: "payroll_run.paid", module: "payroll_hr", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "paid_at", kind: "date" },
+      { name: "employee_count", kind: "number" }, { name: "total_net", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000013", doc_number: "PAY-00012", paid_at: "2026-10-28",
+      employee_count: 24, total_net: 61250, currency: "OMR" },
+  },
+  {
     event: "stock.below_reorder", module: "inventory", hasVehicle: false,
     fields: [{ name: "name", kind: "text" }, { name: "sku", kind: "text" }, { name: "on_hand", kind: "number" },
       { name: "reorder_point", kind: "number" }, { name: "reorder_qty", kind: "number" }],
     sample: { item_id: "00000000-0000-4000-8000-000000000010", name: "Brake pads (set)", sku: "BP-220",
       on_hand: 3, reorder_point: 4, reorder_qty: 10 },
+  },
+  {
+    event: "field_task.completed", module: "mobile_workforce", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" }, { name: "employee", kind: "text" },
+      { name: "priority", kind: "text", options: ["low", "medium", "high", "urgent"] }, { name: "completed_at", kind: "date" }],
+    sample: { id: "00000000-0000-4000-8000-000000000014", doc_number: "TSK-00031", title: "Install speed limiter",
+      employee_id: "00000000-0000-4000-8000-000000000012", employee: "Sara Al Harthy",
+      customer_id: null, vehicle_id: "00000000-0000-4000-8000-000000000001", priority: "high",
+      completed_at: "2026-10-08T10:42:00Z", signed: true },
+  },
+  {
+    event: "purchase_order.sent", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" }, { name: "order_date", kind: "date" },
+      { name: "expected_date", kind: "date" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "purchase_order.received", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "vendor_bill.paid", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "supplier_invoice_number", kind: "text" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000017", doc_number: "BILL-00007", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", supplier_invoice_number: "GP-7781", total: 1250.5, currency: "OMR",
+      purchase_order_id: "00000000-0000-4000-8000-000000000015" },
+  },
+  {
+    event: "purchase_order.acknowledged", module: "vendor_portal", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "vendor_expected_date", kind: "date" }, { name: "vendor_ack_note", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", vendor_expected_date: "2026-10-15", vendor_ack_note: "Ships Monday" },
   },
 ];
 
