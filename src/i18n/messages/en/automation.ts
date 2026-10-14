@@ -158,4 +158,5 @@ export const enAutomation = {
   "automation.ev.delivery.failed": "A delivery attempt fails",
   "automation.ev.shipment.status_changed": "A shipment changes status",
   "automation.ev.insurance_claim.status_changed": "A claim changes status",
+  "automation.ev.incident.reported": "An incident is reported",
 } as const;

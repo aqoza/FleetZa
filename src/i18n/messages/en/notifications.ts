@@ -129,4 +129,10 @@ export const enNotifications = {
   "notifications.msg.policy.endsIn": { one: "Policy ends tomorrow: {policy}", other: "Policy ends in {count} days: {policy}" },
   "notifications.msg.policy.endsToday": "Policy ends today: {policy}",
   "notifications.msg.policy.body": "{insurer}, end date {date}",
+  "notifications.kind.incidents.major": "Major incidents",
+  "notifications.kind.incidents.major.desc": "An incident is reported as major or critical, or raised to it.",
+  "notifications.msg.incident.major": "Major incident {number}: {vehicle}",
+  "notifications.msg.incident.critical": "Critical incident {number}: {vehicle}",
+  "notifications.msg.incident.body": "{type}",
+  "notifications.msg.incident.bodyInjured": { one: "{type}, {count} person injured", other: "{type}, {count} people injured" },
 } as const;

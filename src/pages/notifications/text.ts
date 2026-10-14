@@ -1,3 +1,4 @@
+import { INCIDENT_TYPES, type IncidentType } from "../../../shared/incidents";
 import { bdiText, ltrText } from "../../lib/bidi";
 import { formatDate, formatDateTime, formatMoney } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
@@ -219,6 +220,18 @@ export function useNotificationText() {
             insurer: bdiText(strParam(p, "insurer")),
             date: ltrText(formatDate(strParam(p, "expiry"))),
           }),
+        };
+      }
+      case "incidents.major": {
+        const injuries = numParam(p, "injuries") ?? 0;
+        const raw = strParam(p, "incident_type");
+        const type = (INCIDENT_TYPES as readonly string[]).includes(raw) ? t(`incidents.type.${raw as IncidentType}`) : raw;
+        const vars = { number: ltrText(strParam(p, "doc_number")), vehicle: bdiText(strParam(p, "vehicle")) };
+        return {
+          title: strParam(p, "severity") === "critical"
+            ? t("notifications.msg.incident.critical", vars)
+            : t("notifications.msg.incident.major", vars),
+          body: injuries > 0 ? tp("notifications.msg.incident.bodyInjured", injuries, { type }) : t("notifications.msg.incident.body", { type }),
         };
       }
       default:

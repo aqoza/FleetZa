@@ -212,6 +212,14 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CLAIM_AMOUNT_REQUIRED: "errors.claimAmountRequired",
   CLAIM_LOCKED: "errors.claimLocked",
   CLAIM_NOT_DELETABLE: "errors.claimNotDeletable",
+  ILLEGAL_INCIDENT_TRANSITION: "errors.illegalIncidentTransition",
+  INCIDENT_ROOT_CAUSE_REQUIRED: "errors.incidentRootCauseRequired",
+  INVALID_INCIDENT_TIME: "errors.invalidIncidentTime",
+  INCIDENT_LOCKED: "errors.incidentLocked",
+  INCIDENT_NOT_DELETABLE: "errors.incidentNotDeletable",
+  INCIDENT_NOT_FOUND: "errors.incidentNotFound",
+  INCIDENT_HAS_WORK_ORDER: "errors.incidentHasWorkOrder",
+  INCIDENT_HAS_CLAIM: "errors.incidentHasClaim",
 };
 
 /**

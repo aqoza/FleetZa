@@ -175,4 +175,17 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   },
   "notifications.msg.policy.endsToday": "تنتهي الوثيقة اليوم: {policy}",
   "notifications.msg.policy.body": "{insurer}، تاريخ الانتهاء {date}",
+  "notifications.kind.incidents.major": "الحوادث الكبيرة",
+  "notifications.kind.incidents.major.desc": "يُبلَّغ عن حادث كبير أو حرج، أو تُرفع خطورته إلى ذلك.",
+  "notifications.msg.incident.major": "حادث كبير {number}: {vehicle}",
+  "notifications.msg.incident.critical": "حادث حرج {number}: {vehicle}",
+  "notifications.msg.incident.body": "{type}",
+  "notifications.msg.incident.bodyInjured": {
+    zero: "{type}، دون إصابات",
+    one: "{type}، إصابة شخص واحد",
+    two: "{type}، إصابة شخصين",
+    few: "{type}، إصابة {count} أشخاص",
+    many: "{type}، إصابة {count} شخصًا",
+    other: "{type}، إصابة {count} شخص",
+  },
 };

@@ -202,4 +202,12 @@ export const enErrors = {
   "errors.claimAmountRequired": "Enter the approved amount before approving the claim.",
   "errors.claimLocked": "This claim is closed. Only its notes can change.",
   "errors.claimNotDeletable": "Only draft claims can be deleted. Withdraw it instead.",
+  "errors.illegalIncidentTransition": "The incident can't move to that status from where it is now.",
+  "errors.incidentRootCauseRequired": "Record the root cause before closing a major or critical incident.",
+  "errors.invalidIncidentTime": "The incident time can't be in the future.",
+  "errors.incidentLocked": "This incident is closed. Only its notes can change.",
+  "errors.incidentNotDeletable": "Only incidents still at reported can be deleted.",
+  "errors.incidentNotFound": "That incident no longer exists.",
+  "errors.incidentHasWorkOrder": "This incident already has a work order.",
+  "errors.incidentHasClaim": "This incident already has an insurance claim.",
 } as const;
