@@ -8,6 +8,22 @@ export type TableName = keyof Database["public"]["Tables"];
 
 type AnyFilter = PostgrestFilterBuilder<any, any, any, any[], any>;
 
+/**
+ * supabase.from() over the whole TableName union makes TypeScript instantiate
+ * every table's types at once, which fails with TS2589 ("excessively deep")
+ * past ~55 tables. Every call site below casts the builder anyway, so take it
+ * untyped; table names stay compile-checked through TableName.
+ */
+type AnyQuery = {
+  select: (...args: any[]) => any;
+  insert: (...args: any[]) => any;
+  update: (...args: any[]) => any;
+  delete: (...args: any[]) => any;
+};
+function fromTable(table: TableName): AnyQuery {
+  return (supabase.from as unknown as (t: string) => AnyQuery)(table);
+}
+
 /** The builder handed to every `build` callback — exported for shared helpers
  *  that compose filters (e.g. the picker hooks) rather than inlining them. */
 export type DbFilter = AnyFilter;
@@ -28,7 +44,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
   AUTOMATION_INVALID_RULE: "errors.automationInvalidRule",
-  // Integrations (foundation API keys + 20261008000007 webhooks)
   INVALID_API_KEY_NAME: "errors.apiKeyName",
   INVALID_API_SCOPE: "errors.apiKeyScope",
   INVALID_API_KEY_EXPIRY: "errors.apiKeyExpiry",
@@ -57,22 +72,47 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
   INVOICE_EXCEEDS_ORDER: "errors.invoiceExceedsOrder",
   NOTHING_TO_INVOICE: "errors.nothingToInvoice",
-  // Certificate billing (…_certificate_billing.sql)
+  HR_INVALID_SETTING: "errors.hrInvalidSetting",
+  LEAVE_OVERLAP: "errors.leaveOverlap",
+  LEAVE_NO_WORKDAYS: "errors.leaveNoWorkdays",
+  LEAVE_INVALID_DATES: "errors.leaveInvalidDates",
+  LEAVE_TYPE_INACTIVE: "errors.leaveTypeInactive",
+  LEAVE_NOT_FOUND: "errors.leaveNotFound",
+  ILLEGAL_LEAVE_TRANSITION: "errors.illegalLeaveTransition",
+  NO_EMPLOYEE_PROFILE: "errors.noEmployeeProfile",
+  EMPLOYEE_NOT_FOUND: "errors.employeeNotFound",
+  ATTENDANCE_INVALID: "errors.attendanceInvalid",
+  PAYROLL_NOT_FOUND: "errors.payrollNotFound",
+  PAYROLL_INVALID_PERIOD: "errors.payrollInvalidPeriod",
+  ILLEGAL_PAYROLL_TRANSITION: "errors.illegalPayrollTransition",
+  PAYSLIP_NEGATIVE_NET: "errors.payslipNegativeNet",
   CERT_ALREADY_INVOICED: "errors.certAlreadyInvoiced",
   CERT_PAID_EXTERNALLY: "errors.certPaidExternally",
   CERTS_MULTIPLE_CUSTOMERS: "errors.certsMultipleCustomers",
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
   NO_CERTIFICATES: "errors.noCertificates",
-  // Audit & security (20261008000008)
   SECURITY_INVALID_SETTING: "errors.securityInvalidSetting",
   MEMBER_NOT_FOUND: "errors.memberNotFound",
   CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
-  // Predictive maintenance (20261008000017)
-  ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
-  WORK_ORDER_REQUIRED: "errors.workOrderRequired",
-  // Stock ledger (…_platform_foundation.sql)
+  FIELD_TASK_NOT_FOUND: "errors.fieldTaskNotFound",
+  ILLEGAL_FIELD_TASK_TRANSITION: "errors.illegalFieldTaskTransition",
+  FIELD_INVALID_CHECKLIST: "errors.fieldInvalidChecklist",
+  FIELD_INVALID_SIGNATURE: "errors.fieldInvalidSignature",
+  FIELD_INVALID_LOCATION: "errors.fieldInvalidLocation",
+  FIELD_NO_EMPLOYEE_PROFILE: "errors.fieldNoEmployeeProfile",
+  FIELD_EMPLOYEE_NOT_FOUND: "errors.fieldEmployeeNotFound",
+  POS_SESSION_OPEN: "errors.posSessionOpen",
+  POS_SESSION_CLOSED: "errors.posSessionClosed",
+  POS_REGISTER_INACTIVE: "errors.posRegisterInactive",
+  POS_EMPTY_CART: "errors.posEmptyCart",
+  POS_PRODUCT_INVALID: "errors.posProductInvalid",
+  POS_LINE_INVALID: "errors.posLineInvalid",
+  POS_UNDERPAID: "errors.posUnderpaid",
+  POS_CHANGE_FROM_CARD: "errors.posChangeFromCard",
+  POS_NOT_REFUNDABLE: "errors.posNotRefundable",
+  POS_NO_OPEN_SESSION: "errors.posNoOpenSession",
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",
   INVALID_UNIT_COST: "errors.invalidUnitCost",
@@ -81,6 +121,31 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   TRANSFER_SAME_WAREHOUSE: "errors.transferSameWarehouse",
   MODULE_DISABLED: "errors.moduleDisabled",
   CROSS_TENANT_REFERENCE: "errors.crossTenantReference",
+  ILLEGAL_PO_TRANSITION: "errors.illegalPoTransition",
+  PO_NOT_FOUND: "errors.poNotFound",
+  PO_NOT_RECEIVABLE: "errors.poNotReceivable",
+  PO_WAREHOUSE_REQUIRED: "errors.poWarehouseRequired",
+  PO_NOT_BILLABLE: "errors.poNotBillable",
+  RECEIPT_EMPTY: "errors.receiptEmpty",
+  RECEIPT_EXCEEDS_ORDERED: "errors.receiptExceedsOrdered",
+  NOTHING_TO_BILL: "errors.nothingToBill",
+  ILLEGAL_BILL_TRANSITION: "errors.illegalBillTransition",
+  BILL_HAS_PAYMENTS: "errors.billHasPayments",
+  BILL_NOT_PAYABLE: "errors.billNotPayable",
+  BILL_OVERPAYMENT: "errors.billOverpayment",
+  BILL_PO_MISMATCH: "errors.billPoMismatch",
+  ASSET_NOT_FOUND: "errors.assetNotFound",
+  ASSET_DISPOSED: "errors.assetDisposed",
+  ASSET_ASSIGNEE_REQUIRED: "errors.assetAssigneeRequired",
+  ASSET_NOT_ASSIGNED: "errors.assetNotAssigned",
+  INVALID_ASSET_STATUS: "errors.invalidAssetStatus",
+  INVALID_POSITION_TIME: "errors.invalidPositionTime",
+  INVALID_EVENT_TIME: "errors.invalidEventTime",
+  INVALID_PERIOD: "errors.invalidPeriod",
+  INVALID_READING_TIME: "errors.invalidReadingTime",
+  ILLEGAL_ALERT_TRANSITION: "errors.illegalAlertTransition",
+  ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
+  WORK_ORDER_REQUIRED: "errors.workOrderRequired",
 };
 
 /**
@@ -112,7 +177,7 @@ export async function listRows<T>(
   table: TableName,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<T[]> {
-  let q = supabase.from(table).select("*") as unknown as AnyFilter;
+  let q = fromTable(table).select("*") as unknown as AnyFilter;
   if (build) q = build(q);
   const { data, error } = await q;
   if (error) throw wrapDbError(error);
@@ -136,8 +201,7 @@ export async function listPage<T>(
   pageSize: number,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<Page<T>> {
-  let q = supabase
-    .from(table)
+  let q = fromTable(table)
     .select("*", { count: "exact" }) as unknown as AnyFilter;
   if (build) q = build(q);
   const from = page * pageSize;
@@ -151,8 +215,7 @@ export async function countRows(
   table: TableName,
   build?: (q: AnyFilter) => AnyFilter,
 ): Promise<number> {
-  let q = supabase
-    .from(table)
+  let q = fromTable(table)
     .select("*", { count: "exact", head: true }) as unknown as AnyFilter;
   if (build) q = build(q);
   const { count, error } = await q;
@@ -161,7 +224,7 @@ export async function countRows(
 }
 
 export async function getRow<T>(table: TableName, id: string): Promise<T | null> {
-  const { data, error } = await (supabase.from(table).select("*") as unknown as AnyFilter)
+  const { data, error } = await (fromTable(table).select("*") as unknown as AnyFilter)
     .eq("id", id)
     .maybeSingle();
   if (error) throw wrapDbError(error);
@@ -169,7 +232,7 @@ export async function getRow<T>(table: TableName, id: string): Promise<T | null>
 }
 
 export async function insertRow<T>(table: TableName, values: Record<string, unknown>): Promise<T> {
-  const { data, error } = await supabase.from(table).insert(values as never).select().single();
+  const { data, error } = await fromTable(table).insert(values as never).select().single();
   if (error) throw wrapDbError(error);
   return data as T;
 }
@@ -179,8 +242,7 @@ export async function updateRow<T>(
   id: string,
   values: Record<string, unknown>,
 ): Promise<T> {
-  const { data, error } = await (supabase
-    .from(table)
+  const { data, error } = await (fromTable(table)
     .update(values as never) as unknown as AnyFilter)
     .eq("id", id)
     .select()
@@ -190,6 +252,26 @@ export async function updateRow<T>(
 }
 
 export async function deleteRow(table: TableName, id: string): Promise<void> {
-  const { error } = await (supabase.from(table).delete() as unknown as AnyFilter).eq("id", id);
+  const { error } = await (fromTable(table).delete() as unknown as AnyFilter).eq("id", id);
   if (error) throw wrapDbError(error);
+}
+
+/**
+ * Bulk insert (imports). With `skipDuplicatesOn` rows that hit that unique
+ * key are skipped (ON CONFLICT DO NOTHING) instead of failing the batch.
+ * Returns how many rows were actually inserted.
+ */
+export async function insertMany(
+  table: TableName,
+  rows: Array<Record<string, unknown>>,
+  opts: { skipDuplicatesOn?: string } = {},
+): Promise<number> {
+  if (rows.length === 0) return 0;
+  const q = (supabase.from as unknown as (t: string) => { upsert: (...a: unknown[]) => AnyFilter; insert: (...a: unknown[]) => AnyFilter })(table);
+  const builder = opts.skipDuplicatesOn
+    ? q.upsert(rows, { onConflict: opts.skipDuplicatesOn, ignoreDuplicates: true })
+    : q.insert(rows);
+  const { data, error } = await builder.select("id");
+  if (error) throw wrapDbError(error);
+  return (data ?? []).length;
 }
