@@ -27,11 +27,12 @@ export function isLate(s: Pick<Shipment, "delivered_at" | "delivery_window_end">
 }
 
 /** ISO timestamp → value for <input type="datetime-local"> in the browser's zone. */
-export function toLocalInput(iso: string | null): string {
+export function toLocalInput(iso: string | null, precision: "minute" | "millisecond" = "minute"): string {
   if (!iso) return "";
   const d = new Date(iso);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const minute = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return precision === "millisecond" ? `${minute}:${pad(d.getSeconds())}.${String(d.getMilliseconds()).padStart(3, "0")}` : minute;
 }
 
 /** <input type="datetime-local"> value → ISO, or null when empty. */

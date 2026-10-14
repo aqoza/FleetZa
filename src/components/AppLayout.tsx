@@ -10,6 +10,7 @@ import { NotificationBell } from "../pages/notifications/NotificationBell";
 import { GlobalSearch } from "./GlobalSearch";
 import { ContextPanel } from "./ContextPanel";
 import { IdleGuard } from "./IdleGuard";
+import { RouteErrorBoundary } from "./RouteErrorBoundary";
 
 function LanguageSwitcher({ dark = false }: { dark?: boolean }) {
   const { language, t } = useI18n();
@@ -229,7 +230,7 @@ export default function AppLayout() {
         <div className="flex min-h-0 flex-1">
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-[1600px]">
-              <Outlet />
+              <RouteErrorBoundary><Outlet /></RouteErrorBoundary>
             </div>
           </main>
           <ContextPanel />

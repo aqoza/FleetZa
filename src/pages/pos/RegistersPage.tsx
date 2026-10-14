@@ -87,8 +87,8 @@ function RegisterForm({ register, onDone }: { register: PosRegister | null; onDo
     onDone();
   });
   const submit = onSubmit(() => run(async () => {
-    const values = { name: name.trim(), warehouse_id: warehouseId || null, active, notes: textOrNull(notes) };
-    if (register) await updateRow("pos_registers", register.id, values);
+    const values = { name: name.trim(), warehouse_id: warehouseId || null, notes: textOrNull(notes) };
+    if (register) await updateRow("pos_registers", register.id, { ...values, active });
     else await insertRow("pos_registers", values);
   }));
 
@@ -105,10 +105,10 @@ function RegisterForm({ register, onDone }: { register: PosRegister | null; onDo
           </Select>
         </Field>
       )}
-      <label className="flex items-center gap-2 text-sm text-ink">
+      {register && <label className="flex items-center gap-2 text-sm text-ink">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 rounded border-line" />
         {t("pos.registers.active")}
-      </label>
+      </label>}
       <Field label={t("pos.notes")}>
         <Textarea rows={2} maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} />
       </Field>

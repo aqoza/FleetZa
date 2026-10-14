@@ -327,7 +327,7 @@ export function StepForm({ shipment, step, onDone, onCancel }: {
   const qc = useQueryClient();
   const toast = useToast();
   const [receivedBy, setReceivedBy] = useState("");
-  const [deliveredAt, setDeliveredAt] = useState(toLocalInput(new Date().toISOString()));
+  const [deliveredAt, setDeliveredAt] = useState(() => toLocalInput(new Date().toISOString(), "millisecond"));
   const [text, setText] = useState("");
   const [location, setLocation] = useState("");
   const [error, setError] = useState("");
@@ -364,8 +364,8 @@ export function StepForm({ shipment, step, onDone, onCancel }: {
             <Input value={receivedBy} onChange={(e) => setReceivedBy(e.target.value)} required maxLength={200} autoFocus />
           </Field>
           <Field label={t("tms.deliveredAt")} hint={t("tms.deliveredAtHint")}>
-            <Input type="datetime-local" value={deliveredAt} onChange={(e) => setDeliveredAt(e.target.value)} required
-              min={toLocalInput(shipment.dispatched_at) || undefined} max={toLocalInput(new Date().toISOString())} />
+            <Input type="datetime-local" step="any" value={deliveredAt} onChange={(e) => setDeliveredAt(e.target.value)} required
+              min={toLocalInput(shipment.dispatched_at, "millisecond") || undefined} max={toLocalInput(new Date().toISOString(), "millisecond")} />
           </Field>
         </>
       )}
