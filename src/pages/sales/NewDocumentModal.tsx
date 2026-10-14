@@ -41,6 +41,7 @@ export function NewDocumentModal({
   prefill,
   extraPayload,
   purchaseOrder,
+  onCreated,
 }: {
   open: boolean;
   onClose: () => void;
@@ -62,6 +63,8 @@ export function NewDocumentModal({
    */
   extraPayload?: Record<string, unknown>;
   purchaseOrder?: "full" | "number";
+  /** Runs after the insert, before navigating — e.g. a CRM opportunity linking the new quote. */
+  onCreated?: (id: string) => Promise<unknown>;
 }) {
   const t = useT();
   const navigate = useNavigate();
@@ -100,11 +103,14 @@ export function NewDocumentModal({
   }
 
   const create = useMutation({
-    mutationFn: () =>
-      insertRow<{ id: string }>(table, {
+    mutationFn: async () => {
+      const doc = await insertRow<{ id: string }>(table, {
         ...documentPayload(form, dateColumn, purchaseOrder),
         ...extraPayload,
-      }),
+      });
+      await onCreated?.(doc.id);
+      return doc;
+    },
     onSuccess: (doc) => {
       void qc.invalidateQueries({ queryKey: [table] });
       void qc.invalidateQueries({ queryKey: ["sales_summary"] });

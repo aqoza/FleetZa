@@ -35,6 +35,7 @@ export const linkTypes: Record<LinkType, { labelKey: MessageKey; module: string;
   customer: { labelKey: "documents.entity.customer", module: "customers", href: (id) => `/customers/${id}` },
   supplier: { labelKey: "documents.entity.supplier", module: "suppliers", href: (id) => `/suppliers/${id}` },
   employee: { labelKey: "documents.entity.employee", module: "employees", href: (id) => `/employees/${id}` },
+  incident: { labelKey: "documents.entity.incident", module: "incidents", href: (id) => `/incidents/i/${id}` },
 };
 
 /** Label for any stored entity_type, including ones other modules write (hr_*). */
