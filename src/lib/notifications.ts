@@ -23,6 +23,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "purchasing.bill_due", module: "purchasing" },
   { kind: "purchasing.po_late", module: "purchasing" },
   { kind: "vendor_portal.po_acknowledged", module: "vendor_portal" },
+  { kind: "assets.warranty_expiring", module: "assets" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

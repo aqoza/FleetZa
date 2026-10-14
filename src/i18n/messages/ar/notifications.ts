@@ -131,4 +131,17 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.vendor_portal.po_acknowledged.desc": "يؤكد مورد أمر شراء عبر بوابة الموردين.",
   "notifications.msg.poAcknowledged.title": "أكّد {supplier} الأمر {number}",
   "notifications.msg.poAcknowledged.expected": "التسليم المتوقع {date}",
+  "notifications.kind.assets.warranty_expiring": "انتهاء ضمانات الأصول",
+  "notifications.kind.assets.warranty_expiring.desc": "ينتهي ضمان أصل خلال 30 يومًا، أو انتهى مؤخرًا.",
+  "notifications.msg.warranty.expired": "انتهى الضمان: {asset}",
+  "notifications.msg.warranty.endsIn": {
+    zero: "ينتهي الضمان اليوم: {asset}",
+    one: "ينتهي الضمان غدًا: {asset}",
+    two: "ينتهي الضمان خلال يومين: {asset}",
+    few: "ينتهي الضمان خلال {count} أيام: {asset}",
+    many: "ينتهي الضمان خلال {count} يومًا: {asset}",
+    other: "ينتهي الضمان خلال {count} يوم: {asset}",
+  },
+  "notifications.msg.warranty.endsToday": "ينتهي الضمان اليوم: {asset}",
+  "notifications.msg.warranty.body": "تاريخ انتهاء الضمان {date}",
 };

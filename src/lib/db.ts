@@ -134,6 +134,11 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   BILL_NOT_PAYABLE: "errors.billNotPayable",
   BILL_OVERPAYMENT: "errors.billOverpayment",
   BILL_PO_MISMATCH: "errors.billPoMismatch",
+  ASSET_NOT_FOUND: "errors.assetNotFound",
+  ASSET_DISPOSED: "errors.assetDisposed",
+  ASSET_ASSIGNEE_REQUIRED: "errors.assetAssigneeRequired",
+  ASSET_NOT_ASSIGNED: "errors.assetNotAssigned",
+  INVALID_ASSET_STATUS: "errors.invalidAssetStatus",
 };
 
 /**

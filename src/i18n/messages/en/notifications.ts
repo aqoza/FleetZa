@@ -99,4 +99,10 @@ export const enNotifications = {
   "notifications.kind.vendor_portal.po_acknowledged.desc": "A supplier confirms a purchase order through the vendor portal.",
   "notifications.msg.poAcknowledged.title": "{supplier} confirmed {number}",
   "notifications.msg.poAcknowledged.expected": "Expected delivery {date}",
+  "notifications.kind.assets.warranty_expiring": "Asset warranties ending",
+  "notifications.kind.assets.warranty_expiring.desc": "An asset's warranty ends within 30 days, or ended recently.",
+  "notifications.msg.warranty.expired": "Warranty ended: {asset}",
+  "notifications.msg.warranty.endsIn": { one: "Warranty ends tomorrow: {asset}", other: "Warranty ends in {count} days: {asset}" },
+  "notifications.msg.warranty.endsToday": "Warranty ends today: {asset}",
+  "notifications.msg.warranty.body": "Warranty end date {date}",
 } as const;

@@ -124,4 +124,9 @@ export const enErrors = {
   "errors.billNotPayable": "Approve the bill before recording a payment.",
   "errors.billOverpayment": "That payment is more than the bill's outstanding balance.",
   "errors.billPoMismatch": "The purchase order belongs to a different supplier.",
+  "errors.assetNotFound": "This asset no longer exists.",
+  "errors.assetDisposed": "This asset is disposed, so it can no longer be changed.",
+  "errors.assetAssigneeRequired": "Pick an employee or a vehicle to assign the asset to.",
+  "errors.assetNotAssigned": "This asset isn't assigned to anyone.",
+  "errors.invalidAssetStatus": "Use Dispose to retire an asset.",
 } as const;
