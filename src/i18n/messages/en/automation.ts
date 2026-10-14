@@ -4,8 +4,6 @@ export const enAutomation = {
   "automation.subtitle": "Rules that react to events with notifications, issues and webhooks.",
   "automation.tab.rules": "Rules",
   "automation.tab.runs": "Run log",
-
-  // Rules list
   "automation.newRule": "New rule",
   "automation.searchRules": "Search rules…",
   "automation.allEvents": "All events",
@@ -38,8 +36,6 @@ export const enAutomation = {
     other: "{count} actions",
   },
   "automation.noConditions": "Every time",
-
-  // Editor
   "automation.ruleNotFound": "This rule doesn't exist or was deleted.",
   "automation.backToRules": "Back to rules",
   "automation.name": "Name",
@@ -76,8 +72,6 @@ export const enAutomation = {
   "automation.saveFailed": "Couldn't save the rule.",
   "automation.saved": "Rule saved",
   "automation.readOnly": "Only managers can change automation rules.",
-
-  // Problems
   "automation.problem.name": "Give the rule a name.",
   "automation.problem.event": "Choose the event that starts the rule.",
   "automation.problem.noActions": "Add at least one action.",
@@ -85,8 +79,6 @@ export const enAutomation = {
   "automation.problem.condition": "Condition {n} needs a field, an operator and a value.",
   "automation.problem.action": "Action {n} is incomplete.",
   "automation.problem.issueNeedsVehicle": "Action {n} opens an issue, but this event isn't about a vehicle.",
-
-  // Test panel
   "automation.test": "Test the conditions",
   "automation.testHint": "Runs the conditions against a sample event. Nothing is sent or created.",
   "automation.samplePayload": "Sample event",
@@ -98,8 +90,6 @@ export const enAutomation = {
   "automation.testNoConditions": "No conditions, so the rule runs on every event.",
   "automation.actual": "Event value",
   "automation.missing": "missing",
-
-  // Run log
   "automation.recentRuns": "Recent runs",
   "automation.searchRuns": "Filter by event…",
   "automation.allStatuses": "All results",
@@ -115,8 +105,6 @@ export const enAutomation = {
   "automation.status.success": "Ran",
   "automation.status.skipped": "Skipped",
   "automation.status.failed": "Failed",
-
-  // Operators
   "automation.op.eq": "is",
   "automation.op.neq": "is not",
   "automation.op.gt": "is greater than",
@@ -126,8 +114,6 @@ export const enAutomation = {
   "automation.op.contains": "contains",
   "automation.op.in": "is one of",
   "automation.op.exists": "has a value",
-
-  // Action types
   "automation.action.notify": "Send a notification",
   "automation.action.create_issue": "Open an issue on the vehicle",
   "automation.action.webhook": "Call a webhook",
@@ -141,8 +127,6 @@ export const enAutomation = {
   "automation.priority.normal": "Normal",
   "automation.priority.high": "High",
   "automation.priority.critical": "Critical",
-
-  // Events
   "automation.ev.vehicle.created": "A vehicle is added",
   "automation.ev.customer.created": "A customer is added",
   "automation.ev.issue.created": "An issue is reported",
@@ -153,5 +137,33 @@ export const enAutomation = {
   "automation.ev.invoice.issued": "An invoice is issued",
   "automation.ev.payment.received": "A payment is received",
   "automation.ev.certificate.issued": "A speed limiter certificate is issued",
+  "automation.ev.leave_request.approved": "A leave request is approved",
+  "automation.ev.payroll_run.approved": "A payroll run is approved",
+  "automation.ev.payroll_run.paid": "A payroll run is paid",
   "automation.ev.stock.below_reorder": "Stock falls below its reorder point",
+  "automation.ev.field_task.completed": "A field task is completed",
+  "automation.ev.purchase_order.sent": "A purchase order is sent",
+  "automation.ev.purchase_order.received": "A purchase order is fully received",
+  "automation.ev.vendor_bill.paid": "A vendor bill is paid",
+  "automation.ev.purchase_order.acknowledged": "A supplier acknowledges a purchase order",
+  "automation.ev.geofence.entered": "A vehicle enters a geofence",
+  "automation.ev.geofence.exited": "A vehicle leaves a geofence",
+  "automation.ev.driving_event.created": "A driving event is recorded",
+  "automation.ev.iot.alert": "A sensor reading breaks an IoT alert rule",
+  "automation.ev.trip.dispatched": "A trip is dispatched",
+  "automation.ev.trip.completed": "A trip is completed",
+  "automation.ev.dispatch_job.assigned": "A dispatch job is assigned",
+  "automation.ev.dispatch_job.completed": "A dispatch job is completed",
+  "automation.ev.delivery.delivered": "A delivery is delivered",
+  "automation.ev.delivery.failed": "A delivery attempt fails",
+  "automation.ev.shipment.status_changed": "A shipment changes status",
+  "automation.ev.insurance_claim.status_changed": "A claim changes status",
+  "automation.ev.incident.reported": "An incident is reported",
+  "automation.ev.crm_lead.converted": "A lead is converted to a customer",
+  "automation.ev.crm_opportunity.won": "An opportunity is won",
+  "automation.ev.crm_opportunity.lost": "An opportunity is lost",
+  "automation.ev.contract.activated": "A contract is activated",
+  "automation.ev.contract.terminated": "A contract is terminated",
+  "automation.ev.contract.renewed": "A contract is renewed",
+  "automation.ev.service_request.created": "A customer sends a service request",
 } as const;

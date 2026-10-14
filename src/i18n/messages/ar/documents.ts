@@ -66,6 +66,7 @@ export const arDocuments: Translation<typeof enDocuments, "ar"> = {
   "documents.entity.customer": "عميل",
   "documents.entity.supplier": "مورّد",
   "documents.entity.employee": "موظف",
+  "documents.entity.incident": "حادث",
   "documents.entity.hr": "ملف موارد بشرية",
   "documents.entity.other": "سجل آخر",
   "documents.openRecord": "فتح السجل",
