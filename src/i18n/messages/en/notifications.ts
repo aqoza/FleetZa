@@ -135,4 +135,10 @@ export const enNotifications = {
   "notifications.msg.incident.critical": "Critical incident {number}: {vehicle}",
   "notifications.msg.incident.body": "{type}",
   "notifications.msg.incident.bodyInjured": { one: "{type}, {count} person injured", other: "{type}, {count} people injured" },
+  "notifications.kind.regulatory.obligation_due": "Compliance obligations due",
+  "notifications.kind.regulatory.obligation_due.desc": "Obligations enter their warning window, are due within a week, are due today, or are overdue.",
+  "notifications.msg.obligation.overdue": { one: "{requirement}: {count} obligation overdue", other: "{requirement}: {count} obligations overdue" },
+  "notifications.msg.obligation.today": { one: "{requirement}: {count} obligation due today", other: "{requirement}: {count} obligations due today" },
+  "notifications.msg.obligation.soon": { one: "{requirement}: {count} obligation due soon", other: "{requirement}: {count} obligations due soon" },
+  "notifications.msg.obligation.body": "First due {date}",
 } as const;

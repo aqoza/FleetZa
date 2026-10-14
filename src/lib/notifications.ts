@@ -30,6 +30,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "dispatch.urgent_job", module: "dispatch" },
   { kind: "insurance.policy_expiring", module: "insurance_mgmt" },
   { kind: "incidents.major", module: "incidents" },
+  { kind: "regulatory.obligation_due", module: "regulatory" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

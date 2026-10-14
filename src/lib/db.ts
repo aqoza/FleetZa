@@ -220,6 +220,14 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   INCIDENT_NOT_FOUND: "errors.incidentNotFound",
   INCIDENT_HAS_WORK_ORDER: "errors.incidentHasWorkOrder",
   INCIDENT_HAS_CLAIM: "errors.incidentHasClaim",
+  REQUIREMENT_NOT_FOUND: "errors.requirementNotFound",
+  REQUIREMENT_INACTIVE: "errors.requirementInactive",
+  REQUIREMENT_IN_USE: "errors.requirementInUse",
+  OBLIGATION_NOT_FOUND: "errors.obligationNotFound",
+  OBLIGATION_SUBJECT_MISMATCH: "errors.obligationSubjectMismatch",
+  OBLIGATION_SUBJECT_NOT_FOUND: "errors.obligationSubjectNotFound",
+  OBLIGATION_LOCKED: "errors.obligationLocked",
+  INVALID_COMPLETION_DATE: "errors.invalidCompletionDate",
 };
 
 /**

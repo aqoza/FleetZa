@@ -210,4 +210,12 @@ export const enErrors = {
   "errors.incidentNotFound": "That incident no longer exists.",
   "errors.incidentHasWorkOrder": "This incident already has a work order.",
   "errors.incidentHasClaim": "This incident already has an insurance claim.",
+  "errors.requirementNotFound": "That requirement no longer exists.",
+  "errors.requirementInactive": "This requirement is inactive. Activate it before creating obligations.",
+  "errors.requirementInUse": "This requirement has obligations. Deactivate it instead, or remove its obligations first.",
+  "errors.obligationNotFound": "That obligation no longer exists.",
+  "errors.obligationSubjectMismatch": "This requirement applies to a different kind of subject.",
+  "errors.obligationSubjectNotFound": "That vehicle, driver or employee wasn't found.",
+  "errors.obligationLocked": "An obligation's requirement and subject can't be changed. Create a new one instead.",
+  "errors.invalidCompletionDate": "The completion date can't be in the future.",
 } as const;
