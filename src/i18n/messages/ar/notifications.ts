@@ -154,4 +154,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.drivingCritical.collision": "تحذير تصادم: {who}",
   "notifications.msg.drivingCritical.fatigue": "تنبيه إرهاق: {who}",
   "notifications.msg.drivingCritical.body": "{vehicle} في {at}",
+  "notifications.kind.iot.alert": "تنبيهات المستشعرات",
+  "notifications.kind.iot.alert.desc": "تتجاوز قراءة مستشعر قاعدة تنبيه مفعّلة إشعاراتها.",
+  "notifications.msg.iotAlert.title": "{rule}: {device}",
+  "notifications.msg.iotAlert.body": "قراءة {metric} بلغت {value} (الحد {limit})",
 };

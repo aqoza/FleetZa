@@ -115,4 +115,8 @@ export const enNotifications = {
   "notifications.msg.drivingCritical.collision": "Collision warning: {who}",
   "notifications.msg.drivingCritical.fatigue": "Fatigue alert: {who}",
   "notifications.msg.drivingCritical.body": "{vehicle} at {at}",
+  "notifications.kind.iot.alert": "Sensor alerts",
+  "notifications.kind.iot.alert.desc": "An IoT sensor reading breaks an alert rule that has notifications turned on.",
+  "notifications.msg.iotAlert.title": "{rule}: {device}",
+  "notifications.msg.iotAlert.body": "{metric} reading {value} (limit {limit})",
 } as const;

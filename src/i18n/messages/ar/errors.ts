@@ -131,4 +131,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.invalidPositionTime": "هذا الوقت في المستقبل أو بعيد جدًا في الماضي بالنسبة لموقع GPS.",
   "errors.invalidEventTime": "هذا الوقت في المستقبل أو بعيد جدًا في الماضي بالنسبة لحدث قيادة.",
   "errors.invalidPeriod": "اختر فترة تنتهي بعد بدايتها، بحد أقصى 400 يوم.",
+  "errors.invalidReadingTime": "يجب أن يكون وقت القراءة بعد عام 2000 وألا يكون في المستقبل.",
+  "errors.illegalAlertTransition": "تغيرت حالة هذا التنبيه بالفعل. حدّث الصفحة لرؤية حالته الحالية.",
 };

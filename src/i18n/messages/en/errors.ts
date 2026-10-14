@@ -132,4 +132,6 @@ export const enErrors = {
   "errors.invalidPositionTime": "That time is in the future or too far in the past for a GPS position.",
   "errors.invalidEventTime": "That time is in the future or too far in the past for a driving event.",
   "errors.invalidPeriod": "Pick a period whose end is after its start, up to 400 days long.",
+  "errors.invalidReadingTime": "The reading time must be after 2000 and not in the future.",
+  "errors.illegalAlertTransition": "This alert has already moved on. Refresh to see its current status.",
 } as const;
