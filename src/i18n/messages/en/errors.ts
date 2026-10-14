@@ -134,4 +134,6 @@ export const enErrors = {
   "errors.invalidPeriod": "Pick a period whose end is after its start, up to 400 days long.",
   "errors.invalidReadingTime": "The reading time must be after 2000 and not in the future.",
   "errors.illegalAlertTransition": "This alert has already moved on. Refresh to see its current status.",
+  "errors.illegalPredictionTransition": "This prediction is already closed. Refresh to see its current status.",
+  "errors.workOrderRequired": "Link the work order raised for this prediction first.",
 } as const;

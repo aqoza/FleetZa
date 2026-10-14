@@ -30,8 +30,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.issues.description": "بلّغ عن مشكلات المركبات وتابعها من الاكتشاف حتى الحل.",
   "modules.workshop.name": "إدارة الورشة",
   "modules.workshop.description": "أدر أوامر العمل والفنيين وأعمال الإصلاح في ورشتك.",
-  "modules.predictive_ai.name": "المساعد الذكي والصيانة التنبؤية",
-  "modules.predictive_ai.description": "دع الذكاء الاصطناعي يتنبأ بالأعطال ويقترح الصيانة قبل حدوث التوقفات.",
+  "modules.predictive_ai.name": "الصيانة التنبؤية",
+  "modules.predictive_ai.description": "مؤشرات مخاطر واضحة الأسباب تنبّه إلى المركبات التي يُرجّح أن تحتاج صيانة قبل أن تتعطل.",
 
   // --- Compliance & certification ---
   "modules.renewals.name": "التجديدات وانتهاء المستندات",

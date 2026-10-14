@@ -144,6 +144,8 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   INVALID_PERIOD: "errors.invalidPeriod",
   INVALID_READING_TIME: "errors.invalidReadingTime",
   ILLEGAL_ALERT_TRANSITION: "errors.illegalAlertTransition",
+  ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
+  WORK_ORDER_REQUIRED: "errors.workOrderRequired",
 };
 
 /**

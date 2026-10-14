@@ -133,4 +133,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.invalidPeriod": "اختر فترة تنتهي بعد بدايتها، بحد أقصى 400 يوم.",
   "errors.invalidReadingTime": "يجب أن يكون وقت القراءة بعد عام 2000 وألا يكون في المستقبل.",
   "errors.illegalAlertTransition": "تغيرت حالة هذا التنبيه بالفعل. حدّث الصفحة لرؤية حالته الحالية.",
+  "errors.illegalPredictionTransition": "هذا التنبؤ مغلق بالفعل. حدّث الصفحة لرؤية حالته الحالية.",
+  "errors.workOrderRequired": "اربط أولًا أمر العمل الذي أُنشئ لهذا التنبؤ.",
 };

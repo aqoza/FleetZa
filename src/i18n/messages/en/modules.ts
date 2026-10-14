@@ -30,8 +30,8 @@ export const enModules = {
   "modules.issues.description": "Report vehicle problems and track them from discovery to resolution.",
   "modules.workshop.name": "Workshop Management",
   "modules.workshop.description": "Manage work orders, mechanics, and repair jobs in your own workshop.",
-  "modules.predictive_ai.name": "AI Assistant & Predictive Maintenance",
-  "modules.predictive_ai.description": "Let AI predict failures and suggest maintenance before breakdowns occur.",
+  "modules.predictive_ai.name": "Predictive Maintenance",
+  "modules.predictive_ai.description": "Explainable risk scores that flag vehicles likely to need maintenance before they break down.",
 
   // --- Compliance & certification ---
   "modules.renewals.name": "Renewals & Documents Expiry",
