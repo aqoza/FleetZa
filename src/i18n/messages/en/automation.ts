@@ -157,4 +157,5 @@ export const enAutomation = {
   "automation.ev.payroll_run.approved": "A payroll run is approved",
   "automation.ev.payroll_run.paid": "A payroll run is paid",
   "automation.ev.stock.below_reorder": "Stock falls below its reorder point",
+  "automation.ev.field_task.completed": "A field task is completed",
 } as const;

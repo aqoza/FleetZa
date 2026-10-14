@@ -159,4 +159,5 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.payroll_run.approved": "اعتماد مسير رواتب",
   "automation.ev.payroll_run.paid": "صرف مسير رواتب",
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
+  "automation.ev.field_task.completed": "إنجاز مهمة ميدانية",
 };
