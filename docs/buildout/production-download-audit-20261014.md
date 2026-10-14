@@ -37,7 +37,12 @@ Base: `43315ca` (PR #63). Scope: Acme Logistics demo tenant on
   `A75C3BAC1A7CDF8E68FD661DD6B870356258F03CEEA55055255B1768F03AB2F2`.
 - Fresh baseline cost CSV parsed independently: vehicle UI-AUDIT-20261014 Vehicle,
   fuel 20.00, maintenance 10.00, total 30.00, empty cost/distance cell.
-- Corrected browser download and production deployment checks are pending.
+- Corrected document action was exercised in the local UI without application
+  errors. Its final save, remaining CSV files and production retest are pending.
+  PR #64 remains draft; Cloudflare preview build passed. No fix is deployed yet.
 
-The documents module was temporarily enabled for this test. Its original absent
-module row must be restored at completion; no other module flags need changing.
+The documents module was temporarily enabled for this test, then its original
+absent module row was restored and verified. Other module flags were unchanged.
+The temporary local development server was stopped while awaiting the native
+Save As step. Resume by re-enabling documents for the demo and starting the same
+local port (5212), then save/inspect corrected files before merging and retesting.
