@@ -195,6 +195,25 @@ exception when others then insert into _t values ('approved run cannot be delete
 select public.payroll_mark_paid((select id from _run), null);
 insert into _t select 'marked paid on pay date', (select status = 'paid' and paid_at = '2026-10-28' from public.payroll_runs), null;
 
+-- FINANCE-UI-001: consume real HR-calculated totals, including employer social
+-- contributions, rather than a hand-built source with different semantics.
+reset role;
+insert into public.tenant_modules(tenant_id, module_id, enabled)
+values ('170d2d86-5c22-4bcb-9d74-420c879419b2', 'finance', true)
+on conflict (tenant_id, module_id) do update set enabled = true;
+set local role authenticated;
+select public.finance_setup();
+create temp table _payroll_entry as select public.finance_post_payroll((select id from _run)) as id;
+insert into _t select 'FINANCE-UI-001 payroll cost includes gross exactly once',
+  (select sum(l.debit) = (select total_employer_cost from public.payroll_runs where id = (select id from _run))
+   from public.journal_lines l where entry_id = (select id from _payroll_entry)), null;
+insert into _t select 'FINANCE-UI-001 payroll bank credit equals paid net',
+  (select sum(l.credit) = (select total_net from public.payroll_runs where id = (select id from _run))
+   from public.journal_lines l join public.gl_accounts a on a.id=l.account_id
+   where l.entry_id=(select id from _payroll_entry) and a.code='1010'), null;
+insert into _t select 'FINANCE-UI-001 payroll posting idempotent',
+  public.finance_post_payroll((select id from _run)) = (select id from _payroll_entry), null;
+
 -- September: Ravi joined on the 16th (15 of 30 days). Then cancel + delete
 -- cleanly (cascade + totals trigger).
 insert into public.payroll_runs (period_start, period_end) values ('2026-09-01', '2026-09-30');

@@ -83,3 +83,10 @@ activity-panel verification. Foundation F15 uses deterministic cancellation
 locally and the separate real-PostgreSQL timer probe.
 
 Observed results and remaining coverage limits: [production audit](buildout/final-production-audit-20261014.md).
+
+The subsequent [demo UI write audit](buildout/production-ui-write-audit-20261014.md)
+records representative production flows for all 46 modules, six corrected defects,
+cleanup and explicit coverage limits. FINANCE-UI-001 is covered by real
+HR-to-finance assertions in payroll_hr_tests.sql; final matrix: 1,606 SQL assertions
+and 533 unit tests. Trip/TMS timestamps, POS register/refund, route recovery and
+payroll posting were retested against deployed production.
