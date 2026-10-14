@@ -172,4 +172,7 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.crm_lead.converted": "تحويل عميل محتمل إلى عميل",
   "automation.ev.crm_opportunity.won": "كسب فرصة بيع",
   "automation.ev.crm_opportunity.lost": "خسارة فرصة بيع",
+  "automation.ev.contract.activated": "تفعيل عقد",
+  "automation.ev.contract.terminated": "إنهاء عقد",
+  "automation.ev.contract.renewed": "تجديد عقد",
 };

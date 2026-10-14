@@ -145,4 +145,13 @@ export const enNotifications = {
   "notifications.kind.crm.activities_overdue.desc": "Calls, meetings and tasks you own pass their due time. Sent once a day to the owner.",
   "notifications.msg.crmOverdue.title": { one: "{count} overdue CRM activity", other: "{count} overdue CRM activities" },
   "notifications.msg.crmOverdue.body": "Oldest: {subject}",
+  "notifications.kind.contracts.expiring": "Contracts ending",
+  "notifications.kind.contracts.expiring.desc": "A contract enters its notice period, or ends within 30 or 7 days.",
+  "notifications.kind.contracts.billing_due": "Contract billing due",
+  "notifications.kind.contracts.billing_due.desc": "Contracts have a billing period ready to invoice. Sent once a day.",
+  "notifications.msg.contractEnding.title": { one: "Contract {number} ends in {count} day", other: "Contract {number} ends in {count} days" },
+  "notifications.msg.contractEnding.today": "Contract {number} ends today",
+  "notifications.msg.contractEnding.body": "{customer}: {title}",
+  "notifications.msg.contractEnding.bodyRenews": "{customer}: {title}. Renews automatically.",
+  "notifications.msg.contractBilling.title": { one: "{count} contract is due for billing", other: "{count} contracts are due for billing" },
 } as const;

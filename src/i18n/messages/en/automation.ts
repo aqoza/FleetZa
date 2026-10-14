@@ -162,4 +162,7 @@ export const enAutomation = {
   "automation.ev.crm_lead.converted": "A lead is converted to a customer",
   "automation.ev.crm_opportunity.won": "An opportunity is won",
   "automation.ev.crm_opportunity.lost": "An opportunity is lost",
+  "automation.ev.contract.activated": "A contract is activated",
+  "automation.ev.contract.terminated": "A contract is terminated",
+  "automation.ev.contract.renewed": "A contract is renewed",
 } as const;

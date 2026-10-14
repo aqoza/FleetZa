@@ -235,6 +235,16 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   LEAD_ALREADY_CONVERTED: "errors.leadAlreadyConverted",
   ILLEGAL_OPPORTUNITY_TRANSITION: "errors.illegalOpportunityTransition",
   OPPORTUNITY_LOST_REASON_REQUIRED: "errors.opportunityLostReasonRequired",
+  ILLEGAL_CONTRACT_TRANSITION: "errors.illegalContractTransition",
+  INVALID_CONTRACT_DATES: "errors.invalidContractDates",
+  CONTRACT_TERMINATION_REASON_REQUIRED: "errors.contractTerminationReasonRequired",
+  CONTRACT_LOCKED: "errors.contractLocked",
+  CONTRACT_NOT_DELETABLE: "errors.contractNotDeletable",
+  CONTRACT_NOT_FOUND: "errors.contractNotFound",
+  CONTRACT_NOT_BILLABLE: "errors.contractNotBillable",
+  CONTRACT_NOTHING_TO_BILL: "errors.contractNothingToBill",
+  CONTRACT_NOT_RENEWABLE: "errors.contractNotRenewable",
+  CONTRACT_NO_END_DATE: "errors.contractNoEndDate",
 };
 
 /**
