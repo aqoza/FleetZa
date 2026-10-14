@@ -95,4 +95,8 @@ export const enNotifications = {
   "notifications.msg.billBalance": "Balance {amount}",
   "notifications.msg.poLate.title": "{number} from {supplier} is late",
   "notifications.msg.poLate.body": "Expected {date}",
+  "notifications.kind.vendor_portal.po_acknowledged": "Orders acknowledged by suppliers",
+  "notifications.kind.vendor_portal.po_acknowledged.desc": "A supplier confirms a purchase order through the vendor portal.",
+  "notifications.msg.poAcknowledged.title": "{supplier} confirmed {number}",
+  "notifications.msg.poAcknowledged.expected": "Expected delivery {date}",
 } as const;

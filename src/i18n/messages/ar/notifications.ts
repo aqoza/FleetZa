@@ -127,4 +127,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.msg.billBalance": "الرصيد {amount}",
   "notifications.msg.poLate.title": "تأخر {number} من {supplier}",
   "notifications.msg.poLate.body": "التاريخ المتوقع {date}",
+  "notifications.kind.vendor_portal.po_acknowledged": "أوامر أكّدها الموردون",
+  "notifications.kind.vendor_portal.po_acknowledged.desc": "يؤكد مورد أمر شراء عبر بوابة الموردين.",
+  "notifications.msg.poAcknowledged.title": "أكّد {supplier} الأمر {number}",
+  "notifications.msg.poAcknowledged.expected": "التسليم المتوقع {date}",
 };
