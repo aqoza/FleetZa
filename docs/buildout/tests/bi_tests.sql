@@ -74,7 +74,7 @@ insert into _t select 'issues by status',
 insert into _t select 'vehicles count snapshot by type ignores the period',
   (select bool_or(key = 'truck' and value = 3) and bool_or(key = 'bus' and value = 1)
    from public.bi_metric('vehicles_count', 'category', current_date - 1, current_date)), null;
-insert into _t select 'module metric without its table returns no rows',
+insert into _t select 'trip metric returns no rows before source fixtures',
   (select count(*) = 0 from public.bi_metric('trips_completed', 'month', current_date - 90, current_date)), null;
 insert into _t select 'empty period returns a zero total row',
   (select count(*) = 1 and min(value) = 0 from public.bi_metric('fuel_cost', 'none', current_date - 400, current_date - 300)), null;
@@ -176,18 +176,18 @@ do $$ begin
 exception when others then insert into _t values ('viewer cannot create the default dashboard', sqlerrm = 'FORBIDDEN', sqlerrm); end $$;
 reset role;
 
--- A module table that appears later is picked up without changing the function.
-create table public.trips (id uuid primary key default gen_random_uuid(), tenant_id uuid, vehicle_id uuid, driver_id uuid,
-  customer_id uuid, status text, completed_at timestamptz);
-grant select on public.trips to authenticated;
-insert into public.trips (tenant_id, vehicle_id, driver_id, status, completed_at) values
-  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e001', '5eed0000-0000-4000-8000-00000000d002', 'completed', now() - interval '3 days'),
-  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e001', '5eed0000-0000-4000-8000-00000000d002', 'completed', now() - interval '4 days'),
-  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e002', null, 'planned', null);
+-- Exercise the real trip-planning schema, including its RLS module gate.
+insert into public.tenant_modules (tenant_id, module_id, enabled)
+values ('170d2d86-5c22-4bcb-9d74-420c879419b2', 'trip_planning', true)
+on conflict (tenant_id, module_id) do update set enabled = true;
+insert into public.trips (tenant_id, vehicle_id, driver_id, purpose, planned_start, planned_end, status, completed_at) values
+  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e001', '5eed0000-0000-4000-8000-00000000d002', 'BI completed trip 1', now() - interval '4 days', now() - interval '3 days', 'completed', now() - interval '3 days'),
+  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e001', '5eed0000-0000-4000-8000-00000000d002', 'BI completed trip 2', now() - interval '5 days', now() - interval '4 days', 'completed', now() - interval '4 days'),
+  ('170d2d86-5c22-4bcb-9d74-420c879419b2', '5eed0000-0000-4000-8000-00000000e002', null, 'BI planned trip', now(), now() + interval '1 day', 'planned', null);
 set local role authenticated;
 select set_config('request.jwt.claims',
   '{"sub":"129bbbae-fdfc-4d21-8a86-8949fec2403b","role":"authenticated","app_metadata":{"tenant_id":"170d2d86-5c22-4bcb-9d74-420c879419b2","role":"owner"}}', true);
-insert into _t select 'trips metric reads the new table',
+insert into _t select 'trips metric reads the integrated trip-planning table',
   (select count(*) = 1 and min(label) = 'Maria Lopez' and min(value) = 2 from public.bi_metric('trips_completed', 'driver', current_date - 30, current_date)), null;
 reset role;
 

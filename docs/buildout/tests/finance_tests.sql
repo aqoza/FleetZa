@@ -18,13 +18,11 @@ insert into public.suppliers (id, tenant_id, name) values
   ('f1a0c0de-0029-4b2c-9d3e-4f5a6b7c8e01', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'Fuel Co'),
   ('f1a0c0de-0029-4b2c-9d3e-4f5a6b7c8e0b', '5eed0000-0000-4000-8000-0000000000b1', 'Foreign supplier');
 
--- Stand-ins for the purchasing and payroll tables (read dynamically).
-create table public.vendor_bills (id uuid primary key, tenant_id uuid, doc_number text, supplier_invoice_number text,
-  supplier_id uuid, bill_date date, total numeric, tax_total numeric, status text);
-create table public.vendor_payments (id uuid primary key, tenant_id uuid, vendor_bill_id uuid, paid_at date, amount numeric,
-  method text, reference text);
-create table public.payroll_runs (id uuid primary key, tenant_id uuid, doc_number text, status text, paid_at date, pay_date date,
-  period_end date, total_gross numeric, total_deductions numeric, total_net numeric, total_employer_cost numeric);
+-- Purchasing and HR migrations now supply the real source tables.
+insert into public.tenant_modules (tenant_id, module_id, enabled) values
+  ('170d2d86-5c22-4bcb-9d74-420c879419b2', 'purchasing', true),
+  ('170d2d86-5c22-4bcb-9d74-420c879419b2', 'payroll_hr', true)
+on conflict (tenant_id, module_id) do update set enabled = true;
 
 -- Module off
 set local role authenticated;
@@ -264,20 +262,29 @@ select public.finance_post_invoice((select id from _ids where k = 'inv_voidme'))
 update public.invoices set status = 'void', void_reason = 'mistake' where id = (select id from _ids where k = 'inv_voidme');
 reset role;
 
--- Purchasing and payroll stand-ins
-insert into public.vendor_bills values
+-- Source documents use real tables and their defaults/triggers.
+insert into public.vendor_bills (id, tenant_id, doc_number, supplier_invoice_number,
+  supplier_id, bill_date, total, tax_total, status) values
   ('f1a0c0de-0029-4b2c-9d3e-0000000000b1', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'BILL-00001', 'S-77',
    'f1a0c0de-0029-4b2c-9d3e-4f5a6b7c8e01', current_date, 115, 15, 'open'),
   ('f1a0c0de-0029-4b2c-9d3e-0000000000b2', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'BILL-00002', null,
    'f1a0c0de-0029-4b2c-9d3e-4f5a6b7c8e01', current_date, 10, 0, 'draft');
-insert into public.vendor_payments values
+insert into public.vendor_payments (id, tenant_id, vendor_bill_id, paid_at, amount, method, reference) values
   ('f1a0c0de-0029-4b2c-9d3e-0000000000c1', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'f1a0c0de-0029-4b2c-9d3e-0000000000b1',
    current_date, 115, 'bank_transfer', 'TRX1');
-insert into public.payroll_runs values
+insert into public.payroll_runs (id, tenant_id, doc_number, status, paid_at, pay_date,
+  period_start, period_end, total_gross, total_deductions, total_net, total_employer_cost) values
   ('f1a0c0de-0029-4b2c-9d3e-0000000000d1', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'PAY-00001', 'paid', current_date, null,
-   current_date, 1000, 100, 900, 120),
+   current_date - 29, current_date, 1000, 100, 900, 120),
   ('f1a0c0de-0029-4b2c-9d3e-0000000000d2', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'PAY-00002', 'approved', null, null,
-   current_date, 1000, 100, 900, 120);
+   current_date - 29, current_date, 1000, 100, 900, 120);
+-- The HR insert trigger starts every run in draft; follow its state machine.
+update public.payroll_runs set status = 'calculated'
+where id in ('f1a0c0de-0029-4b2c-9d3e-0000000000d1', 'f1a0c0de-0029-4b2c-9d3e-0000000000d2');
+update public.payroll_runs set status = 'approved'
+where id in ('f1a0c0de-0029-4b2c-9d3e-0000000000d1', 'f1a0c0de-0029-4b2c-9d3e-0000000000d2');
+update public.payroll_runs set status = 'paid'
+where id = 'f1a0c0de-0029-4b2c-9d3e-0000000000d1';
 
 set local role authenticated;
 select set_config('request.jwt.claims',
