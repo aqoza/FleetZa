@@ -146,6 +146,17 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   ILLEGAL_ALERT_TRANSITION: "errors.illegalAlertTransition",
   ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
   WORK_ORDER_REQUIRED: "errors.workOrderRequired",
+  ILLEGAL_TRIP_TRANSITION: "errors.illegalTripTransition",
+  TRIP_LOCKED: "errors.tripLocked",
+  TRIP_NOT_DELETABLE: "errors.tripNotDeletable",
+  TRIP_VEHICLE_CONFLICT: "errors.tripVehicleConflict",
+  TRIP_DRIVER_CONFLICT: "errors.tripDriverConflict",
+  VEHICLE_NOT_AVAILABLE: "errors.vehicleNotAvailable",
+  INVALID_TRIP_ODOMETER: "errors.invalidTripOdometer",
+  INVALID_TRIP_TIMES: "errors.invalidTripTimes",
+  ILLEGAL_STOP_TRANSITION: "errors.illegalStopTransition",
+  STOP_TRIP_NOT_STARTED: "errors.stopTripNotStarted",
+  STOP_LIST_MISMATCH: "errors.stopListMismatch",
 };
 
 /**

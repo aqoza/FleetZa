@@ -150,4 +150,6 @@ export const enAutomation = {
   "automation.ev.geofence.exited": "A vehicle leaves a geofence",
   "automation.ev.driving_event.created": "A driving event is recorded",
   "automation.ev.iot.alert": "A sensor reading breaks an IoT alert rule",
+  "automation.ev.trip.dispatched": "A trip is dispatched",
+  "automation.ev.trip.completed": "A trip is completed",
 } as const;

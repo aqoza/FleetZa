@@ -14,8 +14,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.gps_tracking.description": "شاهد مواقع المركبات ومساراتها وبيانات التليماتكس مباشرةً في الوقت الفعلي.",
   "modules.driver_behavior.name": "سلوك السائقين والتقييم",
   "modules.driver_behavior.description": "راقب السرعة الزائدة والفرملة المفاجئة وغيرها من الأحداث لتقييم السائقين وتوجيههم.",
-  "modules.trip_planning.name": "تخطيط الرحلات والمسارات",
-  "modules.trip_planning.description": "خطط الرحلات وحسّن المسارات لتوفير الوقت والوقود.",
+  "modules.trip_planning.name": "تخطيط الرحلات",
+  "modules.trip_planning.description": "خطط رحلات متعددة المحطات وتجنب الحجز المزدوج للمركبات والسائقين وقارن المخطط بالفعلي.",
   "modules.dispatch.name": "إدارة الإرسال",
   "modules.dispatch.description": "أسند المهام إلى السائقين والمركبات وتابع تنفيذها في الوقت الفعلي.",
 

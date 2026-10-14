@@ -215,6 +215,20 @@ export const EVENT_CATALOG: EventSpec[] = [
       vehicle_id: "00000000-0000-4000-8000-000000000001", metric: "temperature", value: 9.5, unit: "C",
       threshold: 8, op: "gt", at: "2026-10-08T09:30:00Z" },
   },
+  {
+    event: "trip.dispatched", module: "trip_planning", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "purpose", kind: "text" }, { name: "planned_start", kind: "date" },
+      { name: "planned_distance_km", kind: "number" }, { name: "driver_id", kind: "id" }],
+    sample: { trip_id: "00000000-0000-4000-8000-000000000011", doc_number: "TRP-00042", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      driver_id: null, purpose: "Muscat to Sohar delivery", planned_start: "2026-10-09T05:00:00Z", planned_distance_km: 230 },
+  },
+  {
+    event: "trip.completed", module: "trip_planning", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "purpose", kind: "text" },
+      { name: "planned_distance_km", kind: "number" }, { name: "actual_distance_km", kind: "number" }, { name: "driver_id", kind: "id" }],
+    sample: { trip_id: "00000000-0000-4000-8000-000000000011", doc_number: "TRP-00042", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      driver_id: null, purpose: "Muscat to Sohar delivery", planned_distance_km: 230, actual_distance_km: 247.5 },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

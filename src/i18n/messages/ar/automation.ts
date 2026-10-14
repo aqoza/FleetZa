@@ -160,4 +160,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.geofence.exited": "خروج مركبة من نطاق جغرافي",
   "automation.ev.driving_event.created": "تسجيل حدث قيادة",
   "automation.ev.iot.alert": "تجاوز قراءة مستشعر لقاعدة تنبيه",
+  "automation.ev.trip.dispatched": "إرسال رحلة",
+  "automation.ev.trip.completed": "اكتمال رحلة",
 };
