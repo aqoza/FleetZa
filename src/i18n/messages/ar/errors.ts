@@ -29,8 +29,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "لا يمكن إصدار شهادة إلا لمهمة تركيب أو استبدال أو فحص مكتملة.",
   "errors.jobNotFound": "لم يتم العثور على المهمة.",
   "errors.certAlreadyIssued": "توجد بالفعل شهادة سارية صادرة لهذه المهمة.",
-
-  // مستندات المبيعات والفوترة
   "errors.customerHasInvoices":
     "لهذا العميل فواتير صادرة ولا يمكن حذفه. اجعله غير نشط بدلًا من ذلك.",
   "errors.docNotEditable":
@@ -56,11 +54,23 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "الكمية أكبر من المتبقي في أمر البيع. قلّل الكمية ثم حاول مرة أخرى.",
   "errors.nothingToInvoice":
     "تمت فوترة هذا الأمر بالكامل — لا يوجد ما يمكن فوترته.",
+  "errors.hrInvalidSetting": "تحقق من إعدادات الرواتب: ثلاثة أيام عطلة كحد أقصى، ومن 1 إلى 24 ساعة يوميًا، ومعامل من 1 إلى 5، ونسب من 0 إلى 50%.",
+  "errors.leaveOverlap": "هذه التواريخ تتداخل مع إجازة أخرى معلقة أو معتمدة لهذا الموظف.",
+  "errors.leaveNoWorkdays": "هذه التواريخ تقع في العطلة الأسبوعية فقط، فلا توجد إجازة لاحتسابها.",
+  "errors.leaveInvalidDates": "اختر يومًا أخيرًا في اليوم الأول أو بعده، وخلال سنة.",
+  "errors.leaveTypeInactive": "نوع الإجازة هذا متوقف. اختر نوعًا آخر.",
+  "errors.leaveNotFound": "طلب الإجازة هذا لم يعد موجودًا.",
+  "errors.illegalLeaveTransition": "لا يمكن نقل طلب الإجازة إلى هذه الحالة من حالته الحالية.",
+  "errors.noEmployeeProfile": "حسابك غير مرتبط بسجل موظف بعد.",
+  "errors.employeeNotFound": "هذا الموظف ليس ضمن مؤسستك.",
+  "errors.attendanceInvalid": "أحد صفوف الحضور غير صالح. تحقق من أن الأوقات بصيغة HH:MM.",
+  "errors.payrollNotFound": "مسير الرواتب هذا لم يعد موجودًا.",
+  "errors.payrollInvalidPeriod": "تنتهي فترة الرواتب في يوم بدايتها أو بعده وتغطي 62 يومًا كحد أقصى.",
+  "errors.illegalPayrollTransition": "لا يمكن نقل مسير الرواتب إلى هذه الحالة من حالته الحالية.",
+  "errors.payslipNegativeNet": "لا يمكن أن تزيد الاستقطاعات عن إجمالي الراتب.",
   "errors.invoiceNotFound": "لم يتم العثور على الفاتورة.",
   "errors.invoiceNotPayable": "قم بإصدار الفاتورة قبل تسجيل دفعة عليها.",
   "errors.paymentExceedsBalance": "قيمة الدفعة أكبر من الرصيد المستحق على الفاتورة.",
-
-  // فوترة الشهادات
   "errors.certAlreadyInvoiced":
     "إحدى هذه الشهادات مدرجة بالفعل في فاتورة. ألغِ تلك الفاتورة أولًا إن كانت قد أُنشئت بالخطأ.",
   "errors.certPaidExternally":
@@ -71,7 +81,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "لا يوجد عميل مرتبط بهذه الشهادة لفوترته. حدّد مالك المركبة أولًا.",
   "errors.certificateNotFound": "لم يتم العثور على الشهادة.",
   "errors.noCertificates": "اختر شهادة واحدة على الأقل لفوترتها.",
-
   "errors.insufficientStock": "لا يوجد مخزون كافٍ في هذا المستودع لهذه الحركة.",
   "errors.invalidQuantity": "أدخل كمية أكبر من صفر.",
   "errors.invalidUnitCost": "لا يمكن أن تكون تكلفة الوحدة سالبة.",
@@ -84,6 +93,23 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.memberNotFound": "هذا العضو لم يعد ضمن مؤسستك.",
   "errors.cannotSignOutSelf": "لا يمكنك تسجيل خروجك من هنا. استخدم زر تسجيل الخروج.",
   "errors.cannotSignOutOwner": "لا يستطيع عضو آخر إلغاء جلسات المالك.",
+  "errors.fieldTaskNotFound": "هذه المهمة لم تعد موجودة أو غير مسندة إليك.",
+  "errors.illegalFieldTaskTransition": "لا يمكن نقل هذه المهمة إلى هذه الحالة من وضعها الحالي.",
+  "errors.fieldInvalidChecklist": "راجع قائمة التحقق: 50 خطوة كحد أقصى، واسم كل خطوة لا يتجاوز 200 حرف.",
+  "errors.fieldInvalidSignature": "تعذّر حفظ التوقيع. امسحه ثم وقّع مرة أخرى.",
+  "errors.fieldInvalidLocation": "قراءة الموقع غير صالحة. حاول تسجيل الحضور مرة أخرى.",
+  "errors.fieldNoEmployeeProfile": "حسابك غير مرتبط بسجل موظف بعد، لذا لا يوجد من يُسجَّل حضوره.",
+  "errors.fieldEmployeeNotFound": "هذا الموظف ليس ضمن مؤسستك.",
+  "errors.posSessionOpen": "هذا الصندوق لديه وردية مفتوحة بالفعل. أغلقها أولاً.",
+  "errors.posSessionClosed": "هذه الوردية مغلقة. افتح وردية جديدة لمواصلة البيع.",
+  "errors.posRegisterInactive": "هذا الصندوق غير نشط. فعّله من إعدادات نقطة البيع أولاً.",
+  "errors.posEmptyCart": "السلة فارغة. أضف منتجاً واحداً على الأقل.",
+  "errors.posProductInvalid": "أحد المنتجات غير نشط أو لم يعد موجوداً. احذفه من السلة.",
+  "errors.posLineInvalid": "تحقق من الكميات والخصومات والمبالغ: يجب أن تكون أرقاماً موجبة، والخصم 100% كحد أقصى.",
+  "errors.posUnderpaid": "الدفعة لا تغطي الإجمالي.",
+  "errors.posChangeFromCard": "لا يمكن إعطاء الباقي إلا من النقد. خفّض مبلغ البطاقة أو غيرها إلى المبلغ المستحق.",
+  "errors.posNotRefundable": "يمكن استرداد المبيعات المكتملة التي لم تُسترد فقط.",
+  "errors.posNoOpenSession": "افتح وردية على صندوق هذه البيعة لاستردادها.",
   "errors.illegalPoTransition": "لا يمكن نقل أمر الشراء هذا إلى هذه الحالة من وضعه الحالي.",
   "errors.poNotFound": "أمر الشراء هذا لم يعد موجودًا.",
   "errors.poNotReceivable": "أكّد أمر الشراء قبل استلام البضائع عليه.",

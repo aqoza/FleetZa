@@ -2,19 +2,13 @@
 export const enNotifications = {
   "notifications.title": "Notifications",
   "notifications.subtitle": "Alerts and reminders across your modules.",
-
-  // Tabs
   "notifications.tab.inbox": "Inbox",
   "notifications.tab.preferences": "Preferences",
-
-  // Bell
   "notifications.bell": "Notifications",
   "notifications.bellUnread": { one: "{count} unread notification", other: "{count} unread notifications" },
   "notifications.viewAll": "View all",
   "notifications.markAllRead": "Mark all as read",
   "notifications.allCaughtUp": "You're all caught up.",
-
-  // Inbox
   "notifications.filterUnread": "Unread",
   "notifications.filterAll": "All",
   "notifications.allSeverities": "Any severity",
@@ -31,33 +25,30 @@ export const enNotifications = {
   "notifications.emptyUnreadDesc": "Switch to All to see earlier notifications.",
   "notifications.unreadCount": { one: "{count} unread", other: "{count} unread" },
   "notifications.actionFailed": "Could not update the notifications.",
-
-  // Preferences
   "notifications.prefsHint": "Mute the kinds of notification you do not want. Muting applies to you only.",
   "notifications.prefsEmpty": "None of your enabled modules sends notifications yet.",
   "notifications.receive": "Receive",
   "notifications.muted": "Muted",
   "notifications.prefSaved": "Preference saved",
-
-  // Kinds: labels (preferences) and messages (inbox)
   "notifications.kind.inventory.low_stock": "Low stock",
   "notifications.kind.inventory.low_stock.desc": "An item drops to or below its reorder point.",
   "notifications.kind.employees.document_expiring": "Employee documents expiring",
   "notifications.kind.employees.document_expiring.desc":
     "A passport, residence permit or work permit expires in 60, 30 or 7 days, or has expired.",
+  "notifications.kind.hr.leave_requested": "Leave requests",
+  "notifications.kind.hr.leave_requested.desc": "An employee asks for leave and it needs a decision.",
+  "notifications.kind.hr.leave_decided": "Leave decisions",
+  "notifications.kind.hr.leave_decided.desc": "Your own leave request is approved or rejected.",
   "notifications.kind.documents.expiring": "Documents expiring",
   "notifications.kind.documents.expiring.desc": "A stored document expires in 30 or 7 days, or has expired.",
   "notifications.kind.automation.rule": "Automation rules",
   "notifications.kind.automation.rule.desc": "An automation rule sends you a notification.",
   "notifications.kind.integrations.webhook_failed": "Webhook delivery failures",
   "notifications.kind.integrations.webhook_failed.desc": "A webhook delivery fails after every retry. Sent to admins.",
-  "notifications.kind.purchasing.bill_due": "Vendor bills due",
-  "notifications.kind.purchasing.bill_due.desc": "A vendor bill is due within 3 days, or is overdue.",
-  "notifications.kind.purchasing.po_late": "Late purchase orders",
-  "notifications.kind.purchasing.po_late.desc": "A purchase order passes its expected date before it is fully received.",
-  "notifications.kind.vendor_portal.po_acknowledged": "Orders acknowledged by suppliers",
-  "notifications.kind.vendor_portal.po_acknowledged.desc": "A supplier confirms a purchase order through the vendor portal.",
-
+  "notifications.kind.field.task_assigned": "Field tasks assigned to me",
+  "notifications.kind.field.task_assigned.desc": "A manager gives you a new field task.",
+  "notifications.kind.field.task_overdue": "Overdue field tasks",
+  "notifications.kind.field.task_overdue.desc": "A field task passes its due time before it is completed.",
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
   "notifications.msg.employeeDoc.expired": "{employee}: {document} expired",
@@ -66,6 +57,13 @@ export const enNotifications = {
     one: "{employee}: {document} expires tomorrow",
     other: "{employee}: {document} expires in {count} days",
   },
+  "notifications.msg.leaveRequested": {
+    one: "{employee} requested {count} day of {type}",
+    other: "{employee} requested {count} days of {type}",
+  },
+  "notifications.msg.leaveApproved": "Your {type} request was approved",
+  "notifications.msg.leaveRejected": "Your {type} request was rejected",
+  "notifications.msg.leaveDates": "{start} – {end}",
   "notifications.msg.document.expired": "{document} expired",
   "notifications.msg.document.today": "{document} expires today",
   "notifications.msg.document.expiresIn": {
@@ -77,6 +75,17 @@ export const enNotifications = {
   "notifications.msg.webhookFailed.title": "Webhook delivery failed: {name}",
   "notifications.msg.webhookFailed.bodyCode": "{event}, response code {code}",
   "notifications.msg.webhookFailed.bodyError": "{event}: {error}",
+  "notifications.msg.fieldAssigned.title": "New task: {title}",
+  "notifications.msg.fieldOverdue.title": "Task overdue: {title}",
+  "notifications.msg.fieldOverdue.body": "{employee} · due {date}",
+  "notifications.msg.fieldDue": "Due {date}",
+  "notifications.doc.passport": "passport",
+  "notifications.doc.residence_permit": "residence permit",
+  "notifications.doc.work_permit": "work permit",
+  "notifications.kind.purchasing.bill_due": "Vendor bills due",
+  "notifications.kind.purchasing.bill_due.desc": "A vendor bill is due within 3 days, or is overdue.",
+  "notifications.kind.purchasing.po_late": "Late purchase orders",
+  "notifications.kind.purchasing.po_late.desc": "A purchase order passes its expected date before it is fully received.",
   "notifications.msg.billOverdue.title": "Bill {number} from {supplier} is overdue",
   "notifications.msg.billDueToday.title": "Bill {number} from {supplier} is due today",
   "notifications.msg.billDueIn.title": {
@@ -86,9 +95,8 @@ export const enNotifications = {
   "notifications.msg.billBalance": "Balance {amount}",
   "notifications.msg.poLate.title": "{number} from {supplier} is late",
   "notifications.msg.poLate.body": "Expected {date}",
+  "notifications.kind.vendor_portal.po_acknowledged": "Orders acknowledged by suppliers",
+  "notifications.kind.vendor_portal.po_acknowledged.desc": "A supplier confirms a purchase order through the vendor portal.",
   "notifications.msg.poAcknowledged.title": "{supplier} confirmed {number}",
   "notifications.msg.poAcknowledged.expected": "Expected delivery {date}",
-  "notifications.doc.passport": "passport",
-  "notifications.doc.residence_permit": "residence permit",
-  "notifications.doc.work_permit": "work permit",
 } as const;

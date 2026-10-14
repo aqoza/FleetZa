@@ -6,7 +6,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.subtitle": "قواعد تستجيب للأحداث بالإشعارات والأعطال وخطافات الويب.",
   "automation.tab.rules": "القواعد",
   "automation.tab.runs": "سجل التشغيل",
-
   "automation.newRule": "قاعدة جديدة",
   "automation.searchRules": "ابحث في القواعد…",
   "automation.allEvents": "كل الأحداث",
@@ -47,7 +46,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
     other: "{count} إجراء",
   },
   "automation.noConditions": "في كل مرة",
-
   "automation.ruleNotFound": "هذه القاعدة غير موجودة أو حُذفت.",
   "automation.backToRules": "العودة إلى القواعد",
   "automation.name": "الاسم",
@@ -84,7 +82,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.saveFailed": "تعذّر حفظ القاعدة.",
   "automation.saved": "حُفظت القاعدة",
   "automation.readOnly": "يستطيع المديرون فقط تغيير قواعد الأتمتة.",
-
   "automation.problem.name": "أدخل اسمًا للقاعدة.",
   "automation.problem.event": "اختر الحدث الذي يبدأ القاعدة.",
   "automation.problem.noActions": "أضف إجراءً واحدًا على الأقل.",
@@ -92,7 +89,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.problem.condition": "الشرط {n} يحتاج إلى حقل ومقارنة وقيمة.",
   "automation.problem.action": "الإجراء {n} غير مكتمل.",
   "automation.problem.issueNeedsVehicle": "الإجراء {n} يفتح عطلًا، لكن هذا الحدث لا يخص مركبة.",
-
   "automation.test": "اختبار الشروط",
   "automation.testHint": "تُطبَّق الشروط على حدث تجريبي. لا يُرسل أو يُنشأ أي شيء.",
   "automation.samplePayload": "الحدث التجريبي",
@@ -104,7 +100,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.testNoConditions": "لا توجد شروط، لذا تعمل القاعدة مع كل حدث.",
   "automation.actual": "قيمة الحدث",
   "automation.missing": "غير موجودة",
-
   "automation.recentRuns": "آخر مرات التشغيل",
   "automation.searchRuns": "صفِّ حسب الحدث…",
   "automation.allStatuses": "كل النتائج",
@@ -120,7 +115,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.status.success": "نُفّذت",
   "automation.status.skipped": "تُجووزت",
   "automation.status.failed": "فشلت",
-
   "automation.op.eq": "يساوي",
   "automation.op.neq": "لا يساوي",
   "automation.op.gt": "أكبر من",
@@ -130,7 +124,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.op.contains": "يحتوي على",
   "automation.op.in": "أحد القيم",
   "automation.op.exists": "له قيمة",
-
   "automation.action.notify": "إرسال إشعار",
   "automation.action.create_issue": "فتح عطل على المركبة",
   "automation.action.webhook": "استدعاء خطاف ويب",
@@ -144,7 +137,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.priority.normal": "عادية",
   "automation.priority.high": "عالية",
   "automation.priority.critical": "حرجة",
-
   "automation.ev.vehicle.created": "إضافة مركبة",
   "automation.ev.customer.created": "إضافة عميل",
   "automation.ev.issue.created": "الإبلاغ عن عطل",
@@ -155,7 +147,11 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.invoice.issued": "إصدار فاتورة",
   "automation.ev.payment.received": "استلام دفعة",
   "automation.ev.certificate.issued": "إصدار شهادة محدد سرعة",
+  "automation.ev.leave_request.approved": "الموافقة على طلب إجازة",
+  "automation.ev.payroll_run.approved": "اعتماد مسير رواتب",
+  "automation.ev.payroll_run.paid": "صرف مسير رواتب",
   "automation.ev.stock.below_reorder": "انخفاض المخزون عن حد إعادة الطلب",
+  "automation.ev.field_task.completed": "إنجاز مهمة ميدانية",
   "automation.ev.purchase_order.sent": "إرسال أمر شراء",
   "automation.ev.purchase_order.received": "استلام أمر شراء بالكامل",
   "automation.ev.vendor_bill.paid": "سداد فاتورة مورد",
