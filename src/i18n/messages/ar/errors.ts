@@ -29,8 +29,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "لا يمكن إصدار شهادة إلا لمهمة تركيب أو استبدال أو فحص مكتملة.",
   "errors.jobNotFound": "لم يتم العثور على المهمة.",
   "errors.certAlreadyIssued": "توجد بالفعل شهادة سارية صادرة لهذه المهمة.",
-
-  // مستندات المبيعات والفوترة
   "errors.customerHasInvoices":
     "لهذا العميل فواتير صادرة ولا يمكن حذفه. اجعله غير نشط بدلًا من ذلك.",
   "errors.docNotEditable":
@@ -73,8 +71,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.invoiceNotFound": "لم يتم العثور على الفاتورة.",
   "errors.invoiceNotPayable": "قم بإصدار الفاتورة قبل تسجيل دفعة عليها.",
   "errors.paymentExceedsBalance": "قيمة الدفعة أكبر من الرصيد المستحق على الفاتورة.",
-
-  // فوترة الشهادات
   "errors.certAlreadyInvoiced":
     "إحدى هذه الشهادات مدرجة بالفعل في فاتورة. ألغِ تلك الفاتورة أولًا إن كانت قد أُنشئت بالخطأ.",
   "errors.certPaidExternally":
@@ -85,7 +81,6 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
     "لا يوجد عميل مرتبط بهذه الشهادة لفوترته. حدّد مالك المركبة أولًا.",
   "errors.certificateNotFound": "لم يتم العثور على الشهادة.",
   "errors.noCertificates": "اختر شهادة واحدة على الأقل لفوترتها.",
-
   "errors.insufficientStock": "لا يوجد مخزون كافٍ في هذا المستودع لهذه الحركة.",
   "errors.invalidQuantity": "أدخل كمية أكبر من صفر.",
   "errors.invalidUnitCost": "لا يمكن أن تكون تكلفة الوحدة سالبة.",
@@ -115,4 +110,17 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.posChangeFromCard": "لا يمكن إعطاء الباقي إلا من النقد. خفّض مبلغ البطاقة أو غيرها إلى المبلغ المستحق.",
   "errors.posNotRefundable": "يمكن استرداد المبيعات المكتملة التي لم تُسترد فقط.",
   "errors.posNoOpenSession": "افتح وردية على صندوق هذه البيعة لاستردادها.",
+  "errors.illegalPoTransition": "لا يمكن نقل أمر الشراء هذا إلى هذه الحالة من وضعه الحالي.",
+  "errors.poNotFound": "أمر الشراء هذا لم يعد موجودًا.",
+  "errors.poNotReceivable": "أكّد أمر الشراء قبل استلام البضائع عليه.",
+  "errors.poWarehouseRequired": "اختر المستودع الذي تدخل إليه البضاعة.",
+  "errors.poNotBillable": "أكّد أمر الشراء قبل تسجيل فاتورة عليه.",
+  "errors.receiptEmpty": "أدخل كمية لسطر واحد على الأقل.",
+  "errors.receiptExceedsOrdered": "الكمية أكبر من المتبقي للاستلام في أحد السطور.",
+  "errors.nothingToBill": "كل ما في هذا الأمر مسجّل في فواتير بالفعل.",
+  "errors.illegalBillTransition": "لا يمكن نقل هذه الفاتورة إلى هذه الحالة من وضعها الحالي.",
+  "errors.billHasPayments": "على هذه الفاتورة دفعات. احذفها قبل إلغاء الفاتورة.",
+  "errors.billNotPayable": "اعتمد الفاتورة قبل تسجيل دفعة.",
+  "errors.billOverpayment": "قيمة الدفعة أكبر من الرصيد المستحق على الفاتورة.",
+  "errors.billPoMismatch": "أمر الشراء يخص موردًا آخر.",
 };

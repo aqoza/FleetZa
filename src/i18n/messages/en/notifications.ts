@@ -2,19 +2,13 @@
 export const enNotifications = {
   "notifications.title": "Notifications",
   "notifications.subtitle": "Alerts and reminders across your modules.",
-
-  // Tabs
   "notifications.tab.inbox": "Inbox",
   "notifications.tab.preferences": "Preferences",
-
-  // Bell
   "notifications.bell": "Notifications",
   "notifications.bellUnread": { one: "{count} unread notification", other: "{count} unread notifications" },
   "notifications.viewAll": "View all",
   "notifications.markAllRead": "Mark all as read",
   "notifications.allCaughtUp": "You're all caught up.",
-
-  // Inbox
   "notifications.filterUnread": "Unread",
   "notifications.filterAll": "All",
   "notifications.allSeverities": "Any severity",
@@ -31,15 +25,11 @@ export const enNotifications = {
   "notifications.emptyUnreadDesc": "Switch to All to see earlier notifications.",
   "notifications.unreadCount": { one: "{count} unread", other: "{count} unread" },
   "notifications.actionFailed": "Could not update the notifications.",
-
-  // Preferences
   "notifications.prefsHint": "Mute the kinds of notification you do not want. Muting applies to you only.",
   "notifications.prefsEmpty": "None of your enabled modules sends notifications yet.",
   "notifications.receive": "Receive",
   "notifications.muted": "Muted",
   "notifications.prefSaved": "Preference saved",
-
-  // Kinds: labels (preferences) and messages (inbox)
   "notifications.kind.inventory.low_stock": "Low stock",
   "notifications.kind.inventory.low_stock.desc": "An item drops to or below its reorder point.",
   "notifications.kind.employees.document_expiring": "Employee documents expiring",
@@ -59,7 +49,6 @@ export const enNotifications = {
   "notifications.kind.field.task_assigned.desc": "A manager gives you a new field task.",
   "notifications.kind.field.task_overdue": "Overdue field tasks",
   "notifications.kind.field.task_overdue.desc": "A field task passes its due time before it is completed.",
-
   "notifications.msg.lowStock.title": "Low stock: {name}",
   "notifications.msg.lowStock.body": "On hand {qty}, at or below the reorder point of {point}.",
   "notifications.msg.employeeDoc.expired": "{employee}: {document} expired",
@@ -93,4 +82,17 @@ export const enNotifications = {
   "notifications.doc.passport": "passport",
   "notifications.doc.residence_permit": "residence permit",
   "notifications.doc.work_permit": "work permit",
+  "notifications.kind.purchasing.bill_due": "Vendor bills due",
+  "notifications.kind.purchasing.bill_due.desc": "A vendor bill is due within 3 days, or is overdue.",
+  "notifications.kind.purchasing.po_late": "Late purchase orders",
+  "notifications.kind.purchasing.po_late.desc": "A purchase order passes its expected date before it is fully received.",
+  "notifications.msg.billOverdue.title": "Bill {number} from {supplier} is overdue",
+  "notifications.msg.billDueToday.title": "Bill {number} from {supplier} is due today",
+  "notifications.msg.billDueIn.title": {
+    one: "Bill {number} from {supplier} is due tomorrow",
+    other: "Bill {number} from {supplier} is due in {count} days",
+  },
+  "notifications.msg.billBalance": "Balance {amount}",
+  "notifications.msg.poLate.title": "{number} from {supplier} is late",
+  "notifications.msg.poLate.body": "Expected {date}",
 } as const;

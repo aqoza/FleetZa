@@ -30,8 +30,6 @@ export const enErrors = {
     "A certificate can only be issued for a completed installation, replacement or inspection job.",
   "errors.jobNotFound": "Job not found.",
   "errors.certAlreadyIssued": "A valid certificate has already been issued for this job.",
-
-  // Sales & billing documents (see supabase/migrations/…_sales_billing.sql)
   "errors.customerHasInvoices":
     "This customer has issued invoices and cannot be deleted. Mark them inactive instead.",
   "errors.docNotEditable":
@@ -74,8 +72,6 @@ export const enErrors = {
   "errors.invoiceNotFound": "Invoice not found.",
   "errors.invoiceNotPayable": "Issue the invoice before recording a payment against it.",
   "errors.paymentExceedsBalance": "That payment is larger than the invoice's outstanding balance.",
-
-  // Certificate billing (see supabase/migrations/…_certificate_billing.sql)
   "errors.certAlreadyInvoiced":
     "One of these certificates is already on an invoice. Void that invoice first if it was raised in error.",
   "errors.certPaidExternally":
@@ -86,8 +82,6 @@ export const enErrors = {
     "This certificate has no customer to bill. Set the vehicle's owner first.",
   "errors.certificateNotFound": "Certificate not found.",
   "errors.noCertificates": "Select at least one certificate to invoice.",
-
-  // Stock ledger (see supabase/migrations/…_platform_foundation.sql)
   "errors.insufficientStock": "There is not enough stock in that warehouse for this movement.",
   "errors.invalidQuantity": "Enter a quantity greater than zero.",
   "errors.invalidUnitCost": "The unit cost cannot be negative.",
@@ -117,4 +111,17 @@ export const enErrors = {
   "errors.posChangeFromCard": "Change can only be given from cash. Lower the card or other amount to the balance due.",
   "errors.posNotRefundable": "Only completed sales that haven't been refunded can be refunded.",
   "errors.posNoOpenSession": "Open a session on this sale's register to refund it.",
+  "errors.illegalPoTransition": "This purchase order can't move to that status from where it is now.",
+  "errors.poNotFound": "This purchase order no longer exists.",
+  "errors.poNotReceivable": "Confirm the purchase order before receiving goods against it.",
+  "errors.poWarehouseRequired": "Pick the warehouse the stock goes into.",
+  "errors.poNotBillable": "Confirm the purchase order before billing it.",
+  "errors.receiptEmpty": "Enter a quantity for at least one line.",
+  "errors.receiptExceedsOrdered": "That is more than the order still has to receive on one of the lines.",
+  "errors.nothingToBill": "Everything on this order is already billed.",
+  "errors.illegalBillTransition": "This bill can't move to that status from where it is now.",
+  "errors.billHasPayments": "This bill has payments. Delete them before voiding it.",
+  "errors.billNotPayable": "Approve the bill before recording a payment.",
+  "errors.billOverpayment": "That payment is more than the bill's outstanding balance.",
+  "errors.billPoMismatch": "The purchase order belongs to a different supplier.",
 } as const;

@@ -44,7 +44,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
   AUTOMATION_INVALID_RULE: "errors.automationInvalidRule",
-  // Integrations (foundation API keys + 20261008000007 webhooks)
   INVALID_API_KEY_NAME: "errors.apiKeyName",
   INVALID_API_SCOPE: "errors.apiKeyScope",
   INVALID_API_KEY_EXPIRY: "errors.apiKeyExpiry",
@@ -73,7 +72,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
   INVOICE_EXCEEDS_ORDER: "errors.invoiceExceedsOrder",
   NOTHING_TO_INVOICE: "errors.nothingToInvoice",
-  // HR & payroll (20261008000009)
   HR_INVALID_SETTING: "errors.hrInvalidSetting",
   LEAVE_OVERLAP: "errors.leaveOverlap",
   LEAVE_NO_WORKDAYS: "errors.leaveNoWorkdays",
@@ -88,19 +86,16 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PAYROLL_INVALID_PERIOD: "errors.payrollInvalidPeriod",
   ILLEGAL_PAYROLL_TRANSITION: "errors.illegalPayrollTransition",
   PAYSLIP_NEGATIVE_NET: "errors.payslipNegativeNet",
-  // Certificate billing (…_certificate_billing.sql)
   CERT_ALREADY_INVOICED: "errors.certAlreadyInvoiced",
   CERT_PAID_EXTERNALLY: "errors.certPaidExternally",
   CERTS_MULTIPLE_CUSTOMERS: "errors.certsMultipleCustomers",
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
   NO_CERTIFICATES: "errors.noCertificates",
-  // Audit & security (20261008000008)
   SECURITY_INVALID_SETTING: "errors.securityInvalidSetting",
   MEMBER_NOT_FOUND: "errors.memberNotFound",
   CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
-  // Field workforce (20261008000010)
   FIELD_TASK_NOT_FOUND: "errors.fieldTaskNotFound",
   ILLEGAL_FIELD_TASK_TRANSITION: "errors.illegalFieldTaskTransition",
   FIELD_INVALID_CHECKLIST: "errors.fieldInvalidChecklist",
@@ -118,7 +113,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   POS_CHANGE_FROM_CARD: "errors.posChangeFromCard",
   POS_NOT_REFUNDABLE: "errors.posNotRefundable",
   POS_NO_OPEN_SESSION: "errors.posNoOpenSession",
-  // Stock ledger (…_platform_foundation.sql)
   INSUFFICIENT_STOCK: "errors.insufficientStock",
   INVALID_QUANTITY: "errors.invalidQuantity",
   INVALID_UNIT_COST: "errors.invalidUnitCost",
@@ -127,6 +121,19 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   TRANSFER_SAME_WAREHOUSE: "errors.transferSameWarehouse",
   MODULE_DISABLED: "errors.moduleDisabled",
   CROSS_TENANT_REFERENCE: "errors.crossTenantReference",
+  ILLEGAL_PO_TRANSITION: "errors.illegalPoTransition",
+  PO_NOT_FOUND: "errors.poNotFound",
+  PO_NOT_RECEIVABLE: "errors.poNotReceivable",
+  PO_WAREHOUSE_REQUIRED: "errors.poWarehouseRequired",
+  PO_NOT_BILLABLE: "errors.poNotBillable",
+  RECEIPT_EMPTY: "errors.receiptEmpty",
+  RECEIPT_EXCEEDS_ORDERED: "errors.receiptExceedsOrdered",
+  NOTHING_TO_BILL: "errors.nothingToBill",
+  ILLEGAL_BILL_TRANSITION: "errors.illegalBillTransition",
+  BILL_HAS_PAYMENTS: "errors.billHasPayments",
+  BILL_NOT_PAYABLE: "errors.billNotPayable",
+  BILL_OVERPAYMENT: "errors.billOverpayment",
+  BILL_PO_MISMATCH: "errors.billPoMismatch",
 };
 
 /**

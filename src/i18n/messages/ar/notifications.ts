@@ -4,10 +4,8 @@ import type { Translation } from "../../plural";
 export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.title": "الإشعارات",
   "notifications.subtitle": "التنبيهات والتذكيرات من جميع الوحدات.",
-
   "notifications.tab.inbox": "الوارد",
   "notifications.tab.preferences": "التفضيلات",
-
   "notifications.bell": "الإشعارات",
   "notifications.bellUnread": {
     zero: "لا توجد إشعارات غير مقروءة",
@@ -20,7 +18,6 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.viewAll": "عرض الكل",
   "notifications.markAllRead": "تعليم الكل كمقروء",
   "notifications.allCaughtUp": "لا جديد لديك.",
-
   "notifications.filterUnread": "غير المقروءة",
   "notifications.filterAll": "الكل",
   "notifications.allSeverities": "أي مستوى",
@@ -44,13 +41,11 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     other: "{count} غير مقروء",
   },
   "notifications.actionFailed": "تعذّر تحديث الإشعارات.",
-
   "notifications.prefsHint": "أوقف أنواع الإشعارات التي لا تريدها. ينطبق الإيقاف عليك وحدك.",
   "notifications.prefsEmpty": "لا ترسل أي من وحداتك المفعّلة إشعارات بعد.",
   "notifications.receive": "استلام",
   "notifications.muted": "موقوف",
   "notifications.prefSaved": "تم حفظ التفضيل",
-
   "notifications.kind.inventory.low_stock": "انخفاض المخزون",
   "notifications.kind.inventory.low_stock.desc": "عندما تنخفض كمية صنف إلى حد إعادة الطلب أو أقل.",
   "notifications.kind.employees.document_expiring": "انتهاء وثائق الموظفين",
@@ -70,7 +65,6 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.field.task_assigned.desc": "يسند إليك مدير مهمة ميدانية جديدة.",
   "notifications.kind.field.task_overdue": "المهام الميدانية المتأخرة",
   "notifications.kind.field.task_overdue.desc": "تتجاوز مهمة ميدانية موعد استحقاقها قبل إنجازها.",
-
   "notifications.msg.lowStock.title": "مخزون منخفض: {name}",
   "notifications.msg.lowStock.body": "الكمية المتوفرة {qty}، عند حد إعادة الطلب {point} أو أقل.",
   "notifications.msg.employeeDoc.expired": "{employee}: انتهت صلاحية {document}",
@@ -116,4 +110,21 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.doc.passport": "جواز السفر",
   "notifications.doc.residence_permit": "الإقامة",
   "notifications.doc.work_permit": "تصريح العمل",
+  "notifications.kind.purchasing.bill_due": "فواتير الموردين المستحقة",
+  "notifications.kind.purchasing.bill_due.desc": "تستحق فاتورة مورد خلال 3 أيام، أو تأخر سدادها.",
+  "notifications.kind.purchasing.po_late": "أوامر الشراء المتأخرة",
+  "notifications.kind.purchasing.po_late.desc": "يتجاوز أمر شراء تاريخ التسليم المتوقع قبل استلامه بالكامل.",
+  "notifications.msg.billOverdue.title": "تأخر سداد الفاتورة {number} من {supplier}",
+  "notifications.msg.billDueToday.title": "تستحق الفاتورة {number} من {supplier} اليوم",
+  "notifications.msg.billDueIn.title": {
+    zero: "تستحق الفاتورة {number} من {supplier} اليوم",
+    one: "تستحق الفاتورة {number} من {supplier} غدًا",
+    two: "تستحق الفاتورة {number} من {supplier} خلال يومين",
+    few: "تستحق الفاتورة {number} من {supplier} خلال {count} أيام",
+    many: "تستحق الفاتورة {number} من {supplier} خلال {count} يومًا",
+    other: "تستحق الفاتورة {number} من {supplier} خلال {count} يوم",
+  },
+  "notifications.msg.billBalance": "الرصيد {amount}",
+  "notifications.msg.poLate.title": "تأخر {number} من {supplier}",
+  "notifications.msg.poLate.body": "التاريخ المتوقع {date}",
 };

@@ -152,6 +152,28 @@ export const EVENT_CATALOG: EventSpec[] = [
       customer_id: null, vehicle_id: "00000000-0000-4000-8000-000000000001", priority: "high",
       completed_at: "2026-10-08T10:42:00Z", signed: true },
   },
+  {
+    event: "purchase_order.sent", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" }, { name: "order_date", kind: "date" },
+      { name: "expected_date", kind: "date" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "purchase_order.received", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000015", doc_number: "PO-00042", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", order_date: "2026-10-08", expected_date: "2026-10-15", total: 1250.5, currency: "OMR" },
+  },
+  {
+    event: "vendor_bill.paid", module: "purchasing", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "supplier", kind: "text" },
+      { name: "supplier_invoice_number", kind: "text" }, { name: "total", kind: "number" }, { name: "currency", kind: "text" }],
+    sample: { id: "00000000-0000-4000-8000-000000000017", doc_number: "BILL-00007", supplier_id: "00000000-0000-4000-8000-000000000016",
+      supplier: "Gulf Parts LLC", supplier_invoice_number: "GP-7781", total: 1250.5, currency: "OMR",
+      purchase_order_id: "00000000-0000-4000-8000-000000000015" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {
