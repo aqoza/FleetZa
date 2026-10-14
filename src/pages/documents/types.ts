@@ -12,4 +12,4 @@ export const DOC_CATEGORIES: DocCategory[] = [
 export type DocumentRow = Omit<Tables<"documents">, "category"> & { category: DocCategory };
 
 /** Record types a document can be attached to from this module. */
-export type LinkType = "vehicle" | "driver" | "customer" | "supplier" | "employee";
+export type LinkType = "vehicle" | "driver" | "customer" | "supplier" | "employee" | "incident";

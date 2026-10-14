@@ -62,6 +62,7 @@ export const enDocuments = {
   "documents.entity.customer": "Customer",
   "documents.entity.supplier": "Supplier",
   "documents.entity.employee": "Employee",
+  "documents.entity.incident": "Incident",
   "documents.entity.hr": "HR file",
   "documents.entity.other": "Other record",
   "documents.openRecord": "Open record",

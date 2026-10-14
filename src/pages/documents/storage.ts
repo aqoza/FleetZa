@@ -86,6 +86,7 @@ const LINK_TABLES: Record<LinkType, { table: TableName; columns: string; label: 
     columns: "id, first_name, last_name",
     label: (r) => `${r.first_name ?? ""} ${r.last_name ?? ""}`.trim(),
   },
+  incident: { table: "incidents", columns: "id, doc_number", label: (r) => String(r.doc_number ?? "") },
 };
 
 /**
