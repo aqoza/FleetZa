@@ -275,9 +275,9 @@ insert into public.vendor_payments (id, tenant_id, vendor_bill_id, paid_at, amou
 insert into public.payroll_runs (id, tenant_id, doc_number, status, paid_at, pay_date,
   period_start, period_end, total_gross, total_deductions, total_net, total_employer_cost) values
   ('f1a0c0de-0029-4b2c-9d3e-0000000000d1', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'PAY-00001', 'paid', current_date, null,
-   current_date - 29, current_date, 1000, 100, 900, 120),
+   current_date - 29, current_date, 1000, 100, 900, 1120),
   ('f1a0c0de-0029-4b2c-9d3e-0000000000d2', '170d2d86-5c22-4bcb-9d74-420c879419b2', 'PAY-00002', 'approved', null, null,
-   current_date - 29, current_date, 1000, 100, 900, 120);
+   current_date - 29, current_date, 1000, 100, 900, 1120);
 -- The HR insert trigger starts every run in draft; follow its state machine.
 update public.payroll_runs set status = 'calculated'
 where id in ('f1a0c0de-0029-4b2c-9d3e-0000000000d1', 'f1a0c0de-0029-4b2c-9d3e-0000000000d2');
