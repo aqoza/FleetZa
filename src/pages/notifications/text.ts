@@ -1,5 +1,5 @@
 import { bdiText, ltrText } from "../../lib/bidi";
-import { formatDate, formatMoney } from "../../lib/format";
+import { formatDate, formatDateTime, formatMoney } from "../../lib/format";
 import { numParam, strParam } from "../../lib/notifications";
 import { useT, useTp, type MessageKey } from "../../i18n";
 import type { NotificationRow } from "./types";
@@ -41,6 +41,29 @@ export function useNotificationText() {
         const expiry = strParam(p, "expiry");
         return { title, body: expiry ? t("notifications.msg.expiryDate", { date: ltrText(formatDate(expiry)) }) : null };
       }
+      case "hr.leave_requested": {
+        const vars = { employee: bdiText(strParam(p, "employee")), type: bdiText(strParam(p, "type")) };
+        return {
+          title: tp("notifications.msg.leaveRequested", numParam(p, "days") ?? 0, vars),
+          body: t("notifications.msg.leaveDates", {
+            start: ltrText(formatDate(strParam(p, "start"))),
+            end: ltrText(formatDate(strParam(p, "end"))),
+          }),
+        };
+      }
+      case "hr.leave_decided": {
+        const vars = { type: bdiText(strParam(p, "type")) };
+        return {
+          title:
+            strParam(p, "decision") === "approved"
+              ? t("notifications.msg.leaveApproved", vars)
+              : t("notifications.msg.leaveRejected", vars),
+          body: t("notifications.msg.leaveDates", {
+            start: ltrText(formatDate(strParam(p, "start"))),
+            end: ltrText(formatDate(strParam(p, "end"))),
+          }),
+        };
+      }
       case "documents.expiring": {
         const days = numParam(p, "days") ?? 0;
         const vars = { document: bdiText(strParam(p, "document")) };
@@ -74,6 +97,21 @@ export function useNotificationText() {
               : event,
         };
       }
+      case "field.task_assigned": {
+        const due = strParam(p, "due_at");
+        return {
+          title: t("notifications.msg.fieldAssigned.title", { title: bdiText(strParam(p, "title")) }),
+          body: due ? t("notifications.msg.fieldDue", { date: ltrText(formatDateTime(due)) }) : null,
+        };
+      }
+      case "field.task_overdue":
+        return {
+          title: t("notifications.msg.fieldOverdue.title", { title: bdiText(strParam(p, "title")) }),
+          body: t("notifications.msg.fieldOverdue.body", {
+            employee: bdiText(strParam(p, "employee")),
+            date: ltrText(formatDateTime(strParam(p, "due_at"))),
+          }),
+        };
       case "purchasing.bill_due": {
         const days = numParam(p, "days") ?? 0;
         const vars = { number: ltrText(strParam(p, "number")), supplier: bdiText(strParam(p, "supplier")) };
