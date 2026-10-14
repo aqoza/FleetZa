@@ -165,6 +165,22 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   DISPATCH_VEHICLE_BUSY: "errors.dispatchVehicleBusy",
   DISPATCH_DRIVER_BUSY: "errors.dispatchDriverBusy",
   DISPATCH_JOB_NOT_FOUND: "errors.dispatchJobNotFound",
+  ILLEGAL_ROUTE_TRANSITION: "errors.illegalRouteTransition",
+  ROUTE_EMPTY: "errors.routeEmpty",
+  ROUTE_HAS_OPEN_STOPS: "errors.routeHasOpenStops",
+  ROUTE_LOCKED: "errors.routeLocked",
+  ROUTE_NOT_DELETABLE: "errors.routeNotDeletable",
+  ROUTE_NOT_PLANNED: "errors.routeNotPlanned",
+  ROUTE_NOT_FOUND: "errors.routeNotFound",
+  ILLEGAL_DELIVERY_TRANSITION: "errors.illegalDeliveryTransition",
+  DELIVERY_NOT_ON_ROUTE: "errors.deliveryNotOnRoute",
+  DELIVERY_ROUTE_NOT_OUT: "errors.deliveryRouteNotOut",
+  DELIVERY_NOT_AVAILABLE: "errors.deliveryNotAvailable",
+  POD_NAME_REQUIRED: "errors.podNameRequired",
+  FAILURE_REASON_REQUIRED: "errors.failureReasonRequired",
+  DELIVERY_LOCKED: "errors.deliveryLocked",
+  DELIVERY_NOT_DELETABLE: "errors.deliveryNotDeletable",
+  IMPORT_TOO_LARGE: "errors.importTooLarge",
 };
 
 /**

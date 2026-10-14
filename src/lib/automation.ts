@@ -245,6 +245,21 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { dispatch_job_id: "00000000-0000-4000-8000-000000000012", doc_number: "DSP-00017", vehicle_id: "00000000-0000-4000-8000-000000000001",
       driver_id: null, job_type: "delivery", priority: "urgent", title: "Deliver pallets to Rusayl", on_time: true },
   },
+  {
+    event: "delivery.delivered", module: "logistics_delivery", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "city", kind: "text" }, { name: "reference", kind: "text" },
+      { name: "attempts", kind: "number" }, { name: "cod_amount", kind: "number" }, { name: "cod_collected", kind: "number" },
+      { name: "pod_name", kind: "text" }],
+    sample: { delivery_id: "00000000-0000-4000-8000-000000000020", doc_number: "DLV-00042", city: "Muscat", reference: "SO-1042",
+      attempts: 1, cod_amount: 12.5, cod_collected: 12.5, pod_name: "Aisha" },
+  },
+  {
+    event: "delivery.failed", module: "logistics_delivery", hasVehicle: false,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "city", kind: "text" }, { name: "reference", kind: "text" },
+      { name: "attempts", kind: "number" }, { name: "failure_reason", kind: "text" }],
+    sample: { delivery_id: "00000000-0000-4000-8000-000000000020", doc_number: "DLV-00042", city: "Muscat", reference: "SO-1042",
+      attempts: 1, failure_reason: "not_home" },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

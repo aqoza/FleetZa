@@ -154,4 +154,6 @@ export const enAutomation = {
   "automation.ev.trip.completed": "A trip is completed",
   "automation.ev.dispatch_job.assigned": "A dispatch job is assigned",
   "automation.ev.dispatch_job.completed": "A dispatch job is completed",
+  "automation.ev.delivery.delivered": "A delivery is delivered",
+  "automation.ev.delivery.failed": "A delivery attempt fails",
 } as const;
