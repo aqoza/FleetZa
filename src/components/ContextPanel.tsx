@@ -16,6 +16,7 @@ import {
   Truck,
   Wrench,
 } from "lucide-react";
+import { auditTableLabel } from "../lib/auditLabels";
 import { countRows, listRows } from "../lib/db";
 import { certificateBucket } from "../lib/certificateStatus";
 import { daysUntil, formatDate, formatDateTime } from "../lib/format";
@@ -383,7 +384,7 @@ export function ContextPanel() {
                 <Activity className="h-4 w-4 shrink-0 text-ink-3" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm text-ink-2">
-                    {t(`dashboard.entity.${a.table_name}` as Parameters<typeof t>[0])}
+                    {auditTableLabel(t, a.table_name)}
                   </span>
                   <span className="block truncate text-xs text-ink-3">
                     <Ltr>{formatDateTime(a.at)}</Ltr>

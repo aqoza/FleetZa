@@ -2,11 +2,12 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, ArrowRight, Lightbulb } from "lucide-react";
+import { auditTableLabel } from "../../lib/auditLabels";
 import { listRows } from "../../lib/db";
 import { formatDateTime } from "../../lib/format";
 import { useAuth } from "../../context/AuthContext";
 import { Badge, Bdi, Card, ErrorState, Ltr } from "../../components/ui";
-import { useT, type MessageKey } from "../../i18n";
+import { useT } from "../../i18n";
 
 export { GRID_STROKE, TICK_STYLE } from "../../lib/chart";
 
@@ -98,21 +99,6 @@ type AuditRow = {
   diff: Record<string, unknown> | null;
 };
 
-/** Audited tables → entity label keys (mirror of the audit trigger list). */
-const AUDIT_ENTITY_KEYS: Record<string, MessageKey> = {
-  vehicles: "dashboard.entity.vehicles",
-  customers: "dashboard.entity.customers",
-  contacts: "dashboard.entity.contacts",
-  drivers: "dashboard.entity.drivers",
-  sl_devices: "dashboard.entity.sl_devices",
-  sl_technicians: "dashboard.entity.sl_technicians",
-  sl_jobs: "dashboard.entity.sl_jobs",
-  speed_limiter_installations: "dashboard.entity.speed_limiter_installations",
-  speed_limiter_certificates: "dashboard.entity.speed_limiter_certificates",
-  work_orders: "dashboard.entity.work_orders",
-  renewals: "dashboard.entity.renewals",
-};
-
 const ACTION_TONE: Record<AuditRow["action"], "green" | "blue" | "red"> = {
   insert: "green",
   update: "blue",
@@ -160,9 +146,8 @@ export function ActivityCard() {
           {t("dashboard.noActivity")}
         </div>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-line">
           {activity.map((a) => {
-            const entityKey = AUDIT_ENTITY_KEYS[a.table_name];
             const name = auditName(a.diff);
             return (
               <li key={a.id} className="flex items-center gap-3 px-5 py-3">
@@ -171,7 +156,7 @@ export function ActivityCard() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-ink">
-                    {entityKey ? t(entityKey) : <Ltr>{a.table_name}</Ltr>}
+                    {auditTableLabel(t, a.table_name)}
                     {name ? (
                       <>
                         {" · "}

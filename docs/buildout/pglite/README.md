@@ -12,8 +12,17 @@ cd docs/buildout/pglite && npm install          # once
 node harness.mjs build                           # after any migration in supabase/migrations changes (~10 s)
 node harness.mjs run my_dryrun.sql               # load base.tgz, run statement by statement
 node harness.mjs run --all a.sql b.sql           # print every row-returning statement
+node verify.mjs                                # all module + foundation assertions; fails on false rows
 node harness.mjs bundle out.sql mig.sql tests.sql # comment-stripped concat + md5, for the final execute_sql
 ```
+
+Cross-module acceptance commands and downstream consumers are recorded in
+[REGRESSION.md](../../REGRESSION.md). `verify.mjs` runs only the local replica and
+writes its logs and JSON summary to a fresh temporary directory. Build the base
+snapshot after migration changes. Unlike a bare SQL execution exit code, this
+runner also rejects false/null assertion rows. The real PostgreSQL notification
+timer probe is intentionally separate (`tests/production_notification_timeout.sql`);
+PGlite cannot emulate that interrupt.
 
 - Files run **statement by statement**, so an error names the file, line and statement.
   `-- @print` on the line before a statement prints its rows; otherwise only the last
