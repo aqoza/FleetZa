@@ -163,7 +163,8 @@ export default function TripDetailPage() {
               <Button
                 onClick={() => {
                   setEndOdo(trip.vehicle ? String(Math.round(kmToDisplay(Number(trip.vehicle.odometer), unit))) : "");
-                  setActualEnd(toInput(new Date().toISOString()));
+                  // Keep sub-minute precision so a short trip never ends before its start.
+                  setActualEnd(toInput(new Date().toISOString(), "millisecond"));
                   setModal("complete");
                 }}
               >
@@ -278,7 +279,7 @@ export default function TripDetailPage() {
             <Input type="number" min={0} step="0.1" value={endOdo} onChange={(e) => setEndOdo(e.target.value)} />
           </Field>
           <Field label={t("trips.actualEnd")}>
-            <Input type="datetime-local" value={actualEnd} onChange={(e) => setActualEnd(e.target.value)} />
+            <Input type="datetime-local" step="any" value={actualEnd} onChange={(e) => setActualEnd(e.target.value)} />
           </Field>
           <div className="flex justify-end gap-2">
             <Button type="button" variant="secondary" onClick={() => setModal(null)}>{t("action.cancel")}</Button>

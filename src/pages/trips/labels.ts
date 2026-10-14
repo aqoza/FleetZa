@@ -36,11 +36,11 @@ export function timeInTz(iso: string, timeZone: string, locale: string): string 
 }
 
 /** ISO instant → value for a datetime-local input (browser time, like the rest of the app). */
-export function toInput(iso: string | null): string {
+export function toInput(iso: string | null, precision: "minute" | "millisecond" = "minute"): string {
   if (!iso) return "";
   const d = new Date(iso);
   d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-  return d.toISOString().slice(0, 16);
+  return d.toISOString().slice(0, precision === "millisecond" ? 23 : 16);
 }
 
 /** datetime-local value → ISO instant. */
