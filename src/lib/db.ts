@@ -44,7 +44,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   CERT_ALREADY_ISSUED: "errors.certAlreadyIssued",
   FORBIDDEN: "errors.forbidden",
   AUTOMATION_INVALID_RULE: "errors.automationInvalidRule",
-  // Integrations (foundation API keys + 20261008000007 webhooks)
   INVALID_API_KEY_NAME: "errors.apiKeyName",
   INVALID_API_SCOPE: "errors.apiKeyScope",
   INVALID_API_KEY_EXPIRY: "errors.apiKeyExpiry",
@@ -73,19 +72,99 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   PAYMENT_EXCEEDS_BALANCE: "errors.paymentExceedsBalance",
   INVOICE_EXCEEDS_ORDER: "errors.invoiceExceedsOrder",
   NOTHING_TO_INVOICE: "errors.nothingToInvoice",
-  // Certificate billing (…_certificate_billing.sql)
+  HR_INVALID_SETTING: "errors.hrInvalidSetting",
+  LEAVE_OVERLAP: "errors.leaveOverlap",
+  LEAVE_NO_WORKDAYS: "errors.leaveNoWorkdays",
+  LEAVE_INVALID_DATES: "errors.leaveInvalidDates",
+  LEAVE_TYPE_INACTIVE: "errors.leaveTypeInactive",
+  LEAVE_NOT_FOUND: "errors.leaveNotFound",
+  ILLEGAL_LEAVE_TRANSITION: "errors.illegalLeaveTransition",
+  NO_EMPLOYEE_PROFILE: "errors.noEmployeeProfile",
+  EMPLOYEE_NOT_FOUND: "errors.employeeNotFound",
+  ATTENDANCE_INVALID: "errors.attendanceInvalid",
+  PAYROLL_NOT_FOUND: "errors.payrollNotFound",
+  PAYROLL_INVALID_PERIOD: "errors.payrollInvalidPeriod",
+  ILLEGAL_PAYROLL_TRANSITION: "errors.illegalPayrollTransition",
+  PAYSLIP_NEGATIVE_NET: "errors.payslipNegativeNet",
   CERT_ALREADY_INVOICED: "errors.certAlreadyInvoiced",
   CERT_PAID_EXTERNALLY: "errors.certPaidExternally",
   CERTS_MULTIPLE_CUSTOMERS: "errors.certsMultipleCustomers",
   CERT_NO_CUSTOMER: "errors.certNoCustomer",
   CERTIFICATE_NOT_FOUND: "errors.certificateNotFound",
   NO_CERTIFICATES: "errors.noCertificates",
-  // Audit & security (20261008000008)
   SECURITY_INVALID_SETTING: "errors.securityInvalidSetting",
   MEMBER_NOT_FOUND: "errors.memberNotFound",
   CANNOT_SIGN_OUT_SELF: "errors.cannotSignOutSelf",
   CANNOT_SIGN_OUT_OWNER: "errors.cannotSignOutOwner",
-  // Deliveries (…_deliveries.sql)
+  FIELD_TASK_NOT_FOUND: "errors.fieldTaskNotFound",
+  ILLEGAL_FIELD_TASK_TRANSITION: "errors.illegalFieldTaskTransition",
+  FIELD_INVALID_CHECKLIST: "errors.fieldInvalidChecklist",
+  FIELD_INVALID_SIGNATURE: "errors.fieldInvalidSignature",
+  FIELD_INVALID_LOCATION: "errors.fieldInvalidLocation",
+  FIELD_NO_EMPLOYEE_PROFILE: "errors.fieldNoEmployeeProfile",
+  FIELD_EMPLOYEE_NOT_FOUND: "errors.fieldEmployeeNotFound",
+  POS_SESSION_OPEN: "errors.posSessionOpen",
+  POS_SESSION_CLOSED: "errors.posSessionClosed",
+  POS_REGISTER_INACTIVE: "errors.posRegisterInactive",
+  POS_EMPTY_CART: "errors.posEmptyCart",
+  POS_PRODUCT_INVALID: "errors.posProductInvalid",
+  POS_LINE_INVALID: "errors.posLineInvalid",
+  POS_UNDERPAID: "errors.posUnderpaid",
+  POS_CHANGE_FROM_CARD: "errors.posChangeFromCard",
+  POS_NOT_REFUNDABLE: "errors.posNotRefundable",
+  POS_NO_OPEN_SESSION: "errors.posNoOpenSession",
+  INSUFFICIENT_STOCK: "errors.insufficientStock",
+  INVALID_QUANTITY: "errors.invalidQuantity",
+  INVALID_UNIT_COST: "errors.invalidUnitCost",
+  INVENTORY_ITEM_NOT_FOUND: "errors.inventoryItemNotFound",
+  WAREHOUSE_NOT_FOUND: "errors.warehouseNotFound",
+  TRANSFER_SAME_WAREHOUSE: "errors.transferSameWarehouse",
+  MODULE_DISABLED: "errors.moduleDisabled",
+  CROSS_TENANT_REFERENCE: "errors.crossTenantReference",
+  ILLEGAL_PO_TRANSITION: "errors.illegalPoTransition",
+  PO_NOT_FOUND: "errors.poNotFound",
+  PO_NOT_RECEIVABLE: "errors.poNotReceivable",
+  PO_WAREHOUSE_REQUIRED: "errors.poWarehouseRequired",
+  PO_NOT_BILLABLE: "errors.poNotBillable",
+  RECEIPT_EMPTY: "errors.receiptEmpty",
+  RECEIPT_EXCEEDS_ORDERED: "errors.receiptExceedsOrdered",
+  NOTHING_TO_BILL: "errors.nothingToBill",
+  ILLEGAL_BILL_TRANSITION: "errors.illegalBillTransition",
+  BILL_HAS_PAYMENTS: "errors.billHasPayments",
+  BILL_NOT_PAYABLE: "errors.billNotPayable",
+  BILL_OVERPAYMENT: "errors.billOverpayment",
+  BILL_PO_MISMATCH: "errors.billPoMismatch",
+  ASSET_NOT_FOUND: "errors.assetNotFound",
+  ASSET_DISPOSED: "errors.assetDisposed",
+  ASSET_ASSIGNEE_REQUIRED: "errors.assetAssigneeRequired",
+  ASSET_NOT_ASSIGNED: "errors.assetNotAssigned",
+  INVALID_ASSET_STATUS: "errors.invalidAssetStatus",
+  INVALID_POSITION_TIME: "errors.invalidPositionTime",
+  INVALID_EVENT_TIME: "errors.invalidEventTime",
+  INVALID_PERIOD: "errors.invalidPeriod",
+  INVALID_READING_TIME: "errors.invalidReadingTime",
+  ILLEGAL_ALERT_TRANSITION: "errors.illegalAlertTransition",
+  ILLEGAL_PREDICTION_TRANSITION: "errors.illegalPredictionTransition",
+  WORK_ORDER_REQUIRED: "errors.workOrderRequired",
+  ILLEGAL_TRIP_TRANSITION: "errors.illegalTripTransition",
+  TRIP_LOCKED: "errors.tripLocked",
+  TRIP_NOT_DELETABLE: "errors.tripNotDeletable",
+  TRIP_VEHICLE_CONFLICT: "errors.tripVehicleConflict",
+  TRIP_DRIVER_CONFLICT: "errors.tripDriverConflict",
+  VEHICLE_NOT_AVAILABLE: "errors.vehicleNotAvailable",
+  INVALID_TRIP_ODOMETER: "errors.invalidTripOdometer",
+  INVALID_TRIP_TIMES: "errors.invalidTripTimes",
+  ILLEGAL_STOP_TRANSITION: "errors.illegalStopTransition",
+  STOP_TRIP_NOT_STARTED: "errors.stopTripNotStarted",
+  STOP_LIST_MISMATCH: "errors.stopListMismatch",
+  ILLEGAL_DISPATCH_TRANSITION: "errors.illegalDispatchTransition",
+  DISPATCH_JOB_LOCKED: "errors.dispatchJobLocked",
+  DISPATCH_NOT_DELETABLE: "errors.dispatchNotDeletable",
+  DISPATCH_NOT_ASSIGNED: "errors.dispatchNotAssigned",
+  DISPATCH_VEHICLE_UNAVAILABLE: "errors.dispatchVehicleUnavailable",
+  DISPATCH_VEHICLE_BUSY: "errors.dispatchVehicleBusy",
+  DISPATCH_DRIVER_BUSY: "errors.dispatchDriverBusy",
+  DISPATCH_JOB_NOT_FOUND: "errors.dispatchJobNotFound",
   ILLEGAL_ROUTE_TRANSITION: "errors.illegalRouteTransition",
   ROUTE_EMPTY: "errors.routeEmpty",
   ROUTE_HAS_OPEN_STOPS: "errors.routeHasOpenStops",
@@ -102,15 +181,6 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   DELIVERY_LOCKED: "errors.deliveryLocked",
   DELIVERY_NOT_DELETABLE: "errors.deliveryNotDeletable",
   IMPORT_TOO_LARGE: "errors.importTooLarge",
-  // Stock ledger (…_platform_foundation.sql)
-  INSUFFICIENT_STOCK: "errors.insufficientStock",
-  INVALID_QUANTITY: "errors.invalidQuantity",
-  INVALID_UNIT_COST: "errors.invalidUnitCost",
-  INVENTORY_ITEM_NOT_FOUND: "errors.inventoryItemNotFound",
-  WAREHOUSE_NOT_FOUND: "errors.warehouseNotFound",
-  TRANSFER_SAME_WAREHOUSE: "errors.transferSameWarehouse",
-  MODULE_DISABLED: "errors.moduleDisabled",
-  CROSS_TENANT_REFERENCE: "errors.crossTenantReference",
 };
 
 /**
@@ -219,4 +289,24 @@ export async function updateRow<T>(
 export async function deleteRow(table: TableName, id: string): Promise<void> {
   const { error } = await (fromTable(table).delete() as unknown as AnyFilter).eq("id", id);
   if (error) throw wrapDbError(error);
+}
+
+/**
+ * Bulk insert (imports). With `skipDuplicatesOn` rows that hit that unique
+ * key are skipped (ON CONFLICT DO NOTHING) instead of failing the batch.
+ * Returns how many rows were actually inserted.
+ */
+export async function insertMany(
+  table: TableName,
+  rows: Array<Record<string, unknown>>,
+  opts: { skipDuplicatesOn?: string } = {},
+): Promise<number> {
+  if (rows.length === 0) return 0;
+  const q = (supabase.from as unknown as (t: string) => { upsert: (...a: unknown[]) => AnyFilter; insert: (...a: unknown[]) => AnyFilter })(table);
+  const builder = opts.skipDuplicatesOn
+    ? q.upsert(rows, { onConflict: opts.skipDuplicatesOn, ignoreDuplicates: true })
+    : q.insert(rows);
+  const { data, error } = await builder.select("id");
+  if (error) throw wrapDbError(error);
+  return (data ?? []).length;
 }

@@ -14,10 +14,10 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.gps_tracking.description": "شاهد مواقع المركبات ومساراتها وبيانات التليماتكس مباشرةً في الوقت الفعلي.",
   "modules.driver_behavior.name": "سلوك السائقين والتقييم",
   "modules.driver_behavior.description": "راقب السرعة الزائدة والفرملة المفاجئة وغيرها من الأحداث لتقييم السائقين وتوجيههم.",
-  "modules.trip_planning.name": "تخطيط الرحلات والمسارات",
-  "modules.trip_planning.description": "خطط الرحلات وحسّن المسارات لتوفير الوقت والوقود.",
+  "modules.trip_planning.name": "تخطيط الرحلات",
+  "modules.trip_planning.description": "خطط رحلات متعددة المحطات وتجنب الحجز المزدوج للمركبات والسائقين وقارن المخطط بالفعلي.",
   "modules.dispatch.name": "إدارة الإرسال",
-  "modules.dispatch.description": "أسند المهام إلى السائقين والمركبات وتابع تنفيذها في الوقت الفعلي.",
+  "modules.dispatch.description": "أسند المهام إلى المركبات والسائقين وتابع كل مهمة حتى إنجازها وراقب المواعيد.",
 
   // --- Maintenance & workshop ---
   "modules.maintenance.name": "صيانة المركبات",
@@ -30,8 +30,8 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.issues.description": "بلّغ عن مشكلات المركبات وتابعها من الاكتشاف حتى الحل.",
   "modules.workshop.name": "إدارة الورشة",
   "modules.workshop.description": "أدر أوامر العمل والفنيين وأعمال الإصلاح في ورشتك.",
-  "modules.predictive_ai.name": "المساعد الذكي والصيانة التنبؤية",
-  "modules.predictive_ai.description": "دع الذكاء الاصطناعي يتنبأ بالأعطال ويقترح الصيانة قبل حدوث التوقفات.",
+  "modules.predictive_ai.name": "الصيانة التنبؤية",
+  "modules.predictive_ai.description": "مؤشرات مخاطر واضحة الأسباب تنبّه إلى المركبات التي يُرجّح أن تحتاج صيانة قبل أن تتعطل.",
 
   // --- Compliance & certification ---
   "modules.renewals.name": "التجديدات وانتهاء المستندات",
