@@ -1,0 +1,248 @@
+{
+ "tables": {
+  "suppliers": [
+   {
+    "id": "5a000000-0000-4000-8000-000000000001",
+    "number": 1,
+    "doc_number": "SUP-00001",
+    "name": "Gulf Auto Parts LLC",
+    "name_ar": "قطع غيار الخليج",
+    "supplier_type": "parts",
+    "cr_number": "1234567",
+    "tax_number": "OM1100223344",
+    "email": "sales@gulfparts.example",
+    "phone": "+968 2450 1122",
+    "website": "gulfparts.example",
+    "address": "Way 3501, Ghala",
+    "city": "Muscat",
+    "country": "OM",
+    "payment_terms_days": 30,
+    "currency": "OMR",
+    "bank_name": "Bank Muscat",
+    "iban": "OM810180000001299123456",
+    "rating": 4,
+    "status": "active",
+    "notes": "Preferred for filters and brake pads."
+   },
+   {
+    "id": "5a000000-0000-4000-8000-000000000002",
+    "number": 2,
+    "doc_number": "SUP-00002",
+    "name": "Al Noor Fuel Station",
+    "name_ar": null,
+    "supplier_type": "fuel",
+    "phone": "+968 9911 2233",
+    "city": "Sohar",
+    "country": "OM",
+    "payment_terms_days": 0,
+    "rating": 5,
+    "status": "active"
+   }
+  ],
+  "supplier_portal_access": [
+   {
+    "id": "7e000000-0000-4000-8000-000000000001",
+    "supplier_id": "5a000000-0000-4000-8000-000000000001",
+    "token": "7f000000-0000-4000-8000-0000000000aa",
+    "label": "Sales desk",
+    "active": true,
+    "expires_at": null,
+    "last_accessed_at": "2026-10-08T09:12:00Z",
+    "access_count": 7,
+    "created_at": "2026-09-20T08:00:00Z"
+   },
+   {
+    "id": "7e000000-0000-4000-8000-000000000002",
+    "supplier_id": "5a000000-0000-4000-8000-000000000002",
+    "token": "7f000000-0000-4000-8000-0000000000bb",
+    "label": "Accounts",
+    "active": true,
+    "expires_at": "2026-12-31T23:59:59Z",
+    "last_accessed_at": null,
+    "access_count": 0,
+    "created_at": "2026-10-01T08:00:00Z"
+   },
+   {
+    "id": "7e000000-0000-4000-8000-000000000003",
+    "supplier_id": "5a000000-0000-4000-8000-000000000001",
+    "token": "7f000000-0000-4000-8000-0000000000cc",
+    "label": "Old link",
+    "active": true,
+    "expires_at": "2026-09-30T23:59:59Z",
+    "last_accessed_at": "2026-09-12T10:00:00Z",
+    "access_count": 1,
+    "created_at": "2026-08-01T08:00:00Z"
+   }
+  ]
+ },
+ "api": {
+  "GET /api/vendor-portal/7f000000-0000-4000-8000-0000000000aa": {
+   "status": "ok",
+   "company": {
+    "name": "Acme Logistics",
+    "address": "1200 Harbor Blvd, Suite 4",
+    "phone": "+1 510 555 0142"
+   },
+   "supplier": {
+    "name": "Gulf Auto Parts LLC",
+    "name_ar": "قطع غيار الخليج"
+   },
+   "orders": [
+    {
+     "id": "9a000000-0000-4000-8000-000000000009",
+     "doc_number": "PO-2026-00015",
+     "status": "sent",
+     "order_date": "2026-10-06",
+     "expected_date": "2026-10-16",
+     "currency": "USD",
+     "subtotal": 360,
+     "discount_total": 0,
+     "tax_total": 18,
+     "total": 378,
+     "terms": "Payment within 30 days of delivery.",
+     "supplier_reference": null,
+     "deliver_to": "Main store",
+     "vendor_ack_at": null,
+     "vendor_ack_note": null,
+     "vendor_expected_date": null,
+     "lines": [
+      {
+       "id": "9b000000-0000-4000-8000-000000000099",
+       "description": "Air filter",
+       "quantity": 24,
+       "unit": "pcs",
+       "unit_price": 15,
+       "discount_percent": 0,
+       "tax_rate": 5,
+       "line_total": 378,
+       "received_qty": 0
+      }
+     ]
+    },
+    {
+     "id": "9a000000-0000-4000-8000-000000000001",
+     "doc_number": "PO-2026-00012",
+     "status": "partially_received",
+     "order_date": "2026-09-20",
+     "expected_date": "2026-10-01",
+     "currency": "USD",
+     "subtotal": 410.0,
+     "discount_total": 0,
+     "tax_total": 20.5,
+     "total": 430.5,
+     "terms": "Payment within 30 days of delivery.",
+     "supplier_reference": "GAP-Q-8812",
+     "vendor_ack_at": "2026-09-21T10:15:00Z",
+     "vendor_ack_note": null,
+     "vendor_expected_date": null,
+     "deliver_to": "Main store",
+     "lines": [
+      {
+       "id": "9b000000-0000-4000-8000-000000000010",
+       "description": "Oil filter",
+       "quantity": 20,
+       "unit": "pcs",
+       "unit_price": 6.5,
+       "discount_percent": 0,
+       "tax_rate": 5,
+       "line_total": 136.5,
+       "received_qty": 20
+      },
+      {
+       "id": "9b000000-0000-4000-8000-000000000011",
+       "description": "Engine oil 15W-40 (5 L)",
+       "quantity": 10,
+       "unit": "pcs",
+       "unit_price": 28,
+       "discount_percent": 0,
+       "tax_rate": 5,
+       "line_total": 294.0,
+       "received_qty": 4
+      }
+     ]
+    },
+    {
+     "id": "9a000000-0000-4000-8000-000000000004",
+     "doc_number": "PO-2026-00011",
+     "status": "received",
+     "order_date": "2026-09-01",
+     "expected_date": "2026-09-10",
+     "currency": "USD",
+     "subtotal": 195.0,
+     "discount_total": 0,
+     "tax_total": 9.75,
+     "total": 204.75,
+     "terms": "Payment within 30 days of delivery.",
+     "supplier_reference": null,
+     "vendor_ack_at": null,
+     "vendor_ack_note": null,
+     "vendor_expected_date": null,
+     "deliver_to": "Main store",
+     "lines": [
+      {
+       "id": "9b000000-0000-4000-8000-000000000040",
+       "description": "Oil filter",
+       "quantity": 30,
+       "unit": "pcs",
+       "unit_price": 6.5,
+       "discount_percent": 0,
+       "tax_rate": 5,
+       "line_total": 204.75,
+       "received_qty": 30
+      }
+     ]
+    }
+   ],
+   "bills": [
+    {
+     "id": "9e000000-0000-4000-8000-000000000001",
+     "doc_number": "BILL-2026-00021",
+     "status": "paid",
+     "supplier_invoice_number": "INV-GAP-5521",
+     "bill_date": "2026-09-11",
+     "due_date": "2026-10-11",
+     "currency": "USD",
+     "total": 204.75,
+     "amount_paid": 204.75,
+     "balance": 0.0,
+     "order_number": "PO-2026-00011"
+    },
+    {
+     "id": "9e000000-0000-4000-8000-000000000002",
+     "doc_number": "BILL-2026-00022",
+     "status": "partially_paid",
+     "supplier_invoice_number": "INV-GAP-5610",
+     "bill_date": "2026-10-01",
+     "due_date": "2026-10-09",
+     "currency": "USD",
+     "total": 254.1,
+     "amount_paid": 100,
+     "balance": 154.1,
+     "order_number": "PO-2026-00012"
+    },
+    {
+     "id": "9e000000-0000-4000-8000-000000000005",
+     "doc_number": "BILL-2026-00020",
+     "status": "void",
+     "supplier_invoice_number": "INV-GAP-5400",
+     "bill_date": "2026-08-20",
+     "due_date": "2026-09-19",
+     "currency": "USD",
+     "total": 63.0,
+     "amount_paid": 0,
+     "balance": 0,
+     "order_number": null
+    }
+   ]
+  },
+  "GET /api/vendor-portal/7f000000-0000-4000-8000-0000000000dd": {
+   "__status": 404,
+   "__body": {
+    "status": "not_found"
+   }
+  },
+  "POST /api/vendor-portal/*": {
+   "ok": true
+  }
+ }
+}

@@ -76,6 +76,288 @@ export type Database = {
           },
         ]
       }
+      asset_events: {
+        Row: {
+          asset_id: string
+          at: string
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          detail: string | null
+          employee_id: string | null
+          event_type: string
+          id: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          asset_id: string
+          at?: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          employee_id?: string | null
+          event_type: string
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          asset_id?: string
+          at?: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          employee_id?: string | null
+          event_type?: string
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_events_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "asset_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      assets: {
+        Row: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_employee_id?: string | null
+          assigned_vehicle_id?: string | null
+          branch_id?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method?: string
+          disposal_value?: number | null
+          disposed_at?: string | null
+          doc_number?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name: string
+          notes?: string | null
+          number?: number | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          salvage_value?: number
+          serial_number?: string | null
+          status?: string
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number | null
+          warehouse_id?: string | null
+          warranty_expiry?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_employee_id?: string | null
+          assigned_vehicle_id?: string | null
+          branch_id?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          depreciation_method?: string
+          disposal_value?: number | null
+          disposed_at?: string | null
+          doc_number?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          model?: string | null
+          name?: string
+          notes?: string | null
+          number?: number | null
+          purchase_cost?: number | null
+          purchase_date?: string | null
+          salvage_value?: number
+          serial_number?: string | null
+          status?: string
+          supplier_id?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          useful_life_months?: number | null
+          warehouse_id?: string | null
+          warranty_expiry?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assets_assigned_employee_id_fkey"
+            columns: ["assigned_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_assigned_vehicle_id_fkey"
+            columns: ["assigned_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assets_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          check_in: string | null
+          check_out: string | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          hours: number | null
+          id: string
+          note: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_date: string
+        }
+        Insert: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          hours?: number | null
+          id?: string
+          note?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_date: string
+        }
+        Update: {
+          check_in?: string | null
+          check_out?: string | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          hours?: number | null
+          id?: string
+          note?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_events: {
         Row: {
           action: string
@@ -657,6 +939,227 @@ export type Database = {
           },
         ]
       }
+      deliveries: {
+        Row: {
+          address: string
+          attempts: number
+          city: string | null
+          cod_amount: number
+          cod_collected: number | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          doc_number: string | null
+          failed_at: string | null
+          failure_note: string | null
+          failure_reason: string | null
+          id: string
+          instructions: string | null
+          lat: number | null
+          lng: number | null
+          number: number | null
+          parcels: number
+          pod_name: string | null
+          pod_photo_path: string | null
+          pod_signature: string | null
+          recipient_name: string
+          recipient_phone: string | null
+          reference: string | null
+          returned_at: string | null
+          route_id: string | null
+          sequence: number | null
+          status: string
+          tenant_id: string
+          tracking_token: string
+          updated_at: string
+          updated_by: string | null
+          weight_kg: number | null
+        }
+        Insert: {
+          address: string
+          attempts?: number
+          city?: string | null
+          cod_amount?: number
+          cod_collected?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          doc_number?: string | null
+          failed_at?: string | null
+          failure_note?: string | null
+          failure_reason?: string | null
+          id?: string
+          instructions?: string | null
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          parcels?: number
+          pod_name?: string | null
+          pod_photo_path?: string | null
+          pod_signature?: string | null
+          recipient_name: string
+          recipient_phone?: string | null
+          reference?: string | null
+          returned_at?: string | null
+          route_id?: string | null
+          sequence?: number | null
+          status?: string
+          tenant_id?: string
+          tracking_token?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_kg?: number | null
+        }
+        Update: {
+          address?: string
+          attempts?: number
+          city?: string | null
+          cod_amount?: number
+          cod_collected?: number | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          doc_number?: string | null
+          failed_at?: string | null
+          failure_note?: string | null
+          failure_reason?: string | null
+          id?: string
+          instructions?: string | null
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          parcels?: number
+          pod_name?: string | null
+          pod_photo_path?: string | null
+          pod_signature?: string | null
+          recipient_name?: string
+          recipient_phone?: string | null
+          reference?: string | null
+          returned_at?: string | null
+          route_id?: string | null
+          sequence?: number | null
+          status?: string
+          tenant_id?: string
+          tracking_token?: string
+          updated_at?: string
+          updated_by?: string | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_routes: {
+        Row: {
+          canceled_at: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          depot_lat: number | null
+          depot_lng: number | null
+          depot_name: string | null
+          doc_number: string | null
+          driver_id: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          route_date: string
+          started_at: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          depot_lat?: number | null
+          depot_lng?: number | null
+          depot_name?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          route_date: string
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          depot_lat?: number | null
+          depot_lng?: number | null
+          depot_name?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          route_date?: string
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_routes_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_routes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_routes_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       departments: {
         Row: {
           code: string | null
@@ -717,6 +1220,143 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dispatch_jobs: {
+        Row: {
+          assigned_at: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          completed_at: string | null
+          completion_notes: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          doc_number: string | null
+          driver_id: string | null
+          dropoff_address: string | null
+          dropoff_lat: number | null
+          dropoff_lng: number | null
+          en_route_at: string | null
+          id: string
+          job_type: string
+          notes: string | null
+          number: number | null
+          on_site_at: string | null
+          pickup_address: string | null
+          pickup_lat: number | null
+          pickup_lng: number | null
+          priority: string
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          window_end: string
+          window_start: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          completion_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          en_route_at?: string | null
+          id?: string
+          job_type?: string
+          notes?: string | null
+          number?: number | null
+          on_site_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          priority?: string
+          status?: string
+          tenant_id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          window_end: string
+          window_start: string
+        }
+        Update: {
+          assigned_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          completion_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          dropoff_address?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
+          en_route_at?: string | null
+          id?: string
+          job_type?: string
+          notes?: string | null
+          number?: number | null
+          on_site_at?: string | null
+          pickup_address?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          priority?: string
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          window_end?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatch_jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispatch_jobs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -859,6 +1499,79 @@ export type Database = {
           },
         ]
       }
+      driver_coaching_sessions: {
+        Row: {
+          coach_id: string | null
+          created_at: string
+          created_by: string | null
+          driver_id: string
+          event_ids: string[]
+          follow_up_date: string | null
+          id: string
+          notes: string | null
+          session_date: string
+          status: string
+          tenant_id: string
+          topics: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          coach_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id: string
+          event_ids?: string[]
+          follow_up_date?: string | null
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          tenant_id?: string
+          topics?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          coach_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string
+          event_ids?: string[]
+          follow_up_date?: string | null
+          id?: string
+          notes?: string | null
+          session_date?: string
+          status?: string
+          tenant_id?: string
+          topics?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driver_coaching_sessions_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_coaching_sessions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driver_coaching_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drivers: {
         Row: {
           branch_id: string | null
@@ -930,6 +1643,91 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      driving_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          duration_s: number | null
+          event_type: string
+          id: string
+          lat: number | null
+          lng: number | null
+          notes: string | null
+          occurred_at: string
+          severity: string
+          source: string
+          speed_kmh: number | null
+          speed_limit_kmh: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          duration_s?: number | null
+          event_type: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          occurred_at: string
+          severity?: string
+          source?: string
+          speed_kmh?: number | null
+          speed_limit_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          duration_s?: number | null
+          event_type?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          occurred_at?: string
+          severity?: string
+          source?: string
+          speed_kmh?: number | null
+          speed_limit_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "driving_events_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driving_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "driving_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1128,6 +1926,261 @@ export type Database = {
           },
         ]
       }
+      field_checkins: {
+        Row: {
+          accuracy_m: number | null
+          at: string
+          created_by: string | null
+          employee_id: string
+          id: string
+          kind: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          task_id: string | null
+          tenant_id: string
+        }
+        Insert: {
+          accuracy_m?: number | null
+          at?: string
+          created_by?: string | null
+          employee_id: string
+          id?: string
+          kind: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          task_id?: string | null
+          tenant_id?: string
+        }
+        Update: {
+          accuracy_m?: number | null
+          at?: string
+          created_by?: string | null
+          employee_id?: string
+          id?: string
+          kind?: string
+          lat?: number | null
+          lng?: number | null
+          note?: string | null
+          task_id?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_checkins_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_checkins_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "field_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_checkins_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      field_tasks: {
+        Row: {
+          accepted_at: string | null
+          address: string | null
+          canceled_at: string | null
+          checklist: Json
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          doc_number: string | null
+          due_at: string | null
+          employee_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          number: number | null
+          priority: string
+          scheduled_start: string | null
+          signature_data: string | null
+          started_at: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          address?: string | null
+          canceled_at?: string | null
+          checklist?: Json
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          doc_number?: string | null
+          due_at?: string | null
+          employee_id: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          priority?: string
+          scheduled_start?: string | null
+          signature_data?: string | null
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          address?: string | null
+          canceled_at?: string | null
+          checklist?: Json
+          completed_at?: string | null
+          completion_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          doc_number?: string | null
+          due_at?: string | null
+          employee_id?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          number?: number | null
+          priority?: string
+          scheduled_start?: string | null
+          signature_data?: string | null
+          started_at?: string | null
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_tasks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_tasks_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      freight_rates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          destination_city: string
+          id: string
+          min_charge: number
+          mode: string
+          notes: string | null
+          origin_city: string
+          rate_per_kg: number | null
+          rate_per_trip: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          valid_from: string
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          destination_city: string
+          id?: string
+          min_charge?: number
+          mode: string
+          notes?: string | null
+          origin_city: string
+          rate_per_kg?: number | null
+          rate_per_trip?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          destination_city?: string
+          id?: string
+          min_charge?: number
+          mode?: string
+          notes?: string | null
+          origin_city?: string
+          rate_per_kg?: number | null
+          rate_per_trip?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "freight_rates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "freight_rates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuel_logs: {
         Row: {
           created_at: string
@@ -1197,6 +2250,520 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofence_events: {
+        Row: {
+          at: string
+          created_at: string
+          event: string
+          geofence_id: string
+          id: string
+          position_id: string | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          at: string
+          created_at?: string
+          event: string
+          geofence_id: string
+          id?: string
+          position_id?: string | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Update: {
+          at?: string
+          created_at?: string
+          event?: string
+          geofence_id?: string
+          id?: string
+          position_id?: string | null
+          tenant_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofence_events_geofence_id_fkey"
+            columns: ["geofence_id"]
+            isOneToOne: false
+            referencedRelation: "geofences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "gps_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geofence_events_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geofences: {
+        Row: {
+          active: boolean
+          alert_on_enter: boolean
+          alert_on_exit: boolean
+          center_lat: number | null
+          center_lng: number | null
+          color: string
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          name: string
+          notes: string | null
+          polygon: Json | null
+          radius_m: number | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          alert_on_enter?: boolean
+          alert_on_exit?: boolean
+          center_lat?: number | null
+          center_lng?: number | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name: string
+          notes?: string | null
+          polygon?: Json | null
+          radius_m?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          alert_on_enter?: boolean
+          alert_on_exit?: boolean
+          center_lat?: number | null
+          center_lng?: number | null
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          notes?: string | null
+          polygon?: Json | null
+          radius_m?: number | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geofences_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gps_positions: {
+        Row: {
+          altitude_m: number | null
+          created_at: string
+          created_by: string | null
+          driver_id: string | null
+          heading: number | null
+          id: string
+          ignition: boolean | null
+          lat: number
+          lng: number
+          odometer_km: number | null
+          recorded_at: string
+          source: string
+          speed_kmh: number | null
+          tenant_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          altitude_m?: number | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          heading?: number | null
+          id?: string
+          ignition?: boolean | null
+          lat: number
+          lng: number
+          odometer_km?: number | null
+          recorded_at: string
+          source?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          vehicle_id: string
+        }
+        Update: {
+          altitude_m?: number | null
+          created_at?: string
+          created_by?: string | null
+          driver_id?: string | null
+          heading?: number | null
+          id?: string
+          ignition?: boolean | null
+          lat?: number
+          lng?: number
+          odometer_km?: number | null
+          recorded_at?: string
+          source?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gps_positions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_positions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gps_positions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hr_settings: {
+        Row: {
+          id: string
+          overtime_multiplier: number
+          social_employee_pct: number
+          social_employer_pct: number
+          social_nationals_only: boolean
+          standard_daily_hours: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          weekend_days: number[]
+        }
+        Insert: {
+          id?: string
+          overtime_multiplier?: number
+          social_employee_pct?: number
+          social_employer_pct?: number
+          social_nationals_only?: boolean
+          standard_daily_hours?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekend_days?: number[]
+        }
+        Update: {
+          id?: string
+          overtime_multiplier?: number
+          social_employee_pct?: number
+          social_employer_pct?: number
+          social_nationals_only?: boolean
+          standard_daily_hours?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          weekend_days?: number[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hr_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_events: {
+        Row: {
+          at: string
+          created_by: string | null
+          id: string
+          incident_id: string
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          at?: string
+          created_by?: string | null
+          id?: string
+          incident_id: string
+          status: string
+          tenant_id: string
+        }
+        Update: {
+          at?: string
+          created_by?: string | null
+          id?: string
+          incident_id?: string
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_events_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_parties: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          incident_id: string
+          insurance_policy_number: string | null
+          insurer: string | null
+          name: string
+          party_type: string
+          phone: string | null
+          statement: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_plate: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incident_id: string
+          insurance_policy_number?: string | null
+          insurer?: string | null
+          name: string
+          party_type?: string
+          phone?: string | null
+          statement?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_plate?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          incident_id?: string
+          insurance_policy_number?: string | null
+          insurer?: string | null
+          name?: string
+          party_type?: string
+          phone?: string | null
+          statement?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_plate?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_parties_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "incidents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incident_parties_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incidents: {
+        Row: {
+          actual_cost: number | null
+          at_fault: string
+          claim_id: string | null
+          closed_at: string | null
+          corrective_actions: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string
+          doc_number: string | null
+          driver_id: string | null
+          driving_event_id: string | null
+          estimated_damage: number | null
+          fatalities: number
+          id: string
+          incident_type: string
+          injuries: number
+          issue_id: string | null
+          lat: number | null
+          lng: number | null
+          location: string | null
+          notes: string | null
+          number: number | null
+          occurred_at: string
+          police_report_number: string | null
+          police_station: string | null
+          resolved_at: string | null
+          root_cause: string | null
+          severity: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_drivable: boolean
+          vehicle_id: string
+          work_order_id: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          at_fault?: string
+          claim_id?: string | null
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description: string
+          doc_number?: string | null
+          driver_id?: string | null
+          driving_event_id?: string | null
+          estimated_damage?: number | null
+          fatalities?: number
+          id?: string
+          incident_type?: string
+          injuries?: number
+          issue_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          notes?: string | null
+          number?: number | null
+          occurred_at: string
+          police_report_number?: string | null
+          police_station?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_drivable?: boolean
+          vehicle_id: string
+          work_order_id?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          at_fault?: string
+          claim_id?: string | null
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string
+          doc_number?: string | null
+          driver_id?: string | null
+          driving_event_id?: string | null
+          estimated_damage?: number | null
+          fatalities?: number
+          id?: string
+          incident_type?: string
+          injuries?: number
+          issue_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          location?: string | null
+          notes?: string | null
+          number?: number | null
+          occurred_at?: string
+          police_report_number?: string | null
+          police_station?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_drivable?: boolean
+          vehicle_id?: string
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "issues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "incidents_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -1315,6 +2882,275 @@ export type Database = {
           },
           {
             foreignKeyName: "inspections_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_claims: {
+        Row: {
+          adjuster_name: string | null
+          adjuster_phone: string | null
+          amount_approved: number | null
+          amount_claimed: number
+          amount_paid: number | null
+          claim_date: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          decided_at: string | null
+          deductible_applied: number | null
+          description: string
+          doc_number: string | null
+          id: string
+          incident_id: string | null
+          insurer_reference: string | null
+          loss_date: string
+          notes: string | null
+          number: number | null
+          policy_id: string
+          rejection_reason: string | null
+          settled_at: string | null
+          status: string
+          submitted_at: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          withdrawn_at: string | null
+        }
+        Insert: {
+          adjuster_name?: string | null
+          adjuster_phone?: string | null
+          amount_approved?: number | null
+          amount_claimed?: number
+          amount_paid?: number | null
+          claim_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          decided_at?: string | null
+          deductible_applied?: number | null
+          description: string
+          doc_number?: string | null
+          id?: string
+          incident_id?: string | null
+          insurer_reference?: string | null
+          loss_date: string
+          notes?: string | null
+          number?: number | null
+          policy_id: string
+          rejection_reason?: string | null
+          settled_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Update: {
+          adjuster_name?: string | null
+          adjuster_phone?: string | null
+          amount_approved?: number | null
+          amount_claimed?: number
+          amount_paid?: number | null
+          claim_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          decided_at?: string | null
+          deductible_applied?: number | null
+          description?: string
+          doc_number?: string | null
+          id?: string
+          incident_id?: string | null
+          insurer_reference?: string | null
+          loss_date?: string
+          notes?: string | null
+          number?: number | null
+          policy_id?: string
+          rejection_reason?: string | null
+          settled_at?: string | null
+          status?: string
+          submitted_at?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          withdrawn_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_policies: {
+        Row: {
+          auto_renew: boolean
+          broker: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          coverage_amount: number | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          deductible: number | null
+          end_date: string
+          id: string
+          insurer_name: string | null
+          insurer_supplier_id: string | null
+          notes: string | null
+          policy_number: string
+          policy_type: string
+          premium: number
+          premium_frequency: string
+          start_date: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto_renew?: boolean
+          broker?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          coverage_amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deductible?: number | null
+          end_date: string
+          id?: string
+          insurer_name?: string | null
+          insurer_supplier_id?: string | null
+          notes?: string | null
+          policy_number: string
+          policy_type?: string
+          premium?: number
+          premium_frequency?: string
+          start_date: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto_renew?: boolean
+          broker?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          coverage_amount?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          deductible?: number | null
+          end_date?: string
+          id?: string
+          insurer_name?: string | null
+          insurer_supplier_id?: string | null
+          notes?: string | null
+          policy_number?: string
+          policy_type?: string
+          premium?: number
+          premium_frequency?: string
+          start_date?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_policies_insurer_supplier_id_fkey"
+            columns: ["insurer_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policies_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_policy_vehicles: {
+        Row: {
+          added_on: string
+          created_at: string
+          created_by: string | null
+          id: string
+          policy_id: string
+          removed_on: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          added_on?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id: string
+          removed_on?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          added_on?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id?: string
+          removed_on?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_policy_vehicles_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_policies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policy_vehicles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_policy_vehicles_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -1756,6 +3592,308 @@ export type Database = {
           },
         ]
       }
+      iot_alert_rules: {
+        Row: {
+          active: boolean
+          cooldown_minutes: number
+          created_at: string
+          created_by: string | null
+          device_id: string | null
+          device_type: string | null
+          id: string
+          metric: string
+          name: string
+          notes: string | null
+          notify: boolean
+          op: string
+          severity: string
+          tenant_id: string
+          threshold: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          device_type?: string | null
+          id?: string
+          metric: string
+          name: string
+          notes?: string | null
+          notify?: boolean
+          op: string
+          severity?: string
+          tenant_id?: string
+          threshold: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          cooldown_minutes?: number
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          device_type?: string | null
+          id?: string
+          metric?: string
+          name?: string
+          notes?: string | null
+          notify?: boolean
+          op?: string
+          severity?: string
+          tenant_id?: string
+          threshold?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_alert_rules_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alert_rules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          device_id: string
+          id: string
+          metric: string
+          note: string | null
+          op: string
+          reading_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          rule_id: string | null
+          rule_name: string
+          severity: string
+          status: string
+          tenant_id: string
+          threshold: number
+          triggered_at: string
+          unit: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          device_id: string
+          id?: string
+          metric: string
+          note?: string | null
+          op: string
+          reading_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          rule_name: string
+          severity: string
+          status?: string
+          tenant_id: string
+          threshold: number
+          triggered_at: string
+          unit?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          device_id?: string
+          id?: string
+          metric?: string
+          note?: string | null
+          op?: string
+          reading_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          rule_id?: string | null
+          rule_name?: string
+          severity?: string
+          status?: string
+          tenant_id?: string
+          threshold?: number
+          triggered_at?: string
+          unit?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_alerts_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "iot_readings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "iot_alert_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_alerts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_devices: {
+        Row: {
+          asset_id: string | null
+          asset_label: string | null
+          created_at: string
+          created_by: string | null
+          device_type: string
+          id: string
+          last_reading: Json
+          last_seen_at: string | null
+          name: string
+          notes: string | null
+          serial: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          asset_id?: string | null
+          asset_label?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_type?: string
+          id?: string
+          last_reading?: Json
+          last_seen_at?: string | null
+          name: string
+          notes?: string | null
+          serial: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          asset_id?: string | null
+          asset_label?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_type?: string
+          id?: string
+          last_reading?: Json
+          last_seen_at?: string | null
+          name?: string
+          notes?: string | null
+          serial?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_devices_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_devices_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      iot_readings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          device_id: string
+          id: string
+          metric: string
+          recorded_at: string
+          source: string
+          tenant_id: string
+          unit: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          device_id: string
+          id?: string
+          metric: string
+          recorded_at: string
+          source?: string
+          tenant_id?: string
+          unit?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          device_id?: string
+          id?: string
+          metric?: string
+          recorded_at?: string
+          source?: string
+          tenant_id?: string
+          unit?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "iot_readings_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "iot_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "iot_readings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       issues: {
         Row: {
           created_at: string
@@ -1838,6 +3976,229 @@ export type Database = {
           },
           {
             foreignKeyName: "issues_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_requests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type_id: string
+          reason?: string | null
+          start_date: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          days?: number
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type_id?: string
+          reason?: string | null
+          start_date?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_types: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          created_by: string | null
+          days_per_year: number | null
+          id: string
+          name: string
+          name_ar: string | null
+          paid: boolean
+          sort_order: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          created_by?: string | null
+          days_per_year?: number | null
+          id?: string
+          name: string
+          name_ar?: string | null
+          paid?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          days_per_year?: number | null
+          id?: string
+          name?: string
+          name_ar?: string | null
+          paid?: boolean
+          sort_order?: number
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_types_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_predictions: {
+        Row: {
+          avg_daily_km: number | null
+          band: string
+          closed_at: string | null
+          closed_by: string | null
+          computed_at: string
+          created_at: string
+          created_by: string | null
+          days_to_service: number | null
+          factors: Json
+          id: string
+          note: string | null
+          predicted_service_date: string | null
+          risk_score: number
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+          work_order_id: string | null
+        }
+        Insert: {
+          avg_daily_km?: number | null
+          band: string
+          closed_at?: string | null
+          closed_by?: string | null
+          computed_at?: string
+          created_at?: string
+          created_by?: string | null
+          days_to_service?: number | null
+          factors?: Json
+          id?: string
+          note?: string | null
+          predicted_service_date?: string | null
+          risk_score: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+          work_order_id?: string | null
+        }
+        Update: {
+          avg_daily_km?: number | null
+          band?: string
+          closed_at?: string | null
+          closed_by?: string | null
+          computed_at?: string
+          created_at?: string
+          created_by?: string | null
+          days_to_service?: number | null
+          factors?: Json
+          id?: string
+          note?: string | null
+          predicted_service_date?: string | null
+          risk_score?: number
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_predictions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_predictions_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_predictions_work_order_id_fkey"
             columns: ["work_order_id"]
             isOneToOne: false
             referencedRelation: "work_orders"
@@ -2042,6 +4403,592 @@ export type Database = {
           },
         ]
       }
+      payroll_runs: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          currency_decimals?: number
+          doc_number?: string | null
+          employee_count?: number
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_at?: string | null
+          pay_date?: string | null
+          period_end: string
+          period_start: string
+          status?: string
+          tenant_id?: string
+          total_deductions?: number
+          total_employer_cost?: number
+          total_gross?: number
+          total_net?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          calculated_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          currency_decimals?: number
+          doc_number?: string | null
+          employee_count?: number
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_at?: string | null
+          pay_date?: string | null
+          period_end?: string
+          period_start?: string
+          status?: string
+          tenant_id?: string
+          total_deductions?: number
+          total_employer_cost?: number
+          total_gross?: number
+          total_net?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payslips: {
+        Row: {
+          bank_name: string | null
+          basic: number
+          bonus: number
+          created_at: string
+          currency: string | null
+          deduction_note: string | null
+          deductions: number
+          employee_id: string
+          employee_name: string
+          employee_number: string | null
+          gross: number
+          hourly_rate: number
+          housing: number
+          iban: string | null
+          id: string
+          job_title: string | null
+          net: number
+          other_allowances: number
+          overtime_amount: number
+          overtime_hours: number
+          overtime_multiplier: number
+          paid_days: number
+          pay_date: string | null
+          period_days: number
+          period_end: string
+          period_start: string
+          run_id: string
+          run_number: string | null
+          social_insurance_employee: number
+          social_insurance_employer: number
+          tenant_id: string
+          transport: number
+          unpaid_leave_days: number
+          unpaid_leave_deduction: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bank_name?: string | null
+          basic?: number
+          bonus?: number
+          created_at?: string
+          currency?: string | null
+          deduction_note?: string | null
+          deductions?: number
+          employee_id: string
+          employee_name: string
+          employee_number?: string | null
+          gross?: number
+          hourly_rate?: number
+          housing?: number
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          net?: number
+          other_allowances?: number
+          overtime_amount?: number
+          overtime_hours?: number
+          overtime_multiplier?: number
+          paid_days?: number
+          pay_date?: string | null
+          period_days?: number
+          period_end: string
+          period_start: string
+          run_id: string
+          run_number?: string | null
+          social_insurance_employee?: number
+          social_insurance_employer?: number
+          tenant_id: string
+          transport?: number
+          unpaid_leave_days?: number
+          unpaid_leave_deduction?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bank_name?: string | null
+          basic?: number
+          bonus?: number
+          created_at?: string
+          currency?: string | null
+          deduction_note?: string | null
+          deductions?: number
+          employee_id?: string
+          employee_name?: string
+          employee_number?: string | null
+          gross?: number
+          hourly_rate?: number
+          housing?: number
+          iban?: string | null
+          id?: string
+          job_title?: string | null
+          net?: number
+          other_allowances?: number
+          overtime_amount?: number
+          overtime_hours?: number
+          overtime_multiplier?: number
+          paid_days?: number
+          pay_date?: string | null
+          period_days?: number
+          period_end?: string
+          period_start?: string
+          run_id?: string
+          run_number?: string | null
+          social_insurance_employee?: number
+          social_insurance_employer?: number
+          tenant_id?: string
+          transport?: number
+          unpaid_leave_days?: number
+          unpaid_leave_deduction?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payslips_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payslips_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payslips_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_order_lines: {
+        Row: {
+          created_at: string
+          description: string
+          discount_percent: number
+          id: string
+          inventory_item_id: string | null
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          order_id: string
+          product_id: string
+          quantity: number
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount_percent?: number
+          id?: string
+          inventory_item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          order_id: string
+          product_id: string
+          quantity: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id: string
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount_percent?: number
+          id?: string
+          inventory_item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_order_lines_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_orders: {
+        Row: {
+          change_due: number
+          completed_at: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          paid_card: number
+          paid_cash: number
+          paid_other: number
+          refund_of: string | null
+          register_id: string
+          session_id: string
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          change_due?: number
+          completed_at?: string
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          currency_decimals?: number
+          customer_id?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_card?: number
+          paid_cash?: number
+          paid_other?: number
+          refund_of?: string | null
+          register_id: string
+          session_id: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          change_due?: number
+          completed_at?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          customer_id?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_card?: number
+          paid_cash?: number
+          paid_other?: number
+          refund_of?: string | null
+          register_id?: string
+          session_id?: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_refund_of_fkey"
+            columns: ["refund_of"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_register_id_fkey"
+            columns: ["register_id"]
+            isOneToOne: false
+            referencedRelation: "pos_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_registers: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          warehouse_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_registers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_registers_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sessions: {
+        Row: {
+          cash_difference: number | null
+          closed_at: string | null
+          closed_by: string | null
+          closing_cash_counted: number | null
+          created_at: string
+          created_by: string | null
+          doc_number: string | null
+          expected_cash: number | null
+          id: string
+          notes: string | null
+          number: number | null
+          opened_at: string
+          opened_by: string | null
+          opening_cash: number
+          register_id: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_cash_counted?: number | null
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string
+          opened_by?: string | null
+          opening_cash?: number
+          register_id: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_cash_counted?: number | null
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string
+          opened_by?: string | null
+          opening_cash?: number
+          register_id?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sessions_closed_by_fkey"
+            columns: ["closed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_opened_by_fkey"
+            columns: ["opened_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_register_id_fkey"
+            columns: ["register_id"]
+            isOneToOne: false
+            referencedRelation: "pos_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           active: boolean
@@ -2144,6 +5091,364 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_order_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          discount_percent: number
+          id: string
+          item_id: string | null
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          purchase_order_id: string
+          quantity: number
+          received_qty: number
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          discount_percent?: number
+          id?: string
+          item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          purchase_order_id: string
+          quantity?: number
+          received_qty?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          discount_percent?: number
+          id?: string
+          item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          purchase_order_id?: string
+          quantity?: number
+          received_qty?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_order_lines_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_lines_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_order_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_orders: {
+        Row: {
+          canceled_at: string | null
+          closed_at: string | null
+          confirmed_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          discount_total: number
+          doc_number: string | null
+          expected_date: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          order_date: string
+          received_at: string | null
+          sent_at: string | null
+          status: string
+          subtotal: number
+          supplier_id: string
+          supplier_reference: string | null
+          tax_total: number
+          tenant_id: string
+          terms: string | null
+          total: number
+          updated_at: string
+          updated_by: string | null
+          vendor_ack_at: string | null
+          vendor_ack_note: string | null
+          vendor_expected_date: string | null
+          warehouse_id: string | null
+        }
+        Insert: {
+          canceled_at?: string | null
+          closed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          discount_total?: number
+          doc_number?: string | null
+          expected_date?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          order_date?: string
+          received_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          supplier_id: string
+          supplier_reference?: string | null
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vendor_ack_at?: string | null
+          vendor_ack_note?: string | null
+          vendor_expected_date?: string | null
+          warehouse_id?: string | null
+        }
+        Update: {
+          canceled_at?: string | null
+          closed_at?: string | null
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          discount_total?: number
+          doc_number?: string | null
+          expected_date?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          order_date?: string
+          received_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subtotal?: number
+          supplier_id?: string
+          supplier_reference?: string | null
+          tax_total?: number
+          tenant_id?: string
+          terms?: string | null
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          vendor_ack_at?: string | null
+          vendor_ack_note?: string | null
+          vendor_expected_date?: string | null
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_orders_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_orders_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_receipt_lines: {
+        Row: {
+          description: string
+          id: string
+          item_id: string | null
+          purchase_order_line_id: string
+          quantity: number
+          receipt_id: string
+          stock_move_id: string | null
+          tenant_id: string
+          unit_cost: number
+        }
+        Insert: {
+          description: string
+          id?: string
+          item_id?: string | null
+          purchase_order_line_id: string
+          quantity: number
+          receipt_id: string
+          stock_move_id?: string | null
+          tenant_id: string
+          unit_cost?: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          item_id?: string | null
+          purchase_order_line_id?: string
+          quantity?: number
+          receipt_id?: string
+          stock_move_id?: string | null
+          tenant_id?: string
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_receipt_lines_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipt_lines_purchase_order_line_id_fkey"
+            columns: ["purchase_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_order_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipt_lines_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_receipts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipt_lines_stock_move_id_fkey"
+            columns: ["stock_move_id"]
+            isOneToOne: false
+            referencedRelation: "stock_moves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipt_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchase_receipts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          doc_number: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          purchase_order_id: string
+          received_at: string
+          supplier_id: string
+          tenant_id: string
+          warehouse_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          purchase_order_id: string
+          received_at?: string
+          supplier_id: string
+          tenant_id: string
+          warehouse_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          purchase_order_id?: string
+          received_at?: string
+          supplier_id?: string
+          tenant_id?: string
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_receipts_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipts_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "purchase_receipts_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
             referencedColumns: ["id"]
           },
         ]
@@ -2959,6 +6264,280 @@ export type Database = {
           },
         ]
       }
+      shipment_events: {
+        Row: {
+          at: string
+          created_at: string
+          created_by: string | null
+          id: string
+          location: string | null
+          note: string | null
+          shipment_id: string
+          status: string | null
+          tenant_id: string
+        }
+        Insert: {
+          at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          shipment_id: string
+          status?: string | null
+          tenant_id?: string
+        }
+        Update: {
+          at?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          location?: string | null
+          note?: string | null
+          shipment_id?: string
+          status?: string | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipments: {
+        Row: {
+          bol_number: string | null
+          booked_at: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          cargo_description: string | null
+          carrier_cost: number | null
+          carrier_supplier_id: string | null
+          carrier_type: string
+          closed_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          customer_id: string
+          customer_ref: string | null
+          delivered_at: string | null
+          delivery_window_end: string | null
+          delivery_window_start: string | null
+          destination_address: string | null
+          destination_city: string
+          destination_country: string | null
+          destination_lat: number | null
+          destination_lng: number | null
+          destination_name: string | null
+          dispatched_at: string | null
+          doc_number: string | null
+          driver_id: string | null
+          freight_charge: number
+          fuel_surcharge: number
+          hazardous: boolean
+          id: string
+          invoice_id: string | null
+          margin: number | null
+          mode: string
+          notes: string | null
+          number: number | null
+          origin_address: string | null
+          origin_city: string
+          origin_country: string | null
+          origin_lat: number | null
+          origin_lng: number | null
+          origin_name: string | null
+          other_charges: number
+          picked_up_at: string | null
+          pickup_window_end: string | null
+          pickup_window_start: string | null
+          pieces: number | null
+          pod_notes: string | null
+          received_by: string | null
+          service_level: string
+          status: string
+          tenant_id: string
+          total_charge: number | null
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+          volume_m3: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          bol_number?: string | null
+          booked_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          cargo_description?: string | null
+          carrier_cost?: number | null
+          carrier_supplier_id?: string | null
+          carrier_type?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id: string
+          customer_ref?: string | null
+          delivered_at?: string | null
+          delivery_window_end?: string | null
+          delivery_window_start?: string | null
+          destination_address?: string | null
+          destination_city: string
+          destination_country?: string | null
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          freight_charge?: number
+          fuel_surcharge?: number
+          hazardous?: boolean
+          id?: string
+          invoice_id?: string | null
+          margin?: number | null
+          mode?: string
+          notes?: string | null
+          number?: number | null
+          origin_address?: string | null
+          origin_city: string
+          origin_country?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          origin_name?: string | null
+          other_charges?: number
+          picked_up_at?: string | null
+          pickup_window_end?: string | null
+          pickup_window_start?: string | null
+          pieces?: number | null
+          pod_notes?: string | null
+          received_by?: string | null
+          service_level?: string
+          status?: string
+          tenant_id?: string
+          total_charge?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          volume_m3?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          bol_number?: string | null
+          booked_at?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          cargo_description?: string | null
+          carrier_cost?: number | null
+          carrier_supplier_id?: string | null
+          carrier_type?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          customer_id?: string
+          customer_ref?: string | null
+          delivered_at?: string | null
+          delivery_window_end?: string | null
+          delivery_window_start?: string | null
+          destination_address?: string | null
+          destination_city?: string
+          destination_country?: string | null
+          destination_lat?: number | null
+          destination_lng?: number | null
+          destination_name?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          freight_charge?: number
+          fuel_surcharge?: number
+          hazardous?: boolean
+          id?: string
+          invoice_id?: string | null
+          margin?: number | null
+          mode?: string
+          notes?: string | null
+          number?: number | null
+          origin_address?: string | null
+          origin_city?: string
+          origin_country?: string | null
+          origin_lat?: number | null
+          origin_lng?: number | null
+          origin_name?: string | null
+          other_charges?: number
+          picked_up_at?: string | null
+          pickup_window_end?: string | null
+          pickup_window_start?: string | null
+          pieces?: number | null
+          pod_notes?: string | null
+          received_by?: string | null
+          service_level?: string
+          status?: string
+          tenant_id?: string
+          total_charge?: number | null
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string | null
+          volume_m3?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_carrier_supplier_id_fkey"
+            columns: ["carrier_supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sl_devices: {
         Row: {
           created_at: string
@@ -3731,6 +7310,72 @@ export type Database = {
           },
         ]
       }
+      supplier_portal_access: {
+        Row: {
+          access_count: number
+          active: boolean
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          label: string | null
+          last_accessed_at: string | null
+          revoked_at: string | null
+          supplier_id: string
+          tenant_id: string
+          token: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          access_count?: number
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          supplier_id: string
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          access_count?: number
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          label?: string | null
+          last_accessed_at?: string | null
+          revoked_at?: string | null
+          supplier_id?: string
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_portal_access_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_portal_access_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppliers: {
         Row: {
           address: string | null
@@ -3960,6 +7605,203 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_stops: {
+        Row: {
+          actual_arrival: string | null
+          actual_departure: string | null
+          address: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          notes: string | null
+          planned_arrival: string | null
+          sequence: number
+          status: string
+          tenant_id: string
+          trip_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          notes?: string | null
+          planned_arrival?: string | null
+          sequence?: number
+          status?: string
+          tenant_id?: string
+          trip_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          actual_arrival?: string | null
+          actual_departure?: string | null
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          notes?: string | null
+          planned_arrival?: string | null
+          sequence?: number
+          status?: string
+          tenant_id?: string
+          trip_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_stops_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_stops_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          actual_distance_km: number | null
+          actual_end: string | null
+          actual_start: string | null
+          cancel_reason: string | null
+          canceled_at: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          dispatched_at: string | null
+          doc_number: string | null
+          driver_id: string | null
+          end_odometer: number | null
+          estimated_cost: number | null
+          estimated_fuel_l: number | null
+          id: string
+          notes: string | null
+          number: number | null
+          planned_distance_km: number | null
+          planned_end: string
+          planned_start: string
+          purpose: string
+          start_odometer: number | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          actual_distance_km?: number | null
+          actual_end?: string | null
+          actual_start?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          end_odometer?: number | null
+          estimated_cost?: number | null
+          estimated_fuel_l?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          planned_distance_km?: number | null
+          planned_end: string
+          planned_start: string
+          purpose: string
+          start_odometer?: number | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          actual_distance_km?: number | null
+          actual_end?: string | null
+          actual_start?: string | null
+          cancel_reason?: string | null
+          canceled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          dispatched_at?: string | null
+          doc_number?: string | null
+          driver_id?: string | null
+          end_odometer?: number | null
+          estimated_cost?: number | null
+          estimated_fuel_l?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          planned_distance_km?: number | null
+          planned_end?: string
+          planned_start?: string
+          purpose?: string
+          start_odometer?: number | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trips_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trips_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_assignments: {
         Row: {
           created_at: string
@@ -4014,6 +7856,77 @@ export type Database = {
           },
           {
             foreignKeyName: "vehicle_assignments_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_last_positions: {
+        Row: {
+          driver_id: string | null
+          heading: number | null
+          ignition: boolean | null
+          lat: number
+          lng: number
+          position_id: string
+          recorded_at: string
+          speed_kmh: number | null
+          tenant_id: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          driver_id?: string | null
+          heading?: number | null
+          ignition?: boolean | null
+          lat: number
+          lng: number
+          position_id: string
+          recorded_at: string
+          speed_kmh?: number | null
+          tenant_id: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          driver_id?: string | null
+          heading?: number | null
+          ignition?: boolean | null
+          lat?: number
+          lng?: number
+          position_id?: string
+          recorded_at?: string
+          speed_kmh?: number | null
+          tenant_id?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_last_positions_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "gps_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_last_positions_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -4133,6 +8046,273 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_bill_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string
+          discount_percent: number
+          id: string
+          item_id: string | null
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          purchase_order_line_id: string | null
+          quantity: number
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit: string | null
+          unit_price: number
+          updated_at: string
+          updated_by: string | null
+          vendor_bill_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description: string
+          discount_percent?: number
+          id?: string
+          item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          purchase_order_line_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vendor_bill_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          discount_percent?: number
+          id?: string
+          item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          purchase_order_line_id?: string | null
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit?: string | null
+          unit_price?: number
+          updated_at?: string
+          updated_by?: string | null
+          vendor_bill_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_bill_lines_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bill_lines_purchase_order_line_id_fkey"
+            columns: ["purchase_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_order_lines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bill_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bill_lines_vendor_bill_id_fkey"
+            columns: ["vendor_bill_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_bills: {
+        Row: {
+          amount_paid: number
+          bill_date: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          discount_total: number
+          doc_number: string | null
+          due_date: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          opened_at: string | null
+          purchase_order_id: string | null
+          status: string
+          subtotal: number
+          supplier_id: string
+          supplier_invoice_number: string | null
+          tax_total: number
+          tenant_id: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          bill_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          discount_total?: number
+          doc_number?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string | null
+          purchase_order_id?: string | null
+          status?: string
+          subtotal?: number
+          supplier_id: string
+          supplier_invoice_number?: string | null
+          tax_total?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          bill_date?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          discount_total?: number
+          doc_number?: string | null
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string | null
+          purchase_order_id?: string | null
+          status?: string
+          subtotal?: number
+          supplier_id?: string
+          supplier_invoice_number?: string | null
+          tax_total?: number
+          tenant_id?: string
+          total?: number
+          updated_at?: string
+          updated_by?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_bills_purchase_order_id_fkey"
+            columns: ["purchase_order_id"]
+            isOneToOne: false
+            referencedRelation: "purchase_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bills_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_bills_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          method: string
+          notes: string | null
+          paid_at: string
+          reference: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          vendor_bill_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vendor_bill_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          method?: string
+          notes?: string | null
+          paid_at?: string
+          reference?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          vendor_bill_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_payments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_payments_vendor_bill_id_fkey"
+            columns: ["vendor_bill_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_bills"
             referencedColumns: ["id"]
           },
         ]
@@ -4343,6 +8523,89 @@ export type Database = {
         }
         Relationships: []
       }
+      work_order_labor: {
+        Row: {
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          ended_at: string | null
+          hourly_rate: number
+          hours: number | null
+          id: string
+          notes: string | null
+          started_at: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_order_id: string
+          work_order_line_id: string | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          ended_at?: string | null
+          hourly_rate?: number
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id: string
+          work_order_line_id?: string | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          ended_at?: string | null
+          hourly_rate?: number
+          hours?: number | null
+          id?: string
+          notes?: string | null
+          started_at?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id?: string
+          work_order_line_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_order_labor_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_labor_work_order_line_id_fkey"
+            columns: ["work_order_line_id"]
+            isOneToOne: false
+            referencedRelation: "work_order_lines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_order_lines: {
         Row: {
           category: string
@@ -4492,6 +8755,132 @@ export type Database = {
           },
         ]
       }
+      workshop_bays: {
+        Row: {
+          active: boolean
+          bay_type: string
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          bay_type?: string
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          bay_type?: string
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_bays_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workshop_bookings: {
+        Row: {
+          bay_id: string
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          finished_at: string | null
+          id: string
+          notes: string | null
+          started_at: string | null
+          starts_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          work_order_id: string
+        }
+        Insert: {
+          bay_id: string
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string | null
+          starts_at: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id: string
+        }
+        Update: {
+          bay_id?: string
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          finished_at?: string | null
+          id?: string
+          notes?: string | null
+          started_at?: string | null
+          starts_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          work_order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_bookings_bay_id_fkey"
+            columns: ["bay_id"]
+            isOneToOne: false
+            referencedRelation: "workshop_bays"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workshop_bookings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workshop_bookings_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       sl_contacts: {
@@ -4634,6 +9023,146 @@ export type Database = {
       }
     }
     Functions: {
+      asset_assign: {
+        Args: {
+          p_asset: string
+          p_employee?: string
+          p_location?: string
+          p_note?: string
+          p_vehicle?: string
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      asset_dispose: {
+        Args: {
+          p_asset: string
+          p_disposed_at?: string
+          p_note?: string
+          p_value?: number
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      asset_return: {
+        Args: {
+          p_asset: string
+          p_location?: string
+          p_note?: string
+          p_warehouse?: string
+        }
+        Returns: {
+          assigned_at: string | null
+          assigned_employee_id: string | null
+          assigned_vehicle_id: string | null
+          branch_id: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          depreciation_method: string
+          disposal_value: number | null
+          disposed_at: string | null
+          doc_number: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          model: string | null
+          name: string
+          notes: string | null
+          number: number | null
+          purchase_cost: number | null
+          purchase_date: string | null
+          salvage_value: number
+          serial_number: string | null
+          status: string
+          supplier_id: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          useful_life_months: number | null
+          warehouse_id: string | null
+          warranty_expiry: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "assets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      attendance_set: { Args: { p_date: string; p_rows: Json }; Returns: number }
       audit_tables: { Args: never; Returns: string[] }
       billing_state: {
         Args: {
@@ -4947,12 +9476,137 @@ export type Database = {
         Args: { p_events: string[]; p_name: string; p_url: string }
         Returns: Json
       }
+      deliveries_import: { Args: { p_rows: Json }; Returns: number }
+      delivery_route_plan: {
+        Args: { p_delivery_ids: string[]; p_route_id: string }
+        Returns: undefined
+      }
+      dispatch_assign: {
+        Args: { p_driver_id?: string | null; p_job_id: string; p_vehicle_id: string }
+        Returns: undefined
+      }
+      dispatch_busy: {
+        Args: { p_end: string; p_exclude?: string | null; p_start: string }
+        Returns: {
+          doc_number: string | null
+          job_id: string
+          kind: string
+          resource_id: string
+          status: string
+        }[]
+      }
+      driver_scores: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          distance_km: number
+          driver_id: string
+          events: number
+          grade: string
+          high_events: number
+          penalty: number
+          score: number
+        }[]
+      }
+      field_checkin: {
+        Args: {
+          p_accuracy?: number | null
+          p_employee?: string | null
+          p_kind: string
+          p_lat?: number | null
+          p_lng?: number | null
+          p_note?: string | null
+          p_task?: string | null
+        }
+        Returns: {
+          accuracy_m: number | null
+          at: string
+          created_by: string | null
+          employee_id: string
+          id: string
+          kind: string
+          lat: number | null
+          lng: number | null
+          note: string | null
+          task_id: string | null
+          tenant_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "field_checkins"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      field_task_transition: {
+        Args: {
+          p_payload?: Json
+          p_task: string
+          p_to: string | null
+        }
+        Returns: {
+          accepted_at: string | null
+          address: string | null
+          canceled_at: string | null
+          checklist: Json
+          completed_at: string | null
+          completion_notes: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          doc_number: string | null
+          due_at: string | null
+          employee_id: string
+          id: string
+          lat: number | null
+          lng: number | null
+          number: number | null
+          priority: string
+          scheduled_start: string | null
+          signature_data: string | null
+          started_at: string | null
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          vehicle_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "field_tasks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fuel_summary: {
         Args: { p_vehicle_id?: string }
         Returns: {
           fill_count: number
           total_cost: number
           total_liters: number
+        }[]
+      }
+      hr_seed: { Args: { p_weekend_days?: number[] }; Returns: number }
+      incident_create_claim: {
+        Args: { p_incident_id: string; p_policy_id: string }
+        Returns: string
+      }
+      incident_create_work_order: {
+        Args: { p_incident_id: string }
+        Returns: string
+      }
+      insurance_renew_policy: {
+        Args: { p_policy_id: string }
+        Returns: string
+      }
+      insurance_uninsured_vehicles: {
+        Args: { p_on?: string }
+        Returns: {
+          id: string
+          license_plate: string
+          name: string
+          status: string
         }[]
       }
       inventory_low_stock: {
@@ -5039,6 +9693,48 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      leave_balances: {
+        Args: { p_employee?: string; p_year: number }
+        Returns: {
+          employee_id: string
+          entitled: number
+          leave_type_id: string
+          pending: number
+          remaining: number
+          taken: number
+        }[]
+      }
+      leave_transition: {
+        Args: {
+          p_id: string
+          p_note?: string | null
+          p_to: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leave_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       mark_notifications_read: {
         Args: { p_ids?: string[]; p_read?: boolean }
         Returns: number
@@ -5052,6 +9748,245 @@ export type Database = {
           p_obligation_id: string
         }
         Returns: string
+      }
+      payroll_approve: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_calculate: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_cancel: {
+        Args: {
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      payroll_mark_paid: {
+        Args: {
+          p_paid_at?: string
+          p_run: string
+        }
+        Returns: {
+          approved_at: string | null
+          approved_by: string | null
+          calculated_at: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          currency_decimals: number
+          doc_number: string | null
+          employee_count: number
+          id: string
+          notes: string | null
+          number: number | null
+          paid_at: string | null
+          pay_date: string | null
+          period_end: string
+          period_start: string
+          status: string
+          tenant_id: string
+          total_deductions: number
+          total_employer_cost: number
+          total_gross: number
+          total_net: number
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "payroll_runs"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      pos_checkout: {
+        Args: {
+          p_customer_id?: string
+          p_lines: Json
+          p_notes?: string
+          p_payments: Json
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      pos_close_session: {
+        Args: { p_counted_cash: number; p_notes?: string; p_session_id: string }
+        Returns: string
+      }
+      pos_daily_sales: {
+        Args: { p_from: string; p_to: string }
+        Returns: { day: string; orders: number; total: number }[]
+      }
+      pos_open_session: {
+        Args: { p_notes?: string; p_opening_cash?: number; p_register_id: string }
+        Returns: string
+      }
+      pos_refund: { Args: { p_order_id: string; p_reason?: string }; Returns: Json }
+      pos_session_summary: { Args: { p_session_id: string }; Returns: Json }
+      predictive_snapshot: { Args: never; Returns: number }
+      predictive_vehicle_health: {
+        Args: never
+        Returns: {
+          age_years: number | null
+          avg_daily_km: number | null
+          band: string
+          cost_90d: number
+          cost_prev_90d: number
+          days_since_inspection: number | null
+          days_to_service: number | null
+          factors: Json
+          issue_rate: number
+          issues_180d: number
+          issues_90d: number
+          odometer: number
+          open_critical: number
+          open_high: number
+          predicted_service_date: string | null
+          risk_score: number
+          service_overdue: boolean
+          vehicle_id: string
+        }[]
+      }
+      purchase_receive: {
+        Args: {
+          p_lines: Json
+          p_notes?: string | null
+          p_po: string
+          p_warehouse?: string | null
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          doc_number: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          purchase_order_id: string
+          received_at: string
+          supplier_id: string
+          tenant_id: string
+          warehouse_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "purchase_receipts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      quote_freight: {
+        Args: {
+          p_customer_id?: string
+          p_destination_city: string
+          p_mode: string
+          p_on?: string
+          p_origin_city: string
+          p_weight_kg: number
+        }
+        Returns: {
+          customer_specific: boolean
+          price: number
+          rate_id: string
+        }[]
       }
       record_webhook_attempt: {
         Args: {
@@ -5092,6 +10027,39 @@ export type Database = {
           vehicle_id: string
           vehicle_name: string
         }[]
+      }
+      request_leave: {
+        Args: {
+          p_employee: string | null
+          p_end: string
+          p_leave_type: string
+          p_reason?: string | null
+          p_start: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          days: number
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string
+          reason: string | null
+          start_date: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "leave_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       retry_webhook_delivery: { Args: { p_id: string }; Returns: undefined }
       revise_quote: {
@@ -5280,6 +10248,34 @@ export type Database = {
           unbilled_order_value: number
         }[]
       }
+      save_hr_settings: {
+        Args: {
+          p_overtime_multiplier: number
+          p_social_employee_pct: number
+          p_social_employer_pct: number
+          p_social_nationals_only: boolean
+          p_standard_daily_hours: number
+          p_weekend_days: number[]
+        }
+        Returns: {
+          id: string
+          overtime_multiplier: number
+          social_employee_pct: number
+          social_employer_pct: number
+          social_nationals_only: boolean
+          standard_daily_hours: number
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          weekend_days: number[]
+        }
+        SetofOptions: {
+          from: "*"
+          to: "hr_settings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       save_security_settings: {
         Args: {
           p_audit_retention_days: number
@@ -5329,6 +10325,7 @@ export type Database = {
         Args: { p_doc_type: string; p_prefix: string }
         Returns: undefined
       }
+      shipment_create_invoice: { Args: { p_shipment_id: string }; Returns: string }
       stock_adjust: {
         Args: {
           p_item: string
@@ -5372,6 +10369,94 @@ export type Database = {
       test_automation_rule: {
         Args: { p_conditions: Json; p_payload: Json }
         Returns: Json
+      }
+      trip_conflicts: {
+        Args: {
+          p_driver_id: string | null
+          p_end: string
+          p_exclude?: string | null
+          p_start: string
+          p_vehicle_id: string
+        }
+        Returns: {
+          doc_number: string | null
+          driver_clash: boolean
+          planned_end: string
+          planned_start: string
+          purpose: string
+          status: string
+          trip_id: string
+          vehicle_clash: boolean
+        }[]
+      }
+      trip_stops_reorder: {
+        Args: { p_stop_ids: string[]; p_trip_id: string }
+        Returns: undefined
+      }
+      vendor_bill_from_po: {
+        Args: {
+          p_po: string
+        }
+        Returns: {
+          amount_paid: number
+          bill_date: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          discount_total: number
+          doc_number: string | null
+          due_date: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          opened_at: string | null
+          purchase_order_id: string | null
+          status: string
+          subtotal: number
+          supplier_id: string
+          supplier_invoice_number: string | null
+          tax_total: number
+          tenant_id: string
+          total: number
+          updated_at: string
+          updated_by: string | null
+          void_reason: string | null
+          voided_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "vendor_bills"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      vendor_portal_acknowledge: {
+        Args: {
+          p_expected_date?: string
+          p_note?: string
+          p_po: string
+          p_token: string
+        }
+        Returns: Json
+      }
+      vendor_portal_view: { Args: { p_token: string }; Returns: Json }
+      workshop_clock_off: {
+        Args: { p_labor_id: string; p_notes?: string }
+        Returns: number
+      }
+      workshop_clock_on: {
+        Args: { p_employee_id: string; p_work_order_id: string }
+        Returns: string
+      }
+      workshop_issue_part: {
+        Args: {
+          p_item_id: string
+          p_qty: number
+          p_warehouse_id: string
+          p_work_order_id: string
+        }
+        Returns: string
       }
     }
     Enums: {

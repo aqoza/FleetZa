@@ -81,6 +81,16 @@ export function DocumentForm({
       scope: ["employees", "documents"],
       enabled: linkType === "employee",
     }),
+    incident: useEntityPicker<Tables<"incidents">>({
+      table: "incidents",
+      selectedId: linkType === "incident" ? form.link_id : "",
+      searchColumns: ["doc_number", "location", "description"],
+      orderBy: "occurred_at",
+      ascending: false,
+      toOption: (i) => ({ value: i.id, label: i.doc_number ?? i.id, meta: i.location ?? undefined }),
+      scope: ["incidents", "documents"],
+      enabled: linkType === "incident",
+    }),
   };
 
   function pickFile(f: File | null) {
