@@ -141,4 +141,8 @@ export const enNotifications = {
   "notifications.msg.obligation.today": { one: "{requirement}: {count} obligation due today", other: "{requirement}: {count} obligations due today" },
   "notifications.msg.obligation.soon": { one: "{requirement}: {count} obligation due soon", other: "{requirement}: {count} obligations due soon" },
   "notifications.msg.obligation.body": "First due {date}",
+  "notifications.kind.crm.activities_overdue": "Overdue CRM activities",
+  "notifications.kind.crm.activities_overdue.desc": "Calls, meetings and tasks you own pass their due time. Sent once a day to the owner.",
+  "notifications.msg.crmOverdue.title": { one: "{count} overdue CRM activity", other: "{count} overdue CRM activities" },
+  "notifications.msg.crmOverdue.body": "Oldest: {subject}",
 } as const;

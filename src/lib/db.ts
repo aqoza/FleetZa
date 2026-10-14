@@ -228,6 +228,13 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   OBLIGATION_SUBJECT_NOT_FOUND: "errors.obligationSubjectNotFound",
   OBLIGATION_LOCKED: "errors.obligationLocked",
   INVALID_COMPLETION_DATE: "errors.invalidCompletionDate",
+  ILLEGAL_LEAD_TRANSITION: "errors.illegalLeadTransition",
+  LEAD_LOCKED: "errors.leadLocked",
+  LEAD_NOT_DELETABLE: "errors.leadNotDeletable",
+  LEAD_NOT_FOUND: "errors.leadNotFound",
+  LEAD_ALREADY_CONVERTED: "errors.leadAlreadyConverted",
+  ILLEGAL_OPPORTUNITY_TRANSITION: "errors.illegalOpportunityTransition",
+  OPPORTUNITY_LOST_REASON_REQUIRED: "errors.opportunityLostReasonRequired",
 };
 
 /**

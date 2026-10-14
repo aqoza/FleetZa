@@ -218,4 +218,11 @@ export const enErrors = {
   "errors.obligationSubjectNotFound": "That vehicle, driver or employee wasn't found.",
   "errors.obligationLocked": "An obligation's requirement and subject can't be changed. Create a new one instead.",
   "errors.invalidCompletionDate": "The completion date can't be in the future.",
+  "errors.illegalLeadTransition": "That lead can't move to this status.",
+  "errors.leadLocked": "A converted lead can't be changed, except its owner and notes.",
+  "errors.leadNotDeletable": "A converted lead can't be deleted.",
+  "errors.leadNotFound": "That lead no longer exists.",
+  "errors.leadAlreadyConverted": "This lead has already been converted to a customer.",
+  "errors.illegalOpportunityTransition": "A closed opportunity can only be reopened to an open stage.",
+  "errors.opportunityLostReasonRequired": "Give a reason before marking the opportunity lost.",
 } as const;

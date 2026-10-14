@@ -169,4 +169,7 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.shipment.status_changed": "تغيّر حالة شحنة",
   "automation.ev.insurance_claim.status_changed": "تغيّر حالة مطالبة تأمين",
   "automation.ev.incident.reported": "الإبلاغ عن حادث",
+  "automation.ev.crm_lead.converted": "تحويل عميل محتمل إلى عميل",
+  "automation.ev.crm_opportunity.won": "كسب فرصة بيع",
+  "automation.ev.crm_opportunity.lost": "خسارة فرصة بيع",
 };

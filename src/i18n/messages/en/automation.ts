@@ -159,4 +159,7 @@ export const enAutomation = {
   "automation.ev.shipment.status_changed": "A shipment changes status",
   "automation.ev.insurance_claim.status_changed": "A claim changes status",
   "automation.ev.incident.reported": "An incident is reported",
+  "automation.ev.crm_lead.converted": "A lead is converted to a customer",
+  "automation.ev.crm_opportunity.won": "An opportunity is won",
+  "automation.ev.crm_opportunity.lost": "An opportunity is lost",
 } as const;

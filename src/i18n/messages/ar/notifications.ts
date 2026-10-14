@@ -215,4 +215,15 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
     other: "{requirement}: {count} التزام مستحق قريبًا",
   },
   "notifications.msg.obligation.body": "أول استحقاق {date}",
+  "notifications.kind.crm.activities_overdue": "أنشطة إدارة العملاء المتأخرة",
+  "notifications.kind.crm.activities_overdue.desc": "تتجاوز المكالمات والاجتماعات والمهام التي تتولاها موعدها. يُرسل مرة يوميًا إلى المسؤول عنها.",
+  "notifications.msg.crmOverdue.title": {
+    zero: "لا أنشطة متأخرة",
+    one: "نشاط واحد متأخر",
+    two: "نشاطان متأخران",
+    few: "{count} أنشطة متأخرة",
+    many: "{count} نشاطًا متأخرًا",
+    other: "{count} نشاط متأخر",
+  },
+  "notifications.msg.crmOverdue.body": "الأقدم: {subject}",
 };

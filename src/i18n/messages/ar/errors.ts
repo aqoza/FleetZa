@@ -217,4 +217,11 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.obligationSubjectNotFound": "لم يتم العثور على المركبة أو السائق أو الموظف.",
   "errors.obligationLocked": "لا يمكن تغيير متطلب الالتزام أو جهته. أنشئ التزامًا جديدًا بدلًا من ذلك.",
   "errors.invalidCompletionDate": "لا يمكن أن يكون تاريخ الإنجاز في المستقبل.",
+  "errors.illegalLeadTransition": "لا يمكن نقل هذا العميل المحتمل إلى هذه الحالة.",
+  "errors.leadLocked": "لا يمكن تعديل عميل محتمل تم تحويله، باستثناء المسؤول والملاحظات.",
+  "errors.leadNotDeletable": "لا يمكن حذف عميل محتمل تم تحويله.",
+  "errors.leadNotFound": "هذا العميل المحتمل لم يعد موجودًا.",
+  "errors.leadAlreadyConverted": "تم تحويل هذا العميل المحتمل إلى عميل بالفعل.",
+  "errors.illegalOpportunityTransition": "لا يمكن إعادة فتح فرصة مغلقة إلا إلى مرحلة مفتوحة.",
+  "errors.opportunityLostReasonRequired": "اذكر سببًا قبل تسجيل الفرصة كخاسرة.",
 };

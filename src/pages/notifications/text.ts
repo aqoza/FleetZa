@@ -244,6 +244,13 @@ export function useNotificationText() {
         const due = strParam(p, "due");
         return { title: tp(key, count, vars), body: due ? t("notifications.msg.obligation.body", { date: ltrText(formatDate(due)) }) : null };
       }
+      case "crm.activities_overdue": {
+        const subject = strParam(p, "subject");
+        return {
+          title: tp("notifications.msg.crmOverdue.title", numParam(p, "count") ?? 1),
+          body: subject ? t("notifications.msg.crmOverdue.body", { subject: bdiText(subject) }) : null,
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };
