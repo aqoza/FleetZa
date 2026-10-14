@@ -167,4 +167,5 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.delivery.delivered": "تسليم عملية توصيل",
   "automation.ev.delivery.failed": "تعذر محاولة توصيل",
   "automation.ev.shipment.status_changed": "تغيّر حالة شحنة",
+  "automation.ev.insurance_claim.status_changed": "تغيّر حالة مطالبة تأمين",
 };

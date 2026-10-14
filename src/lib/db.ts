@@ -203,6 +203,15 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   WORK_ORDER_NOT_FOUND: "errors.workOrderNotFound",
   LABOR_NOT_FOUND: "errors.laborNotFound",
   INVENTORY_DISABLED: "errors.inventoryDisabled",
+  POLICY_CANCELED: "errors.policyCanceled",
+  INVALID_POLICY_CANCEL: "errors.invalidPolicyCancel",
+  POLICY_NOT_FOUND: "errors.policyNotFound",
+  ILLEGAL_CLAIM_TRANSITION: "errors.illegalClaimTransition",
+  CLAIM_OUTSIDE_POLICY: "errors.claimOutsidePolicy",
+  CLAIM_VEHICLE_NOT_COVERED: "errors.claimVehicleNotCovered",
+  CLAIM_AMOUNT_REQUIRED: "errors.claimAmountRequired",
+  CLAIM_LOCKED: "errors.claimLocked",
+  CLAIM_NOT_DELETABLE: "errors.claimNotDeletable",
 };
 
 /**

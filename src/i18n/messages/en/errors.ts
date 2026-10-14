@@ -193,4 +193,13 @@ export const enErrors = {
   "errors.workOrderNotFound": "That work order no longer exists.",
   "errors.laborNotFound": "That time entry is already closed or no longer exists.",
   "errors.inventoryDisabled": "Turn on the Inventory module to issue parts from stock.",
+  "errors.policyCanceled": "This policy is canceled. Reinstate it first.",
+  "errors.invalidPolicyCancel": "The cancellation date must be between the policy start and today.",
+  "errors.policyNotFound": "That policy no longer exists.",
+  "errors.illegalClaimTransition": "The claim can't move to that status from where it is now.",
+  "errors.claimOutsidePolicy": "The date of loss is outside the policy's cover.",
+  "errors.claimVehicleNotCovered": "That vehicle wasn't on this policy on the date of loss.",
+  "errors.claimAmountRequired": "Enter the approved amount before approving the claim.",
+  "errors.claimLocked": "This claim is closed. Only its notes can change.",
+  "errors.claimNotDeletable": "Only draft claims can be deleted. Withdraw it instead.",
 } as const;

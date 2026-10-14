@@ -192,4 +192,13 @@ export const arErrors: Record<keyof typeof enErrors, string> = {
   "errors.workOrderNotFound": "أمر العمل هذا لم يعد موجودًا.",
   "errors.laborNotFound": "سجل الوقت هذا مغلق بالفعل أو لم يعد موجودًا.",
   "errors.inventoryDisabled": "فعّل وحدة المخزون لصرف القطع من المخزون.",
+  "errors.policyCanceled": "هذه الوثيقة ملغاة. أعد تفعيلها أولًا.",
+  "errors.invalidPolicyCancel": "يجب أن يكون تاريخ الإلغاء بين بداية الوثيقة واليوم.",
+  "errors.policyNotFound": "لم تعد هذه الوثيقة موجودة.",
+  "errors.illegalClaimTransition": "لا يمكن نقل المطالبة إلى هذه الحالة من حالتها الحالية.",
+  "errors.claimOutsidePolicy": "تاريخ الخسارة خارج فترة تغطية الوثيقة.",
+  "errors.claimVehicleNotCovered": "لم تكن هذه المركبة مشمولة بالوثيقة في تاريخ الخسارة.",
+  "errors.claimAmountRequired": "أدخل المبلغ المعتمد قبل اعتماد المطالبة.",
+  "errors.claimLocked": "هذه المطالبة مغلقة. يمكن تعديل الملاحظات فقط.",
+  "errors.claimNotDeletable": "يمكن حذف المطالبات المسودة فقط. اسحبها بدلًا من ذلك.",
 };

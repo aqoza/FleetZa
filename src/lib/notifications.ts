@@ -28,6 +28,7 @@ export const NOTIFICATION_KINDS = [
   { kind: "driver_behavior.critical_event", module: "driver_behavior" },
   { kind: "iot.alert", module: "iot_devices" },
   { kind: "dispatch.urgent_job", module: "dispatch" },
+  { kind: "insurance.policy_expiring", module: "insurance_mgmt" },
 ] as const;
 
 export type KnownKind = (typeof NOTIFICATION_KINDS)[number]["kind"];

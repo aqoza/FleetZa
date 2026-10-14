@@ -162,4 +162,17 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.dispatch.urgent_job.desc": "تُنشأ مهمة جديدة بأولوية عاجلة.",
   "notifications.msg.urgentJob.title": "مهمة عاجلة {number}: {title}",
   "notifications.msg.urgentJob.body": "تحتاج إلى مركبة قبل {time}.",
+  "notifications.kind.insurance.policy_expiring": "انتهاء وثائق التأمين",
+  "notifications.kind.insurance.policy_expiring.desc": "تنتهي وثيقة خلال 60 أو 30 أو 7 أيام، أو اليوم، أو انتهت مؤخرًا دون تجديد.",
+  "notifications.msg.policy.expired": "انتهت الوثيقة: {policy}",
+  "notifications.msg.policy.endsIn": {
+    zero: "تنتهي الوثيقة اليوم: {policy}",
+    one: "تنتهي الوثيقة غدًا: {policy}",
+    two: "تنتهي الوثيقة خلال يومين: {policy}",
+    few: "تنتهي الوثيقة خلال {count} أيام: {policy}",
+    many: "تنتهي الوثيقة خلال {count} يومًا: {policy}",
+    other: "تنتهي الوثيقة خلال {count} يوم: {policy}",
+  },
+  "notifications.msg.policy.endsToday": "تنتهي الوثيقة اليوم: {policy}",
+  "notifications.msg.policy.body": "{insurer}، تاريخ الانتهاء {date}",
 };

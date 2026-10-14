@@ -123,4 +123,10 @@ export const enNotifications = {
   "notifications.kind.dispatch.urgent_job.desc": "A new job is created with urgent priority.",
   "notifications.msg.urgentJob.title": "Urgent job {number}: {title}",
   "notifications.msg.urgentJob.body": "Needs a vehicle before {time}.",
+  "notifications.kind.insurance.policy_expiring": "Insurance policies ending",
+  "notifications.kind.insurance.policy_expiring.desc": "A policy ends in 60, 30 or 7 days, today, or ended recently without a renewal.",
+  "notifications.msg.policy.expired": "Policy ended: {policy}",
+  "notifications.msg.policy.endsIn": { one: "Policy ends tomorrow: {policy}", other: "Policy ends in {count} days: {policy}" },
+  "notifications.msg.policy.endsToday": "Policy ends today: {policy}",
+  "notifications.msg.policy.body": "{insurer}, end date {date}",
 } as const;
