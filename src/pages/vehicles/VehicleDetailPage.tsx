@@ -29,6 +29,7 @@ import { Combobox } from "../../components/Combobox";
 import { VehicleForm } from "./VehicleForm";
 import { RenewCertificateModal } from "../speed-limiters/RenewCertificateModal";
 import { EntityDocuments } from "../documents/EntityDocuments";
+import { VehicleCompliancePanel } from "../regulatory/VehicleCompliancePanel";
 import {
   InvoiceCertificatesModal, useCertificateBilling,
 } from "../speed-limiters/InvoiceCertificatesModal";
@@ -75,6 +76,7 @@ export default function VehicleDetailPage() {
   const slCertsOn = speedLimitersOn && isEnabled("sl_certificates");
   const billingOn = slCertsOn && isEnabled("billing");
   const documentsOn = isEnabled("documents");
+  const regulatoryOn = isEnabled("regulatory");
   const [editing, setEditing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -644,6 +646,10 @@ export default function VehicleDetailPage() {
           </Card>
         )}
       </div>
+
+      {regulatoryOn && (
+        <div className="mt-4"><VehicleCompliancePanel vehicleId={vehicle.id} vehicleName={vehicle.name} /></div>
+      )}
 
       {documentsOn && <EntityDocuments type="vehicle" id={vehicle.id} />}
 
