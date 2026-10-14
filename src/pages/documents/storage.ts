@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
 import { deleteRow, insertRow, listRows, wrapDbError } from "../../lib/db";
-import { storagePath } from "../../lib/documents";
+import { documentDownloadName, storagePath } from "../../lib/documents";
 import { translate } from "../../i18n";
 import type { TableName } from "../../lib/db";
 import { linkTypes } from "./labels";
@@ -57,7 +57,8 @@ export async function openDocument(doc: Pick<DocumentRow, "storage_path" | "name
   const tab = download ? null : window.open("about:blank", "_blank");
   const { data, error } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrl(doc.storage_path, 60, download ? { download: doc.name } : undefined);
+    .createSignedUrl(doc.storage_path, 60, download
+      ? { download: documentDownloadName(doc.name, doc.storage_path) } : undefined);
   if (error || !data?.signedUrl) {
     tab?.close();
     throw new Error(translate("documents.downloadFailed"));
