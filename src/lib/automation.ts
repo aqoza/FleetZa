@@ -229,6 +229,22 @@ export const EVENT_CATALOG: EventSpec[] = [
     sample: { trip_id: "00000000-0000-4000-8000-000000000011", doc_number: "TRP-00042", vehicle_id: "00000000-0000-4000-8000-000000000001",
       driver_id: null, purpose: "Muscat to Sohar delivery", planned_distance_km: 230, actual_distance_km: 247.5 },
   },
+  {
+    event: "dispatch_job.assigned", module: "dispatch", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" },
+      { name: "job_type", kind: "text", options: ["pickup", "delivery", "service", "transfer", "other"] },
+      { name: "priority", kind: "text", options: ["low", "normal", "high", "urgent"] }, { name: "driver_id", kind: "id" }],
+    sample: { dispatch_job_id: "00000000-0000-4000-8000-000000000012", doc_number: "DSP-00017", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      driver_id: null, job_type: "delivery", priority: "urgent", title: "Deliver pallets to Rusayl", window_end: "2026-10-08T14:00:00Z" },
+  },
+  {
+    event: "dispatch_job.completed", module: "dispatch", hasVehicle: true,
+    fields: [{ name: "doc_number", kind: "text" }, { name: "title", kind: "text" },
+      { name: "job_type", kind: "text", options: ["pickup", "delivery", "service", "transfer", "other"] },
+      { name: "priority", kind: "text", options: ["low", "normal", "high", "urgent"] }, { name: "driver_id", kind: "id" }],
+    sample: { dispatch_job_id: "00000000-0000-4000-8000-000000000012", doc_number: "DSP-00017", vehicle_id: "00000000-0000-4000-8000-000000000001",
+      driver_id: null, job_type: "delivery", priority: "urgent", title: "Deliver pallets to Rusayl", on_time: true },
+  },
 ];
 
 export function eventSpec(event: string): EventSpec | undefined {

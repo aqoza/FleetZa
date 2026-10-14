@@ -198,6 +198,13 @@ export function useNotificationText() {
           }),
         };
       }
+      case "dispatch.urgent_job": {
+        const end = strParam(p, "window_end");
+        return {
+          title: t("notifications.msg.urgentJob.title", { number: ltrText(strParam(p, "doc_number")), title: bdiText(strParam(p, "title")) }),
+          body: end ? t("notifications.msg.urgentJob.body", { time: ltrText(formatDateTime(end)) }) : null,
+        };
+      }
       default:
         // Stored text is English: isolate it so it reads correctly inside Arabic UI.
         return { title: bdiText(n.title), body: n.body ? bdiText(n.body) : null };

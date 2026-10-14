@@ -162,4 +162,6 @@ export const arAutomation: Translation<typeof enAutomation, "ar"> = {
   "automation.ev.iot.alert": "تجاوز قراءة مستشعر لقاعدة تنبيه",
   "automation.ev.trip.dispatched": "إرسال رحلة",
   "automation.ev.trip.completed": "اكتمال رحلة",
+  "automation.ev.dispatch_job.assigned": "تخصيص مهمة إرسال",
+  "automation.ev.dispatch_job.completed": "اكتمال مهمة إرسال",
 };

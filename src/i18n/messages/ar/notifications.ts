@@ -158,4 +158,8 @@ export const arNotifications: Translation<typeof enNotifications, "ar"> = {
   "notifications.kind.iot.alert.desc": "تتجاوز قراءة مستشعر قاعدة تنبيه مفعّلة إشعاراتها.",
   "notifications.msg.iotAlert.title": "{rule}: {device}",
   "notifications.msg.iotAlert.body": "قراءة {metric} بلغت {value} (الحد {limit})",
+  "notifications.kind.dispatch.urgent_job": "مهام الإرسال العاجلة",
+  "notifications.kind.dispatch.urgent_job.desc": "تُنشأ مهمة جديدة بأولوية عاجلة.",
+  "notifications.msg.urgentJob.title": "مهمة عاجلة {number}: {title}",
+  "notifications.msg.urgentJob.body": "تحتاج إلى مركبة قبل {time}.",
 };

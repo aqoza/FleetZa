@@ -157,6 +157,14 @@ const RAISED_MESSAGES: Record<string, MessageKey> = {
   ILLEGAL_STOP_TRANSITION: "errors.illegalStopTransition",
   STOP_TRIP_NOT_STARTED: "errors.stopTripNotStarted",
   STOP_LIST_MISMATCH: "errors.stopListMismatch",
+  ILLEGAL_DISPATCH_TRANSITION: "errors.illegalDispatchTransition",
+  DISPATCH_JOB_LOCKED: "errors.dispatchJobLocked",
+  DISPATCH_NOT_DELETABLE: "errors.dispatchNotDeletable",
+  DISPATCH_NOT_ASSIGNED: "errors.dispatchNotAssigned",
+  DISPATCH_VEHICLE_UNAVAILABLE: "errors.dispatchVehicleUnavailable",
+  DISPATCH_VEHICLE_BUSY: "errors.dispatchVehicleBusy",
+  DISPATCH_DRIVER_BUSY: "errors.dispatchDriverBusy",
+  DISPATCH_JOB_NOT_FOUND: "errors.dispatchJobNotFound",
 };
 
 /**

@@ -119,4 +119,8 @@ export const enNotifications = {
   "notifications.kind.iot.alert.desc": "An IoT sensor reading breaks an alert rule that has notifications turned on.",
   "notifications.msg.iotAlert.title": "{rule}: {device}",
   "notifications.msg.iotAlert.body": "{metric} reading {value} (limit {limit})",
+  "notifications.kind.dispatch.urgent_job": "Urgent dispatch jobs",
+  "notifications.kind.dispatch.urgent_job.desc": "A new job is created with urgent priority.",
+  "notifications.msg.urgentJob.title": "Urgent job {number}: {title}",
+  "notifications.msg.urgentJob.body": "Needs a vehicle before {time}.",
 } as const;

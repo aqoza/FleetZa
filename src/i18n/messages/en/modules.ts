@@ -17,7 +17,7 @@ export const enModules = {
   "modules.trip_planning.name": "Trip Planning",
   "modules.trip_planning.description": "Plan multi-stop trips, avoid double-booking vehicles and drivers, and compare plan with actuals.",
   "modules.dispatch.name": "Dispatch Management",
-  "modules.dispatch.description": "Assign jobs to drivers and vehicles and follow their progress in real time.",
+  "modules.dispatch.description": "Assign jobs to vehicles and drivers, follow each one to completion and watch time windows.",
 
   // --- Maintenance & workshop ---
   "modules.maintenance.name": "Vehicle Maintenance",

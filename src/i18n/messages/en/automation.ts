@@ -152,4 +152,6 @@ export const enAutomation = {
   "automation.ev.iot.alert": "A sensor reading breaks an IoT alert rule",
   "automation.ev.trip.dispatched": "A trip is dispatched",
   "automation.ev.trip.completed": "A trip is completed",
+  "automation.ev.dispatch_job.assigned": "A dispatch job is assigned",
+  "automation.ev.dispatch_job.completed": "A dispatch job is completed",
 } as const;

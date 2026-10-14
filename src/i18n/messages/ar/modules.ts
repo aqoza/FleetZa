@@ -17,7 +17,7 @@ export const arModules: Record<keyof typeof enModules, string> = {
   "modules.trip_planning.name": "تخطيط الرحلات",
   "modules.trip_planning.description": "خطط رحلات متعددة المحطات وتجنب الحجز المزدوج للمركبات والسائقين وقارن المخطط بالفعلي.",
   "modules.dispatch.name": "إدارة الإرسال",
-  "modules.dispatch.description": "أسند المهام إلى السائقين والمركبات وتابع تنفيذها في الوقت الفعلي.",
+  "modules.dispatch.description": "أسند المهام إلى المركبات والسائقين وتابع كل مهمة حتى إنجازها وراقب المواعيد.",
 
   // --- Maintenance & workshop ---
   "modules.maintenance.name": "صيانة المركبات",
