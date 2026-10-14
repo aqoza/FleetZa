@@ -2161,6 +2161,120 @@ export type Database = {
           total_employer_cost: number
           total_gross: number
           total_net: number
+      pos_order_lines: {
+        Row: {
+          created_at: string
+          description: string
+          discount_percent: number
+          id: string
+          inventory_item_id: string | null
+          line_discount: number
+          line_gross: number
+          line_net: number
+          line_tax: number
+          line_total: number
+          order_id: string
+          product_id: string
+          quantity: number
+          sort_order: number
+          tax_rate: number
+          tenant_id: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          discount_percent?: number
+          id?: string
+          inventory_item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          order_id: string
+          product_id: string
+          quantity: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id: string
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          discount_percent?: number
+          id?: string
+          inventory_item_id?: string | null
+          line_discount?: number
+          line_gross?: number
+          line_net?: number
+          line_tax?: number
+          line_total?: number
+          order_id?: string
+          product_id?: string
+          quantity?: number
+          sort_order?: number
+          tax_rate?: number
+          tenant_id?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_order_lines_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_lines_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_orders: {
+        Row: {
+          change_due: number
+          completed_at: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          currency_decimals: number
+          customer_id: string | null
+          discount_total: number
+          doc_number: string | null
+          id: string
+          notes: string | null
+          number: number | null
+          paid_card: number
+          paid_cash: number
+          paid_other: number
+          refund_of: string | null
+          register_id: string
+          session_id: string
+          status: string
+          subtotal: number
+          tax_total: number
+          tenant_id: string
+          total: number
           updated_at: string
           updated_by: string | null
         }
@@ -2187,6 +2301,29 @@ export type Database = {
           total_employer_cost?: number
           total_gross?: number
           total_net?: number
+          change_due?: number
+          completed_at?: string
+          created_at?: string
+          created_by?: string | null
+          currency: string
+          currency_decimals?: number
+          customer_id?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_card?: number
+          paid_cash?: number
+          paid_other?: number
+          refund_of?: string | null
+          register_id: string
+          session_id: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          total?: number
           updated_at?: string
           updated_by?: string | null
         }
@@ -2213,12 +2350,64 @@ export type Database = {
           total_employer_cost?: number
           total_gross?: number
           total_net?: number
+          change_due?: number
+          completed_at?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          currency_decimals?: number
+          customer_id?: string | null
+          discount_total?: number
+          doc_number?: string | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          paid_card?: number
+          paid_cash?: number
+          paid_other?: number
+          refund_of?: string | null
+          register_id?: string
+          session_id?: string
+          status?: string
+          subtotal?: number
+          tax_total?: number
+          tenant_id?: string
+          total?: number
           updated_at?: string
           updated_by?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "payroll_runs_tenant_id_fkey"
+            foreignKeyName: "pos_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_refund_of_fkey"
+            columns: ["refund_of"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_register_id_fkey"
+            columns: ["register_id"]
+            isOneToOne: false
+            referencedRelation: "pos_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -2300,6 +2489,100 @@ export type Database = {
           transport?: number
           unpaid_leave_days?: number
           unpaid_leave_deduction?: number
+      pos_registers: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+          warehouse_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string | null
+          warehouse_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_registers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_registers_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sessions: {
+        Row: {
+          cash_difference: number | null
+          closed_at: string | null
+          closed_by: string | null
+          closing_cash_counted: number | null
+          created_at: string
+          created_by: string | null
+          doc_number: string | null
+          expected_cash: number | null
+          id: string
+          notes: string | null
+          number: number | null
+          opened_at: string
+          opened_by: string | null
+          opening_cash: number
+          register_id: string
+          status: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_cash_counted?: number | null
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string
+          opened_by?: string | null
+          opening_cash?: number
+          register_id: string
+          status?: string
+          tenant_id?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -2338,6 +2621,23 @@ export type Database = {
           transport?: number
           unpaid_leave_days?: number
           unpaid_leave_deduction?: number
+          cash_difference?: number | null
+          closed_at?: string | null
+          closed_by?: string | null
+          closing_cash_counted?: number | null
+          created_at?: string
+          created_by?: string | null
+          doc_number?: string | null
+          expected_cash?: number | null
+          id?: string
+          notes?: string | null
+          number?: number | null
+          opened_at?: string
+          opened_by?: string | null
+          opening_cash?: number
+          register_id?: string
+          status?: string
+          tenant_id?: string
           updated_at?: string
           updated_by?: string | null
         }
@@ -2358,6 +2658,28 @@ export type Database = {
           },
           {
             foreignKeyName: "payslips_tenant_id_fkey"
+            foreignKeyName: "pos_sessions_closed_by_fkey"
+            columns: ["closed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_opened_by_fkey"
+            columns: ["opened_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_register_id_fkey"
+            columns: ["register_id"]
+            isOneToOne: false
+            referencedRelation: "pos_registers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_sessions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -5560,6 +5882,30 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      pos_checkout: {
+        Args: {
+          p_customer_id?: string
+          p_lines: Json
+          p_notes?: string
+          p_payments: Json
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      pos_close_session: {
+        Args: { p_counted_cash: number; p_notes?: string; p_session_id: string }
+        Returns: string
+      }
+      pos_daily_sales: {
+        Args: { p_from: string; p_to: string }
+        Returns: { day: string; orders: number; total: number }[]
+      }
+      pos_open_session: {
+        Args: { p_notes?: string; p_opening_cash?: number; p_register_id: string }
+        Returns: string
+      }
+      pos_refund: { Args: { p_order_id: string; p_reason?: string }; Returns: Json }
+      pos_session_summary: { Args: { p_session_id: string }; Returns: Json }
       record_webhook_attempt: {
         Args: {
           p_error?: string
